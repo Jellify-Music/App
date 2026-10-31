@@ -1,6 +1,6 @@
-import { Jellyfin } from '@jellyfin/sdk/lib/jellyfin'
+import { ServerAddressNotAvailableError } from '../../../../types/errors'
 import { JellyfinInfo } from '../../../info'
-import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
+import type { ConnectToServerResult } from '../types'
 
 /**
  * Attempts to connect to a Jellyfin server.
@@ -11,16 +11,11 @@ import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
  * @param serverAddress The server address to connect to.
  * @returns The public system info response and the normalized URL of the responding server.
  */
-export async function connectToServer(serverAddress: string): Promise<{
-	publicSystemInfoResponse: PublicSystemInfo
-	resolvedUrl: string
-}> {
-	if (!serverAddress) throw new Error('Server address was empty')
+export async function connectToServer(serverAddress: string): Promise<ConnectToServerResult> {
+	if (!serverAddress) throw new ServerAddressNotAvailableError()
 
-	const jellyfin = new Jellyfin(JellyfinInfo)
-
-	const candidates = await jellyfin.discovery.getRecommendedServerCandidates(serverAddress)
-	const best = jellyfin.discovery.findBestServer(candidates)
+	const candidates = await JellyfinInfo.discovery.getRecommendedServerCandidates(serverAddress)
+	const best = JellyfinInfo.discovery.findBestServer(candidates)
 
 	if (!best?.systemInfo?.Version) throw new Error('Unable to connect to Jellyfin')
 

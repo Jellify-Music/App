@@ -1,4 +1,5 @@
 import { H4, H5, XStack } from 'tamagui'
+import { usePublicServerInfo } from '../../../api/queries/public-server-info'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
@@ -7,7 +8,6 @@ import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
-import { useJellifyServer } from '../../../stores/auth'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
 import AnimatedRow from '../../Global/helpers/Animated/row'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
@@ -24,7 +24,8 @@ export default function PublicPlaylists(): React.JSX.Element {
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
 
-	const [server] = useJellifyServer()
+	const { data: server } = usePublicServerInfo()
+
 	const { width } = useSafeAreaFrame()
 
 	const publicPlaylistsExist = playlists && playlists.length > 0
@@ -47,7 +48,7 @@ export default function PublicPlaylists(): React.JSX.Element {
 				}}
 			>
 				<H4 marginLeft='2' maxWidth={width * 0.8} lineBreakStrategyIOS='standard'>
-					Playlists on {server?.name ?? 'Jellyfin'}
+					Playlists on {server?.ServerName ?? 'Jellyfin'}
 				</H4>
 				<Icon name='arrow-right' />
 			</XStack>

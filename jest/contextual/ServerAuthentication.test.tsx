@@ -27,6 +27,10 @@ jest.mock('../../src/api/mutations/authentication', () => ({
 	default: () => ({ mutate: mockAuthenticateUserByName, isPending: false }),
 }))
 
+jest.mock('../../src/api/queries/public-server-info', () => ({
+	usePublicServerInfo: () => ({ data: undefined }),
+}))
+
 function renderServerAuthentication() {
 	return render(
 		<SafeAreaProvider>
