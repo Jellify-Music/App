@@ -189,9 +189,9 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     text: 'High (320kbps)'
 - assertVisible:
-    text: 'Medium (192kbps)'
+    text: 'Medium (256kbps)'
 - assertVisible:
-    text: 'Low (128kbps)'
+    text: 'Low (192kbps)'
 - takeScreenshot: screenshots/settings/settings_playback
 
 # Exercise quality radio: tap High, screenshot, restore to Original
