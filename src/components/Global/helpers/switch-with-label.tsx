@@ -77,7 +77,7 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 				/>
 			</Switch>
 			{label && (
-				<Label size={props.size} htmlFor={id}>
+				<Label fontSize={props.size} htmlFor={id}>
 					{label}
 				</Label>
 			)}

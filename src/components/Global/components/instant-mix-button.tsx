@@ -37,7 +37,7 @@ export function InstantMixButton({
 }): React.JSX.Element {
 	return (
 		<Button
-			borderRadius={'4'}
+			borderRadius={'2'}
 			icon={<Icon name='access-point' color='success' size={'7'} />}
 			onPress={() =>
 				navigation.dispatch(

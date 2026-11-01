@@ -201,31 +201,6 @@ PODS:
     - ReactNativeDependencies
     - Yoga
   - PulsarHaptics (1.4.0)
-  - QuickCrypto (1.1.8):
-    - hermes-engine
-    - NitroModules
-    - RCTRequired
-    - RCTTypeSafety
-    - React-bridging
-    - React-callinvoker
-    - React-Core
-    - React-Core-prebuilt
-    - React-cxxstableapi
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
   - RCT-Folly (2024.11.18.00):
     - RCT-Folly/Default (= 2024.11.18.00)
     - ReactNativeDependencies
@@ -1680,29 +1655,6 @@ PODS:
     - ReactNativeDependencies
     - SwiftUIIntrospect (~> 1.0)
     - Yoga
-  - react-native-quick-base64 (3.0.1):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-bridging
-    - React-Core
-    - React-Core-prebuilt
-    - React-cxxstableapi
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
   - react-native-safe-area-context (5.10.1):
     - hermes-engine
     - RCTRequired
@@ -2347,7 +2299,7 @@ PODS:
     - ReactNativeDependencies
     - RNWorklets
     - Yoga
-  - RNScreens (4.30.0):
+  - RNScreens (4.30.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2370,9 +2322,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNScreens/common (= 4.30.0)
+    - RNScreens/common (= 4.30.1)
     - Yoga
-  - RNScreens/common (4.30.0):
+  - RNScreens/common (4.30.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2564,7 +2516,6 @@ DEPENDENCIES:
   - NitroPlayer (from `../node_modules/react-native-nitro-player`)
   - NitroSuperconfig (from `../node_modules/react-native-superconfig`)
   - Pulsar (from `../node_modules/react-native-pulsar`)
-  - QuickCrypto (from `../node_modules/react-native-quick-crypto`)
   - RCT-Folly (from `build/rndeps-facades/RCT-Folly`)
   - RCTDeprecation (from `build/rncore-facades/RCTDeprecation`)
   - RCTRequired (from `build/rncore-facades/RCTRequired`)
@@ -2611,7 +2562,6 @@ DEPENDENCIES:
   - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
-  - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-turbo-image (from `../node_modules/react-native-turbo-image`)
   - "react-native-vector-icons-material-design-icons (from `../node_modules/@react-native-vector-icons/material-design-icons`)"
@@ -2708,8 +2658,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-superconfig"
   Pulsar:
     :path: "../node_modules/react-native-pulsar"
-  QuickCrypto:
-    :path: "../node_modules/react-native-quick-crypto"
   RCT-Folly:
     :path: build/rndeps-facades/RCT-Folly
   RCTDeprecation:
@@ -2800,8 +2748,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-pager-view:
     :path: "../node_modules/react-native-pager-view"
-  react-native-quick-base64:
-    :path: "../node_modules/react-native-quick-base64"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-turbo-image:
@@ -2928,7 +2874,6 @@ SPEC CHECKSUMS:
   NitroSuperconfig: c58fbdb4a975776d2e2a0be596763d5a7513153f
   Pulsar: f6701d83d2995ffc8af1618fd1470946c4913143
   PulsarHaptics: 62d13e9ef63535263f110a925e587d5d027dc683
-  QuickCrypto: 2a204de556ea54d826650d87593f5afe698dba22
   RCT-Folly: 82921e585c0400eda46fac1068297aa9dfb035e4
   RCTDeprecation: e134f2a2c096a6450f5fcbbe949531f913a2ff04
   RCTRequired: f1a68295837ee8f91e112ed1b5694d12e7ff1784
@@ -2974,7 +2919,6 @@ SPEC CHECKSUMS:
   react-native-keyboard-controller: f146a3a36a2bdce995989b771885f1b9a61b8e77
   react-native-netinfo: 687391ecedb199c6d67fbc46c87cbae3277de967
   react-native-pager-view: b50ece85f1aa37b9ceeb8c421819012c66b7cf18
-  react-native-quick-base64: d530613fbc277aa6899775d17f3bc8390399026c
   react-native-safe-area-context: b1c9f15a36e597e9cef4c5526e209ef2645bc2e0
   react-native-turbo-image: 7b5b269e32c211a05e3c07d55695295ae294354c
   react-native-vector-icons-material-design-icons: 811f6c4447a60d8a66394644093dcffdc546772f
@@ -3020,7 +2964,7 @@ SPEC CHECKSUMS:
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: b5512a093e6923dd1c31fbdd8e6186cd0ebb3541
   RNReanimated: 3018727dbf272754d0f31ef73f619e49ade7baf0
-  RNScreens: 6d0d3b7819284dbf9f222899eb819f069fce4b8b
+  RNScreens: f15a5bda1ddeff8575b8ce41d83885b67129f84b
   RNSentry: b9534e0dc7cf1dbea3bc185ef6ba7ac24cb30a75
   RNSVG: c35beed3dcf6fd14b50ca1fc0d4214a17ec5334d
   RNWorklets: 488806637a21eb17812a48dadca7cb8c698c8cfd

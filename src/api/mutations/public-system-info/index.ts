@@ -1,39 +1,33 @@
 import { useMutation } from '@tanstack/react-query'
 import { connectToServer } from './utils'
-import { JellyfinServer } from '@/src/types/JellyfinServer'
-import useJellifyStore from '../../../stores/auth'
+import type { SetServerParams } from '../../../stores/auth/types'
 import { captureError, LoggingContext } from '../../../utils/logging'
+import useJellifyStore from '../../../stores/auth'
+import type {
+	ConnectToServerParams,
+	PublicSystemInfoMutation,
+	ConnectToServerResult,
+} from './types'
 
-interface PublicSystemInfoMutation {
-	serverAddress: string
-}
-
-interface ConnectToServerProps {
-	onSuccess?: (server: JellyfinServer) => void
-	onError?: (error: Error) => void
-}
-
-const useConnectToServer = ({ onSuccess, onError }: ConnectToServerProps) => {
-	const setServer = useJellifyStore((state) => state.setServer)
-
-	return useMutation({
-		mutationFn: ({ serverAddress }: PublicSystemInfoMutation) =>
-			connectToServer(serverAddress!),
+const useConnectToServer = ({ onSuccess, onError }: ConnectToServerParams) =>
+	useMutation<ConnectToServerResult, Error, PublicSystemInfoMutation>({
+		mutationFn: ({ serverAddress }) => connectToServer(serverAddress),
 		onSuccess: ({ publicSystemInfoResponse, resolvedUrl }, { serverAddress }) => {
 			if (!publicSystemInfoResponse.Version)
 				throw new Error(`Jellyfin instance did not respond`)
 
-			const server: JellyfinServer = {
+			if (!publicSystemInfoResponse.StartupWizardCompleted)
+				throw new Error(`Server has not been set up yet`)
+
+			const server: SetServerParams = {
 				url: resolvedUrl,
-				address: serverAddress!,
-				name: publicSystemInfoResponse.ServerName!,
-				version: publicSystemInfoResponse.Version!,
-				startUpComplete: publicSystemInfoResponse.StartupWizardCompleted!,
+				address: serverAddress,
+				publicSystemInfo: publicSystemInfoResponse,
 			}
 
-			setServer(server)
+			useJellifyStore.getState().setServer(server)
 
-			if (onSuccess) onSuccess(server)
+			onSuccess?.(server)
 		},
 		onError: (error: Error) => {
 			captureError(
@@ -42,11 +36,10 @@ const useConnectToServer = ({ onSuccess, onError }: ConnectToServerProps) => {
 				'An error occurred connecting to the Jellyfin instance',
 			)
 
-			setServer(undefined)
+			useJellifyStore.getState().setServer(undefined)
 
-			if (onError) onError(error)
+			onError?.(error)
 		},
 	})
-}
 
 export default useConnectToServer

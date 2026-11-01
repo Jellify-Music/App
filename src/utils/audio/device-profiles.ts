@@ -15,6 +15,7 @@
 
 import {
 	DeviceProfile,
+	DirectPlayProfile,
 	DlnaProfileType,
 	EncodingContext,
 	MediaStreamProtocol,
@@ -44,12 +45,12 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
 			}
 		case 'medium':
 			return {
-				AudioBitRate: 192_000,
+				AudioBitRate: 256_000,
 				MaxAudioBitDepth: '16',
 			}
 		case 'low':
 			return {
-				AudioBitRate: 128_000,
+				AudioBitRate: 192_000,
 				MaxAudioBitDepth: '16',
 			}
 		default:
@@ -60,8 +61,11 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
 	}
 }
 
+const LOSSLESS_CONTAINERS = new Set(['flac', 'alac', 'wav'])
+const LOSSLESS_CODECS = new Set(['alac', 'flac'])
+
 /**
- * A constant that defines the options for the {@link useDeviceProfile} hook - building the
+ * A function that defines the options for the {@link useDeviceProfile} hook - building the
  * {@link DeviceProfile}
  *
  * @param streamingQuality The {@link StreamingQuality} defined by the user in the settings
@@ -70,9 +74,6 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
  * Huge thank you to Bill on the Jellyfin Team for helping us with this! 💜
  * @see https://github.com/thornbill
  */
-const LOSSLESS_CONTAINERS = new Set(['flac', 'alac', 'wav'])
-const LOSSLESS_CODECS = new Set(['alac', 'flac'])
-
 export function getDeviceProfile(
 	streamingQuality: StreamingQuality,
 	type: SourceType,
@@ -99,11 +100,9 @@ export function getDeviceProfile(
 		MusicStreamingTranscodingBitrate: qualityParams?.AudioBitRate,
 		MaxStaticMusicBitrate:
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
-		MaxStreamingMusicBitrate:
-			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
 		TranscodingProfiles: profiles.TranscodingProfiles,
-	} as DeviceProfile
+	}
 }
 
 const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {

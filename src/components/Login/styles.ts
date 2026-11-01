@@ -8,5 +8,6 @@ export const loginStyles = StyleSheet.create({
 	headerSection: {
 		justifyContent: 'center',
 		alignItems: 'center',
+		flex: 1,
 	},
 })

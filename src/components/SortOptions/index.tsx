@@ -94,7 +94,7 @@ export default function SortOptions({
 	return (
 		<YStack padding='4' marginBottom={bottom} gap='4'>
 			<YStack gap='2'>
-				<SizableText fontWeight='6' size={'6'} marginBottom={'2'}>
+				<SizableText fontWeight='6' size={'3'} marginBottom={'2'}>
 					Sort By
 				</SizableText>
 				<RadioGroup value={effectiveSortBy} onValueChange={handleSortByChange}>
@@ -112,12 +112,13 @@ export default function SortOptions({
 			</YStack>
 
 			<YStack gap='2'>
-				<SizableText fontWeight='6' size={'6'} marginBottom={'2'}>
+				<SizableText fontWeight='6' size={'3'} marginBottom={'2'}>
 					Sort Order
 				</SizableText>
 				<RadioGroup
 					value={sortDescending ? 'descending' : 'ascending'}
 					onValueChange={handleSortOrderChange}
+					gap='3'
 				>
 					<YStack gap='2'>
 						<RadioGroupItemWithLabel

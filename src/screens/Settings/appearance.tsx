@@ -58,7 +58,7 @@ function ThemeOptionCard({
 			minWidth='45%'
 		>
 			<Icon size='7' name={option.icon} color={isSelected ? 'primary' : 'borderColor'} />
-			<SizableText size='2' fontWeight='6' flex={1}>
+			<SizableText fontSize='2' fontWeight='6' flex={1}>
 				{option.label}
 			</SizableText>
 			{isSelected && <Icon size='7' name='check-circle-outline' color='primary' />}
@@ -92,7 +92,7 @@ function ColorPresetCard({
 			minWidth='45%'
 		>
 			<YStack width={20} height={20} borderRadius={10} backgroundColor={palette.primary} />
-			<SizableText size='2' fontWeight='6' flex={1}>
+			<SizableText fontSize='2' fontWeight='6' flex={1}>
 				{preset.label}
 			</SizableText>
 			{isSelected && <Icon size='7' name='check-circle-outline' color='primary' />}
@@ -122,7 +122,7 @@ export default function AppearanceScreen(): React.JSX.Element {
 			>
 				<YStack padding='4' gap='6'>
 					<YStack gap='3'>
-						<SizableText size='2' fontWeight='6'>
+						<SizableText fontSize='3' fontWeight='6'>
 							Theme
 						</SizableText>
 						<XStack flexWrap='wrap' gap='2'>
@@ -138,7 +138,7 @@ export default function AppearanceScreen(): React.JSX.Element {
 					</YStack>
 
 					<YStack gap='3'>
-						<SizableText size='2' fontWeight='6'>
+						<SizableText fontSize='3' fontWeight='6'>
 							Color Scheme
 						</SizableText>
 						<XStack flexWrap='wrap' gap='2'>
@@ -155,10 +155,10 @@ export default function AppearanceScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='2' fontWeight='6'>
+							<SizableText fontSize='3' fontWeight='6'>
 								Hide Runtimes
 							</SizableText>
-							<SizableText size='1' color='borderColor'>
+							<SizableText fontSize='2' color='borderColor'>
 								Hide track duration lengths
 							</SizableText>
 						</YStack>
@@ -171,10 +171,10 @@ export default function AppearanceScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='2' fontWeight='6'>
+							<SizableText fontSize='3' fontWeight='6'>
 								Hide Card Indicators
 							</SizableText>
-							<SizableText size='1' color='borderColor'>
+							<SizableText fontSize='2' color='borderColor'>
 								Hide indicators on card corners
 							</SizableText>
 						</YStack>

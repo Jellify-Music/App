@@ -73,10 +73,10 @@ export default function PlaybackScreen(): React.JSX.Element {
 				>
 					<YStack gap='3'>
 						<YStack gap='1'>
-							<SizableText size='2' fontWeight='6'>
+							<SizableText fontSize='3' fontWeight='6'>
 								Streaming Quality
 							</SizableText>
-							<SizableText size='1' color='borderColor'>
+							<SizableText fontSize='2' color='borderColor'>
 								Changes apply to new tracks
 							</SizableText>
 						</YStack>
@@ -85,6 +85,7 @@ export default function PlaybackScreen(): React.JSX.Element {
 							onValueChange={(value) =>
 								setStreamingQuality(value as StreamingQuality)
 							}
+							gap='3'
 						>
 							<RadioGroupItemWithLabel
 								size='3'
@@ -99,22 +100,22 @@ export default function PlaybackScreen(): React.JSX.Element {
 							<RadioGroupItemWithLabel
 								size='3'
 								value={StreamingQuality.Medium}
-								label='Medium (192kbps)'
+								label='Medium (256kbps)'
 							/>
 							<RadioGroupItemWithLabel
 								size='3'
 								value={StreamingQuality.Low}
-								label='Low (128kbps)'
+								label='Low (192kbps)'
 							/>
 						</RadioGroup>
 					</YStack>
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='2' fontWeight='6'>
+							<SizableText fontSize='3' fontWeight='6'>
 								Audio Normalization
 							</SizableText>
-							<SizableText size='1' color='borderColor'>
+							<SizableText fontSize='2' color='borderColor'>
 								Normalize volume between tracks
 							</SizableText>
 						</YStack>
@@ -127,10 +128,10 @@ export default function PlaybackScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='2' fontWeight='6'>
+							<SizableText fontSize='3' fontWeight='6'>
 								Quality Badge
 							</SizableText>
-							<SizableText size='1' color='borderColor'>
+							<SizableText fontSize='2' color='borderColor'>
 								Display audio quality in player
 							</SizableText>
 						</YStack>
@@ -144,19 +145,24 @@ export default function PlaybackScreen(): React.JSX.Element {
 					<YStack alignItems='flex-start' gap='3'>
 						<XStack alignItems='center' justifyContent='space-between' width='100%'>
 							<YStack flex={1}>
-								<SizableText size='2' fontWeight='6'>
+								<SizableText fontSize='3' fontWeight='6'>
 									Track Lookahead
 								</SizableText>
-								<SizableText size='1' color='borderColor'>
+								<SizableText fontSize='2' color='borderColor'>
 									Number of upcoming tracks to prefetch
 								</SizableText>
 							</YStack>
 
 							<SizableText
-								size='4'
-								fontWeight='2'
+								fontSize='4'
+								fontWeight='6'
 								fontVariant={['tabular-nums']}
-								color='borderColor'
+								color='primary'
+								flexShrink={1}
+								borderWidth={'1'}
+								borderRadius={'2'}
+								borderColor='primary'
+								padding='2'
 							>
 								{lookahead}
 							</SizableText>

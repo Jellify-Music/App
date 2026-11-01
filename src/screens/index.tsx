@@ -1,6 +1,6 @@
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { H5, H6, SizableText, YStack } from 'tamagui'
+import { H6, SizableText, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
@@ -12,7 +12,6 @@ import AudioSpecsSheet from './Stats'
 import { getApi, getLibrary } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
-import MigrateDownloadsScreen from './MigrateDownloads'
 import {
 	addToPlaylistSheetPresentation,
 	bottomSheetPresentation,
@@ -26,6 +25,7 @@ import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
 import { useColorScheme } from 'react-native'
 import PlayerStack from './Player'
 import LoginStack from './Login'
+import PrivacyPolicyScreen from './PrivacyPolicy'
 
 /**
  * The root navigation stack for Jellify. Contains all top level screens, such as the login screen
@@ -96,13 +96,13 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetAllowedDetents: 'fitToContents',
 			},
 		},
-		MigrateDownloads: {
-			screen: MigrateDownloadsScreen,
+		PrivacyPolicy: {
+			screen: PrivacyPolicyScreen,
 			options: {
-				headerTitle: 'Migrate Downloads',
+				headerShown: false,
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
-				headerShown: false,
+				sheetGrabberVisible: true,
 			},
 		},
 	},

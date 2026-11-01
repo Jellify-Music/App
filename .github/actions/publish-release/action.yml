@@ -1,0 +1,67 @@
+name: Publish Release
+description: 'Create the tag and GitHub release, then announce it on Discord'
+inputs:
+  tag:
+    description: 'The tag to create (from generate-release-notes)'
+    required: true
+  title:
+    description: 'The release title (from generate-release-notes)'
+    required: true
+  body:
+    description: 'The release body (release_body from generate-release-notes)'
+    required: true
+  notes:
+    description: 'The narrative for the Discord message (release_notes from generate-release-notes)'
+    required: true
+  kind:
+    description: 'full for a store release, ota for an over-the-air update'
+    required: false
+    default: 'full'
+  commit:
+    description: 'The commit to tag. Defaults to the head of the default branch'
+    required: false
+    default: ''
+  artifacts:
+    description: 'Files to attach to the release'
+    required: false
+    default: ''
+  github_token:
+    description: 'Token for creating the tag and release'
+    required: true
+  discord_webhook_url:
+    description: 'Discord webhook to announce the release on'
+    required: true
+outputs:
+  release_url:
+    description: 'The URL of the GitHub release'
+    value: ${{ steps.release.outputs.html_url }}
+runs:
+  using: "composite"
+  steps:
+    # Written to a file so the body never passes through YAML or the shell
+    - name: 📝 Write the release body
+      shell: bash
+      env:
+        BODY: ${{ inputs.body }}
+      run: printf '%s\n' "$BODY" > release-body.md
+
+    - name: 🎉 Create GitHub Release
+      id: release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: ${{ inputs.tag }}
+        name: ${{ inputs.title }}
+        bodyFile: release-body.md
+        commit: ${{ inputs.commit }}
+        artifacts: ${{ inputs.artifacts }}
+        token: ${{ inputs.github_token }}
+
+    - name: 🗣️ Announce on Discord
+      shell: bash
+      env:
+        DISCORD_WEBHOOK_URL: ${{ inputs.discord_webhook_url }}
+        RELEASE_KIND: ${{ inputs.kind }}
+        RELEASE_TITLE: ${{ inputs.title }}
+        RELEASE_URL: ${{ steps.release.outputs.html_url }}
+        RELEASE_NOTES: ${{ inputs.notes }}
+      run: bun scripts/announce-release.js

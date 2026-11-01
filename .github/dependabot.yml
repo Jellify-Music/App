@@ -55,14 +55,6 @@ updates:
       day: "monday"
     open-pull-requests-limit: 15
 
-  # Root Gemfile (if used)
-  - package-ecosystem: "bundler"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 15
-
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
