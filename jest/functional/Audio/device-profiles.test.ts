@@ -121,7 +121,6 @@ describe('Lossless filtering', () => {
 	it.each(LOSSY_QUALITIES)('keeps lossy formats direct playing at %s quality', (quality) => {
 		expect(directPlays('ios', quality, 'mp3')).toBe(true)
 		expect(directPlays('ios', quality, 'm4a', 'aac')).toBe(true)
-		expect(directPlays('ios', quality, 'ogg', 'opus')).toBe(true)
 		expect(directPlays('android', quality, 'mp3')).toBe(true)
 		expect(directPlays('android', quality, 'ogg', 'opus')).toBe(true)
 	})
@@ -172,20 +171,16 @@ describe('Android direct play', () => {
 })
 
 describe('iOS direct play', () => {
-	it('streams Opus in Ogg as is on iOS', () => {
-		expect(directPlays('ios', StreamingQuality.Original, 'ogg', 'opus')).toBe(true)
-		expect(directPlays('ios', StreamingQuality.Original, 'opus', 'opus')).toBe(true)
-		expect(directPlays('ios', StreamingQuality.Original, 'oga', 'opus')).toBe(true)
-		expect(directPlays('ios', StreamingQuality.High, 'ogg', 'opus')).toBe(true)
+	it('transcodes Opus in Ogg, which fails to play as is on iOS', () => {
+		for (const quality of Object.values(StreamingQuality)) {
+			expect(directPlays('ios', quality, 'ogg', 'opus')).toBe(false)
+			expect(directPlays('ios', quality, 'opus', 'opus')).toBe(false)
+			expect(directPlays('ios', quality, 'oga', 'opus')).toBe(false)
+		}
 	})
 
-	it('caps direct played Opus at 2 channels', () => {
-		const opus = profileFor('ios', StreamingQuality.Original).CodecProfiles!.find(
-			(p) => p.Codec === 'opus',
-		)
-		expect(opus?.Conditions).toContainEqual(
-			expect.objectContaining({ Property: 'AudioChannels', Value: '2' }),
-		)
+	it('has no codec conditions', () => {
+		expect(profileFor('ios', StreamingQuality.Original).CodecProfiles).toBeUndefined()
 	})
 
 	it('always transcodes Vorbis, which iOS cannot decode', () => {
