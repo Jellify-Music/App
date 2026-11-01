@@ -250,6 +250,13 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)\
 [Zustand](https://github.com/pmndrs/zustand)
 
+### Made for Jellify
+
+We built these libraries for _Jellify_, and they're free for anyone to use in their own apps:
+
+[React Native Nitro Player](https://github.com/riteshshukla04/react-native-nitro-player)\
+[React Native Reanimated Slider](https://github.com/Jellify-Music/react-native-reanimated-slider)
+
 ### Opt-In Monitoring
 
 All logging and metrics gathering is _opt-in_ **by default**. This is merely here to help us make _Jellify_ better.
