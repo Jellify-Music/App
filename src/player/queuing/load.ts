@@ -12,7 +12,7 @@ import { LoadQueueResult } from './types'
 import uuid from 'react-native-uuid'
 
 export default async function loadQueue({
-	index = 0,
+	index,
 	tracklist,
 	queue,
 	shuffled = false,
@@ -21,8 +21,9 @@ export default async function loadQueue({
 
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
 
-	// Get the item at the start index
-	const startingTrack = tracklist[index]
+	// Get the item at the start index. When shuffling without a chosen
+	// starting track, there isn't one - any track can play first
+	const startingTrack = shuffled && index === undefined ? undefined : tracklist[index ?? 0]
 
 	const downloadedTracks = await ensureDownloadedTracks()
 
@@ -40,7 +41,7 @@ export default async function loadQueue({
 
 	// Handle if a shuffle was requested
 	if (shuffled && playlist.length > 1) {
-		const startingTrackId = startingTrack.Id
+		const startingTrackId = startingTrack?.Id
 		const mappedStartingTrack = playlist.find((track) => track.id === startingTrackId)
 
 		if (mappedStartingTrack) {
@@ -53,7 +54,9 @@ export default async function loadQueue({
 		}
 	}
 
-	const rawStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
+	const rawStartIndex = startingTrack
+		? playlist.findIndex((item) => item.id === startingTrack.Id)
+		: 0
 	const finalStartIndex = rawStartIndex >= 0 ? rawStartIndex : 0
 
 	await clearPlaylists()
