@@ -37,7 +37,7 @@ export const queryClient = new QueryClient({
 			retry(failureCount: number, error: Error) {
 				if (failureCount > MAX_RETRY_ATTEMPTS) return false
 
-				if (error.message.includes('Network Error') || error.message.includes('Timeout'))
+				if (error.message.includes('Network Error') || /timeout/i.test(error.message))
 					return false
 
 				return true

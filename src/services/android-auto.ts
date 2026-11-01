@@ -185,7 +185,7 @@ async function loadChildren(parentId: string): Promise<MediaItem[] | null> {
 			return [
 				pick('recents', 'Play it again', picks[0]),
 				pick('frequents', 'On Repeat', picks[1]),
-				pick('favorites', 'Favourites', picks[2]),
+				pick('favorites', 'Favorites', picks[2]),
 				...recentlyAdded
 					.filter((item) => item.Type === BaseItemKind.MusicAlbum)
 					.map((album) => tile('album', album, 'Recently added')),

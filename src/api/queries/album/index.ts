@@ -5,7 +5,7 @@ import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
 import { fetchAlbums } from './utils/album'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
+import { ApiLimits, LIBRARY_GC_TIME, MaxPages } from '../../../configs/querying/index.config'
 import { queryClient } from '../../../constants/query-client'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyLibrary } from '../../../stores/auth'
@@ -82,6 +82,7 @@ const useAlbums = () => {
 		initialPageParam: 0,
 		select: selectAlbums,
 		maxPages: MaxPages.Library,
+		gcTime: LIBRARY_GC_TIME,
 		getNextPageParam: (lastPage, allPages, lastPageParam) => {
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
