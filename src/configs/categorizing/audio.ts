@@ -1,0 +1,1 @@
+export const HIGH_BITRATE_THRESHOLD = 256_000

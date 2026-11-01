@@ -15,17 +15,17 @@
 
 import {
 	DeviceProfile,
+	DirectPlayProfile,
 	DlnaProfileType,
 	EncodingContext,
 	MediaStreamProtocol,
 } from '@jellyfin/sdk/lib/generated-client'
 import { capitalize } from 'lodash'
 import { SourceType } from '../../types/JellifyTrack'
-import StreamingQuality from '../../enums/audio-quality'
+import { StreamingQuality, DownloadQuality } from '../../enums/audio-quality'
 import uuid from 'react-native-uuid'
 import { Platform } from 'react-native'
-import { DownloadQuality } from '@/src/stores/settings/usage'
-import { AudioQuality } from '@/src/types/AudioQuality'
+import { AudioQuality } from '../../types/audio/quality'
 
 /**
  * Gets quality-specific parameters for transcoding
@@ -44,12 +44,12 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
 			}
 		case 'medium':
 			return {
-				AudioBitRate: 192_000,
+				AudioBitRate: 256_000,
 				MaxAudioBitDepth: '16',
 			}
 		case 'low':
 			return {
-				AudioBitRate: 128_000,
+				AudioBitRate: 192_000,
 				MaxAudioBitDepth: '16',
 			}
 		default:
@@ -60,8 +60,11 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
 	}
 }
 
+const LOSSLESS_CONTAINERS = new Set(['flac', 'alac', 'wav'])
+const LOSSLESS_CODECS = new Set(['alac', 'flac'])
+
 /**
- * A constant that defines the options for the {@link useDeviceProfile} hook - building the
+ * A function that defines the options for the {@link useDeviceProfile} hook - building the
  * {@link DeviceProfile}
  *
  * @param streamingQuality The {@link StreamingQuality} defined by the user in the settings
@@ -70,9 +73,6 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
  * Huge thank you to Bill on the Jellyfin Team for helping us with this! 💜
  * @see https://github.com/thornbill
  */
-const LOSSLESS_CONTAINERS = new Set(['flac', 'alac', 'wav'])
-const LOSSLESS_CODECS = new Set(['alac', 'flac'])
-
 export function getDeviceProfile(
 	streamingQuality: StreamingQuality,
 	type: SourceType,
@@ -99,12 +99,25 @@ export function getDeviceProfile(
 		MusicStreamingTranscodingBitrate: qualityParams?.AudioBitRate,
 		MaxStaticMusicBitrate:
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
-		MaxStreamingMusicBitrate:
-			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
-		TranscodingProfiles: profiles.TranscodingProfiles,
+		TranscodingProfiles: getTranscodingProfiles(profiles, type),
+		CodecProfiles: profiles.CodecProfiles,
 	} as DeviceProfile
 }
+
+const getTranscodingProfiles = (profiles: DeviceProfile, type: SourceType) =>
+	Platform.OS === 'android' && type === 'download'
+		? [
+				{
+					AudioCodec: 'opus',
+					Container: 'ogg',
+					Context: EncodingContext.Streaming,
+					MaxAudioChannels: '6',
+					Protocol: MediaStreamProtocol.Http,
+					Type: DlnaProfileType.Audio,
+				},
+			]
+		: (profiles.TranscodingProfiles ?? [])
 
 const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
@@ -135,7 +148,7 @@ const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 
 const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
-		...(UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles ?? []),
+		...UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles!,
 		{
 			Container: 'ogg',
 			Type: DlnaProfileType.Audio,
@@ -158,13 +171,22 @@ const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 			Type: DlnaProfileType.Audio,
 		},
 	],
+	/**
+	 * ExoPlayer can't seek in a progressive transcode: it has no length, so every seek starts the
+	 * track over.
+	 *
+	 * HLS splits the transcode into segments, which ExoPlayer seeks between natively.
+	 * Downloads still use the progressive profile, since they need a single file.
+	 */
 	TranscodingProfiles: [
 		{
-			AudioCodec: 'opus',
-			Container: 'ogg',
+			AudioCodec: 'aac',
+			Container: 'ts',
 			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
+			MinSegments: 1,
+			BreakOnNonKeyFrames: true,
+			Protocol: MediaStreamProtocol.Hls,
 			Type: DlnaProfileType.Audio,
 		},
 	],

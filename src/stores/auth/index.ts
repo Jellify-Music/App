@@ -10,36 +10,24 @@ import { Api } from '@jellyfin/sdk'
 import { JellyfinInfo } from '../../api/info'
 import AXIOS_INSTANCE from '../../configs/networking/axios.config'
 import { queryClient } from '../../constants/query-client'
-
-type JellifyStore = {
-	server: JellyfinServer | undefined
-	setServer: (server: JellyfinServer | undefined) => void
-
-	user: JellifyUser | undefined
-	setUser: (user: JellifyUser | undefined) => void
-
-	library: JellifyLibrary | undefined
-	setLibrary: (library: JellifyLibrary | undefined) => void
-
-	migratedToNitroPlayer: boolean
-	setMigratedToNitroPlayer: (migrated: boolean) => void
-}
+import JellifyStore from './types'
+import { setServer, setUser } from './utils/set'
 
 const useJellifyStore = create<JellifyStore>()(
 	devtools(
 		persist(
-			(set) => ({
+			(set, get) => ({
 				server: storage.getString(MMKVStorageKeys.Server)
 					? (JSON.parse(storage.getString(MMKVStorageKeys.Server)!) as JellyfinServer)
 					: undefined,
 
-				setServer: (server: JellyfinServer | undefined) => set({ server }),
+				setServer: setServer(set, get),
 
 				user: storage.getString(MMKVStorageKeys.User)
 					? (JSON.parse(storage.getString(MMKVStorageKeys.User)!) as JellifyUser)
 					: undefined,
 
-				setUser: (user: JellifyUser | undefined) => set({ user }),
+				setUser: setUser(set),
 
 				library: storage.getString(MMKVStorageKeys.Library)
 					? (JSON.parse(storage.getString(MMKVStorageKeys.Library)!) as JellifyLibrary)
@@ -58,13 +46,6 @@ const useJellifyStore = create<JellifyStore>()(
 		),
 	),
 )
-
-export const useJellifyServer: () => [
-	JellyfinServer | undefined,
-	(user: JellyfinServer | undefined) => void,
-] = () => {
-	return useJellifyStore(useShallow((state) => [state.server, state.setServer] as const))
-}
 
 export const useJellifyUser: () => [
 	user: JellifyUser | undefined,

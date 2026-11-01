@@ -16,10 +16,12 @@ const JellifyToastConfig: (theme: ThemeParsed) => ToastConfig = (theme: ThemePar
 			},
 			text1Style: {
 				fontFamily: 'Figtree-Bold',
+				fontWeight: 'normal',
 				color: theme.color.val,
 			},
 			text2Style: {
 				fontFamily: 'Figtree-Bold',
+				fontWeight: 'normal',
 				color: theme.neutral.val,
 			},
 		}),
@@ -32,10 +34,12 @@ const JellifyToastConfig: (theme: ThemeParsed) => ToastConfig = (theme: ThemePar
 			},
 			text1Style: {
 				fontFamily: 'Figtree-Bold',
+				fontWeight: 'normal',
 				color: theme.color.val,
 			},
 			text2Style: {
 				fontFamily: 'Figtree-Bold',
+				fontWeight: 'normal',
 				color: theme.neutral.val,
 			},
 		}),
@@ -48,10 +52,12 @@ const JellifyToastConfig: (theme: ThemeParsed) => ToastConfig = (theme: ThemePar
 			},
 			text1Style: {
 				fontFamily: 'Figtree-Bold',
+				fontWeight: 'normal',
 				color: theme.color.val,
 			},
 			text2Style: {
 				fontFamily: 'Figtree-Bold',
+				fontWeight: 'normal',
 				color: theme.neutral.val,
 			},
 		}),

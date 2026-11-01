@@ -178,6 +178,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Home screen access to previously played tracks, artists, and your playlists
 - Quick access to similar artists and items for discovering music in your library
 - Jellyfin playback reporting and [Last.FM Plugin](https://github.com/jesseward/jellyfin-plugin-lastfm) support
+- Quick Connect Support
 - Full Library Browsing
 - Playlist support, including creating, updating, and reordering
 - Offline Playback
@@ -193,24 +194,23 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ### Roadmap
 
-#### 1.2.0 (We Made a Language For Us Two...) - June '26
-- Quick Connect Support
+#### 1.4 - If You Plant Ice, You're Gonna Harvest Wind - December '26
 - Websocket Support (Server online status)
 - Collaborative Playlists
 - EQ Controls
-
-#### 1.3.0 (Endless Summer) - September '26
-- App Customization Options
-- Autoplay Integration
 - Allow Self-Signed Certificates
 
-#### 2.0.0  - December '26
+#### 1.5 - March '27
+- App Customization Options
+
+#### 2.0.0 - December '27
 - Watch Support
 - Desktop Support (Experimental)
 - Tablet Support
-- Seerr (formerly Jellyseerr) Integration
 
 #### 3.0.0 - TBD
+- Seerr (formerly Jellyseerr) Integration
+- Autoplay Integration
 - tvOS (Apple and Android)
 - JellyJam (Collaborative Queue)
 
@@ -250,6 +250,13 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)\
 [Zustand](https://github.com/pmndrs/zustand)
 
+### Made for Jellify
+
+We built these libraries for _Jellify_, and they're free for anyone to use in their own apps:
+
+[React Native Nitro Player](https://github.com/riteshshukla04/react-native-nitro-player)\
+[React Native Reanimated Slider](https://github.com/Jellify-Music/react-native-reanimated-slider)
+
 ### Opt-In Monitoring
 
 All logging and metrics gathering is _opt-in_ **by default**. This is merely here to help us make _Jellify_ better.
@@ -269,10 +276,6 @@ All logging goes through three shared utilities in [`src/utils/logging/index.ts`
 | `captureInfo(context, message)` | Info | Console-only — never sent to Sentry |
 
 In production builds, all `console.*` methods are replaced with no-ops so that no debug output leaks — logs only surface through the explicit capture call path.
-
-#### Usage Analytics — [TelemetryDeck](https://telemetrydeck.com)
-
-Anonymous usage signals are sent via [`@typedigital/telemetrydeck-react`](https://github.com/typedigital/telemetrydeck-react). The only signal currently sent is `Jellify launched` on app open. All signals are anonymous (`clientUser: 'anonymous'`) and are only sent when you have opted in to metrics.
 
 ### Love from Wisconsin 🧀
 
