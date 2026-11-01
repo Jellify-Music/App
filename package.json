@@ -36,7 +36,7 @@
     "postinstall": "bun run generate-config && patch-package"
   },
   "dependencies": {
-    "@jellify-music/react-native-reanimated-slider": "0.5.0",
+    "@jellify-music/react-native-reanimated-slider": "0.5.1",
     "@jellyfin/sdk": "0.13.0",
     "@legendapp/list": "3.7.0",
     "@react-native-clipboard/clipboard": "1.16.3",

@@ -10,7 +10,7 @@ import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 
 export default function FrequentArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()

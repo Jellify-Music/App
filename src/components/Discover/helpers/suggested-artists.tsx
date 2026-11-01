@@ -8,7 +8,7 @@ import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { useDiscoverArtists } from '../../../api/queries/suggestions'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 

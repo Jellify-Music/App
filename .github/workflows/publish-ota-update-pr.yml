@@ -17,7 +17,7 @@ jobs:
     if: github.repository == 'Jellify-Music/App'
     # Fork PRs go to GitHub's runners, never Jellify's own hardware. A
     # missing head repo (deleted fork) counts as a fork.
-    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'ubuntu-latest' || fromJSON('["self-hosted", "Linux"]') }}
+    runs-on: ['ubuntu-latest']
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v6

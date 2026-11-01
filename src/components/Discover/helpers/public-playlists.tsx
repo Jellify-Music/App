@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 
 export default function PublicPlaylists(): React.JSX.Element {
 	const result = usePublicPlaylists()
