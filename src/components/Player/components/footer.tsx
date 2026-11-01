@@ -8,7 +8,9 @@ import useRawLyrics from '../../../api/queries/lyrics'
 import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { CastButton, CastState } from 'react-native-nitro-player'
 import { usePlayerContext } from '../../../providers/Player'
-import { StyleSheet } from 'react-native'
+import { Pressable, StyleSheet } from 'react-native'
+import { CastIcon as HolidayCastIcon, QueueIcon } from '../../Holidays/player-icons'
+import { useIsHolidays } from '../../Holidays/hooks'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -17,18 +19,38 @@ export default function Footer(): React.JSX.Element {
 
 	const theme = useTheme()
 
+	const isHolidays = useIsHolidays()
+
 	const { data: lyrics } = useRawLyrics()
 
 	return (
-		<XStack justifyContent='center' alignItems='center' gap='3'>
+		// Holidays: the design's footer icons sit 10px from the screen edge, in 48px boxes
+		<XStack
+			justifyContent='center'
+			alignItems='center'
+			gap='3'
+			marginHorizontal={isHolidays ? -8 : undefined}
+		>
 			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
-				<Icon
-					size='7'
-					testID='queue-button-test-id'
-					name='playlist-music'
-					onPress={() => setPage(1)}
-					{...ICON_PRESS_STYLES}
-				/>
+				{isHolidays ? (
+					<Pressable
+						testID='queue-button-test-id'
+						accessibilityRole='button'
+						accessibilityLabel='Queue'
+						onPress={() => setPage(1)}
+						style={styles.holidayButton}
+					>
+						<QueueIcon color={theme.color.val} />
+					</Pressable>
+				) : (
+					<Icon
+						size='7'
+						testID='queue-button-test-id'
+						name='playlist-music'
+						onPress={() => setPage(1)}
+						{...ICON_PRESS_STYLES}
+					/>
+				)}
 			</XStack>
 
 			<Spacer flex={1} />
@@ -53,7 +75,7 @@ export default function Footer(): React.JSX.Element {
 					color={theme.color.val}
 					activeColor={theme.primary.val}
 					hideWhenNoDevices={false}
-					renderIcon={CastIcon}
+					renderIcon={isHolidays ? HolidayCast : CastIcon}
 				/>
 			</YStack>
 		</XStack>
@@ -71,7 +93,23 @@ function CastIcon({ isCasting }: CastIconProps) {
 	return <Icon name='cast-audio' size='7' color={color} />
 }
 
+function HolidayCast({ isCasting }: CastIconProps) {
+	const theme = useTheme()
+
+	return (
+		<Pressable style={styles.holidayButton} pointerEvents='none'>
+			<HolidayCastIcon color={isCasting ? theme.primary.val : theme.color.val} />
+		</Pressable>
+	)
+}
+
 const styles = StyleSheet.create({
+	holidayButton: {
+		width: 48,
+		height: 48,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
 	castButton: {
 		flex: 1,
 		paddingHorizontal: 4,

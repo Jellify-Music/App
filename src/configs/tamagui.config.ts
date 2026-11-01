@@ -59,7 +59,10 @@ type PresetModePalette = {
 	background75: string
 	background50: string
 	background25: string
+	/** Muted text / icon color. Also the default outline color for presets without `outline` */
 	borderColor: string
+	/** Hairlines and card outlines, when they should differ from the muted text color */
+	outline?: string
 	color: string
 	success: string
 	secondary: string
@@ -75,7 +78,7 @@ type PresetModePalette = {
 
 /** Palettes per preset (purple = current Jellify themes), for Tamagui + nav */
 export const PRESET_PALETTES: Record<
-	'purple' | 'ocean' | 'forest' | 'sunset' | 'peanut',
+	'purple' | 'ocean' | 'forest' | 'sunset' | 'peanut' | 'holidays',
 	{ light: PresetModePalette; dark: PresetModePalette; oled: PresetModePalette }
 > = {
 	purple: {
@@ -359,9 +362,70 @@ export const PRESET_PALETTES: Record<
 			albumButtonBackground: 'rgb(71, 56, 46)',
 		},
 	},
+	// Christmas theme: holly red + pine green + gold. Values come from the Holidays design
+	// (the design's "dark" artboards are the OLED variant)
+	holidays: {
+		dark: {
+			background: '#0B1710',
+			background75: 'rgba(11, 23, 16, 0.75)',
+			background50: 'rgba(11, 23, 16, 0.5)',
+			background25: 'rgba(11, 23, 16, 0.25)',
+			borderColor: '#A9BBAF',
+			outline: '#3A5244',
+			color: '#F5F1E8',
+			success: '#46A872',
+			secondary: '#E8C36A',
+			primary: '#F2555A',
+			danger: '#C42638',
+			warning: '#E8C36A',
+			neutral: '#8A9B90',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgba(242, 85, 90, 0.14)',
+			albumButtonText: '#0B1710',
+			albumButtonBackground: '#E8C36A',
+		},
+		light: {
+			background: '#FBF8F1',
+			background75: 'rgba(251, 248, 241, 0.75)',
+			background50: 'rgba(251, 248, 241, 0.5)',
+			background25: 'rgba(251, 248, 241, 0.25)',
+			borderColor: '#4F5E55',
+			outline: '#B9B09E',
+			color: '#14201A',
+			success: '#1E6A44',
+			secondary: '#B8861F',
+			primary: '#B3261E',
+			danger: '#A3172A',
+			warning: '#B8861F',
+			neutral: '#5E6B63',
+			translucent: 'rgba(255, 255, 255, 0.75)',
+			play: 'rgba(179, 38, 30, 0.08)',
+			albumButtonText: '#FFFFFF',
+			albumButtonBackground: '#1E6A44',
+		},
+		oled: {
+			background: '#050B08',
+			background75: 'rgba(5, 11, 8, 0.75)',
+			background50: 'rgba(5, 11, 8, 0.5)',
+			background25: 'rgba(5, 11, 8, 0.25)',
+			borderColor: '#A9BBAF',
+			outline: '#3A5244',
+			color: '#F5F1E8',
+			success: '#46A872',
+			secondary: '#E8C36A',
+			primary: '#F2555A',
+			danger: '#C42638',
+			warning: '#E8C36A',
+			neutral: '#8A9B90',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgba(242, 85, 90, 0.14)',
+			albumButtonText: '#050B08',
+			albumButtonBackground: '#E8C36A',
+		},
+	},
 }
 
-const presetNames = ['purple', 'ocean', 'forest', 'sunset', 'peanut'] as const
+const presetNames = ['purple', 'ocean', 'forest', 'sunset', 'peanut', 'holidays'] as const
 
 /**
  * Tamagui v3 components (ToggleGroup items, interactive frames, etc.) style their
@@ -370,6 +434,7 @@ const presetNames = ['purple', 'ocean', 'forest', 'sunset', 'peanut'] as const
  */
 const withInteractionStates = (palette: PresetModePalette) => ({
 	...palette,
+	outline: palette.outline ?? palette.borderColor,
 	'border-color': palette.borderColor,
 	'border-color-hover': palette.primary,
 	'border-color-press': palette.primary,

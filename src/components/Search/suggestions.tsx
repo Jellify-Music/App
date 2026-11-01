@@ -13,12 +13,15 @@ import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/messaging/search'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import List from '../Global/components/Lists/utils'
+import { useIsHolidays } from '../Holidays/hooks'
 
 interface SuggestionsHeaderProps {
 	suggestions?: BaseItemDto[]
 }
 
 function SuggestionsHeader({ suggestions }: SuggestionsHeaderProps): React.JSX.Element {
+	const isHolidays = useIsHolidays()
+
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
 
 	const suggestedArtists = suggestions?.filter((suggestion) => suggestion.Type === 'MusicArtist')
@@ -38,9 +41,18 @@ function SuggestionsHeader({ suggestions }: SuggestionsHeaderProps): React.JSX.E
 
 	return (
 		<YStack accessibilityLabel='Suggested artists' marginTop='2'>
-			<SizableText fontWeight='6' size={'4'}>
-				Suggestions
-			</SizableText>
+			{isHolidays ? (
+				// Design: a 21px extra bold heading with 18px / 6px padding
+				<YStack paddingHorizontal={18} paddingVertical={6}>
+					<SizableText fontSize={21} fontWeight='700'>
+						Suggestions
+					</SizableText>
+				</YStack>
+			) : (
+				<SizableText fontWeight='6' size={'4'}>
+					Suggestions
+				</SizableText>
+			)}
 
 			<HorizontalCardList data={suggestedArtists} renderItem={renderItem} />
 		</YStack>

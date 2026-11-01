@@ -4,6 +4,8 @@ import InternetConnectionWatcher from '../../components/Network/internetConnecti
 import { BottomTabBar, BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import useIsMiniPlayerActive from '../../hooks/use-mini-player'
 import { useTheme } from 'tamagui'
+import HolidayTabBar from '../../components/Holidays/tab-bar'
+import { useIsHolidays } from '../../components/Holidays/hooks'
 
 /**
  * Merge theme-driven tab bar options into the focused route's descriptor
@@ -12,6 +14,7 @@ import { useTheme } from 'tamagui'
  */
 export default function TabBar(props: BottomTabBarProps): React.JSX.Element {
 	const isMiniPlayerActive = useIsMiniPlayerActive()
+	const isHolidays = useIsHolidays()
 	const theme = useTheme()
 
 	const descriptorsWithTheme = (() => {
@@ -29,7 +32,9 @@ export default function TabBar(props: BottomTabBarProps): React.JSX.Element {
 						backgroundColor: theme.background.val,
 					},
 					tabBarActiveTintColor: theme.primary.val,
-					tabBarInactiveTintColor: theme.borderColor.val,
+					// `neutral` equals `borderColor` in every preset except Holidays, where the
+					// design wants a dimmer inactive tab than the muted text color
+					tabBarInactiveTintColor: theme.neutral.val,
 				},
 			},
 		}
@@ -44,7 +49,11 @@ export default function TabBar(props: BottomTabBarProps): React.JSX.Element {
 			{isMiniPlayerActive && <Miniplayer key={themeKey} />}
 			<InternetConnectionWatcher />
 
-			<BottomTabBar {...props} descriptors={descriptorsWithTheme} />
+			{isHolidays ? (
+				<HolidayTabBar {...props} />
+			) : (
+				<BottomTabBar {...props} descriptors={descriptorsWithTheme} />
+			)}
 		</>
 	)
 }

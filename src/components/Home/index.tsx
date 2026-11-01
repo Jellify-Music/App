@@ -9,6 +9,7 @@ import useHomeQueries from '../../api/mutations/home'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { useIsRestoring } from '@tanstack/react-query'
 import { useRecentlyPlayedTracks } from '../../api/queries/recents'
+import { useIsHolidays } from '../Holidays/hooks'
 
 const COMPONENT_NAME = 'Home'
 
@@ -25,6 +26,8 @@ export function Home(): React.JSX.Element {
 
 	const isRestoring = useIsRestoring()
 
+	const isHolidays = useIsHolidays()
+
 	const onRefresh = async () => {
 		await refresh()
 	}
@@ -34,6 +37,8 @@ export function Home(): React.JSX.Element {
 			contentInsetAdjustmentBehavior='automatic'
 			contentContainerStyle={{
 				paddingVertical: getToken('2'),
+				// Holidays: the design starts its first heading 5px higher
+				...(isHolidays && { paddingTop: Math.max(getToken('2') - 5, 0) }),
 			}}
 			refreshControl={
 				<RefreshControl
@@ -43,14 +48,15 @@ export function Home(): React.JSX.Element {
 				/>
 			}
 		>
-			<HomeContent />
+			<HomeContent isHolidays={isHolidays} />
 		</ScrollView>
 	)
 }
 
-function HomeContent(): React.JSX.Element {
+function HomeContent({ isHolidays }: { isHolidays: boolean }): React.JSX.Element {
 	return (
-		<YStack alignContent='flex-start' gap='3'>
+		// Holidays: sections sit 215px apart in the design, 12px more than the stock spacing
+		<YStack alignContent='flex-start' gap={isHolidays ? getToken('3') + 18 : '3'}>
 			<RecentArtists />
 
 			<RecentlyPlayed />

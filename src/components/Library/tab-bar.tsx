@@ -1,5 +1,10 @@
 import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import React from 'react'
+import { View } from 'react-native'
+import HolidayTabIndicator from '../Holidays/library-indicator'
+import StringLights from '../Holidays/lights'
+import { useIsHolidays } from '../Holidays/hooks'
+import { LIGHTS_HEIGHT } from '../Holidays/tokens'
 import { XStack, YStack, useTheme, SizableText } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -16,6 +21,8 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const insets = useSafeAreaInsets()
+
+	const isHolidays = useIsHolidays()
 
 	const { darkBackground75 } = useTheme()
 
@@ -62,16 +69,36 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	}
 
 	return (
-		<YStack marginTop={insets.top} style={tabBarShadowStyle}>
-			<MaterialTopTabBar {...props} />
+		<YStack
+			// Holidays: the design starts the tab strip 4px higher and drops the shadow
+			marginTop={isHolidays ? insets.top - 4 : insets.top}
+			style={isHolidays ? undefined : tabBarShadowStyle}
+		>
+			<View>
+				<MaterialTopTabBar {...props} />
+
+				{isHolidays && (
+					<HolidayTabIndicator
+						index={props.state.index}
+						count={props.state.routes.length}
+					/>
+				)}
+			</View>
+
+			{isHolidays && (
+				<View style={{ height: LIGHTS_HEIGHT }}>
+					<StringLights />
+				</View>
+			)}
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
 					alignContent={'flex-start'}
 					justifyContent='flex-start'
-					paddingHorizontal='1'
-					paddingVertical='2'
-					gap='2'
+					// Holidays: the design's Sort / Filter row is 36px tall with 14px between buttons
+					{...(isHolidays
+						? { alignItems: 'center', height: 36, paddingHorizontal: 4, gap: 14 }
+						: { paddingHorizontal: '1', paddingVertical: '2', gap: '2' })}
 				>
 					{props.state.routes[props.state.index].name === 'Playlists' && (
 						<XStack

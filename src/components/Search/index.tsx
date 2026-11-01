@@ -18,8 +18,12 @@ import { SEARCH_PLACEHOLDERS } from '../../configs/messaging/search'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import useSearchResults from '../../api/queries/search'
 import List from '../Global/components/Lists/utils'
+import HolidaySearchField from '../Holidays/search-field'
+import { useIsHolidays } from '../Holidays/hooks'
 
 export default function Search(): React.JSX.Element {
+	const isHolidays = useIsHolidays()
+
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
 
 	/**
@@ -80,15 +84,26 @@ export default function Search(): React.JSX.Element {
 			contentInsetAdjustmentBehavior='automatic'
 			ListHeaderComponent={
 				<YStack flex={1}>
-					<Input
-						placeholder={placeholder}
-						onChangeText={handleSearchStringUpdate}
-						value={inputValue}
-						testID='search-input'
-						accessibilityLabel='Search your library'
-						accessibilityHint='Type to search artists, albums, playlists, and songs'
-						clearButtonMode='always'
-					/>
+					{isHolidays ? (
+						<HolidaySearchField
+							placeholder={placeholder}
+							onChangeText={handleSearchStringUpdate}
+							value={inputValue}
+							testID='search-input'
+							accessibilityLabel='Search your library'
+							accessibilityHint='Type to search artists, albums, playlists, and songs'
+						/>
+					) : (
+						<Input
+							placeholder={placeholder}
+							onChangeText={handleSearchStringUpdate}
+							value={inputValue}
+							testID='search-input'
+							accessibilityLabel='Search your library'
+							accessibilityHint='Type to search artists, albums, playlists, and songs'
+							clearButtonMode='always'
+						/>
+					)}
 
 					{!isEmpty(artistResults) && (
 						<YStack accessibilityLabel='Artist results' flex={1}>

@@ -7,6 +7,7 @@ import DiscoverStackParamList, { DiscoverAlbumScreenType } from './types'
 import { BaseStackScreens } from '../base-stack'
 import { stackScreenOptions } from '../navigation'
 import { getPublicServerInfo } from '../../api/queries/public-server-info'
+import { holidayHeaderOptions } from '../../components/Holidays/header-options'
 
 const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 	initialRouteName: 'Discover',
@@ -14,6 +15,10 @@ const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 	screens: {
 		Discover: {
 			screen: Index,
+			options: () => ({
+				title: 'Discover',
+				...holidayHeaderOptions({ icon: 'star', snow: { count: 26, seed: 41 } }),
+			}),
 		},
 		...BaseStackScreens,
 		Albums: {

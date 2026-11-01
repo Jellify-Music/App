@@ -3,6 +3,7 @@ import Search from '../../components/Search'
 import SearchParamList from './types'
 import { BaseStackScreens } from '../base-stack'
 import { stackScreenOptions } from '../navigation'
+import { holidayHeaderOptions } from '../../components/Holidays/header-options'
 
 const SearchStack = createNativeStackNavigator<SearchParamList>({
 	initialRouteName: 'SearchScreen',
@@ -10,9 +11,10 @@ const SearchStack = createNativeStackNavigator<SearchParamList>({
 	screens: {
 		SearchScreen: {
 			screen: Search,
-			options: {
+			options: () => ({
 				title: 'Search',
-			},
+				...holidayHeaderOptions({ icon: 'flake', snow: { count: 26, seed: 23 } }),
+			}),
 		},
 		...BaseStackScreens,
 	},

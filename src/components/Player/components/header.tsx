@@ -10,7 +10,7 @@ import Animated, {
 	useSharedValue,
 	withSpring,
 } from 'react-native-reanimated'
-import { LayoutChangeEvent } from 'react-native'
+import { LayoutChangeEvent, StyleSheet, View } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../screens/navigation'
 import { useQueueRef, useCurrentTrack } from '../../../stores/player/queue'
@@ -19,6 +19,13 @@ import { TextTickerConfig } from '../component.config'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { GestureDetector } from 'react-native-gesture-handler'
 import { useAlbumCoverGesture } from '../../../hooks/gestures/player'
+import SnowCap from '../../Holidays/snow-cap'
+import { useHolidayTokens, useIsHolidays } from '../../Holidays/hooks'
+import useIsLightMode from '../../../hooks/use-is-light-mode'
+
+/** Design offsets for the title row and the close chevron (design y = 57 vs 24, chevron 74 vs 35) */
+const HOLIDAY_HEADER_SHIFT = 33
+const HOLIDAY_CHEVRON_SHIFT = 6
 
 export default function PlayerHeader(): React.JSX.Element {
 	const queueRef = useQueueRef()
@@ -31,9 +38,20 @@ export default function PlayerHeader(): React.JSX.Element {
 			? (queueRef.Name ?? 'Untitled')
 			: queueRef
 
+	const isHolidays = useIsHolidays()
+
 	return (
 		<YStack flex={1} justifyContent='flex-start'>
-			<XStack alignContent='flex-start' flexShrink={1} justifyContent='center'>
+			<XStack
+				alignContent='flex-start'
+				flexShrink={1}
+				justifyContent='center'
+				// Holidays: the design hangs lights across the top, so the title row sits lower.
+				// A transform, so the artwork below keeps its layout position.
+				style={
+					isHolidays ? { transform: [{ translateY: HOLIDAY_HEADER_SHIFT }] } : undefined
+				}
+			>
 				<MaterialDesignIcons
 					color={theme.color.val}
 					name={'chevron-down'}
@@ -45,6 +63,7 @@ export default function PlayerHeader(): React.JSX.Element {
 						marginVertical: 'auto',
 						width: 22,
 						marginRight: 8,
+						...(isHolidays && { transform: [{ translateY: HOLIDAY_CHEVRON_SHIFT }] }),
 					}}
 				/>
 
@@ -72,6 +91,10 @@ function PlayerArtwork(): React.JSX.Element {
 
 	const theme = useTheme()
 
+	const isHolidays = useIsHolidays()
+	const isLightMode = useIsLightMode()
+	const holidayTokens = useHolidayTokens()
+
 	const item = getTrackDto(nowPlaying)
 
 	const artworkMaxHeight = useSharedValue<number>(200)
@@ -80,16 +103,26 @@ function PlayerArtwork(): React.JSX.Element {
 	const animatedStyle = useAnimatedStyle(() => ({
 		width: withSpring(artworkMaxWidth.get(), SnappySpringConfig),
 		height: withSpring(artworkMaxWidth.get(), SnappySpringConfig),
-		boxShadow: [
-			{
-				offsetX: 0,
-				offsetY: 2,
-				blurRadius: withSpring(artworkMaxWidth.get() / 10, SnappySpringConfig),
-				spreadDistance: withSpring(artworkMaxWidth.get() / 25, SnappySpringConfig),
-				color: theme.darkBackground75.val,
-			},
-		],
-		borderRadius: Math.log(artworkMaxWidth.get()),
+		// Holidays: the design's softer, deeper drop shadow and 8px corners
+		boxShadow: isHolidays
+			? [
+					{
+						offsetX: 0,
+						offsetY: 18,
+						blurRadius: isLightMode ? 40 : 50,
+						color: isLightMode ? 'rgba(20, 32, 26, 0.35)' : 'rgba(0, 0, 0, 0.6)',
+					},
+				]
+			: [
+					{
+						offsetX: 0,
+						offsetY: 2,
+						blurRadius: withSpring(artworkMaxWidth.get() / 10, SnappySpringConfig),
+						spreadDistance: withSpring(artworkMaxWidth.get() / 25, SnappySpringConfig),
+						color: theme.darkBackground75.val,
+					},
+				],
+		borderRadius: isHolidays ? 8 : Math.log(artworkMaxWidth.get()),
 	}))
 
 	const handleLayout = (event: LayoutChangeEvent) => {
@@ -123,9 +156,26 @@ function PlayerArtwork(): React.JSX.Element {
 							testID='player-image-test-id'
 							imageOptions={{ maxWidth: 800, maxHeight: 800 }}
 						/>
+
+						{isHolidays && (
+							// Snow draped over the top edge, scaled with the artwork (316 x 40 on 300)
+							<View pointerEvents='none' style={styles.snowCap}>
+								<SnowCap size='large' fluid color={holidayTokens.cap} />
+							</View>
+						)}
 					</Animated.View>
 				)}
 			</GestureDetector>
 		</YStack>
 	)
 }
+
+const styles = StyleSheet.create({
+	snowCap: {
+		position: 'absolute',
+		left: '-2.667%',
+		top: '-4%',
+		width: '105.333%',
+		height: '13.333%',
+	},
+})

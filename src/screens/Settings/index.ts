@@ -13,6 +13,7 @@ import PlaybackScreen from './playback'
 import GesturesScreen from './gestures'
 import AppearanceScreen from './appearance'
 import { stackScreenOptions } from '../navigation'
+import { holidayHeaderOptions } from '../../components/Holidays/header-options'
 
 const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 	initialRouteName: 'Settings',
@@ -63,9 +64,10 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 		},
 		Appearance: {
 			screen: AppearanceScreen,
-			options: {
+			options: () => ({
 				title: 'Appearance',
-			},
+				...holidayHeaderOptions({ snow: { count: 22, seed: 57 } }),
+			}),
 		},
 		Gestures: {
 			screen: GesturesScreen,

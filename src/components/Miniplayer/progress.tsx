@@ -10,10 +10,31 @@ import Animated, {
 	Easing,
 } from 'react-native-reanimated'
 import { useTheme, YStack } from 'tamagui'
+import { StyleSheet, View, useWindowDimensions } from 'react-native'
+import CandyStripe from '../Holidays/candy-stripe'
+import { useHolidayTokens, useIsHolidays } from '../Holidays/hooks'
+
+const HOLIDAY_TRACK_HEIGHT = 3
+
+const styles = StyleSheet.create({
+	holidayTrack: {
+		height: HOLIDAY_TRACK_HEIGHT,
+		width: '100%',
+	},
+	holidayFill: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		height: HOLIDAY_TRACK_HEIGHT,
+	},
+})
 
 export default function MiniPlayerProgress(): React.JSX.Element {
 	const { position, totalDuration } = useProgress()
 	const theme = useTheme()
+	const isHolidays = useIsHolidays()
+	const holidayTokens = useHolidayTokens()
+	const { width } = useWindowDimensions()
 	const progressValue = useSharedValue(position === 0 ? 0 : (position / totalDuration) * 100)
 
 	const previousPosition = useRef<number>(position)
@@ -44,6 +65,29 @@ export default function MiniPlayerProgress(): React.JSX.Element {
 	const animatedStyle = useAnimatedStyle(() => ({
 		width: `${progressValue.get()}%`,
 	}))
+
+	if (isHolidays) {
+		// Candy cane track under a solid progress fill
+		return (
+			<View style={styles.holidayTrack}>
+				<CandyStripe
+					width={width}
+					height={HOLIDAY_TRACK_HEIGHT}
+					color={theme.primary.val}
+					cane={holidayTokens.cane}
+					band={5}
+					opacity={0.5}
+				/>
+				<Animated.View
+					style={[
+						animatedStyle,
+						styles.holidayFill,
+						{ backgroundColor: theme.primary.val },
+					]}
+				/>
+			</View>
+		)
+	}
 
 	return (
 		<YStack height='0-25' backgroundColor='borderColor' width={'100%'}>

@@ -47,7 +47,7 @@ function paletteToNavTheme(
 			...base.colors,
 			background: palette.background,
 			card: palette.background,
-			border: palette.borderColor,
+			border: palette.outline ?? palette.borderColor,
 			primary: palette.primary,
 		},
 		fonts: JellifyFonts,
