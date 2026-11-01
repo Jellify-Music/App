@@ -214,6 +214,7 @@ function EqualizerBandRow({ band, onGainChange }: EqualizerBandRowProps): React.
 
 			<YStack flex={1}>
 				<Slider
+					testID={`equalizer-band-slider-${band.index}`}
 					value={sliderValue}
 					onValueChange={handleValueChange}
 					maxValue={EQ_SLIDER_MAX}

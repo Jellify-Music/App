@@ -24,6 +24,8 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     id: 'settings-nav-playback'
 - assertVisible:
+    id: 'settings-nav-equalizer'
+- assertVisible:
     id: 'settings-nav-storage'
 - assertVisible:
     id: 'settings-nav-privacy-developer'
@@ -38,6 +40,8 @@ appId: com.cosmonautical.jellify
     text: 'Gestures'
 - assertVisible:
     text: 'Playback'
+- assertVisible:
+    text: 'Equalizer'
 - assertVisible:
     text: 'Storage'
 - assertVisible:
@@ -212,6 +216,13 @@ appId: com.cosmonautical.jellify
     visible:
       id: 'settings-screen-root'
     timeout: 5000
+
+# ============================================================
+# EQUALIZER — enable, apply presets, adjust band gains, reset
+# ============================================================
+- assertVisible:
+    id: 'settings-screen-root'
+- runFlow: equalizer.yaml
 
 # ============================================================
 # STORAGE — uses dedicated testID, scroll to download settings
