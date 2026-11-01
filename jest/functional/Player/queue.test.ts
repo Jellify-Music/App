@@ -330,6 +330,57 @@ describe('Queue - loadNewQueue', () => {
 
 		expect(TrackPlayer.play).not.toHaveBeenCalled()
 	})
+
+	describe('when shuffled', () => {
+		const dtos = ['a', 'b', 'c', 'd'].map(createDto)
+		const tracks = dtos.map((d) => createTrackItem(d.Id!, `https://example.com/${d.Id}.mp3`))
+
+		beforeEach(() => {
+			;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue(dtos)
+			;(mapDtoToTrack as jest.Mock).mockImplementation((dto: BaseItemDto) =>
+				tracks.find((t) => t.id === dto.Id),
+			)
+		})
+
+		afterEach(() => {
+			jest.spyOn(Math, 'random').mockRestore()
+		})
+
+		it('shuffles the first track too when no starting index is given', async () => {
+			// Math.random() -> 0 makes Fisher-Yates rotate the list: [b, c, d, a]
+			jest.spyOn(Math, 'random').mockReturnValue(0)
+
+			await loadNewQueue({
+				track: dtos[0],
+				tracklist: dtos,
+				queue: 'Library',
+				shuffled: true,
+				startPlayback: false,
+			})
+
+			const queued = (setNewQueue as jest.Mock).mock.calls[0][0] as TrackItem[]
+			expect(queued.map((t) => t.id)).toEqual(['b', 'c', 'd', 'a'])
+			expect(PlayerQueue.loadPlaylist).toHaveBeenCalledWith(expect.any(String), 0)
+		})
+
+		it('keeps the chosen track first when a starting index is given', async () => {
+			jest.spyOn(Math, 'random').mockReturnValue(0)
+
+			await loadNewQueue({
+				track: dtos[2],
+				index: 2,
+				tracklist: dtos,
+				queue: 'Library',
+				shuffled: true,
+				startPlayback: false,
+			})
+
+			const queued = (setNewQueue as jest.Mock).mock.calls[0][0] as TrackItem[]
+			expect(queued[0].id).toBe('c')
+			expect(queued.map((t) => t.id).sort()).toEqual(['a', 'b', 'c', 'd'])
+			expect(PlayerQueue.loadPlaylist).toHaveBeenCalledWith(expect.any(String), 0)
+		})
+	})
 })
 
 describe('Queue - reorderQueue', () => {
