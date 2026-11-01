@@ -124,8 +124,8 @@ describe('EqualizerScreen', () => {
 		mockPresets()
 	})
 
-	it('renders the enable toggle and ten band rows', () => {
-		const { getByTestId, getAllByTestId, getByText } = renderScreen()
+	it('renders the enable toggle and ten band rows', async () => {
+		const { getByTestId, getAllByTestId, getByText } = await renderScreen()
 
 		expect(getByTestId('equalizer-enabled-switch')).toBeTruthy()
 		expect(getAllByTestId(/equalizer-band-row-/)).toHaveLength(10)
@@ -133,75 +133,75 @@ describe('EqualizerScreen', () => {
 		expect(getByText('16 kHz')).toBeTruthy()
 	})
 
-	it('renders formatted gain readouts', () => {
+	it('renders formatted gain readouts', async () => {
 		mockEqualizer({ bands: buildBands({ 5: 3, 0: -2.5 }) })
 
-		const { getByText, getAllByText } = renderScreen()
+		const { getByText, getAllByText } = await renderScreen()
 
 		expect(getByText('+3.0 dB')).toBeTruthy()
 		expect(getByText('-2.5 dB')).toBeTruthy()
 		expect(getAllByText('0 dB')).toHaveLength(8)
 	})
 
-	it('toggling the switch calls setEnabled', () => {
+	it('toggling the switch calls setEnabled', async () => {
 		const equalizer = mockEqualizer({ isEnabled: false })
 
-		const { getByTestId } = renderScreen()
+		const { getByTestId } = await renderScreen()
 
-		fireEvent(getByTestId('equalizer-enabled-switch'), 'checkedChange', true)
+		await fireEvent(getByTestId('equalizer-enabled-switch'), 'checkedChange', true)
 
 		expect(equalizer.setEnabled).toHaveBeenCalledWith(true)
 	})
 
-	it('renders a chip per built-in preset and applies on press', () => {
+	it('renders a chip per built-in preset and applies on press', async () => {
 		const presets = mockPresets()
 
-		const { getAllByTestId, getByText } = renderScreen()
+		const { getAllByTestId, getByText } = await renderScreen()
 
 		expect(getAllByTestId(/equalizer-preset-/)).toHaveLength(BUILT_IN_PRESET_NAMES.length)
 
-		fireEvent.press(getByText('Rock'))
+		await fireEvent.press(getByText('Rock'))
 
 		expect(presets.applyPreset).toHaveBeenCalledWith('Rock')
 	})
 
-	it('shows Custom when no preset is active', () => {
+	it('shows Custom when no preset is active', async () => {
 		mockEqualizer({ currentPreset: null })
 		mockPresets({ currentPreset: null })
 
-		const { getByText } = renderScreen()
+		const { getByText } = await renderScreen()
 
 		expect(getByText('Current: Custom')).toBeTruthy()
 	})
 
-	it('reset button calls reset', () => {
+	it('reset button calls reset', async () => {
 		const equalizer = mockEqualizer()
 
-		const { getByTestId } = renderScreen()
+		const { getByTestId } = await renderScreen()
 
-		fireEvent.press(getByTestId('equalizer-reset-button'))
+		await fireEvent.press(getByTestId('equalizer-reset-button'))
 
 		expect(equalizer.reset).toHaveBeenCalled()
 	})
 
-	it('shows the cast hint only while casting', () => {
-		const { queryByTestId, unmount } = renderScreen()
+	it('shows the cast hint only while casting', async () => {
+		const { queryByTestId, unmount } = await renderScreen()
 
 		expect(queryByTestId('equalizer-cast-hint')).toBeNull()
 
-		unmount()
+		await unmount()
 
 		jest.mocked(useIsCasting).mockReturnValue(true)
 
-		const { getByTestId } = renderScreen()
+		const { getByTestId } = await renderScreen()
 
 		expect(getByTestId('equalizer-cast-hint')).toBeTruthy()
 	})
 
-	it('dims and blocks the sections when disabled', () => {
+	it('dims and blocks the sections when disabled', async () => {
 		mockEqualizer({ isEnabled: false })
 
-		const { getByTestId } = renderScreen()
+		const { getByTestId } = await renderScreen()
 
 		const sections = getByTestId('equalizer-sections')
 
