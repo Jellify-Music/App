@@ -7,9 +7,6 @@ type PlayerParamList = {
 	MultipleArtistsSheet: {
 		artists: NameGuidPair[]
 	}
-	LyricsScreen: {
-		lyrics: LyricDto['Lyrics']
-	}
 
 	CastDialog: undefined
 }
