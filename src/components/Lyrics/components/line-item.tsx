@@ -8,7 +8,8 @@ import Animated, {
 import { AnimatedSizableText } from '../../Global/helpers/Animated/text'
 import { useTheme } from 'tamagui'
 import { ParsedLyricLine } from '../../../types/Lyrics'
-import { GestureDetector, useTapGesture } from 'react-native-gesture-handler'
+import { GestureDetector } from 'react-native-gesture-handler'
+import { useLyricLineTapGesture } from '../../../hooks/lyrics/scrolling'
 
 interface LyricLineItemProps {
 	item: ParsedLyricLine
@@ -81,16 +82,7 @@ export default function LyricLineItem({
 		}
 	})
 
-	const tapGesture = useTapGesture({
-		maxDistance: 10,
-		maxDuration: 500,
-		runOnJS: true,
-		onFinalize: (result) => {
-			if (!result.canceled) {
-				onPress(item.startTime, index)
-			}
-		},
-	})
+	const tapGesture = useLyricLineTapGesture({ onPress, item, index })
 
 	const handleLayout = (e: { nativeEvent: { layout: { height: number } } }) => {
 		onItemLayout?.(index, e.nativeEvent.layout.height)
