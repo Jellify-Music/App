@@ -11,7 +11,7 @@ import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-lab
 import { RadioGroupItemWithLabel } from '../../components/Global/helpers/radio-group-item-with-label'
 import { formatBytes } from '../../utils/formatting/bytes'
 import { useDeletionToast } from '../../utils/toasts/deletion-toast'
-import { DownloadQuality, useAutoDownload, useDownloadQuality } from '../../stores/settings/usage'
+import { useAutoDownload, useDownloadQuality } from '../../stores/settings/usage'
 import {
 	DownloadedTrack,
 	DownloadProgress,
@@ -19,16 +19,13 @@ import {
 import useDownloads from '../../hooks/downloads'
 import { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useDownloadProgress } from 'react-native-nitro-player'
-import { StorageManagementProps } from '../Settings/types'
 import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { DownloadQuality } from '../../enums/audio-quality'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
 
-export default function StorageManagementScreen({
-	navigation,
-}: StorageManagementProps): React.JSX.Element {
-	const { summary, suggestions, selection, toggleSelection, clearSelection, refresh } =
-		useStorageContext()
+export default function StorageManagementScreen(): React.JSX.Element {
+	const { summary, selection, toggleSelection, clearSelection, refresh } = useStorageContext()
 
 	const { data: downloads } = useDownloads()
 

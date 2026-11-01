@@ -5,7 +5,7 @@ import Icon from '../Global/components/icon'
 import { RootStackParamList } from '../../screens/types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useEffect } from 'react'
-import { parseBitrateFromTranscodingUrl } from '../../utils/parsing/url'
+import { parseBitrateFromTranscodingUrl } from '../../utils/audio/transcoding'
 import { SourceType } from '../../types/JellifyTrack'
 import { capitalize } from 'lodash'
 
