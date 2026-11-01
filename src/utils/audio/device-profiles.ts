@@ -14,14 +14,11 @@
  */
 
 import {
-	CodecType,
 	DeviceProfile,
 	DirectPlayProfile,
 	DlnaProfileType,
 	EncodingContext,
 	MediaStreamProtocol,
-	ProfileConditionType,
-	ProfileConditionValue,
 } from '@jellyfin/sdk/lib/generated-client'
 import { capitalize } from 'lodash'
 import { SourceType } from '../../types/JellifyTrack'
@@ -105,7 +102,6 @@ export function getDeviceProfile(
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
 		TranscodingProfiles: profiles.TranscodingProfiles,
-		CodecProfiles: profiles.CodecProfiles,
 	}
 }
 
@@ -176,11 +172,6 @@ const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 const APPLE_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
 		{
-			Container: 'ogg,opus,oga',
-			AudioCodec: 'opus',
-			Type: DlnaProfileType.Audio,
-		},
-		{
 			Container: 'aac',
 			Type: DlnaProfileType.Audio,
 		},
@@ -214,21 +205,6 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
 			MaxAudioChannels: '6',
 			Protocol: MediaStreamProtocol.Http,
 			Type: DlnaProfileType.Audio,
-		},
-	],
-	// Multichannel Opus is untested on AVPlayer, so cap it at stereo like Jellyfin Web does for Safari
-	CodecProfiles: [
-		{
-			Type: CodecType.Audio,
-			Codec: 'opus',
-			Conditions: [
-				{
-					Condition: ProfileConditionType.LessThanEqual,
-					Property: ProfileConditionValue.AudioChannels,
-					Value: '2',
-					IsRequired: false,
-				},
-			],
 		},
 	],
 }
