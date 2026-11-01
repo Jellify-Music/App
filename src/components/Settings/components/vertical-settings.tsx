@@ -102,7 +102,7 @@ export default function VerticalSettings(): React.JSX.Element {
 					title='Equalizer'
 					icon='equalizer'
 					route='Equalizer'
-					iconColor='$success'
+					iconColor='success'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-storage'
