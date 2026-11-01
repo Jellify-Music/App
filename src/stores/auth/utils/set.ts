@@ -20,3 +20,8 @@ export const setServer =
 
 		set({ server })
 	}
+
+export const setUser =
+	(set: JellifyStoreSet): JellifyStore['setUser'] =>
+	(params) =>
+		set({ user: params })
