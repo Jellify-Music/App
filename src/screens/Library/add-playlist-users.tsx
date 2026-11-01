@@ -9,16 +9,13 @@ import {
 import { useUsers } from '../../../src/api/queries/users'
 import { SectionList } from 'react-native'
 import Icon from '../../../src/components/Global/components/icon'
-import TurboImage from 'react-native-turbo-image'
-import getUserImageUrl from '../../utils/images/users'
 import { AddPlaylistUsersProps } from '../types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import getUserImageUrl from '../../api/queries/image/utils/avatar'
+import Image from '../../components/Global/utils/image'
 
 //screen in react native
-export default function addPlaylistUsers({
-	navigation,
-	route,
-}: AddPlaylistUsersProps): React.JSX.Element {
+export default function addPlaylistUsers({ route }: AddPlaylistUsersProps): React.JSX.Element {
 	const [searchQuery, setSearchQuery] = useState('')
 	const { playlist } = route.params
 	const {
@@ -96,8 +93,8 @@ export default function addPlaylistUsers({
 					renderSectionHeader={(info) => <Paragraph> {info.section.title} </Paragraph>}
 					renderItem={({ item: user }) => (
 						<XStack>
-							<TurboImage
-								source={{ uri: getUserImageUrl(user) }}
+							<Image
+								src={getUserImageUrl()}
 								style={{ width: 45, height: 45 }}
 								rounded
 							/>
