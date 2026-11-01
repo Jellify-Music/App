@@ -5,11 +5,10 @@ on:
   # self-hosted runners.
   pull_request_target:
     types: [closed]
-    branches: [main]
 
 jobs:
   delete-pr-bundle-branches:
-    if: github.repository == 'Jellify-Music/App' && github.event.pull_request.merged
+    if: github.repository == 'Jellify-Music/App'
     runs-on: [self-hosted, Linux]
     steps:
       - name: 🧹 Delete PR bundle branches

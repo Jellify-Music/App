@@ -22,7 +22,7 @@ together in the Actions sidebar.
 | [Test / Maestro](test-maestro.yml) | **self-hosted macOS** | Every non-fork PR and nightly at 03:00 UTC (both platforms); manual (pick `both`, `android` or `ios`) |
 | [Publish / Android APK and TestFlight Betas](publish-beta.yml) | **self-hosted Linux** (`generate-release-notes`), `macos-latest` (the rest) | Manual |
 | [Publish / OTA Update PR](publish-ota-update-pr.yml) | **self-hosted Linux** (fork PRs: `ubuntu-latest`) | PRs touching `src/**`, `App.tsx` or the OTA scripts |
-| [Publish / OTA Update PR Cleanup](publish-ota-update-pr-cleanup.yml) | **self-hosted Linux** | PRs merged into `main` (deletes their `PULL_REQUEST_<n>_*` branches in App-Bundles) |
+| [Publish / OTA Update PR Cleanup](publish-ota-update-pr-cleanup.yml) | **self-hosted Linux** | PRs merged or closed (deletes their `PULL_REQUEST_<n>_*` branches in App-Bundles) |
 | [Publish / OTA Update](publish-ota-update.yml) | **self-hosted Linux** | Manual |
 
 Required status checks are job IDs, not workflow names or filenames, so
