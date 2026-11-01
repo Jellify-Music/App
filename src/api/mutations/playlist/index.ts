@@ -1,25 +1,34 @@
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { InfiniteData, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { refreshAndroidAutoLibrary } from '../../../services/android-auto'
 import { createPlaylist, deletePlaylist, updatePlaylist } from './utils/playlists'
 import Toast from 'react-native-toast-message'
-import { queryClient } from '../../../constants/query-client'
-import { PlaylistTracksQueryKey, UserPlaylistsQueryKey } from '../../queries/playlist/keys'
-import { getApi, getUser } from '../../../stores/auth/utils'
+import {
+	addUserPlaylist,
+	removeCachedPlaylist,
+	setPlaylistTracks,
+	updateCachedPlaylist,
+} from '../../queries/playlist/cache'
+import { getApi } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import navigationRef from '../../../screens/navigation'
 import { applyHapticFeedback } from '../../../utils/haptics'
 
 export const useAddPlaylist = () => {
-	const user = getUser()
-
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	return useMutation({
 		mutationFn: ({ name }: { name: string }) => createPlaylist(name),
 		onSuccess: async (data: string, { name }: { name: string }) => {
+			addUserPlaylist({
+				Id: data,
+				Name: name,
+				CanDelete: true,
+				Type: 'Playlist',
+			})
+
 			refreshAndroidAutoLibrary()
 			applyHapticFeedback('success')
 
@@ -30,27 +39,6 @@ export const useAddPlaylist = () => {
 			})
 
 			libraryStackNavigation.goBack()
-
-			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-				UserPlaylistsQueryKey(user),
-				(oldData) => {
-					if (!oldData) return oldData
-
-					const newPlaylist: BaseItemDto = {
-						Id: data,
-						Name: name,
-						CanDelete: true,
-						Type: 'Playlist',
-					} as BaseItemDto
-
-					return {
-						...oldData,
-						pages: oldData.pages.map((page, index) =>
-							index === 0 ? [newPlaylist, ...page] : page,
-						),
-					}
-				},
-			)
 		},
 		onError: () => {
 			applyHapticFeedback('error')
@@ -65,27 +53,13 @@ export const useDeletePlaylist = () => {
 			return deletePlaylist(api, playlist.Id!)
 		},
 		onSuccess: async (data: void, playlist: BaseItemDto) => {
+			removeCachedPlaylist(playlist.Id!)
 			refreshAndroidAutoLibrary()
-			const user = getUser()
 
 			applyHapticFeedback('success')
 
 			navigationRef.goBack() // Dismiss DeletePlaylist sheet
 			navigationRef.goBack() // Pop Playlist screen or Context sheet if open
-
-			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-				UserPlaylistsQueryKey(user),
-				(oldData) => {
-					if (!oldData) return oldData
-
-					return {
-						...oldData,
-						pages: oldData.pages.map((page) =>
-							page.filter((item) => item.Id !== playlist.Id),
-						),
-					}
-				},
-			)
 		},
 		onError: () => {
 			applyHapticFeedback('error')
@@ -119,24 +93,12 @@ export const useUpdatePlaylist = ({
 				tracks.map((track) => track.Id!),
 			)
 		},
-		onSuccess: (_, { playlist, tracks }) => {
+		onSuccess: (_, { playlist, tracks, newName }) => {
+			setPlaylistTracks(playlist, tracks)
+			updateCachedPlaylist(playlist.Id!, { Name: newName })
+
 			refreshAndroidAutoLibrary()
 			applyHapticFeedback('success')
-
-			// Refresh playlist component data
-			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-				PlaylistTracksQueryKey(playlist),
-				(prev) => {
-					if (!prev) return prev
-
-					return {
-						...prev,
-						pages: prev.pages.map((page: BaseItemDto[]) =>
-							page.filter((track) => tracks.some((t) => t.Id === track.Id)),
-						),
-					}
-				},
-			)
 		},
 		onError: onError,
 		onSettled: onSettled,

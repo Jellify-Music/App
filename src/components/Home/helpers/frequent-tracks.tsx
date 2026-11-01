@@ -3,7 +3,6 @@ import { H4, H5, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import ItemCard from '../../Global/components/Card'
 import Icon from '../../Global/components/icon'
-import { useDisplayContext } from '../../../providers/Display/display-provider'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
@@ -18,8 +17,6 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const { horizontalItems } = useDisplayContext()
-
 	return tracksInfiniteQuery.data ? (
 		<AnimatedRow testID='home-frequent-tracks'>
 			<XStack
@@ -33,11 +30,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 			</XStack>
 
 			<HorizontalCardList
-				data={
-					tracksInfiniteQuery.data.length > horizontalItems
-						? tracksInfiniteQuery.data.slice(0, horizontalItems)
-						: tracksInfiniteQuery.data
-				}
+				data={tracksInfiniteQuery.data}
 				renderItem={({ item: track, index }) => (
 					<ItemCard
 						item={track}

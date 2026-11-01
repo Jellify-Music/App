@@ -1,13 +1,7 @@
 import { useUpdatePlaylist } from '../../api/mutations/playlist'
 import { usePlaylistTracks } from '../../api/queries/playlist'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import {
-	FetchNextPageOptions,
-	InfiniteQueryObserverResult,
-	QueryObserverResult,
-	RefetchOptions,
-	UseMutateFunction,
-} from '@tanstack/react-query'
+import { QueryObserverResult, RefetchOptions, UseMutateFunction } from '@tanstack/react-query'
 import {
 	createContext,
 	Dispatch,
@@ -51,11 +45,6 @@ interface PlaylistContext {
 		options?: RefetchOptions | undefined,
 	) => Promise<QueryObserverResult<BaseItemDto[], Error>>
 	isPending: boolean
-	hasNextPage: boolean
-	fetchNextPage: (
-		options?: FetchNextPageOptions,
-	) => Promise<InfiniteQueryObserverResult<BaseItemDto[], Error>>
-	isFetchingNextPage: boolean
 }
 
 const PlaylistContext = createContext<PlaylistContext>({
@@ -76,9 +65,6 @@ const PlaylistContext = createContext<PlaylistContext>({
 	},
 	refetch: () => Promise.resolve({} as QueryObserverResult<BaseItemDto[], Error>),
 	isPending: false,
-	hasNextPage: false,
-	fetchNextPage: () => Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
-	isFetchingNextPage: false,
 })
 
 interface PlaylistProviderProps {
@@ -96,15 +82,7 @@ export const PlaylistProvider = ({ playlist, canEdit, children }: PlaylistProvid
 
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[]>([])
 
-	const {
-		data: tracks,
-		isPending,
-		refetch,
-		isSuccess,
-		hasNextPage,
-		fetchNextPage,
-		isFetchingNextPage,
-	} = usePlaylistTracks(playlist)
+	const { data: tracks, isPending, refetch, isSuccess } = usePlaylistTracks(playlist)
 
 	const { mutate: updatePlaylist, isPending: isUpdatingPlaylist } = useUpdatePlaylist({
 		onSettled: () => {
@@ -160,9 +138,6 @@ export const PlaylistProvider = ({ playlist, canEdit, children }: PlaylistProvid
 		playlistTracks,
 		playlistTrackIds,
 		isPending,
-		hasNextPage,
-		fetchNextPage,
-		isFetchingNextPage,
 	}
 
 	return <PlaylistContext value={value}>{children}</PlaylistContext>

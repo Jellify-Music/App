@@ -3,25 +3,31 @@ import { LegendListProps } from '@legendapp/list/react-native'
 import React from 'react'
 import List from './Lists/utils'
 import { StyleSheet } from 'react-native'
+import { useDisplayContext } from '../../../providers/Display/display-provider'
 
-type HorizontalCardListProps = LegendListProps<BaseItemDto>
+type HorizontalCardListProps = LegendListProps<BaseItemDto> & {
+	slice?: boolean
+}
 
 /**
- * Displays a Horizontal FlatList of 20 ItemCards
- * then shows a "See More" button
- * @param param0
- * @returns
+ * Displays a horizontal list of ItemCards
+ *
+ * @param slice Whether to cap the list at the display's `horizontalItems`
+ * (15, or 30 on wide screens). Defaults to `true` - pass `false` to show every item
  */
 export default function HorizontalCardList({
 	data,
 	renderItem,
 	estimatedItemSize = 150,
+	slice = true,
 	...props
 }: HorizontalCardListProps): React.JSX.Element {
+	const { horizontalItems } = useDisplayContext()
+
 	return (
 		<List<BaseItemDto>
 			horizontal
-			data={data}
+			data={slice ? data?.slice(0, horizontalItems) : data}
 			renderItem={renderItem}
 			estimatedItemSize={estimatedItemSize}
 			recycleItems
