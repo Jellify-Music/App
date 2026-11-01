@@ -1,0 +1,5 @@
+if git diff-tree --no-commit-id -r --name-only ORIG_HEAD HEAD | grep -qE "package\.json|bun\.lockb"; then
+  echo "📦 Dependencies changed, running module install..."
+  bun i
+  echo "✅ Module install completed, ready to rock 🪨!"
+fi
