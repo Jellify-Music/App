@@ -178,6 +178,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Home screen access to previously played tracks, artists, and your playlists
 - Quick access to similar artists and items for discovering music in your library
 - Jellyfin playback reporting and [Last.FM Plugin](https://github.com/jesseward/jellyfin-plugin-lastfm) support
+- Quick Connect Support
 - Full Library Browsing
 - Playlist support, including creating, updating, and reordering
 - Offline Playback
@@ -193,24 +194,23 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ### Roadmap
 
-#### 1.2.0 (We Made a Language For Us Two...) - June '26
-- Quick Connect Support
+#### 1.4 - If You Plant Ice, You're Gonna Harvest Wind - December '26
 - Websocket Support (Server online status)
 - Collaborative Playlists
 - EQ Controls
-
-#### 1.3.0 (Endless Summer) - September '26
-- App Customization Options
-- Autoplay Integration
 - Allow Self-Signed Certificates
 
-#### 2.0.0  - December '26
+#### 1.5 - March '27
+- App Customization Options
+
+#### 2.0.0 - December '27
 - Watch Support
 - Desktop Support (Experimental)
 - Tablet Support
-- Seerr (formerly Jellyseerr) Integration
 
 #### 3.0.0 - TBD
+- Seerr (formerly Jellyseerr) Integration
+- Autoplay Integration
 - tvOS (Apple and Android)
 - JellyJam (Collaborative Queue)
 
