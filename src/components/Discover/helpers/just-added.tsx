@@ -8,7 +8,6 @@ import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screen
 import navigationRef from '../../../screens/navigation'
 import { useRecentlyAddedAlbums } from '../../../api/queries/album'
 import AnimatedRow from '../../Global/helpers/animated-row'
-import { useDisplayContext } from '../../../providers/Display/display-provider'
 
 export default function RecentlyAdded(): React.JSX.Element {
 	const recentlyAddedAlbumsInfinityQuery = useRecentlyAddedAlbums()
@@ -17,8 +16,6 @@ export default function RecentlyAdded(): React.JSX.Element {
 
 	const recentlyAddedExists =
 		recentlyAddedAlbumsInfinityQuery.data && recentlyAddedAlbumsInfinityQuery.data.length > 0
-
-	const { horizontalItems } = useDisplayContext()
 
 	return recentlyAddedExists ? (
 		<AnimatedRow testID='discover-recently-added'>
@@ -35,7 +32,7 @@ export default function RecentlyAdded(): React.JSX.Element {
 			</XStack>
 
 			<HorizontalCardList
-				data={recentlyAddedAlbumsInfinityQuery.data?.slice(0, horizontalItems)}
+				data={recentlyAddedAlbumsInfinityQuery.data}
 				renderItem={({ item }) => (
 					<ItemCard
 						caption={item.Name}

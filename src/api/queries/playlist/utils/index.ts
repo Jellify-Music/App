@@ -1,3 +1,4 @@
+import { getApi, getUser } from '../../../../stores/auth/utils'
 import {
 	BaseItemDto,
 	BaseItemKind,
@@ -9,52 +10,48 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
-import QueryConfig, { ApiLimits } from '../../../../configs/querying/index.config'
+import { ApiLimits } from '../../../../configs/querying/index.config'
 import { setQueryUserDataForItems } from '../../user-data'
 import { captureError, LoggingContext } from '../../../../utils/logging'
+import { ApiNotAvailableError } from '../../../../types/errors'
+
+const PLAYLIST_FIELDS = [
+	ItemFields.Path,
+	ItemFields.CanDelete,
+	ItemFields.Genres,
+	ItemFields.ChildCount,
+	ItemFields.ItemCounts,
+]
 
 /**
- * Returns the user's playlists from the Jellyfin server
+ * Returns all of the user's playlists from the Jellyfin server
  *
  * Performs filtering to ensure that these are playlists stored in the
  * config directory of Jellyfin, as to avoid displaying .m3u files from
  * the library
  *
- * @param api The {@link Api} instance from the {@link useApi} hook
- * @param user The {@link JellifyUser} instance from the {@link useJellifyUser} hook
- * @param library The {@link BaseItemDto} instance from the {@link usePlaylistLibrary} hook
- * @param sortBy An array of {@link ItemSortBy} values to sort the response by
- * @param page The page number for pagination (0-indexed)
  * @param signal Optional AbortSignal to cancel the request
- * @returns
+ * @param user The {@link JellifyUser} to fetch playlists for, defaults to the signed in user
+ * @param api The {@link Api} instance, defaults to the current one
+ * @returns The user's playlists, sorted by name
  */
 export async function fetchUserPlaylists(
-	api: Api | undefined,
-	user: JellifyUser | undefined,
-	sortBy: ItemSortBy[] = [],
-	page: number = 0,
 	signal?: AbortSignal,
+	user: JellifyUser | undefined = getUser(),
+	api: Api | undefined = getApi(),
 ): Promise<BaseItemDto[]> {
-	if (isUndefined(api)) return Promise.reject('Client instance not set')
+	if (isUndefined(api)) return Promise.reject(new ApiNotAvailableError())
 	if (isUndefined(user)) return Promise.reject('User instance not set')
 
 	try {
 		const { data } = await getItemsApi(api).getItems(
 			{
 				userId: user.id,
-				fields: [
-					ItemFields.Path,
-					ItemFields.CanDelete,
-					ItemFields.Genres,
-					ItemFields.ChildCount,
-					ItemFields.ItemCounts,
-				],
+				fields: PLAYLIST_FIELDS,
 				includeItemTypes: [BaseItemKind.Playlist],
 				recursive: true,
 				sortBy: [ItemSortBy.SortName],
 				sortOrder: [SortOrder.Ascending],
-				startIndex: page * QueryConfig.limits.library,
-				limit: QueryConfig.limits.library,
 				enableUserData: true,
 			},
 			{
@@ -73,27 +70,28 @@ export async function fetchUserPlaylists(
 	}
 }
 
+/**
+ * Returns all of the playlists shared on the Jellyfin server, favorites first
+ *
+ * These are playlists stored in the library (i.e. .m3u files) rather
+ * than in Jellyfin's config directory
+ *
+ * @param signal Optional AbortSignal to cancel the request
+ * @param api The {@link Api} instance, defaults to the current one
+ * @returns The public playlists
+ */
 export async function fetchPublicPlaylists(
-	api: Api | undefined,
-	page: number,
 	signal?: AbortSignal,
+	api: Api | undefined = getApi(),
 ): Promise<BaseItemDto[]> {
-	if (isUndefined(api)) return Promise.reject('Client instance not set')
+	if (isUndefined(api)) return Promise.reject(new ApiNotAvailableError())
 
 	try {
 		const { data } = await getItemsApi(api).getItems(
 			{
 				sortBy: [ItemSortBy.IsFavoriteOrLiked, ItemSortBy.Random],
 				sortOrder: [SortOrder.Ascending],
-				startIndex: page * QueryConfig.limits.library,
-				limit: QueryConfig.limits.library,
-				fields: [
-					ItemFields.Path,
-					ItemFields.CanDelete,
-					ItemFields.Genres,
-					ItemFields.ChildCount,
-					ItemFields.ItemCounts,
-				],
+				fields: PLAYLIST_FIELDS,
 				includeItemTypes: [BaseItemKind.Playlist],
 				enableUserData: true,
 			},
@@ -115,42 +113,49 @@ export async function fetchPublicPlaylists(
 }
 
 /**
- * Fetches tracks for a playlist with pagination using NitroFetch
- * for optimized JSON parsing on a background thread.
+ * Fetches every track in a playlist
  *
- * @param api The {@link Api} instance
+ * Requested a page at a time to keep each response small, since tracks
+ * include their media sources
+ *
  * @param playlistId The ID of the playlist to fetch tracks for
- * @param pageParam The page number for pagination (0-indexed)
+ * @param signal Optional AbortSignal to cancel the request
+ * @param api The {@link Api} instance, defaults to the current one
  * @returns Array of tracks for the playlist
  */
 export async function fetchPlaylistTracks(
-	api: Api | undefined,
 	playlistId: string,
-	pageParam: number = 0,
 	signal?: AbortSignal,
+	api: Api | undefined = getApi(),
 ): Promise<BaseItemDto[]> {
-	if (isUndefined(api)) {
-		throw new Error('Client instance not set')
+	if (isUndefined(api)) throw new ApiNotAvailableError()
+
+	const tracks: BaseItemDto[] = []
+
+	for (let page = 0; ; page++) {
+		const { data } = await getItemsApi(api).getItems(
+			{
+				parentId: playlistId,
+				includeItemTypes: [BaseItemKind.Audio],
+				recursive: false,
+				limit: ApiLimits.Library,
+				startIndex: page * ApiLimits.Library,
+				fields: [
+					ItemFields.MediaSources,
+					ItemFields.ParentId,
+					ItemFields.Path,
+					ItemFields.SortName,
+				],
+			},
+			{
+				signal,
+			},
+		)
+
+		const items = data.Items ?? []
+
+		tracks.push(...items)
+
+		if (items.length < ApiLimits.Library) return tracks
 	}
-
-	const response = await getItemsApi(api).getItems(
-		{
-			parentId: playlistId,
-			includeItemTypes: [BaseItemKind.Audio],
-			recursive: false,
-			limit: ApiLimits.Library,
-			startIndex: pageParam * ApiLimits.Library,
-			fields: [
-				ItemFields.MediaSources,
-				ItemFields.ParentId,
-				ItemFields.Path,
-				ItemFields.SortName,
-			],
-		},
-		{
-			signal,
-		},
-	)
-
-	return response.data.Items ?? []
 }

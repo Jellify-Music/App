@@ -5,7 +5,6 @@ import ItemCard from '../../Global/components/Card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
-import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentArtists } from '../../../api/queries/recents'
@@ -19,8 +18,6 @@ export default function RecentArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-	const { horizontalItems } = useDisplayContext()
 
 	const handleHeaderPress = () => {
 		navigation.navigate('RecentArtists')
@@ -53,10 +50,7 @@ export default function RecentArtists(): React.JSX.Element {
 				<Icon name='arrow-right' />
 			</XStack>
 
-			<HorizontalCardList
-				data={recentArtistsInfiniteQuery.data.slice(0, horizontalItems)}
-				renderItem={renderItem}
-			/>
+			<HorizontalCardList data={recentArtistsInfiniteQuery.data} renderItem={renderItem} />
 		</AnimatedRow>
 	) : (
 		<></>

@@ -2,7 +2,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { CarPlay } from 'react-native-carplay'
 import { ListTemplate } from 'react-native-carplay/lib/templates/ListTemplate'
 import AlbumTemplate from './Album'
-import { ensureAlbumDiscsQuery } from '../../api/queries/album'
+import { refreshAlbumDiscs } from '../../api/queries/album'
 
 const ArtistTemplate = (artist: BaseItemDto, albums: BaseItemDto[]) =>
 	new ListTemplate({
@@ -17,7 +17,7 @@ const ArtistTemplate = (artist: BaseItemDto, albums: BaseItemDto[]) =>
 		onItemSelect: async ({ templateId, index }) => {
 			const selectedAlbum = albums[index]
 
-			const albumDiscs = await ensureAlbumDiscsQuery(selectedAlbum)
+			const albumDiscs = await refreshAlbumDiscs(selectedAlbum)
 
 			CarPlay.pushTemplate(AlbumTemplate(selectedAlbum, albumDiscs), true)
 		},

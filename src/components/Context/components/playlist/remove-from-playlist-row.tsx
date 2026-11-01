@@ -6,8 +6,7 @@ import { removeFromPlaylist } from '../../../../api/mutations/playlist/utils/pla
 import { useApi } from '../../../../stores/auth'
 import navigationRef from '../../../../screens/navigation'
 import { triggerHaptic } from '../../../../hooks/use-haptic-feedback'
-import { queryClient } from '../../../../constants/query-client'
-import { PlaylistTracksQueryKey } from '../../../../api/queries/playlist/keys'
+import { invalidatePlaylistTracks } from '../../../../api/queries/playlist/cache'
 
 export default function RemoveFromPlaylistRow({
 	track,
@@ -22,7 +21,7 @@ export default function RemoveFromPlaylistRow({
 		mutationFn: () => removeFromPlaylist(api, track, playlist),
 		onSuccess: () => {
 			triggerHaptic('notificationSuccess')
-			queryClient.invalidateQueries({ queryKey: PlaylistTracksQueryKey(playlist) })
+			invalidatePlaylistTracks(playlist)
 			navigationRef.goBack()
 		},
 		onError: () => {
