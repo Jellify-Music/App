@@ -8,6 +8,7 @@ import { applyHapticFeedback } from '../../../../utils/haptics'
 import { LibrarySectionListData } from '../../types'
 import { SectionListRef } from '@legendapp/list/section-list'
 import onLetterPaginateQuery from './utils'
+import { useHolidayTokens, useIsHolidays } from '../../../Holidays/hooks'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 
 const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
@@ -39,6 +40,8 @@ export default function AZScroller({
 }: AZScrollerProps) {
 	const alphabetToUse = customAlphabet ?? (reverseOrder ? alphabetZtoA : alphabetAtoZ)
 	const theme = useTheme()
+	const isHolidays = useIsHolidays()
+	const holidayTokens = useHolidayTokens()
 
 	const [operationPending, setOperationPending] = useState<boolean>(false)
 
@@ -173,7 +176,8 @@ export default function AZScroller({
 		<Paragraph
 			flex={1}
 			userSelect='none'
-			color='borderColor'
+			// Holidays: a dimmer index, with the "#" picked out in the accent color
+			color={isHolidays ? (index === 0 ? 'primary' : holidayTokens.index) : 'borderColor'}
 			fontSize='3'
 			fontWeight='6'
 			textAlign='center'

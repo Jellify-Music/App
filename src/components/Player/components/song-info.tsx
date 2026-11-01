@@ -16,9 +16,12 @@ import { RootStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { PlayerParamList } from '@/src/screens/Player/types'
 import navigationRef from '../../../screens/navigation'
+import { useIsHolidays } from '../../Holidays/hooks'
 
 export default function SongInfo(): React.JSX.Element {
 	const currentTrack = useCurrentTrack()
+
+	const isHolidays = useIsHolidays()
 
 	const rootStackNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 	const playerStackNavigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -123,12 +126,29 @@ export default function SongInfo(): React.JSX.Element {
 				justifyContent='flex-end'
 				alignItems='center'
 				flexShrink={1}
-				gap='3'
+				gap={isHolidays ? 12 : '3'}
 				paddingLeft={'1'}
 			>
-				{currentTrack && item && <FavoriteButton item={item} />}
+				{/* Holidays: the design seats both buttons in 44px boxes, 12px apart */}
+				{currentTrack && item && (
+					<YStack
+						width={isHolidays ? 44 : undefined}
+						height={isHolidays ? 44 : undefined}
+						alignItems='center'
+						justifyContent='center'
+					>
+						<FavoriteButton item={item} />
+					</YStack>
+				)}
 
-				<Icon name='dots-horizontal-circle-outline' onPress={openContextMenu} />
+				<YStack
+					width={isHolidays ? 44 : undefined}
+					height={isHolidays ? 44 : undefined}
+					alignItems='center'
+					justifyContent='center'
+				>
+					<Icon name='dots-horizontal-circle-outline' onPress={openContextMenu} />
+				</YStack>
 			</XStack>
 		</XStack>
 	)

@@ -5,6 +5,8 @@ import React from 'react'
 import Icon from '../../Global/components/icon'
 import { togglePlayback } from '../../../player/controls/playback'
 import { useNowPlaying } from 'react-native-nitro-player'
+import HolidayPlayButton from '../../Holidays/play-button'
+import { useIsHolidays } from '../../Holidays/hooks'
 
 export default function PlayPauseButton({
 	flex,
@@ -12,8 +14,11 @@ export default function PlayPauseButton({
 	flex?: number | undefined
 }): React.JSX.Element {
 	const { currentState } = useNowPlaying()
+	const isHolidays = useIsHolidays()
 
 	const iconName = currentState === 'playing' ? 'pause' : 'play'
+
+	if (isHolidays) return <HolidayPlayButton flex={flex} />
 
 	return (
 		<View justifyContent='center' alignItems='center' flex={flex}>

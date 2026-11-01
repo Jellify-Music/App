@@ -6,6 +6,8 @@ import { useRepeatMode, useShuffle } from '../../../stores/player/queue'
 import { toggleRepeatMode } from '../../../player/controls/repeat-mode'
 import { toggleShuffle } from '../../../player/controls/shuffle'
 import { previous, skip } from '../../../player/controls'
+import HolidayControls from '../../Holidays/controls'
+import { useIsHolidays } from '../../Holidays/hooks'
 
 export default function Controls({
 	onLyricsScreen,
@@ -15,6 +17,10 @@ export default function Controls({
 	const repeatMode = useRepeatMode()
 
 	const shuffled = useShuffle()
+
+	const isHolidays = useIsHolidays()
+
+	if (isHolidays && !onLyricsScreen) return <HolidayControls />
 
 	return (
 		<XStack alignItems='center' justifyContent='space-between'>

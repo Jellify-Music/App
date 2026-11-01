@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native'
 import { Square, Card, getTokenValue } from 'tamagui'
 import Icon from '../icon'
 import { CardSizeToken } from './types'
+import HolidayCorner from '../../../Holidays/corner'
 
 const footerTypesNeedingIndicating: BaseItemKind[] = [
 	BaseItemKind.MusicAlbum,
@@ -16,11 +17,22 @@ interface ItemCardComponentFooterProps {
 }
 
 export default function ItemCardFooter({ size, type }: ItemCardComponentFooterProps) {
-	const { hideItemIndicators } = useAppSettingsStore()
+	// One read of the store for both values: this component already re-renders on any setting
+	const { hideItemIndicators, colorPreset } = useAppSettingsStore()
+	const isHolidays = colorPreset === 'holidays'
 
 	const displayFooter = footerTypesNeedingIndicating.includes(type) && !hideItemIndicators
 
 	const iconName: 'cassette' | 'disc' = type === BaseItemKind.Playlist ? 'cassette' : 'disc'
+
+	if (isHolidays) {
+		return displayFooter ? (
+			<HolidayCorner
+				kind={type === BaseItemKind.Playlist ? 'playlist' : 'album'}
+				cardSize={getTokenValue(size, 'size') as number}
+			/>
+		) : null
+	}
 
 	const cornerSize = getTokenValue(size, 'size') * 0.45
 	const squareSize = cornerSize * Math.SQRT2

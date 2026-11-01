@@ -5,7 +5,7 @@ import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
 export type ThemeSetting = 'system' | 'light' | 'dark' | 'oled'
-export type ColorPreset = 'purple' | 'ocean' | 'forest' | 'sunset' | 'peanut'
+export type ColorPreset = 'purple' | 'ocean' | 'forest' | 'sunset' | 'peanut' | 'holidays'
 
 type AppSettingsStore = {
 	sendMetrics: boolean

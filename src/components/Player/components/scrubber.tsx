@@ -15,6 +15,9 @@ import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/mapping/tra
 import { Presets } from 'react-native-pulsar'
 import useAppActive from '../../../hooks/use-app-active'
 import seekTo from '../../../player/controls/seek'
+import { View } from 'react-native'
+import HolidayScrubberVisuals, { HOLIDAY_SCRUBBER_HEIGHT } from '../../Holidays/scrubber-visuals'
+import { useIsHolidays } from '../../Holidays/hooks'
 
 interface ScrubberProps {
 	onSeekComplete?: (position: number) => void
@@ -22,6 +25,8 @@ interface ScrubberProps {
 
 export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.JSX.Element {
 	const isAppActive = useAppActive()
+
+	const isHolidays = useIsHolidays()
 
 	const nowPlaying = useCurrentTrack()
 
@@ -79,18 +84,36 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 
 	return (
 		<YStack alignItems='stretch' gap='3'>
-			<Slider
-				value={displayPosition}
-				maxValue={totalDuration}
-				backgroundColor={theme.neutral.val}
-				color={theme.primary.val}
-				onValueChange={handleValueChange}
-				thumbWidth={6}
-				trackHeight={4}
-				gestureActiveRef={isSeeking}
-				thumbShadowColor={theme.black75.val}
-				hitSlop={12}
-			/>
+			{isHolidays ? (
+				// The stock slider stays on top, invisible, for gestures and seeking
+				<View style={{ height: HOLIDAY_SCRUBBER_HEIGHT, justifyContent: 'center' }}>
+					<HolidayScrubberVisuals value={displayPosition} maxValue={totalDuration} />
+					<Slider
+						value={displayPosition}
+						maxValue={totalDuration}
+						backgroundColor='transparent'
+						color='transparent'
+						onValueChange={handleValueChange}
+						thumbWidth={14}
+						trackHeight={8}
+						gestureActiveRef={isSeeking}
+						hitSlop={12}
+					/>
+				</View>
+			) : (
+				<Slider
+					value={displayPosition}
+					maxValue={totalDuration}
+					backgroundColor={theme.neutral.val}
+					color={theme.primary.val}
+					onValueChange={handleValueChange}
+					thumbWidth={6}
+					trackHeight={4}
+					gestureActiveRef={isSeeking}
+					thumbShadowColor={theme.black75.val}
+					hitSlop={12}
+				/>
+			)}
 
 			{/* Time display and quality badge */}
 			<XStack alignItems='center' justifyContent='space-between'>

@@ -8,7 +8,9 @@ import ItemCardBackground from './background'
 import ItemCardCaption from './caption'
 import ItemCardFooter from './footer'
 import { CardSizeToken } from './types'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import SnowCap from '../../../Holidays/snow-cap'
+import { useHolidayTokens, useIsHolidays } from '../../../Holidays/hooks'
 
 interface CardProps extends Omit<TamaguiCardProps, 'size'> {
 	caption?: string | null | undefined
@@ -18,6 +20,8 @@ interface CardProps extends Omit<TamaguiCardProps, 'size'> {
 	captionAlign?: 'center' | 'left' | 'right'
 	/** Single source of truth for the card's width/height; the caption is capped to the same width */
 	size?: CardSizeToken
+	/** Drapes snow over the top of the artwork while the Holidays color scheme is active */
+	snowCap?: boolean
 }
 
 /**
@@ -35,13 +39,21 @@ export default function ItemCard({
 	onPress,
 	captionAlign = 'center',
 	size = '10',
+	snowCap,
 	...cardProps
 }: CardProps) {
 	usePerformanceMonitor('ItemCard', 2)
 
 	const warmContext = useItemContext()
+	const isHolidays = useIsHolidays()
+	const holidayTokens = useHolidayTokens()
 
 	const handlePressIn = () => (item.Type !== 'Audio' ? warmContext(item) : undefined)
+
+	// Holidays: round artwork gets a gold ring, squared artwork a softer, deeper shadow
+	const holidayShadow = squared
+		? [{ offsetX: 0, offsetY: 4, blurRadius: 12, color: 'rgba(0, 0, 0, 0.3)' }]
+		: [{ offsetX: 0, offsetY: 0, blurRadius: 0, spreadDistance: 2, color: holidayTokens.ring }]
 
 	return (
 		<YStack alignItems='center' marginHorizontal='1' marginTop='2'>
@@ -55,11 +67,18 @@ export default function ItemCard({
 				onPress={onPress}
 				onPressIn={handlePressIn}
 				overflow={'hidden'}
-				boxShadow='0 1px 8px black75'
+				{...(isHolidays
+					? { style: { boxShadow: holidayShadow } }
+					: { boxShadow: '0 1px 8px black75' })}
 			>
 				<ItemCardBackground item={item} squared={squared} />
 				<ItemCardFooter type={item.Type ?? BaseItemKind.Audio} size={size} />
 			</TamaguiCard>
+			{isHolidays && snowCap && (
+				<View pointerEvents='none' style={styles.snowCap}>
+					<SnowCap size='small' color={holidayTokens.cap} />
+				</View>
+			)}
 			<ItemCardCaption
 				captionAlign={captionAlign}
 				caption={caption}
@@ -69,3 +88,12 @@ export default function ItemCard({
 		</YStack>
 	)
 }
+
+const styles = StyleSheet.create({
+	// The design drapes the cap 6px above and 4px outside the artwork
+	snowCap: {
+		position: 'absolute',
+		top: -6,
+		left: -4,
+	},
+})

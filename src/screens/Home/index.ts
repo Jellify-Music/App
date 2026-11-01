@@ -5,6 +5,7 @@ import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
 import HomeStackParamList from './types'
 import { BaseStackScreens } from '../base-stack'
+import { holidayHeaderOptions } from '../../components/Holidays/header-options'
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 	initialRouteName: 'HomeScreen',
@@ -12,9 +13,10 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 	screens: {
 		HomeScreen: {
 			screen: HomeComponent,
-			options: {
+			options: () => ({
 				title: 'Home',
-			},
+				...holidayHeaderOptions({ icon: 'holly', snow: { count: 26, seed: 11 } }),
+			}),
 		},
 		...BaseStackScreens,
 		RecentArtists: {
