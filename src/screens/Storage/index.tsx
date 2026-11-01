@@ -508,8 +508,8 @@ const DownloadSettingsSection = ({
 			>
 				<RadioGroupItemWithLabel size='3' value='original' label='Original Quality' />
 				<RadioGroupItemWithLabel size='3' value='high' label='High (320kbps)' />
-				<RadioGroupItemWithLabel size='3' value='medium' label='Medium (192kbps)' />
-				<RadioGroupItemWithLabel size='3' value='low' label='Low (128kbps)' />
+				<RadioGroupItemWithLabel size='3' value='medium' label='Medium (256kbps)' />
+				<RadioGroupItemWithLabel size='3' value='low' label='Low (192kbps)' />
 			</RadioGroup>
 		</YStack>
 	</SettingsSection>
