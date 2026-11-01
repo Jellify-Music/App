@@ -10,6 +10,7 @@ import AccountScreen from './account'
 import AboutScreen from './about'
 import PrivacyDeveloperScreen from './privacy-developer'
 import PlaybackScreen from './playback'
+import EqualizerScreen from './equalizer'
 import GesturesScreen from './gestures'
 import AppearanceScreen from './appearance'
 import { stackScreenOptions } from '../navigation'
@@ -77,6 +78,17 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: PlaybackScreen,
 			options: {
 				title: 'Playback',
+			},
+		},
+		Equalizer: {
+			screen: EqualizerScreen,
+			options: {
+				title: 'Equalizer',
+				headerShown: true,
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
 			},
 		},
 		PrivacyDeveloper: {

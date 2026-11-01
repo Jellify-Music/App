@@ -5,7 +5,6 @@ jest.mock('react-native-reanimated', () => ({
 	LayoutAnimationConfig: jest.fn,
 }))
 
-jest.mock('@jellify-music/react-native-reanimated-slider', () => ({
-	__esModule: true,
-	default: jest.fn(),
-}))
+jest.mock('@jellify-music/react-native-reanimated-slider', () =>
+	require(`@jellify-music/react-native-reanimated-slider/mock`),
+)

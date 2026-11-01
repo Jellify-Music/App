@@ -1,0 +1,144 @@
+appId: com.cosmonautical.jellify
+---
+# Equalizer screen — enable the EQ, apply presets, and drag band sliders
+# to make sure adjusting gains doesn't crash the native audio engine.
+# Expects to start on the Settings hub; returns there when done.
+
+- tapOn:
+    id: 'settings-nav-equalizer'
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-equalizer'
+    timeout: 10000
+- waitForAnimationToEnd
+
+- assertVisible:
+    text: 'Enable Equalizer'
+- assertVisible:
+    id: 'equalizer-enabled-switch'
+- assertVisible:
+    text: 'Presets'
+- assertVisible:
+    text: 'Bands'
+- takeScreenshot: screenshots/settings/equalizer
+
+# State is cleared during setup, so the equalizer starts disabled
+- tapOn:
+    id: 'equalizer-enabled-switch'
+- waitForAnimationToEnd
+- takeScreenshot: screenshots/settings/equalizer_enabled
+
+# ============================================================
+# PRESETS — the sections ignore touches while disabled, so a preset
+# landing also confirms the toggle above took effect
+# ============================================================
+- tapOn:
+    id: 'equalizer-preset-Rock'
+- extendedWaitUntil:
+    visible:
+      text: 'Current: Rock'
+    timeout: 5000
+- takeScreenshot: screenshots/settings/equalizer_preset_rock
+
+- tapOn:
+    id: 'equalizer-preset-Flat'
+- extendedWaitUntil:
+    visible:
+      text: 'Current: Flat'
+    timeout: 5000
+
+# ============================================================
+# BANDS — boost the lowest band, cut the highest, and tap a middle
+# band. Any manual gain change drops the preset to Custom.
+# ============================================================
+- scrollUntilVisible:
+    element:
+      id: 'equalizer-band-slider-0'
+    centerElement: true
+- swipe:
+    from:
+      id: 'equalizer-band-slider-0'
+    direction: UP
+    duration: 600
+- extendedWaitUntil:
+    visible:
+      text: 'Current: Custom'
+    timeout: 5000
+- assertVisible:
+    id: 'settings-screen-equalizer'
+
+- scrollUntilVisible:
+    element:
+      id: 'equalizer-band-slider-4'
+    centerElement: true
+- tapOn:
+    id: 'equalizer-band-slider-4'
+- assertVisible:
+    id: 'settings-screen-equalizer'
+
+- scrollUntilVisible:
+    element:
+      id: 'equalizer-band-slider-9'
+    centerElement: true
+- swipe:
+    from:
+      id: 'equalizer-band-slider-9'
+    direction: DOWN
+    duration: 600
+- assertVisible:
+    id: 'settings-screen-equalizer'
+- takeScreenshot: screenshots/settings/equalizer_bands_adjusted
+
+# Rapid back-and-forth on one band to stress consecutive gain commits
+- swipe:
+    from:
+      id: 'equalizer-band-slider-9'
+    direction: UP
+    duration: 300
+- swipe:
+    from:
+      id: 'equalizer-band-slider-9'
+    direction: DOWN
+    duration: 300
+- swipe:
+    from:
+      id: 'equalizer-band-slider-9'
+    direction: UP
+    duration: 300
+- assertVisible:
+    id: 'settings-screen-equalizer'
+
+# ============================================================
+# RESET — back to Flat
+# ============================================================
+- scrollUntilVisible:
+    element:
+      id: 'equalizer-reset-button'
+    direction: UP
+- tapOn:
+    id: 'equalizer-reset-button'
+- scrollUntilVisible:
+    element:
+      text: 'Current: Flat'
+    direction: UP
+    timeout: 5000
+- takeScreenshot: screenshots/settings/equalizer_reset
+
+# Disable again so later flows play audio without the EQ applied
+- scrollUntilVisible:
+    element:
+      id: 'equalizer-enabled-switch'
+    direction: UP
+- tapOn:
+    id: 'equalizer-enabled-switch'
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'settings-screen-equalizer'
+
+# Return to hub via back
+- runFlow: ../../subflows/platform/back.yaml
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 5000
