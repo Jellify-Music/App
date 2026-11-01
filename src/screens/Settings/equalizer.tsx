@@ -2,10 +2,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import { YStack, XStack, SizableText, ScrollView, useTheme, getTokenValue } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useEqualizer, useEqualizerPresets, type EqualizerBand } from 'react-native-nitro-player'
-import Slider from '@jellify-music/react-native-reanimated-slider'
+import Slider, { SliderOrientations } from '@jellify-music/react-native-reanimated-slider'
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-
 import Icon from '../../components/Global/components/icon'
 import Button from '../../components/Global/helpers/button'
 import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
@@ -84,7 +83,7 @@ export default function EqualizerScreen(): React.JSX.Element {
 
 					{isCasting && (
 						<XStack alignItems='center' gap='$2' testID='equalizer-cast-hint'>
-							<Icon name='cast' color='$warning' small />
+							<Icon name='cast' color='warning' size='2' />
 							<SizableText size='$2' color='$borderColor' flex={1}>
 								The equalizer doesn&apos;t affect Google Cast playback
 							</SizableText>
@@ -115,6 +114,7 @@ export default function EqualizerScreen(): React.JSX.Element {
 										label={preset.name}
 										active={preset.name === currentPreset}
 										onPress={() => handleApplyPreset(preset.name)}
+										icon={'check'}
 									/>
 								))}
 							</XStack>
@@ -128,12 +128,11 @@ export default function EqualizerScreen(): React.JSX.Element {
 
 								<Button
 									testID='equalizer-reset-button'
-									size='$3'
 									backgroundColor='transparent'
 									borderColor='$borderColor'
 									borderWidth={1}
 									onPress={reset}
-									icon={<Icon name='backup-restore' color='$color' small />}
+									icon={<Icon name='backup-restore' color='color' size='2' />}
 								>
 									<SizableText size='$3'>Reset</SizableText>
 								</Button>
@@ -209,7 +208,7 @@ function EqualizerBandRow({ band, onGainChange }: EqualizerBandRowProps): React.
 
 	return (
 		<XStack alignItems='center' gap='$3' testID={`equalizer-band-row-${band.index}`}>
-			<SizableText size='$2' color='$borderColor' width={56}>
+			<SizableText fontSize='3' color='$borderColor' width={56}>
 				{band.frequencyLabel}
 			</SizableText>
 
@@ -221,16 +220,17 @@ function EqualizerBandRow({ band, onGainChange }: EqualizerBandRowProps): React.
 					thumbWidth={8}
 					color={primary.val}
 					backgroundColor={neutral.val}
-					thumbShadowColor={getTokenValue('$color.black')}
-					trackHeight={getTokenValue('$2')}
+					thumbShadowColor={getTokenValue('black')}
+					trackHeight={getTokenValue('2')}
 					gestureActiveRef={gestureActive}
 					hitSlop={8}
+					orientation={SliderOrientations.Vertical}
 				/>
 			</YStack>
 
 			<SizableText
-				size='$3'
-				fontWeight='$6'
+				fontSize='3'
+				fontWeight='6'
 				fontVariant={['tabular-nums']}
 				color='$borderColor'
 				width={72}
