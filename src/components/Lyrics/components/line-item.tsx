@@ -104,7 +104,7 @@ export default function LyricLineItem({
 					paddingVertical: 4,
 					minHeight: 30,
 					justifyContent: 'center',
-					marginHorizontal: 10,
+					marginHorizontal: 30,
 				},
 				animatedStyle,
 			]}
