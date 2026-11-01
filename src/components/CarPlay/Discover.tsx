@@ -33,37 +33,25 @@ const CarPlayDiscover = new ListTemplate({
 		switch (index) {
 			case 0: {
 				// Recently Added
-				const { pages: recentlyAddedPages } = await ensureRecentlyAddedQueryData()
+				const recentlyAdded = await ensureRecentlyAddedQueryData()
 
-				CarPlay.pushTemplate(
-					TracksTemplate(recentlyAddedPages.flat(), 'Recently Added'),
-					true,
-				)
+				CarPlay.pushTemplate(TracksTemplate(recentlyAdded, 'Recently Added'), true)
 				break
 			}
 
 			case 1: {
 				// Suggested Artists
-				const { pages: suggestedArtistsPages } = await ensureDiscoverArtistsQueryData(
-					user,
-					library,
-				)
+				const suggestedArtists = await ensureDiscoverArtistsQueryData(user, library)
 
-				CarPlay.pushTemplate(ArtistsTemplate(suggestedArtistsPages.flat()), true)
+				CarPlay.pushTemplate(ArtistsTemplate(suggestedArtists), true)
 				break
 			}
 
 			case 2: {
 				// Suggested Albums
-				const { pages: suggestedAlbumsPages } = await ensureDiscoverAlbumsQueryData(
-					user,
-					library,
-				)
+				const suggestedAlbums = await ensureDiscoverAlbumsQueryData(user, library)
 
-				CarPlay.pushTemplate(
-					TracksTemplate(suggestedAlbumsPages.flat(), 'More from the Vault'),
-					true,
-				)
+				CarPlay.pushTemplate(TracksTemplate(suggestedAlbums, 'More from the Vault'), true)
 				break
 			}
 		}
