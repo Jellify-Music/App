@@ -46,7 +46,10 @@ const CarPlayHome = new ListTemplate({
 			case 0: {
 				// Recent Artists
 
-				await queryClient.ensureInfiniteQueryData(PlayItAgainQuery(library))
+				await queryClient.infiniteQuery({
+					...PlayItAgainQuery(library),
+					staleTime: 'static',
+				})
 
 				const artists = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
 					RecentlyPlayedArtistsQueryKey(user, library),
@@ -57,7 +60,10 @@ const CarPlayHome = new ListTemplate({
 
 			case 1: {
 				// Recent Tracks
-				await queryClient.ensureInfiniteQueryData(PlayItAgainQuery(library))
+				await queryClient.infiniteQuery({
+					...PlayItAgainQuery(library),
+					staleTime: 'static',
+				})
 
 				const items = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
 					RecentlyPlayedTracksQueryKey(user, library),
