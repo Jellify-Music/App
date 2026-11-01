@@ -63,6 +63,54 @@ describe('Player Controls', () => {
 			expect(TrackPlayer.skipToPrevious).toHaveBeenCalled()
 			expect(TrackPlayer.play).toHaveBeenCalled()
 		})
+		it('should wrap to the last track when skipping back from the first track with repeat all', async () => {
+			usePlayerQueueStore.setState({ repeatMode: 'Playlist' })
+			;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([
+				{ id: 'a' },
+				{ id: 'b' },
+				{ id: 'c' },
+			])
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 0,
+				currentPosition: SKIP_TO_PREVIOUS_THRESHOLD - 1,
+				currentState: 'playing',
+			})
+
+			await previous()
+
+			expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(2)
+			expect(TrackPlayer.skipToPrevious).not.toHaveBeenCalled()
+			expect(TrackPlayer.play).toHaveBeenCalled()
+		})
+
+		it('should seek to beginning of the first track past the threshold with repeat all', async () => {
+			usePlayerQueueStore.setState({ repeatMode: 'Playlist' })
+			;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([{ id: 'a' }, { id: 'b' }])
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 0,
+				currentPosition: SKIP_TO_PREVIOUS_THRESHOLD + 1,
+				currentState: 'playing',
+			})
+
+			await previous()
+
+			expect(TrackPlayer.seek).toHaveBeenCalledWith(0)
+			expect(TrackPlayer.skipToIndex).not.toHaveBeenCalled()
+		})
+
+		it('should skip to previous normally on the first track when repeat is off', async () => {
+			;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([{ id: 'a' }, { id: 'b' }])
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 0,
+				currentPosition: SKIP_TO_PREVIOUS_THRESHOLD - 1,
+				currentState: 'playing',
+			})
+
+			await previous()
+
+			expect(TrackPlayer.skipToPrevious).toHaveBeenCalled()
+			expect(TrackPlayer.skipToIndex).not.toHaveBeenCalled()
+		})
 	})
 
 	describe('skip()', () => {
