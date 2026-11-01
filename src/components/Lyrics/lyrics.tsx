@@ -1,4 +1,4 @@
-import { Text, View, YStack, getTokenValue } from 'tamagui'
+import { SizableText, View, YStack, getTokenValue } from 'tamagui'
 import { useShowNoLyricsMessage } from '../../hooks/lyrics/parsing'
 import { useProgress } from '../../player'
 import React, { useEffect, useRef } from 'react'
@@ -13,6 +13,7 @@ import LyricLineItem from './components/line-item'
 import { useResetScroll } from '../../hooks/lyrics/scrolling'
 import { LegendListRef, LegendListRenderItemProps } from '@legendapp/list/react-native'
 import { AnimatedLegendList } from '@legendapp/list/reanimated'
+import { LyricKeyExtractor } from '../../utils/parsing/key-extractor'
 
 const LyricList = AnimatedLegendList<ParsedLyricLine>
 
@@ -78,21 +79,24 @@ export default function Lyrics(): React.JSX.Element {
 			currentLineIndex.value = withSpring(currentLyricIndex)
 		}
 
+		if (!lyricsListRef.current) return
+
+		if (isInitialMountRef.current) {
+			isInitialMountRef.current = false
+			return
+		}
+
 		if (
 			currentLyricIndex < 0 ||
 			currentLyricIndex >= parsedLyrics.length ||
-			!lyricsListRef.current ||
 			isUserScrolling.value
 		) {
 			return
 		}
 
-		const animated = !isInitialMountRef.current
-		isInitialMountRef.current = false
-
 		lyricsListRef.current.scrollToIndex({
 			index: currentLyricIndex,
-			animated,
+			animated: true,
 			viewPosition: 0.5,
 		})
 	}, [currentLyricIndex, parsedLyrics.length])
@@ -200,9 +204,6 @@ export default function Lyrics(): React.JSX.Element {
 		)
 	}
 
-	const keyExtractor = (item: ParsedLyricLine, index: number) =>
-		`lyric-${index}-${item.startTime}`
-
 	return (
 		<View flex={1}>
 			{parsedLyrics.length > 0 ? (
@@ -210,7 +211,12 @@ export default function Lyrics(): React.JSX.Element {
 					ref={lyricsListRef}
 					data={parsedLyrics}
 					renderItem={renderLyricItem}
-					keyExtractor={keyExtractor}
+					keyExtractor={LyricKeyExtractor}
+					initialScrollIndex={
+						currentLyricIndex >= 0
+							? { index: currentLyricIndex, viewPosition: 0.5 }
+							: undefined
+					}
 					onScrollBeginDrag={handleScrollBeginDrag}
 					onMomentumScrollEnd={handleMomentumScrollEnd}
 					showsVerticalScrollIndicator={false}
@@ -221,9 +227,9 @@ export default function Lyrics(): React.JSX.Element {
 			) : (
 				<YStack justifyContent='center' alignItems='center' flex={1}>
 					{showNoLyricsMessage && (
-						<Text fontSize={'3'} textAlign='center'>
+						<SizableText fontSize={'3'} textAlign='center'>
 							No lyrics available
-						</Text>
+						</SizableText>
 					)}
 				</YStack>
 			)}
