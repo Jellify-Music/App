@@ -277,10 +277,6 @@ All logging goes through three shared utilities in [`src/utils/logging/index.ts`
 
 In production builds, all `console.*` methods are replaced with no-ops so that no debug output leaks — logs only surface through the explicit capture call path.
 
-#### Usage Analytics — [TelemetryDeck](https://telemetrydeck.com)
-
-Anonymous usage signals are sent via [`@typedigital/telemetrydeck-react`](https://github.com/typedigital/telemetrydeck-react). The only signal currently sent is `Jellify launched` on app open. All signals are anonymous (`clientUser: 'anonymous'`) and are only sent when you have opted in to metrics.
-
 ### Love from Wisconsin 🧀
 
 This is undoubtedly a passion project of [mine](https://github.com/anultravioletaurora), and I've learned a lot from working on it (and the many failed attempts before it). I hope you enjoy using it! Feature requests and bug reports are welcome :)
