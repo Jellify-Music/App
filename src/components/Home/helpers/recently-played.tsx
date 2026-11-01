@@ -5,12 +5,11 @@ import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
-import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 import { loadNewQueue } from '../../../player/queuing'
 
 export default function RecentlyPlayed(): React.JSX.Element {
@@ -18,8 +17,6 @@ export default function RecentlyPlayed(): React.JSX.Element {
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const tracksInfiniteQuery = useRecentlyPlayedTracks()
-
-	const { horizontalItems } = useDisplayContext()
 
 	const tracks = tracksInfiniteQuery.data?.filter(({ Type }) => Type === BaseItemKind.Audio)
 
@@ -52,11 +49,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 			</XStack>
 
 			<HorizontalCardList
-				data={
-					(tracksInfiniteQuery.data.length ?? 0 > horizontalItems)
-						? tracksInfiniteQuery.data.slice(0, horizontalItems)
-						: tracksInfiniteQuery.data
-				}
+				data={tracksInfiniteQuery.data}
 				renderItem={({ index, item }) => (
 					<ItemCard
 						size={'10'}

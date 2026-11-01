@@ -1,5 +1,6 @@
-import { XStack, YStack, Spacer, useTheme, SizableText, View } from 'tamagui'
+import { YStack, useTheme, View } from 'tamagui'
 import React from 'react'
+import { usePlayerContext } from '../../../providers/Player'
 import ItemImage from '../../Global/components/image'
 import Animated, {
 	Easing,
@@ -10,57 +11,21 @@ import Animated, {
 	useSharedValue,
 	withSpring,
 } from 'react-native-reanimated'
-import { LayoutChangeEvent } from 'react-native'
-import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import navigationRef from '../../../screens/navigation'
-import { useQueueRef, useCurrentTrack } from '../../../stores/player/queue'
-import TextTicker from 'react-native-text-ticker'
-import { TextTickerConfig } from '../component.config'
+import { LayoutChangeEvent, StyleSheet } from 'react-native'
+import { useCurrentTrack } from '../../../stores/player/queue'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { GestureDetector } from 'react-native-gesture-handler'
 import { useAlbumCoverGesture } from '../../../hooks/gestures/player'
+import Lyrics from '../../Lyrics/lyrics'
 
-export default function PlayerHeader(): React.JSX.Element {
-	const queueRef = useQueueRef()
-
-	const theme = useTheme()
-
-	const playingFrom = !queueRef
-		? 'Untitled'
-		: typeof queueRef === 'object'
-			? (queueRef.Name ?? 'Untitled')
-			: queueRef
+export default function PlayerContent(): React.JSX.Element {
+	const { displayLyrics } = usePlayerContext()
 
 	return (
 		<YStack flex={1} justifyContent='flex-start'>
-			<XStack alignContent='flex-start' flexShrink={1} justifyContent='center'>
-				<MaterialDesignIcons
-					color={theme.color.val}
-					name={'chevron-down'}
-					size={22}
-					onPress={() => navigationRef.goBack()}
-					testID='player-close-button'
-					accessibilityLabel='Close player'
-					style={{
-						marginVertical: 'auto',
-						width: 22,
-						marginRight: 8,
-					}}
-				/>
-
-				<YStack alignItems='center' flexGrow={1}>
-					<SizableText fontSize={'2'}>Playing from</SizableText>
-					<TextTicker {...TextTickerConfig}>
-						<SizableText fontWeight='6' numberOfLines={1} fontSize='2'>
-							{playingFrom}
-						</SizableText>
-					</TextTicker>
-				</YStack>
-
-				<Spacer marginLeft={8} width={22} />
-			</XStack>
-
-			<PlayerArtwork />
+			<View flex={1} maxHeight='67%' marginVertical={'auto'}>
+				{displayLyrics ? <Lyrics /> : <PlayerArtwork />}
+			</View>
 		</YStack>
 	)
 }
@@ -103,21 +68,19 @@ function PlayerArtwork(): React.JSX.Element {
 			alignItems='center'
 			justifyContent='center'
 			paddingHorizontal='2'
-			maxHeight={'60%'}
 			marginHorizontal='4'
-			marginVertical={'auto'}
 			onLayout={handleLayout}
 		>
-			{/* The native gesture requires the detector to have exactly one stable child, so key the artwork inside it */}
 			<GestureDetector gesture={albumCoverGesture}>
-				<View>
+				<View justifyContent='center' alignItems='center' style={StyleSheet.absoluteFill}>
 					{nowPlaying && item && (
 						<Animated.View
-							collapsable={false}
-							style={animatedStyle}
 							entering={FadeIn.easing(Easing.in(Easing.ease))}
 							exiting={FadeOut.easing(Easing.out(Easing.ease))}
-							key={`${item.AlbumId}-item-image`}
+							key={`${nowPlaying.id}-item-image`}
+							style={{
+								...animatedStyle,
+							}}
 						>
 							<ItemImage
 								item={item}

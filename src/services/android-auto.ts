@@ -24,10 +24,10 @@ import { restoreFromStorage } from './player/utils/initialization'
 import { useAutoStore } from '../stores/auto'
 import { fetchRecentlyAdded, fetchRecentlyPlayed } from '../api/queries/recents/utils'
 import { fetchFrequentlyPlayed } from '../api/queries/frequents/utils/frequents'
-import { fetchUserPlaylists } from '../api/queries/playlist/utils'
 import { getItemImageUrl } from '../api/queries/image/utils'
 import { mapDtosToTracks } from '../utils/mapping/item-to-track'
 import { ensureDownloadedTracks } from '../hooks/downloads/utils'
+import { refreshPlaylistTracks, refreshUserPlaylists } from '../api/queries/playlist/cache'
 
 /**
  * Playlists we materialize for Android Auto are tagged with this prefix so
@@ -243,7 +243,7 @@ async function loadChildren(parentId: string): Promise<MediaItem[] | null> {
 			return withMore(
 				base,
 				offset,
-				(await fetchUserPlaylists(api, user, [ItemSortBy.SortName]))
+				(await refreshUserPlaylists())
 					.slice(offset, offset + PAGE_SIZE + 1)
 					.map((playlist) => tile('playlist', playlist)),
 			)
@@ -262,14 +262,7 @@ async function loadChildren(parentId: string): Promise<MediaItem[] | null> {
 				}),
 			)
 		case 'playlist':
-			return playableTracks(
-				base,
-				await getItems({
-					parentId: id,
-					includeItemTypes: [BaseItemKind.Audio],
-					fields: TRACK_FIELDS,
-				}),
-			)
+			return playableTracks(base, await refreshPlaylistTracks({ Id: id }))
 		case 'picks':
 			return playableTracks(
 				base,

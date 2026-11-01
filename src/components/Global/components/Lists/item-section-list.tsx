@@ -6,7 +6,7 @@ import { SizableText, useTheme, View, XStack, YStack } from 'tamagui'
 import { RefreshControl } from 'react-native'
 import { closeAllSwipeableRows } from '../SwipeableRow/registery'
 import AZScroller from '../AZScroller'
-import ListStickyHeader from '../../helpers/list-sticky-header'
+import ListStickyHeader from './list-sticky-header'
 
 interface ItemSectionListProps {
 	ref: RefObject<SectionListRef | null>

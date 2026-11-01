@@ -118,8 +118,16 @@ export const useAlbumDiscs = (album: BaseItemDto) => {
 	return useQuery(AlbumDiscsQuery(api, album))
 }
 
-export const ensureAlbumDiscsQuery = async (album: BaseItemDto) =>
-	await queryClient.ensureQueryData(AlbumDiscsQuery(getApi(), album))
+export async function refreshAlbumDiscs(album: BaseItemDto) {
+	return queryClient.query({
+		...AlbumDiscsQuery(getApi(), album),
+		staleTime: 0,
+	})
+}
+
+export async function prefetchAlbumDiscsQuery(album: BaseItemDto) {
+	return queryClient.query(AlbumDiscsQuery(getApi(), album)).catch(() => {})
+}
 
 const AlbumDiscsQuery = (api: Api | undefined, album: BaseItemDto) => ({
 	queryKey: AlbumDiscsQueryKey(album),

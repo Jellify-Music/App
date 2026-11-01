@@ -1,4 +1,4 @@
-import { H4, H5, XStack } from 'tamagui'
+import { H4, XStack } from 'tamagui'
 import { usePublicServerInfo } from '../../../api/queries/public-server-info'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
@@ -9,18 +9,10 @@ import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
-import AnimatedRow from '../../Global/helpers/animated-row'
-import { useDisplayContext } from '../../../providers/Display/display-provider'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 
 export default function PublicPlaylists(): React.JSX.Element {
-	const {
-		data: playlists,
-		fetchNextPage,
-		hasNextPage,
-		isPending,
-		isFetchingNextPage,
-		refetch,
-	} = usePublicPlaylists()
+	const result = usePublicPlaylists()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
 
@@ -28,23 +20,14 @@ export default function PublicPlaylists(): React.JSX.Element {
 
 	const { width } = useSafeAreaFrame()
 
-	const publicPlaylistsExist = playlists && playlists.length > 0
-
-	const { horizontalItems } = useDisplayContext()
+	const publicPlaylistsExist = result.data && result.data.length > 0
 
 	return publicPlaylistsExist ? (
 		<AnimatedRow testID='discover-public-playlists'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
-					navigation.navigate('PublicPlaylists', {
-						playlists,
-						fetchNextPage,
-						hasNextPage,
-						isPending,
-						isFetchingNextPage,
-						refetch,
-					})
+					navigation.navigate('PublicPlaylists')
 				}}
 			>
 				<H4 marginLeft='2' maxWidth={width * 0.8} lineBreakStrategyIOS='standard'>
@@ -53,7 +36,7 @@ export default function PublicPlaylists(): React.JSX.Element {
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
-				data={playlists?.slice(0, horizontalItems)}
+				data={result.data}
 				renderItem={({ item }) => (
 					<ItemCard
 						caption={item.Name}

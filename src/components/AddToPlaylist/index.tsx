@@ -1,17 +1,15 @@
-import { useMutation, InfiniteData } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist } from '../../api/mutations/playlist/utils/playlists'
 import { YStack, XStack, Spacer, Spinner, View, useTheme, SizableText } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { AddToPlaylistMutation } from './types'
 import ItemImage from '../Global/components/image'
-import TextTicker from 'react-native-text-ticker'
-import { TextTickerConfig } from '../Player/component.config'
+import { Ticker } from '../../components/Global/helpers/Animated/text'
 import { getItemName } from '../../utils/formatting/item-names'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores/auth/utils'
-import { queryClient } from '../../constants/query-client'
-import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import { appendPlaylistTracks } from '../../api/queries/playlist/cache'
 import List from '../Global/components/Lists/utils'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { applyHapticFeedback } from '../../utils/haptics'
@@ -57,18 +55,18 @@ export default function AddToPlaylist({
 					/>
 
 					<YStack justifyContent='space-evenly'>
-						<TextTicker {...TextTickerConfig}>
+						<Ticker>
 							<SizableText fontWeight='6' fontSize={'3'}>
 								{getItemName(source ?? tracks[0])}
 							</SizableText>
-						</TextTicker>
+						</Ticker>
 
 						{(source ?? tracks[0])?.ArtistItems && (
-							<TextTicker {...TextTickerConfig}>
+							<Ticker>
 								<SizableText fontWeight='6' fontSize={'3'}>
 									{`${(source ?? tracks[0])!.ArtistItems?.map((artist) => getItemName(artist)).join(', ')}`}
 								</SizableText>
-							</TextTicker>
+							</Ticker>
 						)}
 					</YStack>
 				</XStack>
@@ -115,19 +113,7 @@ function AddToPlaylistRow({
 		onSuccess: (_, { tracks }) => {
 			applyHapticFeedback('success')
 
-			queryClient.setQueryData(
-				PlaylistTracksQueryKey(playlist),
-				(prev: InfiniteData<BaseItemDto[]> | undefined) => {
-					if (!prev) return prev
-
-					return {
-						...prev,
-						pages: prev.pages.map((page: BaseItemDto[], idx: number) =>
-							idx === prev.pages.length - 1 ? [...page, ...tracks] : page,
-						),
-					}
-				},
-			)
+			appendPlaylistTracks(playlist, tracks)
 		},
 		onError: (error) => {
 			console.error(error)

@@ -1,23 +1,11 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import { useTheme, XStack, YStack, SizableText } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
-import TextTicker from 'react-native-text-ticker'
+import { Ticker } from '../../components/Global/helpers/Animated/text'
 import { PlayPauseIcon } from '../Player/components/buttons'
-import { TextTickerConfig } from '../Player/component.config'
-import { useProgress } from '../../player'
 
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler'
-import Animated, {
-	Easing,
-	FadeIn,
-	FadeOut,
-	useSharedValue,
-	useAnimatedStyle,
-	withTiming,
-	ReduceMotion,
-	interpolate,
-	SlideInDown,
-} from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, SlideInDown } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -26,7 +14,6 @@ import { useCurrentTrack } from '../../stores/player/queue'
 import getTrackDto, { getTypedExtraPayload } from '../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { previous, skip } from '../../player/controls'
-import useAppActive from '../../hooks/use-app-active'
 import { PAN_GESTURE_THRESHOLD } from '../../configs/gesturing/miniplayer'
 import MiniPlayerProgress from './progress'
 
@@ -124,17 +111,17 @@ export default function Miniplayer(): React.JSX.Element | null {
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								key={`${nowPlaying!.id}-mini-player-song-info`}
 							>
-								<TextTicker {...TextTickerConfig}>
+								<Ticker>
 									<SizableText fontWeight='6' fontSize='2'>
 										{nowPlaying.title ?? 'Nothing Playing'}
 									</SizableText>
-								</TextTicker>
+								</Ticker>
 
-								<TextTicker {...TextTickerConfig}>
+								<Ticker>
 									<SizableText fontSize='2'>
 										{nowPlaying.artist ?? 'Unknown Artist'}
 									</SizableText>
-								</TextTicker>
+								</Ticker>
 							</Animated.View>
 						</YStack>
 
