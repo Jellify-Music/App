@@ -1,13 +1,12 @@
-import { BaseItemDto, BaseItemKind, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { CarPlay, ListTemplate } from 'react-native-carplay'
 import uuid from 'react-native-uuid'
 import CarPlayNowPlaying from './NowPlaying'
 import { Queue } from '../../services/types/queue-item'
 import AlbumTemplate from './Album'
 import { loadNewQueue } from '../../player/queuing'
-import { ensureAlbumDiscsQuery } from '../../api/queries/album'
 import { formatArtistNames } from '../../utils/formatting/artist-names'
-import { getItemImageUrl } from '../../api/queries/image/utils'
+import { refreshAlbumDiscs } from '../../api/queries/album'
 
 const TracksTemplate = (items: BaseItemDto[], queuingRef: Queue) =>
 	new ListTemplate({
@@ -35,7 +34,7 @@ const TracksTemplate = (items: BaseItemDto[], queuingRef: Queue) =>
 			const startIndex = tracks.indexOf(item)
 
 			if (startIndex === -1) {
-				const albumDiscs = await ensureAlbumDiscsQuery(item)
+				const albumDiscs = await refreshAlbumDiscs(item)
 
 				CarPlay.pushTemplate(AlbumTemplate(item, albumDiscs), true)
 			} else {

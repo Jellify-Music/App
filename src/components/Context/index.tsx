@@ -10,7 +10,6 @@ import Icon from '../Global/components/icon'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs } from '../../api/queries/item'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { useEffect } from 'react'
@@ -28,6 +27,7 @@ import CircularProgressIndicator from '../Global/components/DownloadIndicator/ci
 import { useArtist } from '../../api/queries/artist'
 import { addToQueue } from '../../player/queuing'
 import { useAlbum } from '../../api/queries/album'
+import { usePlaylistTracks } from '../../api/queries/playlist'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import ViewInstantMixMenuRow from './components/instant-mix-row'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
@@ -64,17 +64,7 @@ export default function ItemContext({
 		isTrack && item.AlbumId ? ({ Id: item.AlbumId } as BaseItemDto) : ({} as BaseItemDto),
 	)
 
-	const { data: tracks } = useQuery({
-		queryKey: [QueryKeys.ItemTracks, item.Id],
-		queryFn: () =>
-			getItemsApi(api!)
-				.getItems({ parentId: item.Id! })
-				.then(({ data }) => {
-					if (data.Items) return data.Items
-					else return []
-				}),
-		enabled: isPlaylist,
-	})
+	const { data: tracks } = usePlaylistTracks(item, !isPlaylist)
 
 	const { data: discs } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, item.Id],
