@@ -1,0 +1,31 @@
+name: Publish / OTA Update PR Cleanup
+on:
+  # pull_request_target runs this file from main, never the PR's copy, and
+  # nothing below checks out PR code, so it's safe for fork PRs and on the
+  # self-hosted runners.
+  pull_request_target:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  delete-pr-bundle-branches:
+    if: github.repository == 'Jellify-Music/App' && github.event.pull_request.merged
+    runs-on: [self-hosted, Linux]
+    steps:
+      - name: 🧹 Delete PR bundle branches
+        run: |
+          for platform in android ios; do
+            branch="PULL_REQUEST_${PR_NUMBER}_${platform}"
+            status=$(curl -s -o /dev/null -w '%{http_code}' -X DELETE \
+              -H "Authorization: Bearer $SIGNING_REPO_PAT" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/Jellify-Music/App-Bundles/git/refs/heads/$branch")
+            case "$status" in
+              204) echo "Deleted $branch" ;;
+              404|422) echo "$branch doesn't exist, skipping" ;;
+              *) echo "::error::Deleting $branch failed with HTTP $status"; exit 1 ;;
+            esac
+          done
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
