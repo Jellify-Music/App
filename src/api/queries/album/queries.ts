@@ -41,5 +41,5 @@ export const RecentlyAddedQuery = (
 }
 
 export const ensureRecentlyAddedQueryData = async () => {
-	return queryClient.ensureInfiniteQueryData(RecentlyAddedQuery())
+	return queryClient.infiniteQuery({ ...RecentlyAddedQuery(), staleTime: 'static' })
 }

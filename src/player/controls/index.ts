@@ -2,6 +2,7 @@ import { applyHapticFeedback } from '../../utils/haptics'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../configs/player/index.config'
 import { isUndefined } from 'lodash'
 import { TrackPlayer } from 'react-native-nitro-player'
+import { usePlayerQueueStore } from '../../stores/player/queue'
 
 let isSkipInFlight = false
 
@@ -14,6 +15,9 @@ let isSkipInFlight = false
  * which determines how many seconds until we will instead skip to the
  * beginning of the track for convenience.
  *
+ * When repeat mode is set to `Playlist` and the current track is the
+ * first in the queue, wraps around to the last track.
+ *
  * Starts playback at the end of the operation if the player was already playing.
  * Does not resume playback if the player was paused
  */
@@ -25,7 +29,14 @@ export async function previous(): Promise<void> {
 	if (isUndefined(currentIndex)) return
 
 	if (Math.floor(currentPosition) <= SKIP_TO_PREVIOUS_THRESHOLD) {
-		await TrackPlayer.skipToPrevious()
+		const { repeatMode } = usePlayerQueueStore.getState()
+
+		if (repeatMode === 'Playlist' && currentIndex === 0) {
+			const queue = await TrackPlayer.getActualQueue()
+			if (queue.length > 0) await TrackPlayer.skipToIndex(queue.length - 1)
+		} else {
+			await TrackPlayer.skipToPrevious()
+		}
 	} else {
 		await TrackPlayer.seek(0)
 	}
@@ -36,6 +47,9 @@ export async function previous(): Promise<void> {
 /**
  * A function that will skip to the next track or the specified
  * track index.
+ *
+ * When repeat mode is set to `Playlist` and the current track is the
+ * last in the queue, wraps around to the first track.
  *
  * Always starts playback at the end of the operation.
  *
@@ -54,7 +68,15 @@ export async function skip(index: number | undefined): Promise<void> {
 			if (index === currentIndex) return
 			await TrackPlayer.skipToIndex(index)
 		} else {
-			await TrackPlayer.skipToNext()
+			const { repeatMode } = usePlayerQueueStore.getState()
+			const queue = await TrackPlayer.getActualQueue()
+			const isLastTrack = !isUndefined(currentIndex) && currentIndex >= queue.length - 1
+
+			if (repeatMode === 'Playlist' && isLastTrack && queue.length > 0) {
+				await TrackPlayer.skipToIndex(0)
+			} else {
+				await TrackPlayer.skipToNext()
+			}
 		}
 
 		await TrackPlayer.play()

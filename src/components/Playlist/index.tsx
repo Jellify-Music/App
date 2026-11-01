@@ -219,7 +219,8 @@ export default function Playlist(): React.JSX.Element {
 				contentInsetAdjustmentBehavior='automatic'
 				containerStyle={{
 					flex: 1,
-					padding: 8,
+					paddingTop: 8,
+					paddingHorizontal: 8,
 				}}
 				ListHeaderComponent={<PlaylistTracklistHeader />}
 				data={playlistTracks}

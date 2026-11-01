@@ -1,7 +1,7 @@
 import React from 'react'
 import { Platform, TextInputProps } from 'react-native'
 import {
-	Paragraph,
+	SizableText,
 	Input as TamaguiInput,
 	InputProps as TamaguiInputProps,
 	XStack,
@@ -21,7 +21,7 @@ type RNTextInputAutofillSubset = Partial<
 	>
 >
 
-type InputProps = TamaguiInputProps &
+type InputProps = Exclude<TamaguiInputProps, 'size'> &
 	RNTextInputAutofillSubset & {
 		title?: string | undefined
 		testID?: string | undefined
@@ -69,13 +69,13 @@ export default function Input(props: InputProps): React.JSX.Element {
 	const clearButtonTestID = testID ? `${testID}-clear` : 'input-clear-button'
 
 	return (
-		<YStack flex={1}>
+		<YStack flex={props.flex}>
 			{props.title && (
-				<Paragraph fontWeight='6' color='borderColor'>
+				<SizableText flexShrink={1} fontWeight='6' color='borderColor'>
 					{props.title}
-				</Paragraph>
+				</SizableText>
 			)}
-			<XStack alignItems='center'>
+			<XStack alignItems='flex-start' flexGrow={1}>
 				{prependElement && (
 					<YStack
 						flexShrink={1}
@@ -94,9 +94,9 @@ export default function Input(props: InputProps): React.JSX.Element {
 					testID={testID}
 					clearButtonMode={resolvedClearButtonMode}
 					borderRadius={'2'}
-					height={'3'}
-					fontSize={'2'}
 					borderColor={'borderColor'}
+					fontSize='3'
+					fontWeight='4'
 					{...inputProps}
 				/>
 

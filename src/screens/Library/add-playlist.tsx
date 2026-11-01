@@ -1,6 +1,6 @@
 import Input from '../../components/Global/helpers/input'
 import React, { useState } from 'react'
-import { Label, Spinner, View, XStack, SizableText } from 'tamagui'
+import { Label, Spinner, View, XStack, SizableText, YStack } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { isEmpty } from 'lodash'
@@ -17,11 +17,13 @@ export default function AddPlaylist(): React.JSX.Element {
 	const addPlaylist = useAddPlaylist()
 
 	return (
-		<View margin='4' flex={1}>
-			<Label size='2' htmlFor='name' fontWeight='6' justifyContent='flex-end'>
-				Name
-			</Label>
-			<Input id='name' onChangeText={setName} />
+		<YStack margin='4' flex={1} gap='4'>
+			<YStack gap='2'>
+				<Label size='2' htmlFor='name' fontWeight='6' justifyContent='flex-end'>
+					Name
+				</Label>
+				<Input id='name' onChangeText={setName} />
+			</YStack>
 			<XStack justifyContent='space-evenly' gap='2'>
 				<Button
 					danger
@@ -29,9 +31,9 @@ export default function AddPlaylist(): React.JSX.Element {
 					borderColor={'borderColor'}
 					onPress={libraryStackNavigation.goBack}
 					flex={1}
-					icon={() => <Icon name='chevron-left' size='7' color={'borderColor'} />}
+					icon={<Icon name='chevron-left' size='6' color={'borderColor'} />}
 				>
-					<SizableText fontWeight='6' color={'borderColor'}>
+					<SizableText fontSize='2' fontWeight='6' color={'borderColor'}>
 						Cancel
 					</SizableText>
 				</Button>
@@ -42,7 +44,7 @@ export default function AddPlaylist(): React.JSX.Element {
 					borderColor={'primary'}
 					icon={
 						!addPlaylist.isPending ? (
-							<Icon name='content-save' size='7' color={'primary'} />
+							<Icon name='content-save' size='6' color={'primary'} />
 						) : undefined
 					}
 					disabled={isEmpty(name) || addPlaylist.isPending}
@@ -50,12 +52,12 @@ export default function AddPlaylist(): React.JSX.Element {
 					{addPlaylist.isPending ? (
 						<Spinner color='primary' />
 					) : (
-						<SizableText fontWeight='6' color={'primary'}>
+						<SizableText fontSize='2' fontWeight='6' color={'primary'}>
 							Save
 						</SizableText>
 					)}
 				</Button>
 			</XStack>
-		</View>
+		</YStack>
 	)
 }

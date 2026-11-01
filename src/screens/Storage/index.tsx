@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
 import { Card, RadioGroup, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
@@ -11,7 +11,7 @@ import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-lab
 import { RadioGroupItemWithLabel } from '../../components/Global/helpers/radio-group-item-with-label'
 import { formatBytes } from '../../utils/formatting/bytes'
 import { useDeletionToast } from '../../utils/toasts/deletion-toast'
-import { DownloadQuality, useAutoDownload, useDownloadQuality } from '../../stores/settings/usage'
+import { useAutoDownload, useDownloadQuality } from '../../stores/settings/usage'
 import {
 	DownloadedTrack,
 	DownloadProgress,
@@ -19,19 +19,13 @@ import {
 import useDownloads from '../../hooks/downloads'
 import { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useDownloadProgress } from 'react-native-nitro-player'
-import navigationRef from '../navigation'
-import { StackActions } from '@react-navigation/native'
-import { getAudioCache } from '../../utils/legacy/offline-mode-utils'
-import { StorageManagementProps } from '../Settings/types'
 import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { DownloadQuality } from '../../enums/audio-quality'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
 
-export default function StorageManagementScreen({
-	navigation,
-}: StorageManagementProps): React.JSX.Element {
-	const { summary, suggestions, selection, toggleSelection, clearSelection, refresh } =
-		useStorageContext()
+export default function StorageManagementScreen(): React.JSX.Element {
+	const { summary, selection, toggleSelection, clearSelection, refresh } = useStorageContext()
 
 	const { data: downloads } = useDownloads()
 
@@ -140,23 +134,6 @@ export default function StorageManagementScreen({
 	)
 
 	const topPadding = 16
-
-	const legacyDownloads = getAudioCache()
-
-	useLayoutEffect(() => {
-		if (legacyDownloads.length > 0)
-			navigation.setOptions({
-				headerRight: () => (
-					<Icon
-						name='information'
-						color='success'
-						onPress={() => {
-							navigationRef.dispatch(StackActions.push('MigrateDownloads'))
-						}}
-					/>
-				),
-			})
-	}, [navigation, legacyDownloads.length])
 
 	return (
 		<YStack flex={1} backgroundColor='background' testID='settings-screen-storage'>
@@ -521,14 +498,15 @@ const DownloadSettingsSection = ({
 				Quality used when downloading tracks
 			</SizableText>
 			<RadioGroup
+				gap='3'
 				marginTop='2'
 				value={downloadQuality}
 				onValueChange={(value) => setDownloadQuality(value as DownloadQuality)}
 			>
 				<RadioGroupItemWithLabel size='3' value='original' label='Original Quality' />
 				<RadioGroupItemWithLabel size='3' value='high' label='High (320kbps)' />
-				<RadioGroupItemWithLabel size='3' value='medium' label='Medium (192kbps)' />
-				<RadioGroupItemWithLabel size='3' value='low' label='Low (128kbps)' />
+				<RadioGroupItemWithLabel size='3' value='medium' label='Medium (256kbps)' />
+				<RadioGroupItemWithLabel size='3' value='low' label='Low (192kbps)' />
 			</RadioGroup>
 		</YStack>
 	</SettingsSection>

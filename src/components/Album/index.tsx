@@ -100,8 +100,8 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 		<SectionList
 			contentInsetAdjustmentBehavior='automatic'
 			contentContainerStyle={{
-				flexGrow: 1,
-				padding: 8,
+				paddingTop: 8,
+				paddingHorizontal: 8,
 			}}
 			sections={sections}
 			keyExtractor={ItemKeyExtractor}

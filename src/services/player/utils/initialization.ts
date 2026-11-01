@@ -9,15 +9,13 @@ import {
 	onSeek,
 	onTracksNeedUpdate,
 } from './event-handlers'
-import useJellifyStore from '../../../stores/auth'
-import { getAudioCache } from '../../../utils/legacy/offline-mode-utils'
 import navigationRef from '../../../screens/navigation'
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
 import {
 	useStreamingDeviceProfileStore,
 	useDownloadingDeviceProfileStore,
-} from '../../../stores/device-profile'
+} from '../../../stores/profile'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import { getDeviceProfile } from '../../../utils/audio/device-profiles'
@@ -69,29 +67,6 @@ export function restoreFromStorage() {
 }
 
 async function restore() {
-	const { migratedToNitroPlayer, setMigratedToNitroPlayer } = useJellifyStore.getState()
-
-	// If we haven't migrated to nitro player yet, we need to clear the persisted queue
-	// This is because the Track objects in the persisted queue are not compatible with
-	// nitro player and will cause errors in the UI if we try to load them
-	if (!migratedToNitroPlayer) {
-		clearPersistedQueue()
-		const audioCache = getAudioCache()
-
-		if (audioCache.length > 0) {
-			if (navigationRef.isReady()) {
-				navigationRef.navigate('MigrateDownloads')
-			} else {
-				setTimeout(() => {
-					navigationRef.navigate('MigrateDownloads')
-				}, 1000)
-			}
-		}
-
-		// Mark that we've migrated to nitro player so we don't clear the queue on every app launch
-		return setMigratedToNitroPlayer(true)
-	}
-
 	const {
 		queue: persistedQueue,
 		currentIndex: persistedIndex,

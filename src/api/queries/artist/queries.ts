@@ -15,5 +15,5 @@ export const artistAlbumsQuery = (library: JellifyLibrary, artist: BaseItemDto) 
 
 export async function ensureArtistAlbumsQueryData(artist: BaseItemDto) {
 	const library = getLibrary()
-	return await queryClient.ensureQueryData(artistAlbumsQuery(library!, artist))
+	return await queryClient.query({ ...artistAlbumsQuery(library!, artist), staleTime: 'static' })
 }

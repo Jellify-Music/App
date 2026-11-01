@@ -9,15 +9,11 @@ import GenreSelectionScreen from '../GenreSelection'
 import DeletePlaylist from './delete-playlist'
 import LibraryTabs from '../../components/Library/component'
 import { BaseStackScreens } from '../base-stack'
+import { stackScreenOptions } from '../navigation'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 	initialRouteName: 'LibraryScreen',
-	screenOptions: {
-		headerTitleAlign: 'center',
-		headerTitleStyle: {
-			fontFamily: 'Figtree-Bold',
-		},
-	},
+	screenOptions: stackScreenOptions,
 	screens: {
 		LibraryScreen: {
 			screen: LibraryTabs,
@@ -34,10 +30,9 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		AddPlaylist: {
 			screen: AddPlaylist,
 			options: {
-				title: 'Add Playlist',
+				title: 'Create Playlist',
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
-				headerShown: false,
 				sheetGrabberVisible: true,
 			},
 		},

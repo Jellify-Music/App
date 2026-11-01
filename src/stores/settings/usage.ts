@@ -1,11 +1,9 @@
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { mmkvStateStorage } from '../../constants/storage'
-import StreamingQuality from '../../enums/audio-quality'
-import { useDownloadingDeviceProfileStore } from '../device-profile'
+import { StreamingQuality, DownloadQuality } from '../../enums/audio-quality'
+import { useDownloadingDeviceProfileStore } from '../profile'
 import { getDeviceProfile } from '../../utils/audio/device-profiles'
-
-export type DownloadQuality = StreamingQuality
 
 type UsageSettingsStore = {
 	downloadQuality: DownloadQuality

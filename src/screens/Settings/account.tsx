@@ -1,5 +1,7 @@
 import React from 'react'
 import { YStack, XStack, SizableText, ScrollView, Avatar, Card, ThemeTokens } from 'tamagui'
+import { useJellyfinServer } from '../../hooks/auth/server'
+import { usePublicServerInfo } from '../../api/queries/public-server-info'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -8,7 +10,7 @@ import Icon from '../../components/Global/components/icon'
 import Button from '../../components/Global/helpers/button'
 import SettingsSection from '../../components/Settings/components/settings-section'
 import { SettingsStackParamList } from './types'
-import { useJellifyUser, useJellifyLibrary, useJellifyServer } from '../../stores/auth'
+import { useJellifyUser, useJellifyLibrary } from '../../stores/auth'
 import HTTPS from '../../constants/protocols'
 import getUserImageUrl from '../../api/queries/image/utils/avatar'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
@@ -17,11 +19,12 @@ export default function AccountScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
-	const [server] = useJellifyServer()
+	const [server] = useJellyfinServer()
+	const { data: serverInfo } = usePublicServerInfo()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const isSecure = server?.url.includes(HTTPS)
+	const isSecure = server?.url?.includes(HTTPS)
 
 	const userAvatarUrl = getUserImageUrl()
 
@@ -49,10 +52,10 @@ export default function AccountScreen(): React.JSX.Element {
 							</Avatar.Fallback>
 						</Avatar>
 						<YStack alignItems='center' gap='1'>
-							<SizableText size='3' fontWeight='6' color='background'>
+							<SizableText fontSize='3' fontWeight='6' color='background'>
 								{user?.name ?? 'Unknown User'}
 							</SizableText>
-							<SizableText size='2' color='background'>
+							<SizableText fontSize='2' color='background'>
 								Jellyfin User
 							</SizableText>
 						</YStack>
@@ -86,10 +89,10 @@ export default function AccountScreen(): React.JSX.Element {
 								<Icon name='music-box-multiple' color='background' size='7' />
 							</YStack>
 							<YStack flex={1}>
-								<SizableText size='2' fontWeight='6'>
+								<SizableText fontSize='2' fontWeight='6'>
 									{library?.musicLibraryName ?? 'Unknown Library'}
 								</SizableText>
-								<SizableText size='1' color='borderColor'>
+								<SizableText fontSize='2' color='borderColor'>
 									Current library
 								</SizableText>
 							</YStack>
@@ -103,7 +106,7 @@ export default function AccountScreen(): React.JSX.Element {
 							onPress={() => navigation.navigate('LibrarySelection')}
 							icon={<Icon name='swap-horizontal' color='color' size='7' />}
 						>
-							<SizableText size='2'>Change</SizableText>
+							<SizableText fontSize='2'>Change</SizableText>
 						</Button>
 					</XStack>
 				</SettingsSection>
@@ -129,10 +132,10 @@ export default function AccountScreen(): React.JSX.Element {
 								<Icon name='server' color='background' size='7' />
 							</YStack>
 							<YStack flex={1}>
-								<SizableText size='2' fontWeight='6'>
-									{server?.name ?? 'Unknown Server'}
+								<SizableText fontSize='3' fontWeight='6'>
+									{serverInfo?.ServerName ?? 'Unknown Server'}
 								</SizableText>
-								<SizableText size='1' color='borderColor'>
+								<SizableText fontSize='2' color='borderColor'>
 									{server?.url ?? 'Unknown Address'}
 								</SizableText>
 							</YStack>
@@ -141,7 +144,7 @@ export default function AccountScreen(): React.JSX.Element {
 						<XStack flexWrap='wrap' gap='2'>
 							<ServerInfoChip
 								label='Version'
-								value={server?.version ?? 'Unknown'}
+								value={serverInfo?.Version ?? 'Unknown'}
 								icon='information'
 							/>
 							<ServerInfoChip
@@ -181,10 +184,10 @@ function ServerInfoChip({
 		>
 			<Icon name={icon} color={color} size='7' />
 			<YStack flex={1}>
-				<SizableText size='2' fontWeight='6' numberOfLines={1}>
+				<SizableText fontSize='2' fontWeight='6' numberOfLines={1}>
 					{value}
 				</SizableText>
-				<SizableText size='1' color='borderColor'>
+				<SizableText fontSize='2' color='borderColor'>
 					{label}
 				</SizableText>
 			</YStack>

@@ -13,7 +13,6 @@ import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { queryClient } from '../../../../constants/query-client'
-import { QueryKey } from '@tanstack/react-query'
 import { FrequentlyPlayedTracksQuery } from '../queries'
 import { ArtistQueryKey } from '../../artist/keys'
 import { setQueryUserDataForItem, setQueryUserDataForItems } from '../../user-data'
@@ -85,9 +84,12 @@ export function fetchFrequentlyPlayedArtists(
 		if (isUndefined(library)) return reject('Library instance not set')
 
 		queryClient
-			.ensureInfiniteQueryData<BaseItemDto[], Error, BaseItemDto[], QueryKey, number>(
-				FrequentlyPlayedTracksQuery(user, library, api),
-			)
+			.infiniteQuery({
+				...FrequentlyPlayedTracksQuery(user, library, api),
+				staleTime: 'static',
+				// Keep the pages, since artists are derived from one page at a time
+				select: (data) => data,
+			})
 			.then(async (frequentlyPlayed) => {
 				const artistWithPlayCount = frequentlyPlayed.pages[page]
 					.filter(

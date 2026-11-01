@@ -84,11 +84,10 @@ export type RootStackParamList = {
 		onDelete: () => void
 	}
 
-	MigrateDownloads: undefined
-
 	AddPlaylistUsers: {
 		playlist: BaseItemDto
 	}
+	PrivacyPolicy: undefined
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -98,7 +97,6 @@ export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
 export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
-export type MigrateDownloadsProps = NativeStackScreenProps<RootStackParamList, 'MigrateDownloads'>
 export type FiltersProps = NativeStackScreenProps<RootStackParamList, 'Filters'>
 export type SortOptionsProps = NativeStackScreenProps<RootStackParamList, 'SortOptions'>
 export type GenreSelectionProps = NativeStackScreenProps<RootStackParamList, 'GenreSelection'>
@@ -113,3 +111,4 @@ export type GenresProps = {
 }
 
 export type AddPlaylistUsersProps = NativeStackScreenProps<RootStackParamList, 'AddPlaylistUsers'>
+export type PrivacyPolicyProps = NativeStackScreenProps<RootStackParamList, 'PrivacyPolicy'>

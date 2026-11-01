@@ -23,8 +23,7 @@ export default function List<T extends ListType>({ horizontal, ...props }: ListP
 	const contentContainerStyle = horizontal
 		? undefined
 		: {
-				marginTop: 4,
-				marginHorizontal: 4,
+				marginHorizontal: 8,
 			}
 
 	return (

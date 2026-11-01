@@ -47,11 +47,11 @@ export default function SettingsNavRow({
 			>
 				<XStack alignItems='center' gap='3' flex={1}>
 					<Icon name={icon} color={iconColor} />
-					<SizableText size='3' fontWeight='6'>
+					<SizableText fontSize='3' fontWeight='6'>
 						{title}
 					</SizableText>
 					{description && (
-						<SizableText size='2' color='borderColor'>
+						<SizableText fontSize='2' color='borderColor'>
 							{description}
 						</SizableText>
 					)}

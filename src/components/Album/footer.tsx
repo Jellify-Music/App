@@ -4,7 +4,7 @@ import LibraryStackParamList from '../../screens/Library/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { YStack, Spinner, Text } from 'tamagui'
+import { YStack, Spinner, Text, SizableText } from 'tamagui'
 import ItemCard from '../Global/components/Card'
 import { useSimilarItems } from '../../api/queries/suggestions'
 import HorizontalCardList from '../Global/components/horizontal-list'
@@ -36,9 +36,9 @@ export default function AlbumTrackListFooter({
 			<YStack gap='3' marginVertical='2' flex={1}>
 				{album.ArtistItems && album.ArtistItems.length > 1 && (
 					<YStack>
-						<Text marginHorizontal='2' fontWeight='6'>
+						<SizableText marginHorizontal='2' fontWeight='6'>
 							Featuring
-						</Text>
+						</SizableText>
 
 						<List
 							data={album.ArtistItems}
@@ -66,9 +66,9 @@ export default function AlbumTrackListFooter({
 						exiting={FadeOut.easing(Easing.out(Easing.ease))}
 						style={{ flex: 1 }}
 					>
-						<Text marginHorizontal='2' fontWeight='6'>
+						<SizableText marginHorizontal='2' fontWeight='6'>
 							Similar Albums
-						</Text>
+						</SizableText>
 						<HorizontalCardList
 							data={suggestions}
 							renderItem={({ item: album }) => (
@@ -94,9 +94,9 @@ export default function AlbumTrackListFooter({
 									{isLoadingSuggestions ? (
 										<Spinner alignSelf='center' color='primary' />
 									) : (
-										<Text justifyContent='center' textAlign='center'>
+										<SizableText justifyContent='center' textAlign='center'>
 											No similar albums found
-										</Text>
+										</SizableText>
 									)}
 								</YStack>
 							}

@@ -50,7 +50,7 @@ export default function SettingsSection({
 			>
 				<XStack alignItems='center' gap='3' flex={1}>
 					<Icon name={icon} color={iconColor} />
-					<SizableText size='2' fontWeight='6'>
+					<SizableText fontSize='3' fontWeight='6'>
 						{title}
 					</SizableText>
 				</XStack>
