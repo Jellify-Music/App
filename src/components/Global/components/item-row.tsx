@@ -185,8 +185,8 @@ function ItemRow({
 					) : null}
 					<FavoriteIcon item={item} />
 
-					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
-						<Icon name='dots-horizontal' onPress={onLongPress} />
+					{item.Type === 'MusicAlbum' || item.Type === 'Playlist' ? (
+						<Icon name='dots-horizontal' onPress={handleLongPress} />
 					) : null}
 				</XStack>
 			</XStack>

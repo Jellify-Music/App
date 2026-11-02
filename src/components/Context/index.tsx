@@ -74,7 +74,7 @@ export default function ItemContext({
 		gcTime: QueryAges.OneWeek,
 	})
 
-	const renderAddToQueueRow = isTrack || (isAlbum && tracks) || (isPlaylist && tracks)
+	const renderAddToQueueRow = isTrack || (isAlbum && discs) || (isPlaylist && tracks)
 
 	const renderAddToPlaylistRow = isTrack || isAlbum
 
@@ -170,7 +170,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 					})
 				}}
 			>
-				{/* Use same icon as swipe Add to Queue for consistency */}
+				{/* Use same icon as swipe Play Later for consistency */}
 				<Icon size={'7'} color='primary' name='playlist-play' />
 
 				<SizableText fontSize={'3'} fontWeight='6'>
@@ -191,11 +191,11 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 					})
 				}}
 			>
-				{/* Consistent Add to Queue icon */}
+				{/* Consistent Play Later icon */}
 				<Icon size={'7'} color='primary' name='playlist-play' />
 
 				<SizableText fontSize={'3'} fontWeight='6'>
-					Add to Queue
+					Play Later
 				</SizableText>
 			</ListItem>
 		</>
