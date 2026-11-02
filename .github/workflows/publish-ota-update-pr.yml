@@ -32,8 +32,15 @@ jobs:
           git config --global user.email "violet@cosmonautical.cloud"
           git config --global user.name "anultravioletaurora"
 
-      - name: 🤖 Publish Update
-        run: bun run sendOTA:PR ${{ github.event.pull_request.number }}
+      - name: 🤖 Publish Android Update
+        run: bun run sendOTA:PR ${{ github.event.pull_request.number }} android
+        env:
+          SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
+
+      # Still attempt iOS when Android fails; the job fails if either does
+      - name: 🍎 Publish iOS Update
+        if: ${{ !cancelled() }}
+        run: bun run sendOTA:PR ${{ github.event.pull_request.number }} ios
         env:
           SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
 
