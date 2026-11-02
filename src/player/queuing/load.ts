@@ -2,14 +2,13 @@ import { networkStatusTypes } from '../../components/Network/internetConnectionW
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
 import { useNetworkStore } from '../../stores/network'
 import { setPlaybackPosition } from '../../stores/player/playback'
-import { usePlayerQueueStore, setNewQueue } from '../../stores/player/queue'
+import { usePlayerQueueStore } from '../../stores/player/queue'
 import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
-import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
-import { filterTracksOnNetworkStatus, clearPlaylists } from '../utils/queue'
+import { TrackPlayer } from 'react-native-nitro-player'
+import { filterTracksOnNetworkStatus } from '../utils/queue'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import { QueueMutation } from '../interfaces'
 import { LoadQueueResult } from './types'
-import uuid from 'react-native-uuid'
 
 export default async function loadQueue({
 	index = 0,
@@ -35,8 +34,8 @@ export default async function loadQueue({
 	// Convert to JellifyTracks first
 	let playlist = mapDtosToTracks(availableAudioItems, downloadedTracks)
 
-	// Store the original unshuffled queue
-	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
+	// Keep the original order for unshuffling
+	const unShuffledQueue = playlist
 
 	// Handle if a shuffle was requested
 	if (shuffled && playlist.length > 1) {
@@ -56,16 +55,15 @@ export default async function loadQueue({
 	const rawStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
 	const finalStartIndex = rawStartIndex >= 0 ? rawStartIndex : 0
 
-	await clearPlaylists()
-
-	const playlistId = await PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
-
-	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
-
-	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 	setPlaybackPosition(0)
 
-	await PlayerQueue.loadPlaylist(playlistId, finalStartIndex)
+	await usePlayerQueueStore.getState().replaceQueue({
+		queue: playlist,
+		unShuffledQueue,
+		queueRef: queue,
+		index: finalStartIndex,
+		shuffled,
+	})
 
 	return {
 		finalStartIndex,
