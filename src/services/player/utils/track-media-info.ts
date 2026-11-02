@@ -1,4 +1,5 @@
-import { updateQueueTracks } from '../../../stores/player/queue'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { updateQueueStore } from '../../../stores/player/utils/replace'
 import resolveTrackUrls from '../../../utils/fetching/track-media-info'
 import { TrackItem, TrackPlayer } from 'react-native-nitro-player'
 
@@ -17,5 +18,5 @@ export async function updateTrackMediaInfo(
 
 	await TrackPlayer.updateTracks(updatedTracks)
 
-	updateQueueTracks(updatedTracks)
+	updateQueueStore(usePlayerQueueStore.getState(), updatedTracks)
 }

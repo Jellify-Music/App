@@ -1,7 +1,7 @@
 import Toast from 'react-native-toast-message'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import { isUndefined } from 'lodash'
-import { setNewQueue, usePlayerQueueStore } from '../../stores/player/queue'
+import { usePlayerQueueStore } from '../../stores/player/queue'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { useStreamingDeviceProfileStore } from '../../stores/profile'
 import { getApi, getLibrary, getUser } from '../../stores/auth/utils'
@@ -166,21 +166,14 @@ export async function handleLibraryShuffle() {
 					return { currentIndex: 0, queue: [] }
 				}
 
-				// Save off unshuffledQueue (the new random queue)
-				usePlayerQueueStore.getState().setUnshuffledQueue([...finalQueue])
-
 				// Replace the queue with random tracks
-				const randomTrackPlaylistId = await PlayerQueue.createPlaylist('Library Shuffle')
-
-				await PlayerQueue.addTracksToPlaylist(randomTrackPlaylistId, finalQueue)
-				await PlayerQueue.loadPlaylist(randomTrackPlaylistId)
-
-				if (startIndex > 0) {
-					await TrackPlayer.skipToIndex(startIndex)
-				}
-
-				// Update state
-				setNewQueue(finalQueue, 'Library Shuffle', startIndex, true)
+				await usePlayerQueueStore.getState().replaceQueue({
+					queue: finalQueue,
+					unShuffledQueue: [...finalQueue],
+					queueRef: 'Library Shuffle',
+					index: startIndex,
+					shuffled: true,
+				})
 
 				return { currentIndex: startIndex, queue: finalQueue }
 			}

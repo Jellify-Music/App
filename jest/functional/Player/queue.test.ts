@@ -1,7 +1,8 @@
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { loadNewQueue, addToQueue } from '../../../src/player/queuing'
 import reorderQueue from '../../../src/player/queuing/reorder'
-import { setNewQueue, usePlayerQueueStore } from '../../../src/stores/player/queue'
+import { usePlayerQueueStore } from '../../../src/stores/player/queue'
+import { replaceQueue } from '../../../src/stores/player/utils/replace'
 import { mapDtoToTrack, mapDtosToTracks } from '../../../src/utils/mapping/item-to-track'
 import { filterTracksOnNetworkStatus } from '../../../src/player/utils/queue'
 import { useNetworkStore } from '../../../src/stores/network'
@@ -17,7 +18,6 @@ jest.mock('../../../src/stores/player/queue', () => ({
 		getState: jest.fn(),
 		setState: jest.fn(),
 	},
-	setNewQueue: jest.fn(),
 }))
 
 jest.mock('../../../src/utils/mapping/item-to-track', () => ({
@@ -26,7 +26,6 @@ jest.mock('../../../src/utils/mapping/item-to-track', () => ({
 }))
 
 jest.mock('../../../src/player/utils/queue', () => ({
-	clearPlaylists: jest.fn().mockResolvedValue(undefined),
 	filterTracksOnNetworkStatus: jest.fn(),
 }))
 
@@ -92,16 +91,16 @@ describe('Queue - loadNewQueue', () => {
 		}) as unknown as TrackItem
 
 	let mockSetIsQueuing: jest.Mock
-	let mockSetUnshuffledQueue: jest.Mock
+	let mockSet: jest.Mock
 
 	beforeEach(() => {
 		jest.clearAllMocks()
 
 		mockSetIsQueuing = jest.fn()
-		mockSetUnshuffledQueue = jest.fn()
+		mockSet = jest.fn()
 		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
 			setIsQueuing: mockSetIsQueuing,
-			setUnshuffledQueue: mockSetUnshuffledQueue,
+			replaceQueue: replaceQueue(mockSet),
 		})
 		;(useNetworkStore.getState as jest.Mock).mockReturnValue({ networkStatus: 'ONLINE' })
 		;(PlayerQueue.createPlaylist as jest.Mock).mockResolvedValue('test-playlist-id')
@@ -207,18 +206,20 @@ describe('Queue - loadNewQueue', () => {
 		})
 
 		expect(updateTrackMediaInfo).not.toHaveBeenCalled()
-		expect(setNewQueue).toHaveBeenCalledWith(
-			expect.arrayContaining([
-				expect.objectContaining({ id: 'a', url: '' }),
-				expect.objectContaining({ id: 'b', url: '' }),
-			]),
-			'Library',
-			0,
-			false,
+		expect(mockSet).toHaveBeenCalledWith(
+			expect.objectContaining({
+				queue: expect.arrayContaining([
+					expect.objectContaining({ id: 'a', url: '' }),
+					expect.objectContaining({ id: 'b', url: '' }),
+				]),
+				queueRef: 'Library',
+				currentIndex: 0,
+				shuffled: false,
+			}),
 		)
 	})
 
-	it('passes mapped tracks directly to setNewQueue', async () => {
+	it('passes mapped tracks directly to the queue store', async () => {
 		const dtos = [createDto('a'), createDto('b')]
 		const trackA = createTrackItem('a', 'https://example.com/a.mp3')
 		const trackB = createTrackItem('b', '')
@@ -236,14 +237,16 @@ describe('Queue - loadNewQueue', () => {
 			startPlayback: false,
 		})
 
-		expect(setNewQueue).toHaveBeenCalledWith(
-			expect.arrayContaining([
-				expect.objectContaining({ id: 'a', url: 'https://example.com/a.mp3' }),
-				expect.objectContaining({ id: 'b', url: '' }),
-			]),
-			'Library',
-			0,
-			false,
+		expect(mockSet).toHaveBeenCalledWith(
+			expect.objectContaining({
+				queue: expect.arrayContaining([
+					expect.objectContaining({ id: 'a', url: 'https://example.com/a.mp3' }),
+					expect.objectContaining({ id: 'b', url: '' }),
+				]),
+				queueRef: 'Library',
+				currentIndex: 0,
+				shuffled: false,
+			}),
 		)
 	})
 
@@ -284,15 +287,15 @@ describe('Queue - loadNewQueue', () => {
 		expect(TrackPlayer.play).toHaveBeenCalled()
 	})
 
-	it('calls TrackPlayer.play() after setNewQueue so the queue is ready before playback starts', async () => {
+	it('calls TrackPlayer.play() after the queue store is set so the queue is ready before playback starts', async () => {
 		const callOrder: string[] = []
 		const dto = createDto('a')
 		const track = createTrackItem('a', 'https://example.com/a.mp3')
 		;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue([dto])
 		;(mapDtoToTrack as jest.Mock).mockReturnValue(track)
 		;(resolveTrackUrls as jest.Mock).mockResolvedValue([track])
-		;(setNewQueue as jest.Mock).mockImplementation(() => {
-			callOrder.push('setNewQueue')
+		mockSet.mockImplementation(() => {
+			callOrder.push('set')
 		})
 		;(TrackPlayer.play as jest.Mock).mockImplementation(async () => {
 			callOrder.push('play')
@@ -306,7 +309,7 @@ describe('Queue - loadNewQueue', () => {
 			startPlayback: true,
 		})
 
-		expect(callOrder).toEqual(['setNewQueue', 'play'])
+		expect(callOrder).toEqual(['set', 'play'])
 	})
 
 	it('does not call TrackPlayer.play() when startPlayback is false', async () => {
@@ -778,7 +781,7 @@ describe('Queue - addToQueue', () => {
 				currentIndex: undefined,
 				queue: [],
 				unShuffledQueue: [],
-				setUnshuffledQueue: jest.fn(),
+				replaceQueue: replaceQueue(jest.fn()),
 			})
 
 			const dtos: BaseItemDto[] = [{ Id: 'a' } as BaseItemDto, { Id: 'b' } as BaseItemDto]

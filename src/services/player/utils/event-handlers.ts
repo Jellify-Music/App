@@ -1,6 +1,6 @@
 import reportPlaybackProgress from '../../../api/mutations/playback/functions/playback-progress'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
-import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
 import {
 	PlayerQueue,
 	TrackPlayer,
@@ -14,7 +14,6 @@ import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
-import { AppState, Platform } from 'react-native'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 
 /**
@@ -101,7 +100,13 @@ async function adoptNativeQueue(track: TrackItem): Promise<boolean> {
 	const playlist = currentPlaylistId ? PlayerQueue.getPlaylist(currentPlaylistId) : null
 	const index = playlist?.tracks.findIndex((t) => t.id === track.id) ?? -1
 	if (!playlist || index < 0) return false
-	setNewQueue(playlist.tracks, 'Android Auto', index, false)
+	usePlayerQueueStore.setState({
+		queue: playlist.tracks,
+		unShuffledQueue: playlist.tracks,
+		queueRef: 'Android Auto',
+		currentIndex: index,
+		shuffled: false,
+	})
 	return true
 }
 
