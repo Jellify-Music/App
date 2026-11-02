@@ -74,6 +74,8 @@ export async function fetchArtistSuggestions(
 		if (isUndefined(libraryId)) return reject('Library has not been set')
 
 		getArtistApi(api)
+			// The SDK deprecates ArtistApi without a replacement — /Items has no album-artist filter
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			.getAlbumArtists(
 				{
 					parentId: libraryId,

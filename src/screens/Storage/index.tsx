@@ -308,12 +308,7 @@ const DownloadRow = ({
 			/>
 
 			{download.localArtworkPath ? (
-				<Image
-					source={{ uri: download.localArtworkPath, width: 50, height: 50 }}
-					width={50}
-					height={50}
-					borderRadius='2'
-				/>
+				<Image src={download.localArtworkPath} width={50} height={50} borderRadius='2' />
 			) : (
 				<YStack
 					width={50}

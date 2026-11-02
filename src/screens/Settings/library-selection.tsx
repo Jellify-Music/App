@@ -29,8 +29,8 @@ export default function LibrarySelectionScreen(): React.JSX.Element {
 			})
 
 			// Invalidate all library-related queries to refresh the data
-			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllArtistsAlphabetical] })
-			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllAlbumsAlphabetical] })
+			queryClient.invalidateQueries({ queryKey: [QueryKeys.InfiniteArtists] })
+			queryClient.invalidateQueries({ queryKey: [QueryKeys.InfiniteAlbums] })
 			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllTracks] })
 			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllAlbums] })
 			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllArtists] })

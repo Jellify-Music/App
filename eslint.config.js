@@ -72,4 +72,19 @@ module.exports = defineConfig([
 			},
 		},
 	},
+	{
+		// Type-aware rules — these need the TypeScript program, so scope them to TS sources
+		files: ['**/*.ts', '**/*.tsx'],
+
+		languageOptions: {
+			parserOptions: {
+				projectService: true,
+				tsconfigRootDir: __dirname,
+			},
+		},
+
+		rules: {
+			'@typescript-eslint/no-deprecated': 'error',
+		},
+	},
 ])
