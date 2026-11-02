@@ -1,4 +1,4 @@
-import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api/playstate-api'
+import { SessionApi } from '@jellyfin/sdk/lib/generated-client'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { TrackItem } from 'react-native-nitro-player'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
@@ -17,8 +17,10 @@ export default async function reportPlaybackStopped(
 	const { sessionId } = track.extraPayload as TrackExtraPayload
 	const { id } = track
 
+	const sessionApi = new SessionApi(api.configuration, api.basePath, api.axiosInstance)
+
 	try {
-		await getPlaystateApi(api).reportPlaybackStopped({
+		await sessionApi.reportPlaybackStopped({
 			playbackStopInfo: {
 				PlaySessionId: sessionId,
 				ItemId: id,

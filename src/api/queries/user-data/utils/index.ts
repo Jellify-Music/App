@@ -1,7 +1,7 @@
 import { getApi, getUser } from '../../../../stores/auth/utils'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { UserItemDataDto } from '@jellyfin/sdk/lib/generated-client/models/user-item-data-dto'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
+import { getUserDataApi } from '@jellyfin/sdk/lib/utils/api/user-data-api'
 import { isUndefined } from 'lodash'
 
 /**
@@ -21,7 +21,7 @@ export default async function fetchUserData(
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
 
-		getItemsApi(api)
+		getUserDataApi(api)
 			.getItemUserData(
 				{
 					itemId,

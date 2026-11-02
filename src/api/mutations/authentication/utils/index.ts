@@ -1,6 +1,6 @@
 import { Api } from '@jellyfin/sdk'
 import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client'
-import { getUserApi } from '@jellyfin/sdk/lib/utils/api'
+import { getAuthenticationApi } from '@jellyfin/sdk/lib/utils/api/authentication-api'
 import { isUndefined } from 'lodash'
 
 export default function authenticateUserByName(
@@ -9,7 +9,7 @@ export default function authenticateUserByName(
 	password: string | undefined,
 ): Promise<AuthenticationResult> {
 	return new Promise((resolve, reject) => {
-		getUserApi(api!)
+		getAuthenticationApi(api!)
 			.authenticateUserByName({
 				authenticateUserByName: {
 					Username: username,
