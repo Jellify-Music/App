@@ -3,7 +3,7 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { isEmpty, isUndefined, trim } from 'lodash'
 import QueryConfig from '../../../../configs/querying/index.config'
 import { getApi, getUser } from '../../../../stores/auth/utils'
-import { setQueryUserDataForItems } from '../../user-data'
+import { setQueryUserDataForItems } from '../../user-data/cache'
 /**
  * Performs a search for items against the Jellyfin server, trimming whitespace
  * around the search term for the best possible results.

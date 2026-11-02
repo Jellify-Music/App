@@ -33,6 +33,7 @@ import ViewInstantMixMenuRow from './components/instant-mix-row'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import goToScreenFromContextSheet from './utils/navigation'
 import { applyHapticFeedback } from '../../utils/haptics'
+import { QueryAges } from '../../constants/durations'
 import AddToPlaylistRow from './components/playlist/add-to-playlist-row'
 
 interface ContextProps {
@@ -70,6 +71,7 @@ export default function ItemContext({
 		queryKey: [QueryKeys.ItemTracks, item.Id],
 		queryFn: ({ signal }) => fetchAlbumDiscs(api, item, signal),
 		enabled: isAlbum,
+		gcTime: QueryAges.OneWeek,
 	})
 
 	const renderAddToQueueRow = isTrack || (isAlbum && tracks) || (isPlaylist && tracks)
@@ -315,7 +317,7 @@ function ArtistMenuRows({
 	artistIds,
 	stackNavigation,
 }: {
-	artistIds: (string | null | undefined)[]
+	artistIds: BaseItemDto['Id'][]
 	stackNavigation: StackNavigation | undefined
 }): React.JSX.Element {
 	return (
@@ -331,7 +333,7 @@ function ViewArtistMenuRow({
 	artistId,
 	stackNavigation,
 }: {
-	artistId: string | null | undefined
+	artistId: BaseItemDto['Id']
 	stackNavigation: StackNavigation | undefined
 }): React.JSX.Element {
 	const { data: artist } = useArtist(artistId)

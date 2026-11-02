@@ -13,7 +13,7 @@ import { ApiLimits } from '../../../../configs/querying/index.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { setQueryUserDataForItems } from '../../user-data'
+import { setQueryUserDataForItems } from '../../user-data/cache'
 
 export default function fetchTracks(
 	api: Api | undefined,

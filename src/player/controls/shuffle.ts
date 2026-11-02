@@ -6,7 +6,7 @@ import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { useStreamingDeviceProfileStore } from '../../stores/profile'
 import { getApi, getLibrary, getUser } from '../../stores/auth/utils'
 import useLibraryStore from '../../stores/library'
-import { queryClient } from '../../constants/query-client'
+import { queryClient } from '../../api/client'
 import UserDataQueryKey from '../../api/queries/user-data/keys'
 import {
 	BaseItemKind,

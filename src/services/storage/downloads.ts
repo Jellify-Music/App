@@ -1,10 +1,10 @@
 import { DownloadedTrack, DownloadManager } from 'react-native-nitro-player'
-import { queryClient } from '../constants/query-client'
-import ALL_DOWNLOADS_KEY from '../hooks/downloads/keys'
-import { MAX_CONCURRENT_DOWNLOADS } from '../configs/networking/download.config'
-import { MAX_RETRY_ATTEMPTS } from '../configs/querying/index.config'
+import { queryClient } from '../../api/client'
+import ALL_DOWNLOADS_KEY from '../../hooks/downloads/keys'
+import { MAX_CONCURRENT_DOWNLOADS } from '../../configs/networking/download.config'
+import { MAX_RETRY_ATTEMPTS } from '../../configs/querying/index.config'
 
-export default function configureDownloadManager() {
+export function configureDownloadManager() {
 	DownloadManager.configure({
 		maxConcurrentDownloads: MAX_CONCURRENT_DOWNLOADS,
 		autoRetry: true,

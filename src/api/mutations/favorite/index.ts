@@ -1,4 +1,4 @@
-import { queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../client'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
@@ -8,7 +8,7 @@ import { getApi, getUser, getLibrary } from '../../../stores/auth/utils'
 import { TrackQueryKeys } from '../../queries/track/keys'
 import { QueryKeys } from '../../../enums/query-keys'
 import { captureError, LoggingContext } from '../../../utils/logging'
-import { setQueryUserDataForItem } from '../../queries/user-data'
+import { setQueryUserDataForItem } from '../../queries/user-data/cache'
 import { applyHapticFeedback } from '../../../utils/haptics'
 
 export const FAVORITE_MUTATION_KEY = ['favorite']

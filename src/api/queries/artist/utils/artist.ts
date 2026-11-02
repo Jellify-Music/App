@@ -11,7 +11,7 @@ import {
 import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/querying/index.config'
-import { setQueryUserDataForItems } from '../../user-data'
+import { setQueryUserDataForItems } from '../../user-data/cache'
 import { getApi } from '../../../../stores/auth/utils'
 
 export function fetchArtists(
@@ -69,8 +69,8 @@ export function fetchArtists(
  * @returns A promise that resolves to an array of {@link BaseItemDto}s
  */
 export function fetchArtistAlbums(
-	libraryId: string | undefined,
 	artist: BaseItemDto,
+	libraryId?: string,
 	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {

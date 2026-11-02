@@ -13,11 +13,11 @@ import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { JellifyUser } from '../../../../types/JellifyUser'
-import { queryClient } from '../../../../constants/query-client'
+import { queryClient } from '../../../client'
 import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/categorizing/home.config'
 import { PlayItAgainQuery } from '..'
 import { ArtistQueryKey } from '../../artist/keys'
-import { setQueryUserDataForItem } from '../../user-data'
+import { setQueryUserDataForItem } from '../../user-data/cache'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,

@@ -11,7 +11,7 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/querying/index.config'
-import { setQueryUserDataForItems } from '../../user-data'
+import { setQueryUserDataForItems } from '../../user-data/cache'
 import { captureError, LoggingContext } from '../../../../utils/logging'
 import { ApiNotAvailableError } from '../../../../types/errors'
 

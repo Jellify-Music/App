@@ -1,6 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { QueryKey } from '@tanstack/react-query'
-import { queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../client'
 import { getUser } from '../../../stores/auth/utils'
 import {
 	PlaylistsQueryKey,

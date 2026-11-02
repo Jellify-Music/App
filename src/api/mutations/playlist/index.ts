@@ -2,7 +2,7 @@ import LibraryStackParamList from '@/src/screens/Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useMutation } from '@tanstack/react-query'
-import { refreshAndroidAutoLibrary } from '../../../services/android-auto'
+import { refreshAndroidAutoLibrary } from '../../../services/auto/android-auto'
 import { createPlaylist, deletePlaylist, updatePlaylist } from './utils/playlists'
 import Toast from 'react-native-toast-message'
 import {

@@ -18,16 +18,16 @@ import {
 } from 'react-native-nitro-player'
 
 import NetInfo from '@react-native-community/netinfo'
-import { getApi, getLibrary, getUser } from '../stores/auth/utils'
-import useJellifyStore from '../stores/auth'
-import { restoreFromStorage } from './player/utils/initialization'
-import { useAutoStore } from '../stores/auto'
-import { fetchRecentlyAdded, fetchRecentlyPlayed } from '../api/queries/recents/utils'
-import { fetchFrequentlyPlayed } from '../api/queries/frequents/utils/frequents'
-import { getItemImageUrl } from '../api/queries/image/utils'
-import { mapDtosToTracks } from '../utils/mapping/item-to-track'
-import { ensureDownloadedTracks } from '../hooks/downloads/utils'
-import { refreshPlaylistTracks, refreshUserPlaylists } from '../api/queries/playlist/cache'
+import { getApi, getLibrary, getUser } from '../../stores/auth/utils'
+import useJellifyStore from '../../stores/auth'
+import { restoreFromStorage } from '../player/utils/initialization'
+import { useAutoStore } from '../../stores/auto'
+import { fetchRecentlyAdded, fetchRecentlyPlayed } from '../../api/queries/recents/utils'
+import { fetchFrequentlyPlayed } from '../../api/queries/frequents/utils/frequents'
+import { getItemImageUrl } from '../../api/queries/image/utils'
+import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
+import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
+import { refreshPlaylistTracks, refreshUserPlaylists } from '../../api/queries/playlist/cache'
 
 /**
  * Playlists we materialize for Android Auto are tagged with this prefix so

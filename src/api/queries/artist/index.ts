@@ -6,26 +6,20 @@ import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { useJellifyLibrary, useJellifyUser } from '../../../stores/auth'
-import { getApi } from '../../../stores/auth/utils'
 import useLibraryStore from '../../../stores/library'
-import { fetchItem } from '../item'
-import { ArtistQueryKey } from './keys'
-import { artistAlbumsQuery } from './queries'
+import { artistAlbumsQuery, artistQuery } from './queries'
+import { QueryAges } from '../../../constants/durations'
 
-export const useArtist = (artistId: string | undefined | null) => {
-	const api = getApi()
-
-	return useQuery({
-		queryKey: ArtistQueryKey(artistId),
-		queryFn: ({ signal }) => fetchItem(api, artistId!, signal),
+export const useArtist = (artistId: BaseItemDto['Id']) =>
+	useQuery({
+		...artistQuery(artistId),
 		enabled: !!artistId,
 	})
-}
 
 export const useArtistAlbums = (artist: BaseItemDto) => {
 	const [library] = useJellifyLibrary()
 
-	return useQuery(artistAlbumsQuery(library!, artist))
+	return useQuery(artistAlbumsQuery(artist, library))
 }
 
 export const useArtistFeaturedOn = (artist: BaseItemDto) => {
@@ -35,6 +29,7 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 		queryKey: [QueryKeys.ArtistFeaturedOn, library?.musicLibraryId, artist.Id],
 		queryFn: ({ signal }) => fetchArtistFeaturedOn(library?.musicLibraryId, artist, signal),
 		enabled: !isUndefined(artist.Id),
+		gcTime: QueryAges.OneWeek,
 	})
 }
 
