@@ -1,5 +1,5 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { H5, Paragraph, XStack, YStack } from 'tamagui'
+import { Paragraph, XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
 import { useArtistContext } from '../../providers/Artist'
 import FavoriteButton from '../Global/components/favorite-button'
@@ -62,14 +62,6 @@ export default function ArtistHeader(): React.JSX.Element {
 			/>
 
 			<YStack paddingHorizontal='2'>
-				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
-					<XStack alignItems='center' flex={1} justifyContent='space-between'>
-						<H5 flexGrow={1} fontWeight={'6'}>
-							{artist.Name}
-						</H5>
-					</XStack>
-				</XStack>
-
 				<XStack alignItems='center' justifyContent='space-between' flex={1}>
 					<XStack alignItems='center' gap='3' flex={1}>
 						<FavoriteButton item={artist} />

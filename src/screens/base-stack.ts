@@ -18,7 +18,7 @@ export const BaseStackScreens = {
 		}) => ({
 			title: route.params.artist.Name ?? 'Unknown Artist',
 			headerTitleStyle: {
-				color: theme.colors.background,
+				color: theme.colors.text,
 			},
 		}),
 	},
