@@ -32,6 +32,7 @@ export function fetchGenres(
 					fields: [ItemFields.PrimaryImageAspectRatio, ItemFields.ItemCounts],
 					startIndex: pageParam * ApiLimits.Library,
 					limit: ApiLimits.Library,
+					enableUserData: true,
 				},
 				{
 					signal,

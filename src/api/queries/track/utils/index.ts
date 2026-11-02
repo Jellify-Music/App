@@ -12,7 +12,6 @@ import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
-import { setQueryUserDataForItems } from '../../user-data/cache'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 
 export default function fetchTracks(
@@ -74,7 +73,6 @@ export default function fetchTracks(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
