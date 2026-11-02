@@ -11,7 +11,6 @@ import {
 import { getArtistApi, getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/querying/index.config'
-import { setQueryUserDataForItems } from '../../user-data/cache'
 import { getApi } from '../../../../stores/auth/utils'
 
 export function fetchArtists(
@@ -54,7 +53,6 @@ export function fetchArtists(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
@@ -104,7 +102,6 @@ export function fetchArtistAlbums(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
@@ -154,7 +151,6 @@ export function fetchArtistFeaturedOn(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {

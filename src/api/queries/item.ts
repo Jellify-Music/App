@@ -12,7 +12,6 @@ import { Api } from '@jellyfin/sdk/lib/api'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
 import { ApiLimits } from '../../configs/querying/index.config'
 import { JellifyUser } from '../../types/JellifyUser'
-import { setQueryUserDataForItems } from './user-data/cache'
 import { getApi } from '../../stores/auth/utils'
 
 /**
@@ -35,6 +34,7 @@ export async function fetchItem(
 				{
 					ids: [itemId],
 					fields: [ItemFields.Tags, ItemFields.Genres],
+					enableUserData: true,
 				},
 				{
 					signal,
@@ -96,6 +96,7 @@ export async function fetchItems(
 					limit: ApiLimits.Items,
 					isFavorite: isFavorite,
 					ids: ids,
+					enableUserData: true,
 				},
 				{
 					signal,
@@ -161,7 +162,6 @@ export async function fetchAlbumDiscs(
 						)
 					: [{ title: '1', data: [] }]
 
-				setQueryUserDataForItems(data.Items ?? [])
 				resolve(discs)
 			})
 			.catch((error) => {

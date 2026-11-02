@@ -3,7 +3,6 @@ import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { isEmpty, isUndefined, trim } from 'lodash'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { getApi, getUser } from '../../../../stores/auth/utils'
-import { setQueryUserDataForItems } from '../../user-data/cache'
 /**
  * Performs a search for items against the Jellyfin server, trimming whitespace
  * around the search term for the best possible results.
@@ -45,7 +44,6 @@ export async function fetchSearchResults(
 			)
 			.then((response) => {
 				if (response.data.Items) {
-					setQueryUserDataForItems(response.data.Items)
 					resolve(response.data.Items)
 				} else {
 					resolve([])

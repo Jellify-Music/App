@@ -146,6 +146,7 @@ export async function handleLibraryShuffle() {
 					genreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
 					years: yearsParam,
 					limit: ApiLimits.LibraryShuffle,
+					enableUserData: true,
 					fields: [
 						ItemFields.MediaSources,
 						ItemFields.ParentId,

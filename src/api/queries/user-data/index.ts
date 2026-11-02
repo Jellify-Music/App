@@ -11,8 +11,9 @@ export const useIsFavorite = (item: BaseItemDto) => {
 	return useQuery({
 		queryKey: UserDataQueryKey(user!, item.Id!),
 		queryFn: ({ signal }) => fetchUserData(item.Id!, signal),
+		initialData: item.UserData ?? undefined,
 		select: ({ IsFavorite }) => IsFavorite || false,
 		enabled: Boolean(item.Id),
-		staleTime: QueryAges.OneMinute * 15,
+		staleTime: QueryAges.OneHour / 4,
 	})
 }

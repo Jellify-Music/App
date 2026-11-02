@@ -45,6 +45,7 @@ export async function fetchSearchSuggestions(
 					],
 					sortBy: ['IsFavoriteOrLiked', 'Random'],
 					fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
+					enableUserData: true,
 				},
 				{
 					signal,
@@ -87,6 +88,7 @@ export async function fetchArtistSuggestions(
 					enableImages: true,
 					enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
 					imageTypeLimit: 1,
+					enableUserData: true,
 				},
 				{
 					signal,
@@ -128,6 +130,7 @@ export async function fetchAlbumSuggestions(
 					includeItemTypes: [BaseItemKind.MusicAlbum],
 					sortBy: [ItemSortBy.Random, ItemSortBy.SortName],
 					sortOrder: [SortOrder.Ascending],
+					enableUserData: true,
 				},
 				{
 					signal,
