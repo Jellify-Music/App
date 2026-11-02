@@ -5,6 +5,7 @@ import { CastButton, CastState } from 'react-native-nitro-player'
 import { usePlayerContext } from '../../../providers/Player'
 import { StyleSheet } from 'react-native'
 import useRawLyrics from '../../../api/queries/lyrics'
+import useAutoIsConnected from '../../../stores/auto'
 
 export default function Footer(): React.JSX.Element {
 	const { setPage } = usePlayerContext()
@@ -14,6 +15,8 @@ export default function Footer(): React.JSX.Element {
 	const { displayLyrics, setDisplayLyrics } = usePlayerContext()
 
 	const rawLyricsQuery = useRawLyrics()
+
+	const isAutoConnected = useAutoIsConnected()
 
 	const displayLyricsAvailable = rawLyricsQuery.data || displayLyrics
 
@@ -44,16 +47,21 @@ export default function Footer(): React.JSX.Element {
 			)}
 
 			<YStack alignItems='center' justifyContent='center'>
-				{/* nitro-player Cast button — opens the native device picker and
-				    reflects the live connection state. */}
-				<CastButton
-					style={styles.castButton}
-					size={28}
-					color={theme.color.val}
-					activeColor={theme.primary.val}
-					hideWhenNoDevices={false}
-					renderIcon={CastIcon}
-				/>
+				{isAutoConnected ? (
+					// CarPlay / Android Auto owns the audio route, so show that instead of Cast
+					<Icon name='car-connected' size='7' color='primary' />
+				) : (
+					// nitro-player Cast button — opens the native device picker and
+					// reflects the live connection state.
+					<CastButton
+						style={styles.castButton}
+						size={28}
+						color={theme.color.val}
+						activeColor={theme.primary.val}
+						hideWhenNoDevices={false}
+						renderIcon={CastIcon}
+					/>
+				)}
 			</YStack>
 		</XStack>
 	)
