@@ -18,6 +18,7 @@ export default function QueueListHeader() {
 			borderColor='borderColor'
 			backgroundColor='background'
 			height={ITEM_ROW_HEIGHT}
+			flexShrink={1}
 		>
 			{Platform.OS === 'android' ? (
 				<Icon
@@ -31,7 +32,7 @@ export default function QueueListHeader() {
 				<Spacer width={24} />
 			)}
 
-			<YStack justifyContent='space-evenly' alignContent='center' flex={1} paddingTop='2'>
+			<YStack justifyContent='space-evenly' alignContent='center' flex={1}>
 				<Square
 					opacity={0.5}
 					backgroundColor='borderColor'

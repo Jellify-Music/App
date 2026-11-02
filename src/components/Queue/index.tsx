@@ -46,7 +46,7 @@ export default function Queue(): React.JSX.Element {
 	const { freezeQueue } = usePlayerContext()
 
 	return (
-		<View flex={1} backgroundColor='background'>
+		<View flex={1} backgroundColor='background' collapsable={false}>
 			<QueueListHeader />
 
 			<Freeze freeze={freezeQueue}>
@@ -67,7 +67,7 @@ export default function Queue(): React.JSX.Element {
 						initialScrollOffset={ITEM_ROW_HEIGHT}
 						itemDraxViewProps={itemDraxViewProps}
 						lockToMainAxis
-						itemExiting={FadeOut.springify()}
+						itemExiting={FadeOut}
 						estimatedItemSize={ITEM_ROW_HEIGHT}
 						drawDistance={drawDistance}
 						recycleItems
