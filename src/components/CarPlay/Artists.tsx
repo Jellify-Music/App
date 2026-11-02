@@ -1,4 +1,4 @@
-import { ensureArtistAlbumsQueryData } from '../../api/queries/artist/queries'
+import { ensureArtistAlbumsQueryData } from '../../api/queries/artist/cache'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { CarPlay, ListTemplate } from 'react-native-carplay'

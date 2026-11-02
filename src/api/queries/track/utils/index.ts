@@ -12,8 +12,8 @@ import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
+import { setQueryUserDataForItems } from '../../user-data/cache'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
-import { setQueryUserDataForItems } from '../../user-data'
 
 export default function fetchTracks(
 	api: Api | undefined,

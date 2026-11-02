@@ -2,15 +2,16 @@ import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/mo
 import { JellifyUser } from '../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { prefetchPlaylistTracks } from '../api/queries/playlist/cache'
-import { ONE_DAY, ONE_MINUTE, queryClient } from '../constants/query-client'
+import { queryClient } from '../api/client'
 import { QueryKeys } from '../enums/query-keys'
-import { fetchItem } from '../api/queries/item'
 import fetchUserData from '../api/queries/user-data/utils'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import { getApi, getUser } from '../stores/auth/utils'
 import { ArtistQueryKey } from '../api/queries/artist/keys'
 import { AlbumQuery } from '../api/queries/album/queries'
 import { prefetchAlbumDiscsQuery } from '../api/queries/album'
+import { QueryAges } from '../constants/durations'
+import { prefetchArtistQueryData } from '../api/queries/artist/cache'
 
 // Module-level dedup guard — no hook needed, this is just a long-lived Set
 const prefetchedContext = new Set<string>()
@@ -43,7 +44,7 @@ function warmItemContext(
 	// Fail fast if we don't have an Item ID to work with
 	if (!Id || !api || !user) return
 
-	if (Type === BaseItemKind.Audio) warmTrackContext(api, item)
+	if (Type === BaseItemKind.Audio) warmTrackContext(item)
 
 	if (Type === BaseItemKind.MusicArtist) queryClient.setQueryData(ArtistQueryKey(Id), item)
 
@@ -60,7 +61,7 @@ function warmItemContext(
 		.query({
 			queryKey: UserDataQueryKey(user, item.Id!),
 			queryFn: () => fetchUserData(Id),
-			staleTime: ONE_MINUTE * 15,
+			staleTime: QueryAges.OneMinute * 15,
 		})
 		.catch(() => {})
 }
@@ -73,24 +74,17 @@ function warmAlbumContext(api: Api | undefined, album: BaseItemDto): void {
 	prefetchAlbumDiscsQuery(album)
 }
 
-function warmArtistContext(api: Api | undefined, artistId: string): void {
+function warmArtistContext(artistId: BaseItemDto['Id']): void {
 	// Fail fast if we don't have an artist ID to work with
 	if (!artistId) return
 
-	// query respects staleTime internally — no need to check getQueryState first
-	queryClient
-		.query({
-			queryKey: ArtistQueryKey(artistId),
-			queryFn: () => fetchItem(api, artistId),
-			staleTime: ONE_DAY,
-		})
-		.catch(() => {})
+	prefetchArtistQueryData(artistId)
 }
 
-function warmTrackContext(api: Api | undefined, track: BaseItemDto): void {
+function warmTrackContext(track: BaseItemDto): void {
 	const { AlbumId, ArtistItems } = track
 
 	if (AlbumId) queryClient.query(AlbumQuery({ Id: AlbumId } as BaseItemDto)).catch(() => {})
 
-	if (ArtistItems) ArtistItems.forEach((artistItem) => warmArtistContext(api, artistItem.Id!))
+	if (ArtistItems) ArtistItems.forEach((artistItem) => warmArtistContext(artistItem.Id))
 }

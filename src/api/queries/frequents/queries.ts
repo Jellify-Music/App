@@ -3,13 +3,15 @@ import { FrequentlyPlayedTracksQueryKey } from './keys'
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { fetchFrequentlyPlayed } from './utils/frequents'
-import { QueryKey, UseInfiniteQueryOptions } from '@tanstack/react-query'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { ApiLimits } from '../../../configs/querying/index.config'
-import { ONE_DAY } from '../../../constants/query-client'
+import { QueryAges } from '../../../constants/durations'
+import { BaseItemDtoInfiniteQueryOptions } from '../../types/infinite-query'
 
-const FREQUENTS_QUERY_CONFIG = {
-	staleTime: ONE_DAY,
+const FREQUENTS_QUERY_CONFIG: Pick<
+	BaseItemDtoInfiniteQueryOptions,
+	'staleTime' | 'refetchOnMount'
+> = {
+	staleTime: QueryAges.OneDay,
 	refetchOnMount: false,
 } as const
 
@@ -17,7 +19,7 @@ export const FrequentlyPlayedTracksQuery: (
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	api: Api | undefined,
-) => UseInfiniteQueryOptions<BaseItemDto[], Error, BaseItemDto[], QueryKey, number> = (
+) => BaseItemDtoInfiniteQueryOptions = (
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	api: Api | undefined,

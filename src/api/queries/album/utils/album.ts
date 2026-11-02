@@ -11,8 +11,8 @@ import { fetchItem } from '../../item'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
+import { setQueryUserDataForItems } from '../../user-data/cache'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
-import { setQueryUserDataForItems } from '../../user-data'
 
 export function fetchAlbums(
 	api: Api | undefined,
@@ -71,7 +71,7 @@ export function fetchAlbumById(
 	signal?: AbortSignal,
 ): Promise<BaseItemDto> {
 	return new Promise((resolve, reject) => {
-		fetchItem(api, albumId, signal)
+		fetchItem(albumId, signal)
 			.then((item) => {
 				resolve(item)
 			})

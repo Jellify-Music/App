@@ -1,6 +1,6 @@
 import { QueryKeys } from '../../enums/query-keys'
 import { CarPlay, ListTemplate } from 'react-native-carplay'
-import { queryClient } from '../../constants/query-client'
+import { queryClient } from '../../api/client'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import TracksTemplate from './Tracks'
 import ArtistsTemplate from './Artists'

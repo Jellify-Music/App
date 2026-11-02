@@ -12,7 +12,8 @@ import { Api } from '@jellyfin/sdk/lib/api'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
 import { ApiLimits } from '../../configs/querying/index.config'
 import { JellifyUser } from '../../types/JellifyUser'
-import { setQueryUserDataForItems } from './user-data'
+import { setQueryUserDataForItems } from './user-data/cache'
+import { getApi } from '../../stores/auth/utils'
 
 /**
  * Fetches a single Jellyfin item by it's ID
@@ -21,12 +22,12 @@ import { setQueryUserDataForItems } from './user-data'
  * @returns The item - a {@link BaseItemDto}
  */
 export async function fetchItem(
-	api: Api | undefined,
-	itemId: string,
+	itemId: BaseItemDto['Id'],
 	signal?: AbortSignal,
+	api: Api | undefined = getApi(),
 ): Promise<BaseItemDto> {
 	return new Promise((resolve, reject) => {
-		if (isEmpty(itemId)) return reject('No item ID proviced')
+		if (!itemId || isEmpty(itemId)) return reject('No item ID provided or it is empty')
 		if (isUndefined(api)) return reject('Client not initialized')
 
 		getLibraryApi(api)

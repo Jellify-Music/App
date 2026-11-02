@@ -12,10 +12,10 @@ import { isEmpty, isNull, isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { JellifyUser } from '@/src/types/JellifyUser'
-import { queryClient } from '../../../../constants/query-client'
+import { queryClient } from '../../../client'
 import { FrequentlyPlayedTracksQuery } from '../queries'
 import { ArtistQueryKey } from '../../artist/keys'
-import { setQueryUserDataForItem, setQueryUserDataForItems } from '../../user-data'
+import { setQueryUserDataForItem, setQueryUserDataForItems } from '../../user-data/cache'
 
 /**
  * Fetches the 100 most frequently played items from the user's library

@@ -6,11 +6,12 @@ import { fetchAlbums } from './utils/album'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
-import { queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../client'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyLibrary } from '../../../stores/auth'
 import useLibraryStore from '../../../stores/library'
 import { fetchAlbumDiscs } from '../item'
+import { QueryAges } from '../../../constants/durations'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
 import { AlbumQuery, RecentlyAddedQuery } from './queries'
@@ -131,4 +132,5 @@ export async function prefetchAlbumDiscsQuery(album: BaseItemDto) {
 const AlbumDiscsQuery = (api: Api | undefined, album: BaseItemDto) => ({
 	queryKey: AlbumDiscsQueryKey(album),
 	queryFn: () => fetchAlbumDiscs(api, album),
+	gcTime: QueryAges.OneWeek,
 })
