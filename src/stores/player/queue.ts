@@ -1,4 +1,7 @@
 import { Queue } from '@/src/services/types/queue-item'
+import { PlayerQueueStore } from './types'
+import { setQueue } from './utils/set'
+import { replaceQueue } from './utils/replace'
 import { createVersionedMmkvStorage } from '../../constants/versioned-storage'
 import { create } from 'zustand'
 import { devtools, persist, PersistStorage, StorageValue } from 'zustand/middleware'
@@ -11,26 +14,6 @@ import getTrackDto from '../../utils/mapping/track-extra-payload'
  * This prevents storage overflow when users have very large queues.
  */
 const MAX_PERSISTED_QUEUE_SIZE = 500
-
-type PlayerQueueStore = {
-	shuffled: boolean
-	setShuffled: (shuffled: boolean) => void
-
-	repeatMode: RepeatMode
-	setRepeatMode: (repeatMode: RepeatMode) => void
-
-	queueRef: Queue | undefined
-	setQueueRef: (queueRef: Queue | undefined) => void
-
-	unShuffledQueue: TrackItem[]
-	setUnshuffledQueue: (unShuffledQueue: TrackItem[]) => void
-
-	queue: TrackItem[]
-	setQueue: (queue: TrackItem[]) => void
-
-	currentIndex: number | undefined
-	setCurrentIndex: (index: number | undefined) => void
-}
 
 /**
  * Custom storage that serializes/deserializes tracks to their slim form
@@ -108,16 +91,15 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 					}),
 
 				queue: [],
-				setQueue: (queue: TrackItem[]) =>
-					set({
-						queue,
-					}),
+				setQueue: setQueue(set),
 
 				currentIndex: undefined,
 				setCurrentIndex: (currentIndex: number | undefined) =>
 					set({
 						currentIndex,
 					}),
+
+				replaceQueue: replaceQueue(set),
 			}),
 			{
 				name: 'player-queue-storage',
@@ -159,20 +141,6 @@ export const useCurrentIndex = () => usePlayerQueueStore((state) => state.curren
 
 export const useRepeatMode = () => usePlayerQueueStore((state) => state.repeatMode)
 
-export const setNewQueue = (
-	queue: TrackItem[],
-	queueRef: Queue,
-	index: number,
-	shuffled: boolean,
-) => {
-	usePlayerQueueStore.setState({
-		queue,
-		queueRef,
-		currentIndex: index,
-		shuffled,
-	})
-}
-
 /**
  * Clears the queue and resets the player repeat mode to 'off'. This is useful when the user logs out or switches accounts.
  */
@@ -192,13 +160,4 @@ export const clearQueueStore = () => {
 	setQueue([])
 	setCurrentIndex(undefined)
 	setRepeatMode('off')
-}
-
-export const updateQueueTracks = (updatedTracks: TrackItem[]) => {
-	const updatedById = new Map(updatedTracks.map((t) => [t.id, t]))
-	usePlayerQueueStore.setState((state) => ({
-		...state,
-		queue: state.queue.map((t) => updatedById.get(t.id) ?? t),
-		unShuffledQueue: state.unShuffledQueue.map((t) => updatedById.get(t.id) ?? t),
-	}))
 }

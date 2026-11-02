@@ -27,12 +27,7 @@ import { getItemImageUrl } from '../../api/queries/image/utils'
 import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
-
-/**
- * Playlists we materialize for Android Auto are tagged with this prefix so
- * `clearPlaylists` can leave them untouched when the user starts a new queue.
- */
-export const AA_PLAYLIST_NAME_PREFIX = 'jellify-aa:'
+import { AA_PLAYLIST_NAME_PREFIX } from '../../constants/android-auto'
 
 const LETTERS = ['#', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ']
 const TILE_LIMIT = 500

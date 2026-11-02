@@ -1,8 +1,11 @@
-import { TrackItem, TrackPlayer } from 'react-native-nitro-player'
+import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { updateTrackMediaInfo } from '../../../src/services/player/utils/track-media-info'
-import { onTracksNeedUpdate } from '../../../src/services/player/utils/event-handlers'
+import {
+	onChangeTrack,
+	onTracksNeedUpdate,
+} from '../../../src/services/player/utils/event-handlers'
 import resolveTrackUrls from '../../../src/utils/fetching/track-media-info'
-import { updateQueueTracks, usePlayerQueueStore } from '../../../src/stores/player/queue'
+import { usePlayerQueueStore } from '../../../src/stores/player/queue'
 import Toast from 'react-native-toast-message'
 
 jest.mock('../../../src/utils/fetching/track-media-info', () => ({
@@ -10,9 +13,11 @@ jest.mock('../../../src/utils/fetching/track-media-info', () => ({
 	default: jest.fn(),
 }))
 
+const setQueue = jest.fn()
+const queueState = { queue: [], unShuffledQueue: [], currentIndex: undefined, setQueue }
+
 jest.mock('../../../src/stores/player/queue', () => ({
-	usePlayerQueueStore: { getState: jest.fn() },
-	updateQueueTracks: jest.fn(),
+	usePlayerQueueStore: { getState: jest.fn(), setState: jest.fn() },
 }))
 
 jest.mock('../../../src/utils/logging', () => ({
@@ -97,18 +102,60 @@ describe('updateTrackMediaInfo', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
 		;(TrackPlayer.updateTracks as jest.Mock).mockResolvedValue(undefined)
+		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue(queueState)
 	})
 
 	it('resolves URLs, updates the player, syncs the queue store, and returns updated tracks', async () => {
 		const track = createTrack('a', '')
+		const other = createTrack('b')
 		const updatedTrack = createTrack('a', 'https://cdn.example.com/a.mp3')
 		;(resolveTrackUrls as jest.Mock).mockResolvedValue([updatedTrack])
+		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
+			...queueState,
+			queue: [other, track],
+			unShuffledQueue: [track, other],
+		})
 
-		const result = await updateTrackMediaInfo([track])
+		await updateTrackMediaInfo([track])
 
 		expect(resolveTrackUrls).toHaveBeenCalledWith([track], 'stream', undefined)
 		expect(TrackPlayer.updateTracks).toHaveBeenCalledWith([updatedTrack])
-		expect(updateQueueTracks).toHaveBeenCalledWith([updatedTrack])
+		expect(setQueue).toHaveBeenCalledWith([other, updatedTrack], [updatedTrack, other])
+	})
+
+	it('leaves the queue store alone for tracks that could not be resolved', async () => {
+		const track = createTrack('a', '')
+		;(resolveTrackUrls as jest.Mock).mockResolvedValue([track])
+		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
+			...queueState,
+			queue: [track],
+			unShuffledQueue: [track],
+		})
+
+		await updateTrackMediaInfo([track])
+
+		expect(setQueue).not.toHaveBeenCalled()
+	})
+
+	it("keeps the current track's URL but applies updates to the rest of the queue", async () => {
+		const current = createTrack('a')
+		const upcoming = createTrack('b', '')
+		const updatedCurrent = createTrack('a', 'https://cdn.example.com/new-a.mp3')
+		const updatedUpcoming = createTrack('b', 'https://cdn.example.com/b.mp3')
+		;(resolveTrackUrls as jest.Mock).mockResolvedValue([updatedCurrent, updatedUpcoming])
+		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
+			...queueState,
+			queue: [current, upcoming],
+			unShuffledQueue: [current, upcoming],
+			currentIndex: 0,
+		})
+
+		await updateTrackMediaInfo([current, upcoming])
+
+		expect(setQueue).toHaveBeenCalledWith(
+			[current, updatedUpcoming],
+			[current, updatedUpcoming],
+		)
 	})
 
 	it('concurrent calls both complete and each updates the player and queue store', async () => {
@@ -129,7 +176,7 @@ describe('updateTrackMediaInfo', () => {
 		await firstCall
 
 		expect(TrackPlayer.updateTracks).toHaveBeenCalledTimes(2)
-		expect(updateQueueTracks).toHaveBeenCalledTimes(2)
+		expect(setQueue).toHaveBeenCalledTimes(2)
 	})
 
 	it('pauses and shows an error when the buffering current track could not be resolved', async () => {
@@ -181,7 +228,10 @@ describe('onTracksNeedUpdate', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
 		;(TrackPlayer.updateTracks as jest.Mock).mockResolvedValue(undefined)
-		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({ isQueuing: false })
+		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
+			isQueuing: false,
+			...queueState,
+		})
 	})
 
 	it('returns immediately and does not fetch media info when the tracks array is empty', async () => {
@@ -208,5 +258,50 @@ describe('onTracksNeedUpdate', () => {
 		await onTracksNeedUpdate(tracks, 10)
 
 		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks, 'stream', undefined)
+	})
+})
+
+// ─── onChangeTrack ───────────────────────────────────────────────────────────
+
+describe('onChangeTrack', () => {
+	beforeEach(() => {
+		jest.clearAllMocks()
+	})
+
+	it('moves the current index when the track is already in the queue', async () => {
+		const tracks = [createTrack('a'), createTrack('b')]
+		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
+			...queueState,
+			queue: tracks,
+			currentIndex: 0,
+		})
+
+		await onChangeTrack(tracks[1])
+
+		expect(PlayerQueue.getPlaylist).not.toHaveBeenCalled()
+		const update = (usePlayerQueueStore.setState as jest.Mock).mock.calls[0][0]
+		expect(update({ currentIndex: 0 })).toEqual(expect.objectContaining({ currentIndex: 1 }))
+	})
+
+	it('adopts a native playlist the store has never seen as an unshuffled queue', async () => {
+		const tracks = [createTrack('x'), createTrack('y')]
+		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
+			...queueState,
+			queue: [createTrack('a')],
+			unShuffledQueue: [createTrack('a')],
+			currentIndex: 0,
+		})
+		;(TrackPlayer.getState as jest.Mock).mockResolvedValueOnce({ currentPlaylistId: 'car' })
+		;(PlayerQueue.getPlaylist as jest.Mock).mockReturnValueOnce({ id: 'car', tracks })
+
+		await onChangeTrack(tracks[1])
+
+		expect(usePlayerQueueStore.setState).toHaveBeenCalledWith({
+			queue: tracks,
+			unShuffledQueue: tracks,
+			queueRef: 'Android Auto',
+			currentIndex: 1,
+			shuffled: false,
+		})
 	})
 })
