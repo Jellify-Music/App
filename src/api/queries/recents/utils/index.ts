@@ -167,7 +167,12 @@ export function fetchRecentlyPlayedArtists(
 
 		// Get the recently played tracks from the query client
 		queryClient
-			.ensureInfiniteQueryData(PlayItAgainQuery(library))
+			.infiniteQuery({
+				...PlayItAgainQuery(library),
+				staleTime: 'static',
+				// Keep the pages, since artists are derived from one page at a time
+				select: (data) => data,
+			})
 			.then((recentlyPlayedTracks) => {
 				if (!recentlyPlayedTracks) {
 					return resolve([])

@@ -2,23 +2,21 @@ import HorizontalCardList from '../../../components/Global/components/horizontal
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React from 'react'
 import ItemCard from '../../Global/components/Card'
-import { H4, H5, XStack } from 'tamagui'
+import { H4, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
-import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 
 export default function FrequentArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
-	const { horizontalItems } = useDisplayContext()
 
 	const renderItem = ({ item: artist }: { item: BaseItemDto }) => (
 		<ItemCard
@@ -52,10 +50,7 @@ export default function FrequentArtists(): React.JSX.Element {
 				<Icon name='arrow-right' />
 			</XStack>
 
-			<HorizontalCardList
-				data={frequentArtistsInfiniteQuery.data.slice(0, horizontalItems) ?? []}
-				renderItem={renderItem}
-			/>
+			<HorizontalCardList data={frequentArtistsInfiniteQuery.data} renderItem={renderItem} />
 		</AnimatedRow>
 	) : (
 		<></>

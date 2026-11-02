@@ -22,11 +22,10 @@ import {
 } from '@jellyfin/sdk/lib/generated-client'
 import { capitalize } from 'lodash'
 import { SourceType } from '../../types/JellifyTrack'
-import StreamingQuality from '../../enums/audio-quality'
+import { StreamingQuality, DownloadQuality } from '../../enums/audio-quality'
 import uuid from 'react-native-uuid'
 import { Platform } from 'react-native'
-import { DownloadQuality } from '@/src/stores/settings/usage'
-import { AudioQuality } from '@/src/types/AudioQuality'
+import { AudioQuality } from '../../types/audio/quality'
 
 /**
  * Gets quality-specific parameters for transcoding
@@ -101,9 +100,24 @@ export function getDeviceProfile(
 		MaxStaticMusicBitrate:
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
-		TranscodingProfiles: profiles.TranscodingProfiles,
-	}
+		TranscodingProfiles: getTranscodingProfiles(profiles, type),
+		CodecProfiles: profiles.CodecProfiles,
+	} as DeviceProfile
 }
+
+const getTranscodingProfiles = (profiles: DeviceProfile, type: SourceType) =>
+	Platform.OS === 'android' && type === 'download'
+		? [
+				{
+					AudioCodec: 'opus',
+					Container: 'ogg',
+					Context: EncodingContext.Streaming,
+					MaxAudioChannels: '6',
+					Protocol: MediaStreamProtocol.Http,
+					Type: DlnaProfileType.Audio,
+				},
+			]
+		: (profiles.TranscodingProfiles ?? [])
 
 const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
@@ -134,7 +148,7 @@ const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 
 const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
-		...(UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles ?? []),
+		...UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles!,
 		{
 			Container: 'ogg',
 			Type: DlnaProfileType.Audio,
@@ -157,13 +171,22 @@ const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 			Type: DlnaProfileType.Audio,
 		},
 	],
+	/**
+	 * ExoPlayer can't seek in a progressive transcode: it has no length, so every seek starts the
+	 * track over.
+	 *
+	 * HLS splits the transcode into segments, which ExoPlayer seeks between natively.
+	 * Downloads still use the progressive profile, since they need a single file.
+	 */
 	TranscodingProfiles: [
 		{
-			AudioCodec: 'opus',
-			Container: 'ogg',
+			AudioCodec: 'aac',
+			Container: 'ts',
 			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
+			MinSegments: 1,
+			BreakOnNonKeyFrames: true,
+			Protocol: MediaStreamProtocol.Hls,
 			Type: DlnaProfileType.Audio,
 		},
 	],

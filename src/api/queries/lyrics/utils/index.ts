@@ -3,11 +3,6 @@ import { isEmpty, isUndefined } from 'lodash'
 import { getLyricApi } from '@jellyfin/sdk/lib/utils/api'
 import { LyricDto } from '@jellyfin/sdk/lib/generated-client/models'
 
-export interface ParsedLyricLine {
-	time: number // seconds
-	text: string
-}
-
 /**
  * Fetch raw lyrics text for a given track item.
  */

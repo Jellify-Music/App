@@ -2,14 +2,13 @@ import navigationRef from '../../../screens/navigation'
 import { formatArtistNames } from '../../../utils/formatting/artist-names'
 import ItemCard from '../../Global/components/Card'
 import HorizontalCardList from '../../Global/components/horizontal-list'
-import { H4, H5, XStack } from 'tamagui'
+import { H4, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
 import { useDiscoverAlbums } from '../../../api/queries/suggestions'
-import AnimatedRow from '../../Global/helpers/animated-row'
-import { useDisplayContext } from '../../../providers/Display/display-provider'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 
 export default function SuggestedAlbums() {
 	const suggestedAlbumsInfiniteQuery = useDiscoverAlbums()
@@ -18,8 +17,6 @@ export default function SuggestedAlbums() {
 
 	const suggestedAlbumsExist =
 		suggestedAlbumsInfiniteQuery.data && suggestedAlbumsInfiniteQuery.data.length > 0
-
-	const { horizontalItems } = useDisplayContext()
 
 	return suggestedAlbumsExist ? (
 		<AnimatedRow testID='discover-suggested-albums'>
@@ -36,7 +33,7 @@ export default function SuggestedAlbums() {
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
-				data={suggestedAlbumsInfiniteQuery.data?.slice(0, horizontalItems)}
+				data={suggestedAlbumsInfiniteQuery.data}
 				renderItem={({ item }) => (
 					<ItemCard
 						squared

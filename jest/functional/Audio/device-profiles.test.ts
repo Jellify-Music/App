@@ -1,5 +1,5 @@
 import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
-import StreamingQuality from '../../../src/enums/audio-quality'
+import { StreamingQuality } from '../../../src/enums/audio-quality'
 import { SourceType } from '../../../src/types/JellifyTrack'
 
 /**
@@ -165,18 +165,6 @@ describe('Android direct play', () => {
 		expect(directPlays('android', StreamingQuality.Original, 'ogg', 'opus')).toBe(true)
 	})
 
-	it('transcodes to Opus in Ogg', () => {
-		expect(profileFor('android', StreamingQuality.High).TranscodingProfiles).toEqual([
-			expect.objectContaining({
-				AudioCodec: 'opus',
-				Container: 'ogg',
-				Context: 'Streaming',
-				Protocol: 'http',
-				MaxAudioChannels: '6',
-			}),
-		])
-	})
-
 	it('has no codec conditions', () => {
 		expect(profileFor('android', StreamingQuality.Original).CodecProfiles).toBeUndefined()
 	})
@@ -250,6 +238,33 @@ describe('Every platform', () => {
 		const profile = profileFor(os, StreamingQuality.Original)
 		for (const p of [...profile.DirectPlayProfiles!, ...profile.TranscodingProfiles!]) {
 			expect(p.Type).toBe('Audio')
+		}
+	})
+})
+
+describe('Transcoding protocol', () => {
+	it('transcodes Android streams to HLS, so they stay seekable', () => {
+		expect(profileFor('android', StreamingQuality.High).TranscodingProfiles).toEqual([
+			expect.objectContaining({
+				AudioCodec: 'aac',
+				Container: 'ts',
+				Context: 'Streaming',
+				Protocol: 'hls',
+			}),
+		])
+	})
+
+	it('keeps Android downloads on a single progressive file', () => {
+		expect(
+			profileFor('android', StreamingQuality.High, 'download').TranscodingProfiles,
+		).toEqual([
+			expect.objectContaining({ AudioCodec: 'opus', Container: 'ogg', Protocol: 'http' }),
+		])
+	})
+
+	it.each(['ios', 'web'])('keeps %s streams progressive', (os) => {
+		for (const p of profileFor(os, StreamingQuality.High).TranscodingProfiles!) {
+			expect(p.Protocol).toBe('http')
 		}
 	})
 })

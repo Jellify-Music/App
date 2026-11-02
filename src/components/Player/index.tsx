@@ -5,13 +5,14 @@ import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Footer from './components/footer'
 import BlurredBackground, { BlurOverlay } from './components/blurred-background'
-import PlayerHeader from './components/header'
+import PlayerContent from './components/content'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { useCurrentTrack } from '../../stores/player/queue'
 import Queue from '../Queue'
 import { StyleSheet } from 'react-native'
 import { PlayerProvider } from '../../providers/Player'
+import PlayerHeading from './components/heading'
 
 export default function PlayerScreen(): React.JSX.Element {
 	return (
@@ -42,17 +43,13 @@ export function Player(): React.JSX.Element {
 		<ZStack position='absolute' inset={0}>
 			<BlurOverlay />
 
-			<YStack
-				flex={1}
-				justifyContent='center'
-				marginTop='3'
-				marginHorizontal='4'
-				marginBottom={bottom}
-			>
-				{/* flexGrow 1 */}
-				<PlayerHeader />
+			<YStack flex={1} justifyContent='center' marginTop='3' marginBottom={bottom}>
+				<PlayerHeading />
 
-				<YStack flexShrink={1} gap='4' justifyContent='flex-start' marginBottom='4'>
+				{/* flexGrow 1 */}
+				<PlayerContent />
+
+				<YStack flexShrink={1} gap='4' justifyContent='flex-start' margin='4'>
 					<SongInfo />
 					<Scrubber />
 					<Controls />

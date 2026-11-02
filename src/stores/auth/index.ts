@@ -11,7 +11,7 @@ import { JellyfinInfo } from '../../api/info'
 import AXIOS_INSTANCE from '../../configs/networking/axios.config'
 import { queryClient } from '../../constants/query-client'
 import JellifyStore from './types'
-import { setServer } from './utils/set'
+import { setServer, setUser } from './utils/set'
 
 const useJellifyStore = create<JellifyStore>()(
 	devtools(
@@ -27,7 +27,7 @@ const useJellifyStore = create<JellifyStore>()(
 					? (JSON.parse(storage.getString(MMKVStorageKeys.User)!) as JellifyUser)
 					: undefined,
 
-				setUser: (user: JellifyUser | undefined) => set({ user }),
+				setUser: setUser(set),
 
 				library: storage.getString(MMKVStorageKeys.Library)
 					? (JSON.parse(storage.getString(MMKVStorageKeys.Library)!) as JellifyLibrary)

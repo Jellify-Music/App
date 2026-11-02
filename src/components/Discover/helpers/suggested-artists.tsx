@@ -8,10 +8,9 @@ import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { useDiscoverArtists } from '../../../api/queries/suggestions'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
-import { useDisplayContext } from '../../../providers/Display/display-provider'
 
 export default function SuggestedArtists(): React.JSX.Element {
 	const suggestedArtistsInfiniteQuery = useDiscoverArtists()
@@ -20,8 +19,6 @@ export default function SuggestedArtists(): React.JSX.Element {
 
 	const suggestedArtistsExist =
 		suggestedArtistsInfiniteQuery.data && suggestedArtistsInfiniteQuery.data.length > 0
-
-	const { horizontalItems } = useDisplayContext()
 
 	const renderItem = ({ item, index }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
@@ -54,10 +51,7 @@ export default function SuggestedArtists(): React.JSX.Element {
 				<H4>Artists for You</H4>
 				<Icon name='arrow-right' />
 			</XStack>
-			<HorizontalCardList
-				data={suggestedArtistsInfiniteQuery.data?.slice(0, horizontalItems)}
-				renderItem={renderItem}
-			/>
+			<HorizontalCardList data={suggestedArtistsInfiniteQuery.data} renderItem={renderItem} />
 		</AnimatedRow>
 	) : (
 		<></>

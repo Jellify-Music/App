@@ -36,7 +36,10 @@ export async function ensureDiscoverArtistsQueryData(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 ) {
-	return await queryClient.ensureInfiniteQueryData(DiscoverArtistsQuery(user, library))
+	return await queryClient.infiniteQuery({
+		...DiscoverArtistsQuery(user, library),
+		staleTime: 'static',
+	})
 }
 
 export const DiscoverAlbumsQuery = (
@@ -65,5 +68,8 @@ export async function ensureDiscoverAlbumsQueryData(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 ) {
-	return await queryClient.ensureInfiniteQueryData(DiscoverAlbumsQuery(user, library))
+	return await queryClient.infiniteQuery({
+		...DiscoverAlbumsQuery(user, library),
+		staleTime: 'static',
+	})
 }
