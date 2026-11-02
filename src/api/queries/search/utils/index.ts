@@ -1,5 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { isEmpty, isUndefined, trim } from 'lodash'
 import QueryConfig from '../../../../configs/querying/index.config'
 import { getApi, getUser } from '../../../../stores/auth/utils'
@@ -26,7 +26,7 @@ export async function fetchSearchResults(
 		if (isUndefined(user)) return reject('User has not been set')
 		if (isUndefined(libraryId)) return reject('Library has not been set')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: libraryId,
