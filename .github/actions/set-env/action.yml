@@ -1,0 +1,52 @@
+name: Set up the build environment
+description: 'Write the app secrets to .env and, for a platform, the GlitchTip CLI config used to upload source maps'
+inputs:
+  glitchtip_dsn:
+    description: 'GlitchTip DSN the app reports crashes to'
+    required: true
+  telemetrydeck_appid:
+    description: 'TelemetryDeck app ID'
+    required: true
+  platform:
+    description: 'android or ios: also writes <platform>/sentry.properties. Leave empty to only write .env'
+    required: false
+    default: ''
+  sentry_url:
+    description: 'GlitchTip URL for the CLI config'
+    required: false
+    default: ''
+  sentry_org:
+    description: 'GlitchTip organization for the CLI config'
+    required: false
+    default: ''
+  sentry_project:
+    description: 'GlitchTip project for the CLI config'
+    required: false
+    default: ''
+runs:
+  using: "composite"
+  steps:
+    # Passed through env so secret values never get interpolated into the script
+    - name: 🤫 Output secrets to .env
+      shell: bash
+      env:
+        GLITCHTIP_DSN: ${{ inputs.glitchtip_dsn }}
+        TELEMETRYDECK_APPID: ${{ inputs.telemetrydeck_appid }}
+      run: |
+        echo "GLITCHTIP_DSN=$GLITCHTIP_DSN" >> .env
+        echo "TELEMETRYDECK_APPID=$TELEMETRYDECK_APPID" >> .env
+
+    - name: 🤫 Output GlitchTip CLI config
+      if: inputs.platform != ''
+      shell: bash
+      env:
+        PLATFORM: ${{ inputs.platform }}
+        SENTRY_URL: ${{ inputs.sentry_url }}
+        SENTRY_ORG: ${{ inputs.sentry_org }}
+        SENTRY_PROJECT: ${{ inputs.sentry_project }}
+      run: |
+        {
+          echo "defaults.url=$SENTRY_URL"
+          echo "defaults.org=$SENTRY_ORG"
+          echo "defaults.project=$SENTRY_PROJECT"
+        } >> "$PLATFORM/sentry.properties"

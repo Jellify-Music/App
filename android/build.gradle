@@ -6,6 +6,11 @@ buildscript {
         targetSdkVersion = 36
         ndkVersion = "27.1.12297006"
         kotlinVersion = "2.2.0"
+
+        // F-Droid / FOSS build (-Pfoss=true): no proprietary Google libraries.
+        isFossBuild = (findProperty("foss") ?: "false").toString().toBoolean()
+        // Read by react-native-nitro-player (see patches/) to compile out Google Cast.
+        nitroPlayerCastEnabled = !isFossBuild
     }
     repositories {
         google()

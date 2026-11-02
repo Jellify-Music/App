@@ -1,8 +1,280 @@
+diff --git a/node_modules/react-native-nitro-player/android/build.gradle b/node_modules/react-native-nitro-player/android/build.gradle
+index 0b0adee..5b027f4 100644
+--- a/node_modules/react-native-nitro-player/android/build.gradle
++++ b/node_modules/react-native-nitro-player/android/build.gradle
+@@ -35,6 +35,24 @@ def getExtOrIntegerDefault(name) {
+   return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["NitroPlayer_" + name]).toInteger()
+ }
+ 
++// Google Cast support. Set `nitroPlayerCastEnabled = false` in the root project's ext
++// (or pass -PnitroPlayerCastEnabled=false) to build without the proprietary Cast SDK,
++// e.g. for F-Droid. Cast APIs then become inert no-ops.
++def isCastEnabled() {
++  def value = rootProject.ext.has("nitroPlayerCastEnabled")
++    ? rootProject.ext.get("nitroPlayerCastEnabled")
++    : rootProject.findProperty("nitroPlayerCastEnabled")
++  return value == null ? true : value.toString().toBoolean()
++}
++
++// Sources in src/main that reference the Cast SDK; swapped for src/nocast stubs when Cast is off.
++def castOnlySources = [
++  "CastSessionController.kt",
++  "NitroCastConfig.kt",
++  "NitroCastOptionsProvider.kt",
++  "NitroMediaItemConverter.kt",
++]
++
+ android {
+   namespace "com.margelo.nitro.nitroplayer"
+ 
+@@ -121,6 +139,22 @@ android {
+           "${project.buildDir}/generated/source/codegen/java"
+         ]
+       }
++      if (isCastEnabled()) {
++        java.srcDirs += ["src/cast/java"]
++      } else {
++        java.srcDirs += ["src/nocast/java"]
++      }
++    }
++  }
++}
++
++if (!isCastEnabled()) {
++  // Source-set excludes aren't applied to Kotlin compilation, so filter the task itself.
++  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
++    // Match on the full path: the src/nocast stubs share these file names.
++    def mainSources = file("src/main/java").absolutePath + File.separator
++    exclude { element ->
++      element.file.absolutePath.startsWith(mainSources) && castOnlySources.contains(element.name)
+     }
+   }
+ }
+@@ -151,9 +185,11 @@ dependencies {
+ 
+   // Google Cast: CastPlayer (drop-in Media3 Player), the Cast framework and the
+   // MediaRouter chooser/controller dialogs used by Cast.showCastPicker().
+-  implementation "androidx.media3:media3-cast:$media3_version"
+-  implementation "com.google.android.gms:play-services-cast-framework:21.5.0"
+-  implementation "androidx.mediarouter:mediarouter:1.7.0"
++  if (isCastEnabled()) {
++    implementation "androidx.media3:media3-cast:$media3_version"
++    implementation "com.google.android.gms:play-services-cast-framework:21.5.0"
++    implementation "androidx.mediarouter:mediarouter:1.7.0"
++  }
+ 
+   // WorkManager for background downloads.
+   implementation "androidx.work:work-runtime-ktx:2.10.5" // Latest version of 2.10
 diff --git a/node_modules/react-native-nitro-player/android/consumer-rules.pro b/node_modules/react-native-nitro-player/android/consumer-rules.pro
 new file mode 100644
-index 0000000..0000001
+index 0000000..875047a
 --- /dev/null
 +++ b/node_modules/react-native-nitro-player/android/consumer-rules.pro
 @@ -0,0 +1,2 @@
 +# Keep the Cast OptionsProvider (referenced reflectively from the manifest) under R8.
 +-keep class com.margelo.nitro.nitroplayer.media.NitroCastOptionsProvider { *; }
+diff --git a/node_modules/react-native-nitro-player/android/src/cast/java/com/margelo/nitro/nitroplayer/media/CastSessionFactory.kt b/node_modules/react-native-nitro-player/android/src/cast/java/com/margelo/nitro/nitroplayer/media/CastSessionFactory.kt
+new file mode 100644
+index 0000000..755cd83
+--- /dev/null
++++ b/node_modules/react-native-nitro-player/android/src/cast/java/com/margelo/nitro/nitroplayer/media/CastSessionFactory.kt
+@@ -0,0 +1,54 @@
++package com.margelo.nitro.nitroplayer.media
++
++import android.content.Context
++import android.os.Handler
++import androidx.media3.cast.CastPlayer
++import androidx.media3.common.Player
++import androidx.media3.common.util.UnstableApi
++import androidx.media3.session.MediaSession
++import com.google.android.gms.cast.framework.CastContext
++import com.margelo.nitro.nitroplayer.core.NitroPlayerLogger
++
++/**
++ * Builds the [CastSessionController] for [NitroPlayerPlaybackService].
++ *
++ * Lives in the `cast` source set so the Google Cast SDK is only referenced when
++ * `nitroPlayerCastEnabled` is true; the `nocast` source set provides a stub that
++ * always returns null.
++ */
++@UnstableApi
++internal object CastSessionFactory {
++    /**
++     * Best-effort: when Google Play services or the Cast framework are unavailable
++     * (older devices, no Play services), returns null and all Cast features become
++     * inert no-ops.
++     */
++    fun create(
++        context: Context,
++        localPlayer: Player,
++        localSessionPlayer: Player,
++        mediaSession: MediaSession,
++        mainHandler: Handler,
++    ): CastSessionController? =
++        try {
++            val castContext = CastContext.getSharedInstance(context)
++            val castPlayer =
++                CastPlayer(
++                    castContext,
++                    NitroMediaItemConverter(),
++                    ExoPlayerBuilder.DEFAULT_REMOTE_SKIP_INTERVAL_MS,
++                    ExoPlayerBuilder.DEFAULT_REMOTE_SKIP_INTERVAL_MS,
++                )
++            CastSessionController(
++                castContext = castContext,
++                castPlayer = castPlayer,
++                localPlayer = localPlayer,
++                localSessionPlayer = localSessionPlayer,
++                mediaSession = mediaSession,
++                mainHandler = mainHandler,
++            )
++        } catch (e: Exception) {
++            NitroPlayerLogger.log("PlaybackService") { "Cast unavailable: ${e.message}" }
++            null
++        }
++}
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
+index 6202379..f801564 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
+@@ -7,7 +7,6 @@ import android.os.Binder
+ import android.os.Handler
+ import android.os.IBinder
+ import android.os.Looper
+-import androidx.media3.cast.CastPlayer
+ import androidx.media3.common.C
+ import androidx.media3.common.ForwardingPlayer
+ import androidx.media3.common.MediaItem
+@@ -17,7 +16,6 @@ import androidx.media3.exoplayer.ExoPlayer
+ import androidx.media3.session.DefaultMediaNotificationProvider
+ import androidx.media3.session.MediaSession
+ import androidx.media3.session.MediaSessionService
+-import com.google.android.gms.cast.framework.CastContext
+ import com.margelo.nitro.nitroplayer.core.NitroPlayerLogger
+ import com.margelo.nitro.nitroplayer.core.checkUpcomingTracksForUrls
+ import com.margelo.nitro.nitroplayer.core.TrackPlayerCore
+@@ -179,34 +177,16 @@ class NitroPlayerPlaybackService : MediaSessionService() {
+         initCast()
+     }
+ 
+-    /**
+-     * Initialize Google Cast. Best-effort: when Google Play services or the Cast
+-     * framework are unavailable (older devices, no Play services), the controller
+-     * stays null and all Cast features become inert no-ops.
+-     */
++    /** Initialize Google Cast; see [CastSessionFactory] (null when Cast is unavailable or not compiled in). */
+     private fun initCast() {
+-        try {
+-            val castContext = CastContext.getSharedInstance(this)
+-            val castPlayer =
+-                CastPlayer(
+-                    castContext,
+-                    NitroMediaItemConverter(),
+-                    ExoPlayerBuilder.DEFAULT_REMOTE_SKIP_INTERVAL_MS,
+-                    ExoPlayerBuilder.DEFAULT_REMOTE_SKIP_INTERVAL_MS,
+-                )
+-            castSessionController =
+-                CastSessionController(
+-                    castContext = castContext,
+-                    castPlayer = castPlayer,
+-                    localPlayer = player,
+-                    localSessionPlayer = sessionPlayer,
+-                    mediaSession = mediaSession!!,
+-                    mainHandler = mainHandler,
+-                )
+-        } catch (e: Exception) {
+-            NitroPlayerLogger.log("PlaybackService") { "Cast unavailable: ${e.message}" }
+-            castSessionController = null
+-        }
++        castSessionController =
++            CastSessionFactory.create(
++                context = this,
++                localPlayer = player,
++                localSessionPlayer = sessionPlayer,
++                mediaSession = mediaSession!!,
++                mainHandler = mainHandler,
++            )
+     }
+ 
+     // Content intent for the notification tap — newer Android has no fallback without it
+diff --git a/node_modules/react-native-nitro-player/android/src/nocast/java/com/margelo/nitro/nitroplayer/media/CastSessionController.kt b/node_modules/react-native-nitro-player/android/src/nocast/java/com/margelo/nitro/nitroplayer/media/CastSessionController.kt
+new file mode 100644
+index 0000000..f9f8f76
+--- /dev/null
++++ b/node_modules/react-native-nitro-player/android/src/nocast/java/com/margelo/nitro/nitroplayer/media/CastSessionController.kt
+@@ -0,0 +1,33 @@
++package com.margelo.nitro.nitroplayer.media
++
++import android.app.Activity
++import androidx.media3.common.Player
++import androidx.media3.common.util.UnstableApi
++import androidx.media3.session.MediaSession
++import com.margelo.nitro.nitroplayer.CastState
++import com.margelo.nitro.nitroplayer.core.TrackPlayerCore
++
++/**
++ * Cast-free stand-in for the Google Cast controller, keeping the core's Cast
++ * plumbing compiling without the Cast SDK. Never instantiated —
++ * [CastSessionFactory.create] always returns null in this build.
++ */
++@UnstableApi
++class CastSessionController private constructor(
++    val castPlayer: Player,
++    val localPlayer: Player,
++    val localSessionPlayer: Player,
++    val mediaSession: MediaSession,
++) {
++    fun attachCore(core: TrackPlayerCore) = Unit
++
++    fun getCastState(): CastState = CastState.NO_DEVICES_AVAILABLE
++
++    fun currentDeviceName(): String? = null
++
++    fun endCurrentSession() = Unit
++
++    fun showCastPicker(activity: Activity) = Unit
++
++    fun release() = Unit
++}
+diff --git a/node_modules/react-native-nitro-player/android/src/nocast/java/com/margelo/nitro/nitroplayer/media/CastSessionFactory.kt b/node_modules/react-native-nitro-player/android/src/nocast/java/com/margelo/nitro/nitroplayer/media/CastSessionFactory.kt
+new file mode 100644
+index 0000000..17570aa
+--- /dev/null
++++ b/node_modules/react-native-nitro-player/android/src/nocast/java/com/margelo/nitro/nitroplayer/media/CastSessionFactory.kt
+@@ -0,0 +1,23 @@
++package com.margelo.nitro.nitroplayer.media
++
++import android.content.Context
++import android.os.Handler
++import androidx.media3.common.Player
++import androidx.media3.common.util.UnstableApi
++import androidx.media3.session.MediaSession
++
++/**
++ * Cast-free build (`nitroPlayerCastEnabled=false`): Google Cast is not compiled
++ * in, so there is never a [CastSessionController] and all Cast features are inert.
++ */
++@UnstableApi
++internal object CastSessionFactory {
++    @Suppress("UNUSED_PARAMETER")
++    fun create(
++        context: Context,
++        localPlayer: Player,
++        localSessionPlayer: Player,
++        mediaSession: MediaSession,
++        mainHandler: Handler,
++    ): CastSessionController? = null
++}
+diff --git a/node_modules/react-native-nitro-player/android/src/nocast/java/com/margelo/nitro/nitroplayer/media/NitroCastConfig.kt b/node_modules/react-native-nitro-player/android/src/nocast/java/com/margelo/nitro/nitroplayer/media/NitroCastConfig.kt
+new file mode 100644
+index 0000000..ae69c79
+--- /dev/null
++++ b/node_modules/react-native-nitro-player/android/src/nocast/java/com/margelo/nitro/nitroplayer/media/NitroCastConfig.kt
+@@ -0,0 +1,7 @@
++package com.margelo.nitro.nitroplayer.media
++
++/** Cast-free build: keeps `Cast.configure(...)` a harmless no-op. */
++object NitroCastConfig {
++    @Volatile
++    var receiverApplicationId: String? = null
++}

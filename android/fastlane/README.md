@@ -31,13 +31,29 @@ Runs all the tests
 
 
 
-### android deploy
+### android gplay
 
 ```sh
-[bundle exec] fastlane android deploy
+[bundle exec] fastlane android gplay
 ```
 
-Deploy a new version to the Google Play
+Deploy a new version to Google Play internal testing, then promote it to open testing
+
+### android fdroid_check
+
+```sh
+[bundle exec] fastlane android fdroid_check
+```
+
+Fail if the FOSS (F-Droid) build resolves any non-free dependencies
+
+### android fdroid
+
+```sh
+[bundle exec] fastlane android fdroid
+```
+
+Build the FOSS (F-Droid) release APKs: no Google Cast, OTA, or crash reporting
 
 ----
 

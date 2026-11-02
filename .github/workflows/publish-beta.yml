@@ -30,6 +30,7 @@ jobs:
     outputs:
       release_notes: ${{ steps.generate_release_notes.outputs.release_notes }}
       release_body: ${{ steps.generate_release_notes.outputs.release_body }}
+      store_notes: ${{ steps.generate_release_notes.outputs.store_notes }}
       tag: ${{ steps.generate_release_notes.outputs.tag }}
       title: ${{ steps.generate_release_notes.outputs.title }}
     steps:
@@ -61,6 +62,7 @@ jobs:
 
   publish-android:
     if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
+    needs: [generate-release-notes]
     runs-on: [macos-latest]
     outputs:
       version: ${{ steps.setver.outputs.version }}
@@ -112,19 +114,23 @@ jobs:
         env:
           PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
 
-      - name: 🤫 Output secrets to .env
-        run: |
-          echo "GLITCHTIP_DSN=${{ secrets.GLITCHTIP_DSN }}" >> .env
-          echo "TELEMETRYDECK_APPID=${{ secrets.TELEMETRYDECK_APPID }}" >> .env
+      - name: 🤫 Set up the build environment
+        uses: ./.github/actions/set-env
+        with:
+          glitchtip_dsn: ${{ secrets.GLITCHTIP_DSN }}
+          telemetrydeck_appid: ${{ secrets.TELEMETRYDECK_APPID }}
+          platform: android
+          sentry_url: ${{ secrets.SENTRY_URL }}
+          sentry_org: ${{ secrets.SENTRY_ORG }}
+          sentry_project: ${{ secrets.SENTRY_PROJECT }}
 
-      - name: 🤫 Output GlitchTip CLI config
-        run: |
-          echo "defaults.url=${{ secrets.SENTRY_URL }}" >> android/sentry.properties
-          echo "defaults.org=${{ secrets.SENTRY_ORG }}" >> android/sentry.properties
-          echo "defaults.project=${{ secrets.SENTRY_PROJECT }}" >> android/sentry.properties
+      - name: 📝 Write Play Store release notes
+        run: bun scripts/write-store-changelog.js
+        env:
+          STORE_NOTES: ${{ needs.generate-release-notes.outputs.store_notes }}
 
-      - name: 🚀 Run Android fastlane deploy
-        run: bun run fastlane:android:deploy
+      - name: 🚀 Run Android fastlane gplay
+        run: bun run fastlane:android:gplay
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -136,6 +142,68 @@ jobs:
         with:
           name: android-artifacts
           path: ./android/app/build/outputs/apk/release/*.apk
+
+  # F-Droid builds from the release tag on its own servers, so nothing is uploaded here. This job
+  # writes the changelog F-Droid reads from that tag, and builds the FOSS APKs so a non-free
+  # dependency fails the release instead of F-Droid's build weeks later.
+  publish-fdroid:
+    if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
+    needs: [generate-release-notes]
+    runs-on: [macos-latest]
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 📥 Install dependencies
+        uses: ./.github/actions/install-deps
+
+      - name: 💎 Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          working-directory: android
+          bundler-cache: true
+
+      - name: ➕ Version Up
+        if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
+        run: bun x react-native bump-version --type ${{ github.event.inputs['version-bump'] }}
+
+      # Signs the FOSS APKs attached to the GitHub release; F-Droid re-signs its own builds
+      - name: 🔑 Setup release keystore
+        run: |
+          if [ -n "${{ secrets.ANDROID_SIGNING_BASE64 }}" ]; then
+            echo "${{ secrets.ANDROID_SIGNING_BASE64 }}" | base64 --decode > android/app/jellify.keystore
+            echo "Release keystore created"
+          else
+            echo "ERROR: No keystore secret found!"
+            exit 1
+          fi
+
+      - name: 📝 Write F-Droid release notes
+        run: bun scripts/write-store-changelog.js
+        env:
+          STORE_NOTES: ${{ needs.generate-release-notes.outputs.store_notes }}
+
+      - name: 🚀 Run Android fastlane fdroid
+        run: bun run fastlane:android:fdroid
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: 📤 Upload F-Droid Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: fdroid-artifacts
+          path: ./android/app/build/outputs/apk/release/*.apk
+
+      # finalize-release commits this, so only one job pushes to main
+      - name: 📤 Upload F-Droid Changelog
+        uses: actions/upload-artifact@v7
+        with:
+          name: fdroid-changelog
+          path: ./android/fastlane/metadata/android/en-US/changelogs/
 
 
   publish-iOS:
@@ -174,16 +242,15 @@ jobs:
         run: echo -e '${{ secrets.APPSTORE_CONNECT_API_KEY_JSON }}' > appstore_connect_api_key.json
         working-directory: ./ios/fastlane
 
-      - name: 🤫 Output secrets to .env
-        run: |
-          echo "GLITCHTIP_DSN=${{ secrets.GLITCHTIP_DSN }}" >> .env
-          echo "TELEMETRYDECK_APPID=${{ secrets.TELEMETRYDECK_APPID }}" >> .env
-
-      - name: 🤫 Output GlitchTip CLI config
-        run: |
-          echo "defaults.url=${{ secrets.SENTRY_URL }}" >> ios/sentry.properties
-          echo "defaults.org=${{ secrets.SENTRY_ORG }}" >> ios/sentry.properties
-          echo "defaults.project=${{ secrets.SENTRY_PROJECT }}" >> ios/sentry.properties
+      - name: 🤫 Set up the build environment
+        uses: ./.github/actions/set-env
+        with:
+          glitchtip_dsn: ${{ secrets.GLITCHTIP_DSN }}
+          telemetrydeck_appid: ${{ secrets.TELEMETRYDECK_APPID }}
+          platform: ios
+          sentry_url: ${{ secrets.SENTRY_URL }}
+          sentry_org: ${{ secrets.SENTRY_ORG }}
+          sentry_project: ${{ secrets.SENTRY_PROJECT }}
 
       - name: 🚀 Run iOS fastlane build and publish to TestFlight
         run: bun run fastlane:ios:beta
@@ -203,7 +270,7 @@ jobs:
           path: ./ios/Jellify.ipa
 
   finalize-release:
-    needs: [publish-android, publish-iOS, generate-release-notes]
+    needs: [publish-android, publish-fdroid, publish-iOS, generate-release-notes]
     if: always()
     runs-on: [macos-latest]
     steps:
@@ -217,22 +284,24 @@ jobs:
           SELECTED="${{ github.event.inputs['build-platform'] }}"
           IOS_RESULT="${{ needs.publish-ios.result }}"
           ANDROID_RESULT="${{ needs.publish-android.result }}"
+          FDROID_RESULT="${{ needs.publish-fdroid.result }}"
 
           echo "Selected: $SELECTED"
           echo "iOS Result: $IOS_RESULT"
           echo "Android Result: $ANDROID_RESULT"
+          echo "F-Droid Result: $FDROID_RESULT"
 
           if [[ "$SELECTED" == "iOS" && "$IOS_RESULT" != "success" ]]; then
             echo "❌ iOS build failed!"
             exit 1
           fi
 
-          if [[ "$SELECTED" == "Android" && "$ANDROID_RESULT" != "success" ]]; then
-            echo "❌ Android build failed!"
+          if [[ "$SELECTED" == "Android" && ( "$ANDROID_RESULT" != "success" || "$FDROID_RESULT" != "success" ) ]]; then
+            echo "❌ Android or F-Droid build failed!"
             exit 1
           fi
 
-          if [[ "$SELECTED" == "Both" && ( "$IOS_RESULT" != "success" || "$ANDROID_RESULT" != "success" ) ]]; then
+          if [[ "$SELECTED" == "Both" && ( "$IOS_RESULT" != "success" || "$ANDROID_RESULT" != "success" || "$FDROID_RESULT" != "success" ) ]]; then
             echo "❌ One or more platform builds failed!"
             exit 1
           fi
@@ -246,6 +315,14 @@ jobs:
         with:
           name: android-artifacts
           path: artifacts/
+
+      # Same file names as the Play build's APKs, so they get their own folder
+      - name: ⬇️ Download F-Droid Artifacts
+        if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: fdroid-artifacts
+          path: artifacts/foss/
 
       - name: ⬇️ Download iOS Artifacts
         if: ${{ github.event.inputs['build-platform'] == 'iOS' || github.event.inputs['build-platform'] == 'Both' }}
@@ -276,13 +353,28 @@ jobs:
             done
           fi
 
-      - name: 🔢 Commit version bump if any
-        if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
+          # Rename FOSS APKs: no Google Cast, OTA or crash reporting
+          if [ -d artifacts/foss/ ]; then
+            for apk in artifacts/foss/*.apk; do
+              filename=$(basename "$apk")
+              cp "$apk" "final-artifacts/Jellify-${VERSION}-foss-${filename}"
+            done
+          fi
+
+      # F-Droid reads changelogs/<versionCode>.txt from the release tag, so it's committed before tagging
+      - name: ⬇️ Download F-Droid Changelog
+        if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: fdroid-changelog
+          path: android/fastlane/metadata/android/en-US/changelogs/
+
+      - name: 🔢 Commit version bump and release notes
         run: |
           git config --global user.name "anultravioletaurora"
           git config --global user.email "violet@jellify.app"
-          git add package.json ios/Jellify.xcodeproj/project.pbxproj android/app/build.gradle || true
-          git commit -m "[skip actions] version bump" || echo "No changes to commit"
+          git add package.json ios/Jellify.xcodeproj/project.pbxproj android/app/build.gradle android/fastlane/metadata/android/en-US/changelogs || true
+          git commit -m "[skip actions] version bump and release notes" || echo "No changes to commit"
           git pull origin main
           git push origin main
 

@@ -129,7 +129,10 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.release
+            // F-Droid signs with its own key, so FOSS builds stay unsigned
+            // unless a release keystore is configured.
+            def releaseKeystoreConfigured = keystoreExists && envKeystorePassword && envKeyAlias && envKeyPassword
+            signingConfig((rootProject.ext.isFossBuild && !releaseKeystoreConfigured) ? null : signingConfigs.release)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
@@ -147,9 +150,38 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation("com.google.android.gms:play-services-cast-framework:22.3.1")
+    if (!rootProject.ext.isFossBuild) {
+        implementation("com.google.android.gms:play-services-cast-framework:22.3.1")
+    }
     implementation("com.facebook.react:hermes-android")
     // MainApplication reads settings before JS loads. Keep in sync with react-native-mmkv's android/build.gradle
     implementation("io.github.zhongwuzw:mmkv:2.4.1")
 
+}
+
+if (rootProject.ext.isFossBuild) {
+    // -Pfoss only compiles out the native Google libraries; the JS side (OTA, Cast UI) comes from
+    // .env. Fail rather than ship a FOSS build that still downloads OTA bundles.
+    def env = [:]
+    rootProject.file("../.env").eachLine { line ->
+        def separator = line.indexOf("=")
+        if (!line.trim().startsWith("#") && separator > 0) {
+            env[line.substring(0, separator).trim()] = line.substring(separator + 1).trim().replaceAll(/^"|"$/, "")
+        }
+    }
+    def expected = [IS_FOSS_BUILD: "true", OTA_UPDATE_ENABLED: "false"]
+    def mismatched = expected.findAll { key, value -> env[key] != value }
+    if (mismatched) {
+        throw new GradleException(
+            "FOSS build (-Pfoss=true) needs ${expected.collect { key, value -> "$key=$value" }.join(", ")} in .env, " +
+            "but found ${mismatched.collect { key, value -> "$key=${env[key]}" }.join(", ")}. " +
+            "Build with `bundle exec fastlane fdroid`, which sets them."
+        )
+    }
+
+    // react-native-device-info loads the Play Install Referrer API reflectively, so it
+    // degrades gracefully without it. Keep it out of FOSS builds.
+    configurations.configureEach {
+        exclude group: "com.android.installreferrer"
+    }
 }

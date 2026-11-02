@@ -1,0 +1,24 @@
+<p><i>Jellify</i> is a free and open source music player for the <a href="https://jellyfin.org/">Jellyfin Media Server</a>.</p>
+
+<p>Showcasing the artwork of your library, it has a user interface congruent to what <i>the big guys</i> do. <i>Jellify</i> also provides algorithmic curation of your music, driven by Jellyfin's Instant Mix and Suggestions APIs.</p>
+
+<p><b>Jellify requires a connection to a Jellyfin server to work.</b></p>
+
+<p><b>Features</b></p>
+<ul>
+<li>Light and Dark modes, with different theme colors</li>
+<li>Home screen access to previously played tracks, artists, and your playlists</li>
+<li>Quick access to similar artists and items for discovering music in your library</li>
+<li>Jellyfin playback reporting and Last.FM plugin support</li>
+<li>Quick Connect support</li>
+<li>Full library browsing and switching between music libraries</li>
+<li>Playlists, including creating, updating, and reordering</li>
+<li>Offline playback and a storage manager</li>
+<li>Jellyfin Instant Mixes and shuffling</li>
+<li>Gapless playback</li>
+<li>Android Auto support</li>
+</ul>
+
+<p>This build is compiled without proprietary Google libraries, so Google Cast is not available. Over-the-air updates are disabled; updates are delivered through F-Droid.</p>
+
+<p>Crash reporting is disabled in this build.</p>
