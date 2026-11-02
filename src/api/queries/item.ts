@@ -10,7 +10,7 @@ import { groupBy, isEmpty, isEqual, isUndefined } from 'lodash'
 import { SectionList } from 'react-native'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
-import QueryConfig from '../../configs/querying/index.config'
+import { ApiLimits } from '../../configs/querying/index.config'
 import { JellifyUser } from '../../types/JellifyUser'
 import { setQueryUserDataForItems } from './user-data'
 
@@ -91,8 +91,8 @@ export async function fetchItems(
 					recursive: true,
 					sortOrder: sortOrder,
 					fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
-					startIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
-					limit: QueryConfig.limits.library,
+					startIndex: typeof page === 'number' ? page * ApiLimits.Items : 0,
+					limit: ApiLimits.Items,
 					isFavorite: isFavorite,
 					ids: ids,
 				},

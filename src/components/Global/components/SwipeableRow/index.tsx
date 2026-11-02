@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { XStack, YStack, getToken } from 'tamagui'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import {
+	GestureDetector,
+	useCompetingGestures,
+	useLongPressGesture,
+	usePanGesture,
+	useTapGesture,
+} from 'react-native-gesture-handler'
 import Animated, {
 	Easing,
 	useAnimatedStyle,
@@ -9,7 +15,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { runOnUI } from 'react-native-worklets'
 import Icon from '../icon'
-import { triggerHaptic } from '../../../../hooks/use-haptic-feedback'
+import { applyHapticFeedback } from '../../../../utils/haptics'
 import {
 	notifySwipeableRowClosed,
 	notifySwipeableRowOpened,
@@ -145,43 +151,45 @@ export default function SwipeableRow({
 	 * Reserve the right edge for per-row controls (e.g. three dots) by shrinking the tap area there
 	 * so those controls can receive presses without being swallowed by the row tap gesture.
 	 */
-	const tapGesture = Gesture.Tap()
-		.runOnJS(true)
-		.hitSlop({ right: -64 })
-		.maxDistance(2)
-		.onBegin(() => {
+	const tapGesture = useTapGesture({
+		runOnJS: true,
+		hitSlop: { right: -64 },
+		maxDistance: 2,
+		onBegin: () => {
 			fgOpacity.set(0.5)
-		})
-		.onEnd((e, success) => {
+		},
+		onDeactivate: (e) => {
 			// If a quick-action menu is open, row-level tap should NOT trigger onPress.
-			if (!isMenuOpen && onPress && success) {
-				triggerHaptic('impactLight')
+			if (!isMenuOpen && onPress && !e.canceled) {
+				applyHapticFeedback('info')
 				onPress()
 			}
-		})
-		.onFinalize(() => {
+		},
+		onFinalize: () => {
 			fgOpacity.set(1.0)
-		})
+		},
+	})
 
-	const longPressGesture = Gesture.LongPress()
-		.runOnJS(true)
-		.onBegin(() => {
+	const longPressGesture = useLongPressGesture({
+		runOnJS: true,
+		onBegin: () => {
 			fgOpacity.set(0.5)
-		})
-		.onStart(() => {
+		},
+		onActivate: () => {
 			if (onLongPress) {
-				triggerHaptic('impactLight')
+				applyHapticFeedback('info')
 				onLongPress()
 			}
 			fgOpacity.set(1.0)
-		})
-		.onTouchesCancelled(() => {
+		},
+		onTouchesCancel: () => {
 			fgOpacity.set(1.0)
-		})
+		},
+	})
 
-	const panGesture = Gesture.Pan()
-		.runOnJS(true)
-		.hitSlop({
+	const panGesture = usePanGesture({
+		runOnJS: true,
+		hitSlop: {
 			/**
 			 * Preserve Swipe to go back system gestures
 			 *
@@ -193,22 +201,23 @@ export default function SwipeableRow({
 			 * {@link https://github.com/computerjazz/react-native-draggable-flatlist/issues/336#issuecomment-970573916}
 			 */
 			left: -50,
-		})
-		.activeOffsetX([-15, 15])
-		.failOffsetY([-8, 8])
-		.onBegin(() => {
+		},
+		activeOffsetX: [-15, 15],
+		failOffsetY: [-8, 8],
+		onBegin: () => {
 			if (disabled) return
 			dragging.set(true)
 			fgOpacity.set(1.0)
-		})
-		.onUpdate((e) => {
+		},
+		onUpdate: (e) => {
 			if (disabled) return
 			const next = Math.max(Math.min(e.translationX, maxLeft), maxRight)
 			tx.value = next
-		})
-		.onEnd((e, success) => {
+		},
+		onDeactivate: (e) => {
+			const success = !e.canceled
 			console.log(
-				'[SR] pan.onEnd success=',
+				'[SR] pan.onDeactivate success=',
 				success,
 				'tx=',
 				tx.value,
@@ -223,7 +232,7 @@ export default function SwipeableRow({
 			if (tx.value > threshold) {
 				// Right swipe: show left quick actions if provided; otherwise trigger leftAction
 				if (leftActions && leftActions.length > 0) {
-					triggerHaptic('impactLight')
+					applyHapticFeedback('info')
 					// Snap open to expose quick actions, do not auto-trigger
 					const _maxLeft = maxLeft
 					runOnUI(() => {
@@ -236,7 +245,7 @@ export default function SwipeableRow({
 					openMenu()
 					return
 				} else if (leftAction) {
-					triggerHaptic('impactLight')
+					applyHapticFeedback('info')
 					leftAction.onTrigger()
 					close()
 					return
@@ -245,7 +254,7 @@ export default function SwipeableRow({
 			// Left swipe (quick actions)
 			if (tx.value < -Math.min(threshold, Math.abs(maxRight) / 2)) {
 				if (rightActions && rightActions.length > 0) {
-					triggerHaptic('impactLight')
+					applyHapticFeedback('info')
 					// Snap open to expose quick actions, do not auto-trigger
 					const _maxRight = maxRight
 					runOnUI(() => {
@@ -258,7 +267,7 @@ export default function SwipeableRow({
 					openMenu()
 					return
 				} else if (rightAction) {
-					triggerHaptic('impactLight')
+					applyHapticFeedback('info')
 					rightAction.onTrigger()
 					close()
 					return
@@ -267,7 +276,7 @@ export default function SwipeableRow({
 			// Velocity fallback (open quick actions if fast flick even without full displacement)
 			if (v > velocityTrigger && hasLeftSide) {
 				if (leftActions && leftActions.length > 0) {
-					triggerHaptic('impactLight')
+					applyHapticFeedback('info')
 					const _maxLeft = maxLeft
 					runOnUI(() => {
 						'worklet'
@@ -279,7 +288,7 @@ export default function SwipeableRow({
 					openMenu()
 					return
 				} else if (leftAction) {
-					triggerHaptic('impactLight')
+					applyHapticFeedback('info')
 					leftAction.onTrigger()
 					close()
 					return
@@ -287,7 +296,7 @@ export default function SwipeableRow({
 			}
 			if (v < -velocityTrigger && hasRightSide) {
 				if (rightActions && rightActions.length > 0) {
-					triggerHaptic('impactLight')
+					applyHapticFeedback('info')
 					const _maxRight = maxRight
 					runOnUI(() => {
 						'worklet'
@@ -299,7 +308,7 @@ export default function SwipeableRow({
 					openMenu()
 					return
 				} else if (rightAction) {
-					triggerHaptic('impactLight')
+					applyHapticFeedback('info')
 					rightAction.onTrigger()
 					close()
 					return
@@ -310,11 +319,14 @@ export default function SwipeableRow({
 				tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
 			})()
 			syncClosedState()
-		})
-		.onFinalize(() => {
+		},
+		onFinalize: () => {
 			if (disabled) return
 			dragging.set(false)
-		})
+		},
+	})
+
+	const combinedGesture = useCompetingGestures(panGesture, longPressGesture, tapGesture)
 
 	const fgStyle = useAnimatedStyle(() => ({
 		transform: [
@@ -358,8 +370,6 @@ export default function SwipeableRow({
 	})
 
 	if (disabled) return <>{children}</>
-
-	const combinedGesture = Gesture.Race(panGesture, longPressGesture, tapGesture)
 
 	return (
 		<GestureDetector gesture={combinedGesture}>

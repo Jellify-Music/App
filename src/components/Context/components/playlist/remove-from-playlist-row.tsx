@@ -5,7 +5,7 @@ import { useMutation } from '@tanstack/react-query'
 import { removeFromPlaylist } from '../../../../api/mutations/playlist/utils/playlists'
 import { useApi } from '../../../../stores/auth'
 import navigationRef from '../../../../screens/navigation'
-import { triggerHaptic } from '../../../../hooks/use-haptic-feedback'
+import { applyHapticFeedback } from '../../../../utils/haptics'
 import { invalidatePlaylistTracks } from '../../../../api/queries/playlist/cache'
 
 export default function RemoveFromPlaylistRow({
@@ -20,12 +20,12 @@ export default function RemoveFromPlaylistRow({
 	const { mutate: removeTrack, isPending } = useMutation({
 		mutationFn: () => removeFromPlaylist(api, track, playlist),
 		onSuccess: () => {
-			triggerHaptic('notificationSuccess')
+			applyHapticFeedback('success')
 			invalidatePlaylistTracks(playlist)
 			navigationRef.goBack()
 		},
 		onError: () => {
-			triggerHaptic('notificationError')
+			applyHapticFeedback('error')
 		},
 	})
 
