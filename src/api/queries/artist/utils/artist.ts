@@ -8,7 +8,7 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getArtistApi, getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { setQueryUserDataForItems } from '../../user-data'
@@ -30,7 +30,9 @@ export function fetchArtists(
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
 
-		getArtistsApi(api)
+		getArtistApi(api)
+			// The SDK deprecates ArtistApi without a replacement — /Items has no album-artist filter
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			.getAlbumArtists(
 				{
 					parentId: library.musicLibraryId,
@@ -79,7 +81,7 @@ export function fetchArtistAlbums(
 		if (!api) return reject('No API instance provided')
 		if (!libraryId) return reject('Library has not been set')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: libraryId,
@@ -129,7 +131,7 @@ export function fetchArtistFeaturedOn(
 		if (!api) return reject('No API instance provided')
 		if (!libraryId) return reject('Library has not been set')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: libraryId,

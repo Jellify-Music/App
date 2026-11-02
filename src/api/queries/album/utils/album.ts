@@ -11,7 +11,7 @@ import { fetchItem } from '../../item'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
 import { setQueryUserDataForItems } from '../../user-data'
 
 export function fetchAlbums(
@@ -33,7 +33,7 @@ export function fetchAlbums(
 
 		const yearsParam = buildYearsParam(yearMin, yearMax)
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: library.musicLibraryId,

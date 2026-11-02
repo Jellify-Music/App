@@ -1,4 +1,4 @@
-import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getArtistApi, getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import {
 	BaseItemDto,
 	BaseItemKind,
@@ -30,7 +30,7 @@ export async function fetchSearchSuggestions(
 		if (isUndefined(user)) return reject('User has not been set')
 		if (isUndefined(libraryId)) return reject('Library has not been set')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: libraryId,
@@ -73,7 +73,9 @@ export async function fetchArtistSuggestions(
 		if (isUndefined(user)) return reject('User has not been set')
 		if (isUndefined(libraryId)) return reject('Library has not been set')
 
-		getArtistsApi(api)
+		getArtistApi(api)
+			// The SDK deprecates ArtistApi without a replacement — /Items has no album-artist filter
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			.getAlbumArtists(
 				{
 					parentId: libraryId,
@@ -115,7 +117,7 @@ export async function fetchAlbumSuggestions(
 
 		console.debug(`fetching albums at page ${page}`)
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: libraryId,
