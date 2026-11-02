@@ -1,11 +1,12 @@
 import React from 'react'
+import type { EventHandler } from '../../../types/Events'
 import { Square, SizableText, Circle, FontSizeTokens, getFontSize } from 'tamagui'
 import Icon from '../components/icon'
 import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 interface IconButtonProps {
-	onPress: () => Promise<void>
+	onPress: EventHandler
 	name: MaterialDesignIconsIconName
 	title?: string | undefined
 	circular?: boolean | undefined

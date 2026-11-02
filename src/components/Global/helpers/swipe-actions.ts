@@ -1,11 +1,12 @@
 import { QuickAction, SwipeAction } from '../components/SwipeableRow'
+import type { EventHandler } from '../../../types/Events'
 import { SwipeActionType } from '../../../stores/settings/swipe'
 
 export type SwipeHandlers = {
-	addToQueue: () => void
-	toggleFavorite: () => void
-	addToPlaylist: () => void
-	playNext: () => void
+	addToQueue: EventHandler
+	toggleFavorite: EventHandler
+	addToPlaylist: EventHandler
+	playNext: EventHandler
 }
 
 export type SwipeConfig = {
