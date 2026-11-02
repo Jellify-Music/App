@@ -1,11 +1,7 @@
 import { useEffect } from 'react'
-import { SharedValue } from 'react-native-reanimated'
 import { SCROLL_RESET_DELAY } from './config'
-
-interface UseResetScrollProps {
-	currentLyricIndex: number
-	isUserScrolling: SharedValue<boolean>
-}
+import { useTapGesture } from 'react-native-gesture-handler'
+import { UseResetScrollParams, UseLyricLineTapGestureParams } from './types'
 
 /**
  * Hook to reset the scroll position based on the current lyric index after a delay.
@@ -13,7 +9,7 @@ interface UseResetScrollProps {
 export const useResetScroll = ({
 	currentLyricIndex,
 	isUserScrolling,
-}: UseResetScrollProps): void => {
+}: UseResetScrollParams): void => {
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			isUserScrolling.value = false
@@ -22,3 +18,15 @@ export const useResetScroll = ({
 		return () => clearTimeout(timer)
 	}, [currentLyricIndex])
 }
+
+export const useLyricLineTapGesture = ({ onPress, item, index }: UseLyricLineTapGestureParams) =>
+	useTapGesture({
+		maxDistance: 10,
+		maxDuration: 500,
+		runOnJS: true,
+		onFinalize: (result) => {
+			if (!result.canceled) {
+				onPress(item.startTime, index)
+			}
+		},
+	})
