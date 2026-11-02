@@ -15,7 +15,7 @@ import { JellifyUser } from '@/src/types/JellifyUser'
 import { queryClient } from '../../../client'
 import { FrequentlyPlayedTracksQuery } from '../queries'
 import { ArtistQueryKey } from '../../artist/keys'
-import { setQueryUserDataForItem, setQueryUserDataForItems } from '../../user-data/cache'
+import { setQueryUserDataForItem } from '../../user-data/cache'
 
 /**
  * Fetches the 100 most frequently played items from the user's library
@@ -54,7 +54,6 @@ export function fetchFrequentlyPlayed(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
