@@ -48,10 +48,6 @@ jest.mock('react-native-uuid', () => ({
 	default: { v4: jest.fn().mockReturnValue('test-uuid') },
 }))
 
-jest.mock('../../../src/hooks/use-haptic-feedback', () => ({
-	triggerHaptic: jest.fn(),
-}))
-
 jest.mock('../../../src/hooks/downloads/utils', () => ({
 	ensureDownloadedTracks: jest.fn().mockResolvedValue([]),
 }))

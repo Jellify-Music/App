@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { isEmpty, isUndefined, trim } from 'lodash'
-import QueryConfig from '../../../../configs/querying/index.config'
+import { ApiLimits } from '../../../../configs/querying/index.config'
 import { getApi, getUser } from '../../../../stores/auth/utils'
 import { setQueryUserDataForItems } from '../../user-data'
 /**
@@ -26,7 +26,7 @@ export async function fetchSearchResults(
 		if (isUndefined(user)) return reject('User has not been set')
 		if (isUndefined(libraryId)) return reject('Library has not been set')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: libraryId,
@@ -34,7 +34,7 @@ export async function fetchSearchResults(
 					searchTerm: trim(searchString),
 					recursive: true,
 					includeItemTypes: ['MusicArtist', 'Audio', 'MusicAlbum', 'Playlist'],
-					limit: QueryConfig.limits.search,
+					limit: ApiLimits.Search,
 					sortBy: ['IsFolder'],
 					sortOrder: ['Descending'],
 					enableUserData: true,

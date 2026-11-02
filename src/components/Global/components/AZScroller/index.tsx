@@ -1,7 +1,12 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react'
 import { LayoutChangeEvent, Text as RNText } from 'react-native'
 import { getToken, Paragraph, Spinner, TamaguiElement, useTheme, View, YStack } from 'tamagui'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import {
+	GestureDetector,
+	usePanGesture,
+	useSimultaneousGestures,
+	useTapGesture,
+} from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 import { applyHapticFeedback } from '../../../../utils/haptics'
@@ -150,18 +155,20 @@ export default function AZScroller({
 		}
 	}
 
-	const panGesture = Gesture.Pan()
-		.runOnJS(true)
-		.onBegin(handleGestureBeginOrUpdate)
-		.onUpdate(handleGestureBeginOrUpdate)
-		.onEnd(handleGestureEnd)
+	const panGesture = usePanGesture({
+		runOnJS: true,
+		onBegin: handleGestureBeginOrUpdate,
+		onUpdate: handleGestureBeginOrUpdate,
+		onDeactivate: handleGestureEnd,
+	})
 
-	const tapGesture = Gesture.Tap()
-		.runOnJS(true)
-		.onBegin(handleGestureBeginOrUpdate)
-		.onEnd(handleGestureEnd)
+	const tapGesture = useTapGesture({
+		runOnJS: true,
+		onBegin: handleGestureBeginOrUpdate,
+		onDeactivate: handleGestureEnd,
+	})
 
-	const gesture = Gesture.Simultaneous(panGesture, tapGesture)
+	const gesture = useSimultaneousGestures(panGesture, tapGesture)
 
 	const animatedOverlayStyle = useAnimatedStyle(() => ({
 		opacity: overlayOpacity.value,
