@@ -7,7 +7,7 @@ import FavoriteIcon from '../favorite-icon'
 import DownloadIndicator from '../DownloadIndicator'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from '../SwipeableRow/context'
-import { isExplicit } from '../../../../utils/trackDetails'
+import { isExplicit } from '../../../../utils/audio/explicit'
 
 export interface TrackRowContentProps {
 	track: BaseItemDto
