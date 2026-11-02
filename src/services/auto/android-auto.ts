@@ -8,8 +8,6 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
-import { getArtistsApi } from '@jellyfin/sdk/lib/utils/api/artists-api'
 import {
 	AndroidAutoMediaLibraryHelper,
 	PlayerQueue,
@@ -24,10 +22,11 @@ import { restoreFromStorage } from '../player/utils/initialization'
 import { useAutoStore } from '../../stores/auto'
 import { fetchRecentlyAdded, fetchRecentlyPlayed } from '../../api/queries/recents/utils'
 import { fetchFrequentlyPlayed } from '../../api/queries/frequents/utils/frequents'
+import { refreshPlaylistTracks, refreshUserPlaylists } from '../../api/queries/playlist/cache'
 import { getItemImageUrl } from '../../api/queries/image/utils'
 import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
-import { refreshPlaylistTracks, refreshUserPlaylists } from '../../api/queries/playlist/cache'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
 
 /**
  * Playlists we materialize for Android Auto are tagged with this prefix so
@@ -106,8 +105,8 @@ async function playableTracks(key: string, items: BaseItemDto[]): Promise<MediaI
 	}))
 }
 
-async function getItems(params: Parameters<ReturnType<typeof getItemsApi>['getItems']>[0]) {
-	const { data } = await getItemsApi(getApi()!).getItems({
+async function getItems(params: Parameters<ReturnType<typeof getLibraryApi>['getItems']>[0]) {
+	const { data } = await getLibraryApi(getApi()!).getItems({
 		userId: getUser()?.id,
 		enableUserData: true,
 		...params,
@@ -202,16 +201,17 @@ async function loadChildren(parentId: string): Promise<MediaItem[] | null> {
 				offset,
 				kind === 'artists'
 					? ((
-							await getArtistsApi(api).getAlbumArtists({
+							await getItems({
 								parentId: musicLibraryId,
 								userId: user.id,
+								includeItemTypes: [BaseItemKind.MusicArtist],
 								sortBy: [ItemSortBy.SortName],
 								sortOrder: [SortOrder.Ascending],
 								enableImages: true,
 								...page,
 								...byLetter(id),
 							})
-						).data.Items?.map((artist) => tile('artist', artist)) ?? [])
+						).map((artist) => tile('artist', artist)) ?? [])
 					: (
 							await getItems({
 								parentId: musicLibraryId,
@@ -292,14 +292,13 @@ async function search(query: string): Promise<MediaItem[]> {
 			limit: 40,
 			fields: TRACK_FIELDS,
 		}),
-		getArtistsApi(api)
-			.getAlbumArtists({
-				parentId: library.musicLibraryId,
-				userId: user.id,
-				searchTerm: query,
-				limit: 10,
-			})
-			.then(({ data }) => data.Items ?? []),
+		getItems({
+			parentId: library.musicLibraryId,
+			searchTerm: query,
+			recursive: true,
+			includeItemTypes: [BaseItemKind.MusicArtist],
+			limit: 10,
+		}),
 		getItems({
 			searchTerm: query,
 			recursive: true,

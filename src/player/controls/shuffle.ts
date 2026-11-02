@@ -18,12 +18,12 @@ import {
 import { ApiLimits } from '../../configs/querying/index.config'
 import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { ShuffleResult } from '../interfaces'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
 import { captureError } from '../../utils/logging'
 import LoggingContext from '../../utils/logging/enums'
 import { applyHapticFeedback } from '../../utils/haptics'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
@@ -136,7 +136,7 @@ export async function handleLibraryShuffle() {
 						: undefined
 
 				// Fetch random tracks from Jellyfin with filters
-				const { data } = await getItemsApi(api).getItems({
+				const { data } = await getLibraryApi(api).getItems({
 					parentId: library.musicLibraryId,
 					userId: user.id,
 					includeItemTypes: [BaseItemKind.Audio],

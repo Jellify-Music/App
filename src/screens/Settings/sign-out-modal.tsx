@@ -26,11 +26,8 @@ export default function SignOutModal(): React.JSX.Element {
 		settingsStackNavigation.goBack()
 
 		navigationRef.dispatch(
-			CommonActions.navigate({
-				name: 'Login',
-				params: {
-					screen: 'ServerAddress',
-				},
+			CommonActions.navigate('Login', {
+				screen: 'ServerAddress',
 			}),
 		)
 
