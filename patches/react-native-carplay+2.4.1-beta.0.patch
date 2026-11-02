@@ -5282,25 +5282,3 @@ index 01dbabd..ac348ca 100644
          }
        }
      }.build()
-diff --git a/node_modules/react-native-carplay/ios/RNCarPlay.m b/node_modules/react-native-carplay/ios/RNCarPlay.m
-index 153dbad..d763b90 100644
---- a/node_modules/react-native-carplay/ios/RNCarPlay.m
-+++ b/node_modules/react-native-carplay/ios/RNCarPlay.m
-@@ -36,7 +36,7 @@
-     store.window = window;
-     [store setConnected:true];
-     RNCarPlay *cp = [RNCarPlay allocWithZone:nil];
--    if (cp.bridge) {
-+    if (cp->hasListeners) {
-         [cp sendEventWithName:@"didConnect" body:[self getConnectedWindowInformation:window]];
-     }
- }
-@@ -47,7 +47,7 @@
-     [store setConnected:false];
-     store.window.rootViewController = nil;
- 
--    if (cp.bridge) {
-+    if (cp->hasListeners) {
-         [cp sendEventWithName:@"didDisconnect" body:@{}];
-     }
- }
