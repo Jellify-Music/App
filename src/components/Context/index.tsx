@@ -59,7 +59,7 @@ export default function ItemContext({
 		gcTime: QueryAges.OneWeek,
 	})
 
-	const hasTracks = isTrack || (isAlbum && tracks) || (isPlaylist && tracks)
+	const hasTracks = isTrack || (isAlbum && discs) || (isPlaylist && tracks)
 
 	const renderAddToPlaylistRow = isTrack || isAlbum
 

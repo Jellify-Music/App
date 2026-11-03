@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import type { EventHandler } from '../../../../types/Events'
 import { getToken } from 'tamagui'
 import { RunTimeTicks } from '../../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -29,8 +30,8 @@ export interface TrackProps {
 	queue: Queue
 	playlist?: BaseItemDto
 	showArtwork?: boolean | undefined
-	onPress?: () => Promise<void> | undefined
-	onLongPress?: () => void | undefined
+	onPress?: EventHandler
+	onLongPress?: EventHandler
 	isNested?: boolean | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined

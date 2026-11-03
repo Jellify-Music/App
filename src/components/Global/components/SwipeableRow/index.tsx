@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { XStack, YStack, getToken } from 'tamagui'
+import type { EventHandler } from '../../../../types/Events'
+import { ThemeTokens, XStack, YStack, getToken } from 'tamagui'
 import {
 	GestureDetector,
 	useCompetingGestures,
@@ -29,21 +30,21 @@ import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material
 export type SwipeAction = {
 	label: string
 	icon: MaterialDesignIconsIconName
-	color: string // Tamagui token e.g. 'success'
-	onTrigger: () => void
+	color: ThemeTokens // Tamagui token e.g. 'success'
+	onTrigger: EventHandler
 }
 
 export type QuickAction = {
 	icon: MaterialDesignIconsIconName
-	color: string // Tamagui token e.g. 'primary'
-	onPress: () => void
+	color: ThemeTokens // Tamagui token e.g. 'primary'
+	onPress: EventHandler
 }
 
 type Props = {
 	children: React.ReactNode
 	id?: string
-	onPress?: () => Promise<void> | null
-	onLongPress?: () => void | null
+	onPress?: EventHandler
+	onLongPress?: EventHandler
 	leftAction?: SwipeAction | null // immediate action on right swipe
 	leftActions?: QuickAction[] | null // quick action menu on right swipe
 	rightAction?: SwipeAction | null // legacy immediate action on left swipe
