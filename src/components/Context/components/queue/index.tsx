@@ -4,7 +4,7 @@ import AddToQueueMenuRowsProps from './types'
 import type { ContextMenuRowImageProp } from '../types'
 import ContextMenuRow from '..'
 
-// Use same icon as swipe Add to Queue for consistency
+// Use same icon as swipe Play Later for consistency
 const IMAGE_PROP: ContextMenuRowImageProp = {
 	iconName: 'playlist-play',
 }
@@ -21,7 +21,7 @@ export default function AddToQueueMenuRows({ tracks }: AddToQueueMenuRowsProps):
 			<ContextMenuRow
 				onPress={() => addToQueue({ tracks, queuingType: QueuingType.PlayLater })}
 				imageProp={IMAGE_PROP}
-				label='Add to Queue'
+				label='Play Later'
 			/>
 		</>
 	)
