@@ -1,6 +1,6 @@
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { H6, SizableText, YStack } from 'tamagui'
+import { SizableText, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
@@ -129,9 +129,9 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 	return (
 		<YStack gap='1' marginVertical='4' alignItems='center'>
 			<Ticker>
-				<H6 fontSize='4' fontWeight='6'>
+				<SizableText fontSize='5' fontWeight='6'>
 					{getItemName(item)}
-				</H6>
+				</SizableText>
 			</Ticker>
 
 			{(item.ArtistItems?.length ?? 0) > 0 && (
