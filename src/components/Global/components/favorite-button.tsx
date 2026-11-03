@@ -1,12 +1,13 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import React from 'react'
+import type { EventHandler } from '../../../types/Events'
 import { useToggleFavorite } from '../../../api/mutations/favorite/toggle'
 import Icon from './icon'
 import { AnimatePresence, getTokenValue, Spinner } from 'tamagui'
 
 interface FavoriteButtonProps {
 	item: BaseItemDto
-	onToggle?: () => void
+	onToggle?: EventHandler
 }
 
 export default function FavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.Element {

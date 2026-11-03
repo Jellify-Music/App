@@ -913,7 +913,7 @@ describe('Queue - addToQueue', () => {
 		})
 
 		expect(mockToast.show).toHaveBeenCalledWith({
-			text1: 'Failed to add to queue',
+			text1: 'Failed to play later',
 			type: 'error',
 		})
 	})

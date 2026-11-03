@@ -1,4 +1,5 @@
 import React from 'react'
+import type { EventHandler } from '../../../../types/Events'
 import { SizableText, Theme, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../icon'
@@ -20,7 +21,7 @@ export interface TrackRowContentProps {
 	artistsText: string
 	runtimeComponent: React.ReactNode
 	editing?: boolean
-	handleIconPress: () => void
+	handleIconPress: EventHandler
 	testID?: string
 }
 

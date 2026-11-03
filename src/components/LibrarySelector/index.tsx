@@ -1,5 +1,6 @@
 import { SizableText, Spinner, ToggleGroup, XStack, YGroup, YStack } from 'tamagui'
 import React, { useEffect, useState } from 'react'
+import type { EventHandler } from '../../types/Events'
 import Button from '../Global/helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../Global/components/icon'
@@ -13,7 +14,7 @@ import LoadErrorMessage from './components/loading-error'
 
 interface LibrarySelectorProps {
 	onLibrarySelected: (libraryId: string, selectedLibrary: BaseItemDto) => void
-	onCancel: () => void
+	onCancel: EventHandler
 	primaryButtonText: string
 	primaryButtonIcon: MaterialDesignIconsIconName
 	cancelButtonText: string
@@ -43,6 +44,7 @@ export default function LibrarySelector({
 	const [selectedLibraryId, setSelectedLibraryId] = useState<string | undefined>(
 		library?.musicLibraryId,
 	)
+
 	const handleLibrarySelection = () => {
 		if (!selectedLibraryId || !libraries) return
 

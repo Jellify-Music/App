@@ -1,4 +1,5 @@
 import { YStack } from 'tamagui'
+import type { EventHandler } from '../../../types/Events'
 import SendMetricsAndCrashDataSetting from '../../Settings/components/settings/send-metrics-and-crash-data'
 import Input from '../../Global/helpers/input'
 import { IS_MAESTRO_BUILD } from '../../../configs/config'
@@ -6,7 +7,7 @@ import { DEFAULT_SERVER_ADDRESS } from '../../../configs/defaults.config'
 
 interface AddressInputProps {
 	setServerAddress: (address: string) => void
-	connectWithAddress: () => void
+	connectWithAddress: EventHandler
 }
 
 export default function AddressInput({ setServerAddress, connectWithAddress }: AddressInputProps) {

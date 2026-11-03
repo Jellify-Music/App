@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import type { EventHandler } from '../../types/Events'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
 import { Card, RadioGroup, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
@@ -210,10 +211,10 @@ const StorageSummaryCard = ({
 	onDeleteAll,
 }: {
 	summary: ReturnType<typeof useStorageContext>['summary']
-	onRefresh: () => void
+	onRefresh: EventHandler
 	activeDownloadsCount: number
 	activeDownloads: DownloadProgress[] | undefined
-	onDeleteAll: () => void
+	onDeleteAll: EventHandler
 }) => {
 	return (
 		<Card
@@ -297,8 +298,8 @@ const DownloadRow = ({
 }: {
 	download: DownloadedTrack
 	isSelected: boolean
-	onToggle: () => void
-	onDelete: () => void
+	onToggle: EventHandler
+	onDelete: EventHandler
 }) => (
 	<Pressable onPress={onToggle} accessibilityRole='button'>
 		<XStack padding='3' alignItems='center' gap='3' borderRadius='4'>
@@ -375,8 +376,8 @@ const SelectionReviewBanner = ({
 }: {
 	selectedCount: number
 	selectedBytes: number
-	onDelete: () => void
-	onClear: () => void
+	onDelete: EventHandler
+	onClear: EventHandler
 }) => (
 	<Card
 		borderRadius='6'

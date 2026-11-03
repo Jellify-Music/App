@@ -1,11 +1,12 @@
 import { QuickAction, SwipeAction } from '../components/SwipeableRow'
+import type { EventHandler } from '../../../types/Events'
 import { SwipeActionType } from '../../../stores/settings/swipe'
 
 export type SwipeHandlers = {
-	addToQueue: () => void
-	toggleFavorite: () => void
-	addToPlaylist: () => void
-	playNext: () => void
+	addToQueue: EventHandler
+	toggleFavorite: EventHandler
+	addToPlaylist: EventHandler
+	playNext: EventHandler
 }
 
 export type SwipeConfig = {
@@ -18,7 +19,7 @@ function toSwipeAction(type: SwipeActionType, handlers: SwipeHandlers): SwipeAct
 	switch (type) {
 		case 'AddToQueue':
 			return {
-				label: 'Add to queue',
+				label: 'Play later',
 				// Use a distinct icon from Add to Playlist to avoid confusion
 				icon: 'playlist-play',
 				color: 'success',
@@ -53,7 +54,7 @@ function toQuickAction(type: SwipeActionType, handlers: SwipeHandlers): QuickAct
 	switch (type) {
 		case 'AddToQueue':
 			return {
-				// Distinct icon for Add to Queue quick action
+				// Distinct icon for Play Later quick action
 				icon: 'playlist-play',
 				color: 'success',
 				onPress: handlers.addToQueue,

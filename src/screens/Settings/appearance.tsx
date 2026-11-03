@@ -1,4 +1,5 @@
 import React from 'react'
+import type { EventHandler } from '../../types/Events'
 import { YStack, XStack, SizableText, ScrollView } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -41,7 +42,7 @@ function ThemeOptionCard({
 }: {
 	option: ThemeOptionConfig
 	isSelected: boolean
-	onPress: () => void
+	onPress: EventHandler
 }) {
 	return (
 		<XStack
@@ -73,7 +74,7 @@ function ColorPresetCard({
 }: {
 	preset: ColorPresetConfig
 	isSelected: boolean
-	onPress: () => void
+	onPress: EventHandler
 }) {
 	const palette = PRESET_PALETTES[preset.value].dark
 
