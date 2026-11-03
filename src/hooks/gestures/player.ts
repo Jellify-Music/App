@@ -27,6 +27,9 @@ const SWIPE_DISTANCE_THRESHOLD = 120
 const SWIPE_FLING_MIN_DISTANCE = 40
 const SWIPE_FLING_MIN_VELOCITY = 800
 
+const TAP_MAX_DISTANCE = 4
+const DOUBLE_TAP_MAX_NUMBER_OF_TAPS = 2
+
 const isHorizontalSwipe = (
 	translationX: number,
 	translationY: number,
@@ -108,14 +111,14 @@ export const useAlbumCoverGesture = () => {
 
 	const tapGesture = useTapGesture({
 		runOnJS: true,
-		maxDistance: 4,
+		maxDistance: TAP_MAX_DISTANCE,
 		onFinalize: onTapGestureFinalize,
 	})
 
 	const doubleTapGesture = useTapGesture({
 		runOnJS: true,
-		numberOfTaps: 2,
-		maxDistance: 4,
+		numberOfTaps: DOUBLE_TAP_MAX_NUMBER_OF_TAPS,
+		maxDistance: TAP_MAX_DISTANCE,
 		onFinalize: async (e: GestureEvent<TapHandlerData> & { canceled: boolean }) => {
 			if (!e.canceled) await toggleFavorite({ item: currentTrack! })
 		},
