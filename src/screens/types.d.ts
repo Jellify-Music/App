@@ -65,7 +65,6 @@ export type RootStackParamList = {
 		streamingMediaSourceInfo?: MediaSourceInfo
 		downloadedMediaSourceInfo?: MediaSourceInfo
 		navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
-		navigationCallback?: (screen: 'Album' | 'Artist', item: BaseItemDto) => void
 	}
 
 	AddToPlaylist: {
