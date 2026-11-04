@@ -1,6 +1,6 @@
 import { SectionList, SectionListRef } from '@legendapp/list/section-list'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import { JSX, RefObject } from 'react'
+import { JSX, ReactElement, RefObject } from 'react'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../../types'
 import { SizableText, useTheme, View, XStack, YStack } from 'tamagui'
 import { RefreshControl } from 'react-native'
@@ -13,6 +13,7 @@ interface ItemSectionListProps {
 	query: UseInfiniteQueryResult<LibrarySectionListData[], Error>
 	renderItem: (info: LibrarySectionListRenderItemInfo) => JSX.Element
 	sortDescending: boolean | undefined
+	ListHeaderComponent?: ReactElement
 }
 
 export default function ItemSectionList({
@@ -20,6 +21,7 @@ export default function ItemSectionList({
 	query,
 	renderItem,
 	sortDescending,
+	ListHeaderComponent,
 }: ItemSectionListProps) {
 	const theme = useTheme()
 
@@ -39,6 +41,7 @@ export default function ItemSectionList({
 				renderSectionHeader={({ section }) => (
 					<ListStickyHeader text={section.title.toUpperCase()} />
 				)}
+				ListHeaderComponent={ListHeaderComponent}
 				stickySectionHeadersEnabled
 				renderItem={render}
 				refreshControl={

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useArtistContext } from '../../providers/Artist'
+import { useArtistContext } from '../../../providers/Artist'
 import {
 	RefreshControl,
 	SectionBase,
@@ -8,18 +8,18 @@ import {
 } from 'react-native'
 import { SectionList } from '@legendapp/list/section-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import ItemRow from '../Global/components/item-row'
-import ArtistHeader from './header'
-import SimilarArtists from './similar'
+import ItemRow from '../../Global/components/item-row'
+import SimilarArtists from '../similar'
+import ArtistListHeader from '../list-header'
 import { Spinner, useTheme, YStack, SizableText, View } from 'tamagui'
 import {
 	filterForAlbums,
 	filterForEPs,
 	filterForSingles,
 	filterForUnknown,
-} from '../../configs/categorizing/albums.config'
+} from '../../../configs/categorizing/albums.config'
 
-export default function Artist(): React.JSX.Element {
+export default function DiscographyTab(): React.JSX.Element {
 	const { featuredOn, albums, fetchingAlbums, refresh } = useArtistContext()
 
 	const theme = useTheme()
@@ -88,10 +88,10 @@ export default function Artist(): React.JSX.Element {
 		<SectionList
 			contentInsetAdjustmentBehavior='automatic'
 			sections={sections}
-			ListHeaderComponent={ArtistHeader}
 			renderSectionHeader={renderSectionHeader}
 			renderItem={renderItem}
 			refreshControl={refreshControl}
+			ListHeaderComponent={ArtistListHeader}
 			ListFooterComponent={SimilarArtists}
 			ListEmptyComponent={ListEmptyComponent}
 		/>
