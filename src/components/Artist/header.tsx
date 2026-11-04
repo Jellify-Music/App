@@ -6,7 +6,6 @@ import { InstantMixIconButton } from '../Global/components/instant-mix-button'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
-import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { getApi } from '../../stores/auth/utils'
 import Icon from '../Global/components/icon'
@@ -76,7 +75,12 @@ export default function ArtistHeader(): React.JSX.Element {
 
 					<InstantMixIconButton item={artist} navigation={navigation} />
 
-					<IconButton circular name='play' onPress={() => playArtist(false)} />
+					<Icon
+						size='7'
+						color='primary'
+						name='play-circle-outline'
+						onPress={() => playArtist(false)}
+					/>
 				</ActionPill>
 			</XStack>
 		</YStack>
