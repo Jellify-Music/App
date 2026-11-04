@@ -63,13 +63,9 @@ export default function ArtistHeader(): React.JSX.Element {
 				right='$2'
 				bottom='$2'
 				alignItems='center'
-				justifyContent='space-between'
+				justifyContent='flex-end'
 				pointerEvents='box-none'
 			>
-				<ActionPill>
-					<InstantMixIconButton item={artist} navigation={navigation} />
-				</ActionPill>
-
 				<ActionPill>
 					<Icon
 						size='7'
@@ -77,6 +73,8 @@ export default function ArtistHeader(): React.JSX.Element {
 						name='shuffle'
 						onPress={() => playArtist(true)}
 					/>
+
+					<InstantMixIconButton item={artist} navigation={navigation} />
 
 					<IconButton circular name='play' onPress={() => playArtist(false)} />
 				</ActionPill>
