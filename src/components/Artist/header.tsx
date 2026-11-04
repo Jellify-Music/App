@@ -1,5 +1,5 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { H5, Paragraph, XStack, YStack } from 'tamagui'
+import { H5, XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
 import { useArtistContext } from '../../providers/Artist'
 import FavoriteButton from '../Global/components/favorite-button'
@@ -11,8 +11,6 @@ import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { getApi } from '../../stores/auth/utils'
 import Icon from '../Global/components/icon'
-import { useArtistTracks } from '../../api/queries/track'
-import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { loadNewQueue } from '../../player/queuing'
 import { ImageUrlOptions } from '../../api/queries/image/utils'
 
@@ -49,10 +47,8 @@ export default function ArtistHeader(): React.JSX.Element {
 		}
 	}
 
-	const tracksInfiniteQuery = useArtistTracks(artist.Id!)
-
 	return (
-		<YStack flex={1}>
+		<YStack>
 			<ItemImage
 				item={artist}
 				height={'14'}
@@ -62,7 +58,7 @@ export default function ArtistHeader(): React.JSX.Element {
 			/>
 
 			<YStack paddingHorizontal='2'>
-				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
+				<XStack alignItems='flex-end' justifyContent='flex-start'>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
 						<H5 flexGrow={1} fontWeight={'6'}>
 							{artist.Name}
@@ -70,7 +66,7 @@ export default function ArtistHeader(): React.JSX.Element {
 					</XStack>
 				</XStack>
 
-				<XStack alignItems='center' justifyContent='space-between' flex={1}>
+				<XStack alignItems='center' justifyContent='space-between'>
 					<XStack alignItems='center' gap='3' flex={1}>
 						<FavoriteButton item={artist} />
 
@@ -86,26 +82,6 @@ export default function ArtistHeader(): React.JSX.Element {
 						/>
 						<IconButton circular name='play' onPress={() => playArtist(false)} />
 					</XStack>
-				</XStack>
-
-				<XStack
-					alignItems='center'
-					flex={1}
-					justifyContent='flex-start'
-					marginVertical='2'
-					{...ICON_PRESS_STYLES}
-					onPress={() =>
-						navigation.navigate('Tracks', {
-							tracksInfiniteQuery,
-							showAlphabeticalSelector: true,
-						})
-					}
-				>
-					<Paragraph fontWeight='6' fontSize='3'>
-						{`View Tracks`}
-					</Paragraph>
-
-					<Icon name='chevron-right' size='7' />
 				</XStack>
 			</YStack>
 		</YStack>
