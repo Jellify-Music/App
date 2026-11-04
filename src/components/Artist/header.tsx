@@ -8,6 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { getApi } from '../../stores/auth/utils'
+import { AZ_SCROLLER_CLEARANCE } from '../Global/components/AZScroller'
 import Icon from '../Global/components/icon'
 import { loadNewQueue } from '../../player/queuing'
 import { ImageUrlOptions } from '../../api/queries/image/utils'
@@ -66,7 +67,7 @@ export default function ArtistHeader(): React.JSX.Element {
 			<XStack
 				position='absolute'
 				left='$2'
-				right='$2'
+				right={AZ_SCROLLER_CLEARANCE}
 				bottom='$2'
 				alignItems='center'
 				justifyContent='flex-end'
