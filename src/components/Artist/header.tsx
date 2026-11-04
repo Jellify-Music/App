@@ -1,8 +1,7 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { H5, XStack, YStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
 import { useArtistContext } from '../../providers/Artist'
-import FavoriteButton from '../Global/components/favorite-button'
 import { InstantMixIconButton } from '../Global/components/instant-mix-button'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -57,34 +56,48 @@ export default function ArtistHeader(): React.JSX.Element {
 				imageOptions={backdropImageOptions}
 			/>
 
-			<YStack paddingHorizontal='2'>
-				<XStack alignItems='flex-end' justifyContent='flex-start'>
-					<XStack alignItems='center' flex={1} justifyContent='space-between'>
-						<H5 flexGrow={1} fontWeight={'6'}>
-							{artist.Name}
-						</H5>
-					</XStack>
-				</XStack>
+			{/* box-none: the space between the pills is still the image's, not theirs */}
+			<XStack
+				position='absolute'
+				left='$2'
+				right='$2'
+				bottom='$2'
+				alignItems='center'
+				justifyContent='space-between'
+				pointerEvents='box-none'
+			>
+				<ActionPill>
+					<InstantMixIconButton item={artist} navigation={navigation} />
+				</ActionPill>
 
-				<XStack alignItems='center' justifyContent='space-between'>
-					<XStack alignItems='center' gap='3' flex={1}>
-						<FavoriteButton item={artist} />
+				<ActionPill>
+					<Icon
+						size='7'
+						color='primary'
+						name='shuffle'
+						onPress={() => playArtist(true)}
+					/>
 
-						<InstantMixIconButton item={artist} navigation={navigation} />
-					</XStack>
-
-					<XStack alignItems='center' justifyContent='flex-end' gap='3' flex={1}>
-						<Icon
-							size='7'
-							color='primary'
-							name='shuffle'
-							onPress={() => playArtist(true)}
-						/>
-						<IconButton circular name='play' onPress={() => playArtist(false)} />
-					</XStack>
-				</XStack>
-			</YStack>
+					<IconButton circular name='play' onPress={() => playArtist(false)} />
+				</ActionPill>
+			</XStack>
 		</YStack>
+	)
+}
+
+/** A group of buttons on the artist's image, on a background that keeps them readable on any artwork */
+function ActionPill({ children }: { children: React.ReactNode }): React.JSX.Element {
+	return (
+		<XStack
+			alignItems='center'
+			gap='3'
+			paddingHorizontal='3'
+			paddingVertical='1'
+			borderRadius={999}
+			backgroundColor='$darkBackground'
+		>
+			{children}
+		</XStack>
 	)
 }
 
