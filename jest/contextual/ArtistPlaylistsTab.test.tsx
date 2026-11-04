@@ -75,7 +75,7 @@ const state = (overrides: Record<string, unknown> = {}) => ({
 
 const renderTab = () =>
 	render(
-		<TamaguiProvider config={config} defaultTheme='purple_dark'>
+		<TamaguiProvider config={config} defaultTheme='haze_dark'>
 			<PlaylistsTab />
 		</TamaguiProvider>,
 	)
