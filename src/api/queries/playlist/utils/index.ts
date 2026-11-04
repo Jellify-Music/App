@@ -13,6 +13,7 @@ import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { captureError, LoggingContext } from '../../../../utils/logging'
 import { ApiNotAvailableError } from '../../../../types/errors'
+import { buildPlaylistArtistIndex, PlaylistArtistIndex } from '../../../../utils/artist-playlists'
 
 const PLAYLIST_FIELDS = [
 	ItemFields.Path,
@@ -20,6 +21,8 @@ const PLAYLIST_FIELDS = [
 	ItemFields.Genres,
 	ItemFields.ChildCount,
 	ItemFields.ItemCounts,
+	// Changes whenever a playlist is edited, so cached summaries can tell when they're out of date
+	ItemFields.Etag,
 ]
 
 /**
@@ -159,4 +162,49 @@ export async function fetchPlaylistTracks(
 			return Promise.reject(error)
 		}
 	}
+}
+
+/**
+ * Works out which artists appear on a playlist.
+ *
+ * Jellyfin can't filter a playlist's items by artist, so this reads the playlist's tracks.
+ * It only asks for the bare minimum of each track (artists, no images or user data) and
+ * keeps just the artists' IDs, rather than the whole track list.
+ *
+ * @param playlist The playlist to index
+ * @param signal Optional AbortSignal to cancel the request
+ * @param api The {@link Api} instance, defaults to the current one
+ */
+export async function fetchPlaylistArtists(
+	playlist: BaseItemDto,
+	signal?: AbortSignal,
+	api: Api | undefined = getApi(),
+): Promise<PlaylistArtistIndex> {
+	if (isUndefined(api)) throw new ApiNotAvailableError()
+
+	const tracks: BaseItemDto[] = []
+
+	for (let page = 0; ; page++) {
+		const { data } = await getLibraryApi(api).getItems(
+			{
+				parentId: playlist.Id!,
+				includeItemTypes: [BaseItemKind.Audio],
+				recursive: false,
+				limit: ApiLimits.Library,
+				startIndex: page * ApiLimits.Library,
+				enableImages: false,
+				enableUserData: false,
+				enableTotalRecordCount: false,
+			},
+			{ signal },
+		)
+
+		const items = data.Items ?? []
+
+		tracks.push(...items)
+
+		if (items.length < ApiLimits.Library) break
+	}
+
+	return buildPlaylistArtistIndex(tracks)
 }
