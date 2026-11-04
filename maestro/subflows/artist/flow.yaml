@@ -13,6 +13,14 @@ appId: com.cosmonautical.jellify
     id: "artist-discography-tab-button"
 - assertVisible:
     id: "artist-tracks-tab-button"
+- assertVisible:
+    id: "artist-playlists-tab-button"
+
+# Open the Playlists tab; whatever the artist is on (or not), the list itself is shown
+- tapOn:
+    id: "artist-playlists-tab-button"
+- assertVisible:
+    id: "artist-playlists-list"
 
 # Navigate back
 - runFlow: ../../subflows/platform/back.yaml

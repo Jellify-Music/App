@@ -9,8 +9,8 @@ describe('artist tabs', () => {
 		screenOptions: { lazy: boolean; swipeEnabled: boolean; animationEnabled: boolean }
 	}
 
-	it('are the discography and the tracks, in that order', () => {
-		expect(Object.keys(config.screens)).toEqual(['Discography', 'Tracks'])
+	it('are the discography, the tracks and the playlists, in that order', () => {
+		expect(Object.keys(config.screens)).toEqual(['Discography', 'Tracks', 'Playlists'])
 	})
 
 	// each list starts with the header and the tab bar, so they scroll away together
