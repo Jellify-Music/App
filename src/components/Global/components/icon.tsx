@@ -12,6 +12,7 @@ import MaterialDesignIcon, {
 	MaterialDesignIconsIconName,
 } from '@react-native-vector-icons/material-design-icons'
 import { StyleSheet } from 'react-native'
+import usePressFade from '../../../hooks/use-press-fade'
 
 interface IconProps extends YStackProps {
 	name: MaterialDesignIconsIconName
@@ -39,9 +40,10 @@ export default function Icon({
 }: IconProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const animation = onPress || onPressIn ? 'quick' : props.transition
-
-	const pressOpacity = onPress || onPressIn ? '1 press: 0.6 hover: 0.8' : undefined
+	const pressable = !!(onPress || onPressIn)
+	const pressFade = usePressFade('1 press: 0.6 hover: 0.8', pressable, onPressIn)
+	const animation = pressable ? pressFade.transition : props.transition
+	const pressOpacity = pressable ? pressFade.opacity : undefined
 
 	// Tamagui theme keys are unprefixed (e.g. "primary" not "primary"); resolve for token strings
 	const themeColorKey =
@@ -60,7 +62,7 @@ export default function Icon({
 			alignContent='center'
 			justifyContent='center'
 			onPress={onPress}
-			onPressIn={onPressIn}
+			onPressIn={pressable ? pressFade.onPressIn : undefined}
 			hitSlop={10}
 			flex={flex}
 			shadowColor={textOutline === 'strong' ? 'rgba(0, 0, 0, 0.9)' : 'transparent'}

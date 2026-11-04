@@ -8,6 +8,7 @@ import FavoriteIcon from './favorite-icon'
 import navigationRef from '../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
+import usePressFade from '../../../hooks/use-press-fade'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import React from 'react'
@@ -168,18 +169,16 @@ function ItemRow({
 	}
 
 	// The resting value is required - without it, a cancelled press animates opacity to null and crashes Reanimated
-	const pressOpacity = '1 press:0.5'
+	const pressFade = usePressFade('1 press:0.5', true, onPressIn)
 	if (!isAudio) {
 		return (
 			<XStack
 				alignContent='center'
 				width={'100%'}
-				transition={'quick'}
-				opacity={pressOpacity}
+				{...pressFade}
 				paddingVertical='2'
 				backgroundColor='background'
 				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
-				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={onLongPressCallback}
 			>
@@ -214,12 +213,10 @@ function ItemRow({
 			<XStack
 				alignContent='center'
 				width={'100%'}
-				transition={'quick'}
-				opacity={pressOpacity}
+				{...pressFade}
 				paddingVertical='2'
 				backgroundColor='background'
 				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
-				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={onLongPressCallback}
 			>
