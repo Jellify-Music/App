@@ -28,19 +28,14 @@ import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
 
+	// Flip the icon before the native work so it responds instantly, regardless of queue length
+	usePlayerQueueStore.setState({ shuffled: !shuffled })
 	applyHapticFeedback('info')
 
-	let result: ShuffleResult | undefined
+	const result = shuffled ? await handleDeshuffle() : await handleShuffle()
 
-	if (shuffled) result = await handleDeshuffle()
-	else result = await handleShuffle()
-
-	usePlayerQueueStore.setState((state) => ({
-		...state,
-		queue: result.queue,
-		currentIndex: result.currentIndex,
-		shuffled: !shuffled,
-	}))
+	// Roll back if the native queue couldn't be updated
+	if (!result) usePlayerQueueStore.setState({ shuffled })
 }
 
 export async function handleLibraryShuffle() {
@@ -203,7 +198,7 @@ export async function handleLibraryShuffle() {
 	}
 }
 
-export async function handleShuffle(): Promise<ShuffleResult> {
+export async function handleShuffle(): Promise<ShuffleResult | undefined> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
 	const { currentIndex, queue: playQueue } = usePlayerQueueStore.getState()
@@ -230,22 +225,22 @@ export async function handleShuffle(): Promise<ShuffleResult> {
 		return { currentIndex, queue: playQueue }
 	}
 
-	const otherTracks = playQueue.filter((_, index) => index !== currentIndex)
+	let updatedQueue: TrackItem[]
 
-	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(otherTracks)
-
-	// Apply player operations
+	// Shuffle natively in a single pass - keeps the playing track at index 0 without interrupting it
 	try {
-		for (const { id } of otherTracks) {
-			await PlayerQueue.removeTrackFromPlaylist(playlistId, id)
-		}
+		await PlayerQueue.shufflePlaylist(playlistId, { keepCurrentTrackFirst: true })
 
-		await PlayerQueue.addTracksToPlaylist(playlistId, newShuffledQueue)
+		const tracks = PlayerQueue.getPlaylist(playlistId)?.tracks
+
+		if (!tracks) throw new Error(`Playlist ${playlistId} not found after shuffling`)
+
+		updatedQueue = tracks
 	} catch (error) {
 		captureError(error, LoggingContext.NitroFetch, 'Failed to shuffle tracks in the playlist')
+		return undefined
 	}
 
-	const updatedQueue = [currentTrack, ...newShuffledQueue]
 	const updatedCurrentIndex = 0
 
 	// Update store
@@ -262,26 +257,15 @@ export async function handleShuffle(): Promise<ShuffleResult> {
 	}
 }
 
-export async function handleDeshuffle(): Promise<ShuffleResult> {
+export async function handleDeshuffle(): Promise<ShuffleResult | undefined> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
-	const {
-		currentIndex,
-		shuffled,
-		unShuffledQueue,
-		queue: playQueue,
-	} = usePlayerQueueStore.getState()
+	const { currentIndex, unShuffledQueue, queue: playQueue } = usePlayerQueueStore.getState()
 
 	const currentTrack = !isUndefined(currentIndex) ? playQueue[currentIndex] : undefined
 
-	// Don't deshuffle if not shuffled or no unshuffled queue stored
-	if (
-		!shuffled ||
-		!unShuffledQueue ||
-		unShuffledQueue.length === 0 ||
-		!playlistId ||
-		!currentTrack
-	) {
+	// Don't deshuffle if no unshuffled queue stored
+	if (!unShuffledQueue || unShuffledQueue.length === 0 || !playlistId || !currentTrack) {
 		return { currentIndex: currentIndex ?? 0, queue: playQueue }
 	}
 
@@ -295,11 +279,15 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 	const prevUnshuffledItems = unShuffledQueue.slice(0, newCurrentIndex)
 	const nextUnshuffledItems = unShuffledQueue.slice(newCurrentIndex + 1)
 
-	// Remove all tracks except the current track from the current playlist
+	// Remove all tracks except the current track from the current playlist in one native pass.
+	// Removal is by id, so the current track's id is excluded to keep the playing copy.
 	try {
-		const tracksToRemove = playQueue.filter((_, index) => index !== currentIndex)
-		for (const { id } of tracksToRemove) {
-			await PlayerQueue.removeTrackFromPlaylist(playlistId, id)
+		const idsToRemove = [
+			...new Set(playQueue.map(({ id }) => id).filter((id) => id !== currentTrack.id)),
+		]
+
+		if (idsToRemove.length > 0) {
+			await PlayerQueue.removeTracksFromPlaylist(playlistId, idsToRemove)
 		}
 
 		if (prevUnshuffledItems.length > 0) {
@@ -311,6 +299,7 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 		}
 	} catch (error) {
 		captureError(error, LoggingContext.NitroFetch, 'Failed to deshuffle tracks in the playlist')
+		return undefined
 	}
 
 	const updatedQueue = unShuffledQueue
