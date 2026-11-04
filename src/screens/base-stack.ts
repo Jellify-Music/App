@@ -9,17 +9,9 @@ import InstantMixScreen from './InstantMix'
 export const BaseStackScreens = {
 	Artist: {
 		screen: ArtistScreen,
-		options: ({
-			route,
-			theme,
-		}: {
-			route: RouteProp<BaseStackParamList, 'Artist'>
-			theme: ReactNavigation.Theme
-		}) => ({
+		// the title is styled by the stack, like Home's: a `headerTitleStyle` here would replace it
+		options: ({ route }: { route: RouteProp<BaseStackParamList, 'Artist'> }) => ({
 			title: route.params.artist.Name ?? 'Unknown Artist',
-			headerTitleStyle: {
-				color: theme.colors.background,
-			},
 		}),
 	},
 	Album: {

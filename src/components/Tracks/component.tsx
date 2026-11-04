@@ -1,4 +1,4 @@
-import React, { RefObject, useRef } from 'react'
+import React, { ReactElement, RefObject, useRef } from 'react'
 import Track from '../Global/components/Track'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../services/types/queue-item'
@@ -19,6 +19,8 @@ interface TracksProps {
 	sortBy?: ItemSortBy
 	sortDescending?: boolean
 	queue: Queue
+	/** Shown above the list, scrolling with it */
+	ListHeaderComponent?: ReactElement
 }
 
 export default function Tracks(props: TracksProps): React.JSX.Element {
@@ -37,6 +39,7 @@ function TracksSectionList({
 	tracksInfiniteQuery,
 	sortDescending,
 	queue,
+	ListHeaderComponent,
 }: Omit<TracksProps, 'sortBy'>) {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
@@ -65,6 +68,7 @@ function TracksSectionList({
 			query={tracksInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error>}
 			renderItem={renderItem}
 			sortDescending={sortDescending}
+			ListHeaderComponent={ListHeaderComponent}
 		/>
 	)
 }
