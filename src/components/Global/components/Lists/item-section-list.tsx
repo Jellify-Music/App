@@ -3,7 +3,13 @@ import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { JSX, ReactElement, RefObject } from 'react'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../../types'
 import { SizableText, useTheme, View, XStack, YStack } from 'tamagui'
-import { RefreshControl } from 'react-native'
+import {
+	LayoutChangeEvent,
+	NativeScrollEvent,
+	NativeSyntheticEvent,
+	RefreshControl,
+} from 'react-native'
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { closeAllSwipeableRows } from '../SwipeableRow/registery'
 import AZScroller, { AZ_SCROLLER_CLEARANCE } from '../AZScroller'
 import ListStickyHeader from './list-sticky-header'
@@ -34,6 +40,13 @@ export default function ItemSectionList({
 	 */
 	const scrollerOverlaysList = !!ListHeaderComponent
 
+	// The scroller starts below the header, and takes the whole height once that has scrolled away
+	const headerHeight = useSharedValue(0)
+	const scrollY = useSharedValue(0)
+	const scrollerStyle = useAnimatedStyle(() => ({
+		top: Math.max(headerHeight.get() - scrollY.get(), 0),
+	}))
+
 	const onRefresh = () => {
 		query.refetch()
 	}
@@ -53,7 +66,24 @@ export default function ItemSectionList({
 					<ListStickyHeader text={section.title.toUpperCase()} />
 				)}
 				recycleItems
-				ListHeaderComponent={ListHeaderComponent}
+				ListHeaderComponent={
+					ListHeaderComponent ? (
+						<View
+							onLayout={(event: LayoutChangeEvent) =>
+								headerHeight.set(event.nativeEvent.layout.height)
+							}
+						>
+							{ListHeaderComponent}
+						</View>
+					) : undefined
+				}
+				onScroll={
+					scrollerOverlaysList
+						? (event: NativeSyntheticEvent<NativeScrollEvent>) =>
+								scrollY.set(event.nativeEvent.contentOffset.y)
+						: undefined
+				}
+				scrollEventThrottle={16}
 				stickySectionHeadersEnabled
 				renderItem={render}
 				refreshControl={
@@ -79,14 +109,18 @@ export default function ItemSectionList({
 				}
 			/>
 
-			<XStack
-				position={scrollerOverlaysList ? 'absolute' : 'relative'}
-				right={0}
-				top={0}
-				bottom={0}
-			>
+			{scrollerOverlaysList ? (
+				<Animated.View
+					style={[
+						{ position: 'absolute', right: 0, bottom: 0, flexDirection: 'row' },
+						scrollerStyle,
+					]}
+				>
+					<AZScroller query={query} reverseOrder={sortDescending} sectionListRef={ref} />
+				</Animated.View>
+			) : (
 				<AZScroller query={query} reverseOrder={sortDescending} sectionListRef={ref} />
-			</XStack>
+			)}
 		</XStack>
 	)
 }
