@@ -11,6 +11,7 @@ import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import AnimatedRow from '../../Global/helpers/Animated/row'
 import { useRecentlyUpdatedPlaylists } from '../../../api/queries/playlist'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function RecentPlaylists(): React.JSX.Element {
 	const recentPlaylistsQuery = useRecentlyUpdatedPlaylists()
@@ -23,7 +24,7 @@ export default function RecentPlaylists(): React.JSX.Element {
 		navigation.navigate('RecentPlaylists')
 	}
 
-	const renderItem = ({ item: recentPlaylist }: { item: BaseItemDto }) => (
+	const renderItem = ({ item: recentPlaylist }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
 			item={recentPlaylist}
 			caption={recentPlaylist.Name ?? 'Unknown Playlist'}
@@ -40,7 +41,6 @@ export default function RecentPlaylists(): React.JSX.Element {
 					navigation,
 				})
 			}}
-			size={'12'}
 		/>
 	)
 
