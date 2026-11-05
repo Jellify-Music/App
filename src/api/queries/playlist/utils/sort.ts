@@ -1,26 +1,14 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 /**
- * Sorts playlists by when they were last updated, most recent first,
- * falling back to their names
+ * Sorts playlists by name, since the user's playlists are cached
+ * most recently updated first
  *
- * Jellyfin can't sort playlists by this server side, so it's done here
+ * @param playlists The playlists to sort
+ * @returns The playlists sorted by {@link BaseItemDto.SortName} or {@link BaseItemDto.Name}
  */
-export function sortPlaylistsByLastUpdated(playlists: BaseItemDto[]): BaseItemDto[] {
-	return [...playlists].sort(
-		(a, b) =>
-			getLastUpdated(b) - getLastUpdated(a) ||
-			(a.SortName ?? a.Name ?? '').localeCompare(b.SortName ?? b.Name ?? ''),
+export function sortPlaylistsByName(playlists: BaseItemDto[]): BaseItemDto[] {
+	return [...playlists].sort((a, b) =>
+		(a.SortName ?? a.Name ?? '').localeCompare(b.SortName ?? b.Name ?? ''),
 	)
-}
-
-/**
- * When a playlist was last updated, for sorting
- *
- * Jellyfin bumps `DateLastMediaAdded` whenever tracks are added to a playlist,
- * so fall back to `DateCreated` for playlists that haven't had tracks added yet
- */
-function getLastUpdated(playlist: BaseItemDto): number {
-	const date = playlist.DateLastMediaAdded ?? playlist.DateCreated
-	return date ? Date.parse(date) : 0
 }

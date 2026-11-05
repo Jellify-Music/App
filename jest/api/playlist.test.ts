@@ -2,7 +2,7 @@ import { Api } from '@jellyfin/sdk'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getPlaylistApi } from '@jellyfin/sdk/lib/utils/api'
 import { fetchPlaylistTracks } from '../../src/api/queries/playlist/utils'
-import { sortPlaylistsByLastUpdated } from '../../src/api/queries/playlist/utils/sort'
+import { sortPlaylistsByName } from '../../src/api/queries/playlist/utils/sort'
 import { ApiLimits } from '../../src/configs/querying/index.config'
 import { ApiNotAvailableError } from '../../src/types/errors'
 import { captureError } from '../../src/utils/logging'
@@ -118,33 +118,29 @@ describe('fetchPlaylistTracks', () => {
 	})
 })
 
-describe('sortPlaylistsByLastUpdated', () => {
-	test('sorts by when tracks were last added, falling back to creation date and name', () => {
+describe('sortPlaylistsByName', () => {
+	test('sorts by sort name, falling back to name', () => {
 		const playlists: BaseItemDto[] = [
-			{ Id: 'never-dated', Name: 'B' },
-			{ Id: 'old-add', DateLastMediaAdded: '2026-01-01T00:00:00Z' },
-			{ Id: 'new-playlist', DateCreated: '2026-03-01T00:00:00Z' },
-			{ Id: 'recent-add', DateLastMediaAdded: '2026-04-01T00:00:00Z' },
-			{ Id: 'also-never-dated', Name: 'A' },
+			{ Id: 'charlie', Name: 'Charlie' },
+			{ Id: 'the-beatles', Name: 'The Beatles', SortName: 'Beatles' },
+			{ Id: 'alpha', Name: 'Alpha' },
 		]
 
-		expect(sortPlaylistsByLastUpdated(playlists).map(({ Id }) => Id)).toEqual([
-			'recent-add',
-			'new-playlist',
-			'old-add',
-			'also-never-dated',
-			'never-dated',
+		expect(sortPlaylistsByName(playlists).map(({ Id }) => Id)).toEqual([
+			'alpha',
+			'the-beatles',
+			'charlie',
 		])
 	})
 
 	test('does not mutate the cached playlists', () => {
 		const playlists: BaseItemDto[] = [
-			{ Id: 'old', DateCreated: '2026-01-01T00:00:00Z' },
-			{ Id: 'new', DateCreated: '2026-02-01T00:00:00Z' },
+			{ Id: 'b', Name: 'B' },
+			{ Id: 'a', Name: 'A' },
 		]
 
-		sortPlaylistsByLastUpdated(playlists)
+		sortPlaylistsByName(playlists)
 
-		expect(playlists.map(({ Id }) => Id)).toEqual(['old', 'new'])
+		expect(playlists.map(({ Id }) => Id)).toEqual(['b', 'a'])
 	})
 })
