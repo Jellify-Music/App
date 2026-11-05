@@ -40,7 +40,7 @@ export default function RecentPlaylists(): React.JSX.Element {
 					navigation,
 				})
 			}}
-			size={'10'}
+			size={'12'}
 		/>
 	)
 

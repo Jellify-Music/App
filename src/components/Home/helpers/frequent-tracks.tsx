@@ -34,7 +34,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 				renderItem={({ item: track, index }) => (
 					<ItemCard
 						item={track}
-						size={'10'}
+						size={'8'}
 						caption={track.Name}
 						subCaption={`${track.Artists?.join(', ')}`}
 						onPress={async () => {

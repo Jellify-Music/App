@@ -39,7 +39,7 @@ export default function RecentArtists(): React.JSX.Element {
 					navigation,
 				})
 			}}
-			size={'10'}
+			size={'8'}
 		/>
 	)
 
