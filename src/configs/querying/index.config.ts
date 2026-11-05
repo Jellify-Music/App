@@ -11,7 +11,7 @@ export enum ApiLimits {
 	Recents = 50,
 	Frequents = 200,
 	Library = 400,
-	Similar = 10,
+	Similar = 30,
 	LibraryShuffle = 50,
 	Items = 250,
 	InstantMix = 50,

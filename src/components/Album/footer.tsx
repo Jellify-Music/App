@@ -75,7 +75,6 @@ export default function AlbumTrackListFooter({
 								<ItemCard
 									size={'8'}
 									item={album}
-									squared
 									caption={album.Name ?? 'Unknown Album'}
 									subCaption={formatArtistNames(album.Artists ?? [])}
 									onPress={() => {

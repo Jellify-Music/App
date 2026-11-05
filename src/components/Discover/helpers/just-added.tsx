@@ -37,7 +37,6 @@ export default function RecentlyAdded(): React.JSX.Element {
 					<ItemCard
 						caption={item.Name}
 						subCaption={`${item.Artists?.join(', ')}`}
-						squared
 						size={'10'}
 						item={item}
 						onPress={() => {

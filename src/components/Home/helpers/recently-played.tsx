@@ -55,7 +55,6 @@ export default function RecentlyPlayed(): React.JSX.Element {
 						size={'10'}
 						caption={item.Name}
 						subCaption={`${item.Artists?.join(', ')}`}
-						squared
 						testID={`recently-played-${index}`}
 						item={item}
 						onPress={() => handleItemPress(item, index)}

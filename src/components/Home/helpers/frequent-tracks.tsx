@@ -37,7 +37,6 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 						size={'10'}
 						caption={track.Name}
 						subCaption={`${track.Artists?.join(', ')}`}
-						squared
 						onPress={async () => {
 							await loadNewQueue({
 								track,
