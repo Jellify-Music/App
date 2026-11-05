@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useMutation } from '@tanstack/react-query'
 import { refreshAndroidAutoLibrary } from '../../../services/auto/android-auto'
+import { refreshCarPlayLibrary } from '../../../services/auto/carplay'
 import { createPlaylist, deletePlaylist, updatePlaylist } from './utils/playlists'
 import Toast from 'react-native-toast-message'
 import {
@@ -31,6 +32,7 @@ export const useAddPlaylist = () => {
 			})
 
 			refreshAndroidAutoLibrary()
+			refreshCarPlayLibrary('playlists')
 			applyHapticFeedback('success')
 
 			Toast.show({
@@ -56,6 +58,7 @@ export const useDeletePlaylist = () => {
 		onSuccess: async (data: void, playlist: BaseItemDto) => {
 			removeCachedPlaylist(playlist.Id!)
 			refreshAndroidAutoLibrary()
+			refreshCarPlayLibrary('playlists')
 
 			applyHapticFeedback('success')
 
@@ -99,6 +102,8 @@ export const useUpdatePlaylist = ({
 			updateCachedPlaylist(playlist.Id!, { Name: newName })
 
 			refreshAndroidAutoLibrary()
+			refreshCarPlayLibrary('playlists')
+			refreshCarPlayLibrary(`playlist:${playlist.Id}`)
 			applyHapticFeedback('success')
 		},
 		onError: onError,

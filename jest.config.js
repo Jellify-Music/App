@@ -12,7 +12,6 @@ module.exports = {
 	setupFilesAfterEnv: [
 		'./jest/setup/setup.ts',
 		'./jest/setup/blur.ts',
-		'./jest/setup/carplay.ts',
 		'./jest/setup/clipboard.ts',
 		'./jest/setup/device-info.js', // JS to prevent Typescript implicit any warning
 		'./jest/setup/worklets.ts', // Must be before Reanimated

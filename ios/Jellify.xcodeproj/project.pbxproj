@@ -29,7 +29,6 @@
 		CF605E762DF95BAB00858968 /* Figtree-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E692DF95BAB00858968 /* Figtree-SemiBold.otf */; };
 		CF605E772DF95BAB00858968 /* Figtree-SemiBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E6A2DF95BAB00858968 /* Figtree-SemiBoldItalic.otf */; };
 		CF605E782DF95BAB00858968 /* Figtree-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E682DF95BAB00858968 /* Figtree-Regular.otf */; };
-		CF98CA472D3E99E0003D88B7 /* CarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA452D3E99DF003D88B7 /* CarScene.swift */; };
 		CF98CA482D3E99E0003D88B7 /* PhoneScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA462D3E99DF003D88B7 /* PhoneScene.swift */; };
 		CF98CA492D3E99E0003D88B7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA442D3E99DF003D88B7 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -88,7 +87,6 @@
 		CF6588752D25C12400AECE18 /* Jellify.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Jellify.entitlements; path = Jellify/Jellify.entitlements; sourceTree = "<group>"; };
 		CF7179092CBC486C0021BCA3 /* Jellify-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Jellify-Bridging-Header.h"; sourceTree = "<group>"; };
 		CF98CA442D3E99DF003D88B7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		CF98CA452D3E99DF003D88B7 /* CarScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarScene.swift; sourceTree = "<group>"; };
 		CF98CA462D3E99DF003D88B7 /* PhoneScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneScene.swift; sourceTree = "<group>"; };
 		DEF20584B68B4278A94DE482 /* Figtree-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Regular.otf"; path = "../assets/fonts/Figtree-Regular.otf"; sourceTree = "<group>"; };
 		E431B2EF5BD1E467BD2406A3 /* Pods-Jellify.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.debug.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.debug.xcconfig"; sourceTree = "<group>"; };
@@ -147,7 +145,6 @@
 			isa = PBXGroup;
 			children = (
 				CF98CA442D3E99DF003D88B7 /* AppDelegate.swift */,
-				CF98CA452D3E99DF003D88B7 /* CarScene.swift */,
 				CF98CA462D3E99DF003D88B7 /* PhoneScene.swift */,
 				CF6588752D25C12400AECE18 /* Jellify.entitlements */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -474,7 +471,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CF98CA472D3E99E0003D88B7 /* CarScene.swift in Sources */,
 				CF98CA482D3E99E0003D88B7 /* PhoneScene.swift in Sources */,
 				CF98CA492D3E99E0003D88B7 /* AppDelegate.swift in Sources */,
 			);
