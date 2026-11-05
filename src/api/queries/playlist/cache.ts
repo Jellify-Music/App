@@ -9,6 +9,7 @@ import {
 	UserPlaylistsQueryKey,
 } from './keys'
 import { PlaylistTracksQuery, UserPlaylistsQuery } from './queries'
+import { sortPlaylistsByName } from './utils/sort'
 
 /**
  * Helpers for keeping the playlist caches in sync after a mutation,
@@ -23,9 +24,11 @@ const playlistListKeys = () => [UserPlaylistsQueryKey(getUser()), PublicPlaylist
 
 /**
  * Always fetches the user's playlists from the server, updating the cache with the result
+ *
+ * @returns The user's playlists, sorted by name
  */
-export function refreshUserPlaylists() {
-	return queryClient.query({ ...UserPlaylistsQuery(), staleTime: 0 })
+export async function refreshUserPlaylists() {
+	return sortPlaylistsByName(await queryClient.query({ ...UserPlaylistsQuery(), staleTime: 0 }))
 }
 
 /**
@@ -44,10 +47,20 @@ export async function prefetchPlaylistTracks(playlist: BaseItemDto) {
 	return queryClient.query(PlaylistTracksQuery(playlist)).catch(() => {})
 }
 
+/**
+ * Adds a playlist to the user's cached playlists
+ *
+ * @param playlist The playlist to add
+ */
 export function addUserPlaylist(playlist: BaseItemDto) {
 	updateItems(UserPlaylistsQueryKey(getUser()), (playlists) => [playlist, ...playlists])
 }
 
+/**
+ * Adds a playlist to the user's cached playlists
+ *
+ * @param playlist The playlist to add
+ */
 export function updateCachedPlaylist(playlistId: string, changes: Partial<BaseItemDto>) {
 	playlistListKeys().forEach((queryKey) =>
 		updateItems(queryKey, (playlists) =>
@@ -58,6 +71,11 @@ export function updateCachedPlaylist(playlistId: string, changes: Partial<BaseIt
 	)
 }
 
+/**
+ * Removes a playlist from the cache, including its tracks
+ *
+ * @param playlistId The ID of the playlist to remove
+ */
 export function removeCachedPlaylist(playlistId: string) {
 	playlistListKeys().forEach((queryKey) =>
 		updateItems(queryKey, (playlists) =>
@@ -68,21 +86,46 @@ export function removeCachedPlaylist(playlistId: string) {
 	queryClient.removeQueries({ queryKey: PlaylistTracksQueryKey({ Id: playlistId }) })
 }
 
+/**
+ * Appends tracks to a playlist's cached track list
+ *
+ * Also moves the playlist to the front of the user's playlists, matching
+ * Jellyfin's `DateLastContentAdded` sort, so it tops the recently updated playlists
+ *
+ * @param playlist The playlist to append tracks to
+ * @param tracks The tracks to append
+ */
 export function appendPlaylistTracks(playlist: BaseItemDto, tracks: BaseItemDto[]) {
 	updateItems(PlaylistTracksQueryKey(playlist), (prev) => [...prev, ...tracks])
+	updateItems(UserPlaylistsQueryKey(getUser()), (playlists) => {
+		const updated = playlists.find(({ Id }) => Id === playlist.Id)
+
+		return updated ? [updated, ...playlists.filter(({ Id }) => Id !== playlist.Id)] : playlists
+	})
 }
 
 /**
  * Replaces a playlist's cached tracks, i.e. after it's been reordered or had tracks removed
+ *
+ * @param playlist The playlist to set tracks for
+ * @param tracks The new set of tracks for the playlist
  */
 export function setPlaylistTracks(playlist: BaseItemDto, tracks: BaseItemDto[]) {
 	updateItems(PlaylistTracksQueryKey(playlist), () => tracks)
 }
 
+/**
+ * Invalidates a playlist's cached tracks, forcing them to be refetched
+ *
+ * @param playlist The playlist whose tracks should be invalidated
+ */
 export function invalidatePlaylistTracks(playlist: BaseItemDto) {
 	return queryClient.invalidateQueries({ queryKey: PlaylistTracksQueryKey(playlist) })
 }
 
+/**
+ * Invalidates all cached playlists, forcing them to be refetched
+ */
 export function invalidatePlaylists() {
 	return queryClient.invalidateQueries({ queryKey: PlaylistsQueryKey })
 }

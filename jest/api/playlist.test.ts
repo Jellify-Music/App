@@ -2,6 +2,7 @@ import { Api } from '@jellyfin/sdk'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getPlaylistApi } from '@jellyfin/sdk/lib/utils/api'
 import { fetchPlaylistTracks } from '../../src/api/queries/playlist/utils'
+import { sortPlaylistsByName } from '../../src/api/queries/playlist/utils/sort'
 import { ApiLimits } from '../../src/configs/querying/index.config'
 import { ApiNotAvailableError } from '../../src/types/errors'
 import { captureError } from '../../src/utils/logging'
@@ -114,5 +115,32 @@ describe('fetchPlaylistTracks', () => {
 		await expect(fetchPlaylistTracks('playlist')).rejects.toBeInstanceOf(ApiNotAvailableError)
 
 		expect(getPlaylistItems).not.toHaveBeenCalled()
+	})
+})
+
+describe('sortPlaylistsByName', () => {
+	test('sorts by sort name, falling back to name', () => {
+		const playlists: BaseItemDto[] = [
+			{ Id: 'charlie', Name: 'Charlie' },
+			{ Id: 'the-beatles', Name: 'The Beatles', SortName: 'Beatles' },
+			{ Id: 'alpha', Name: 'Alpha' },
+		]
+
+		expect(sortPlaylistsByName(playlists).map(({ Id }) => Id)).toEqual([
+			'alpha',
+			'the-beatles',
+			'charlie',
+		])
+	})
+
+	test('does not mutate the cached playlists', () => {
+		const playlists: BaseItemDto[] = [
+			{ Id: 'b', Name: 'B' },
+			{ Id: 'a', Name: 'A' },
+		]
+
+		sortPlaylistsByName(playlists)
+
+		expect(playlists.map(({ Id }) => Id)).toEqual(['b', 'a'])
 	})
 })
