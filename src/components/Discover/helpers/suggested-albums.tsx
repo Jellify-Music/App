@@ -36,7 +36,6 @@ export default function SuggestedAlbums() {
 				data={suggestedAlbumsInfiniteQuery.data}
 				renderItem={({ item }) => (
 					<ItemCard
-						squared
 						caption={item.Name}
 						subCaption={formatArtistNames(item.Artists)}
 						size={'10'}

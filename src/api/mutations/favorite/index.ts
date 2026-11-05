@@ -1,6 +1,6 @@
 import { queryClient } from '../../client'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
-import { getLibraryApi, getUserDataApi } from '@jellyfin/sdk/lib/utils/api'
+import { getUserDataApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'

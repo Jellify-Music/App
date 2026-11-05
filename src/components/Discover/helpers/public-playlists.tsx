@@ -41,7 +41,6 @@ export default function PublicPlaylists(): React.JSX.Element {
 					<ItemCard
 						caption={item.Name}
 						subCaption={`${item.Genres?.join(', ')}`}
-						squared
 						size={'8'}
 						item={item}
 						onPress={() => {

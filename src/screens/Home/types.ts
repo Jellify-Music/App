@@ -8,6 +8,7 @@ type HomeStackParamList = BaseStackParamList & {
 	MostPlayedArtists: undefined
 	RecentTracks: undefined
 	MostPlayedTracks: undefined
+	RecentPlaylists: undefined
 }
 
 export default HomeStackParamList
@@ -16,3 +17,4 @@ export type RecentArtistsProps = NativeStackScreenProps<HomeStackParamList, 'Rec
 export type RecentTracksProps = NativeStackScreenProps<HomeStackParamList, 'RecentTracks'>
 export type MostPlayedArtistsProps = NativeStackScreenProps<HomeStackParamList, 'MostPlayedArtists'>
 export type MostPlayedTracksProps = NativeStackScreenProps<HomeStackParamList, 'MostPlayedTracks'>
+export type RecentPlaylistsProps = NativeStackScreenProps<HomeStackParamList, 'RecentPlaylists'>
