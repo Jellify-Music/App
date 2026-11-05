@@ -24,8 +24,8 @@ export function setQueryUserDataForItem(item: BaseItemDto, userItemData?: UserIt
 /**
  * Reads whether an item is a favorite without a mounted query observer.
  *
- * User data is only cached for items that have rendered (see `useIsFavorite`), so an item that
- * hasn't been displayed this session has no cache entry. A cached entry wins when present, since it
+ * User data is only cached for items that were fetched individually or toggled in the app (see
+ * `useIsFavorite`), so most items have no cache entry. A cached entry wins when present, since it
  * reflects favorite toggles made in the app; otherwise fall back to the `UserData` carried on the
  * item itself (e.g. the snapshot stored with a downloaded track).
  */

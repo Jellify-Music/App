@@ -37,9 +37,8 @@ export const useAlbumArtists = () => {
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const { filters, sortDescending: librarySortDescendingState } = useLibraryStore()
-	const sortDescending = librarySortDescendingState.artists ?? false
-	const isFavorites = filters.artists.isFavorites
+	const sortDescending = useLibraryStore((state) => state.sortDescending.artists) ?? false
+	const isFavorites = useLibraryStore((state) => state.filters.artists.isFavorites)
 
 	const selectArtists = (data: InfiniteData<BaseItemDto[], unknown>) => {
 		return flattenInfiniteQueryPages(data)

@@ -24,11 +24,14 @@ jest.mock('../../src/stores/auth', () => ({
 
 jest.mock('../../src/stores/library', () => ({
 	__esModule: true,
-	default: () => ({
-		filters: { tracks: { isDownloaded: true, isFavorites: true } },
-		sortBy: { tracks: undefined },
-		sortDescending: { tracks: false },
-	}),
+	default: (selector?: (state: unknown) => unknown) => {
+		const state = {
+			filters: { tracks: { isDownloaded: true, isFavorites: true } },
+			sortBy: { tracks: undefined },
+			sortDescending: { tracks: false },
+		}
+		return selector ? selector(state) : state
+	},
 }))
 
 jest.mock('react-native-nitro-player', () => ({

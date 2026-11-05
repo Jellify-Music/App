@@ -45,14 +45,26 @@ describe('useIsFavorite', () => {
 		expect(fetchUserData).not.toHaveBeenCalled()
 	})
 
-	test('seeds the cache only for items that render', async () => {
-		await renderIsFavorite({ Id: 'rendered', UserData: { Key: 'value', IsFavorite: false } })
-
-		expect(queryClient.getQueryData(UserDataQueryKey(user, 'rendered'))).toEqual({
-			Key: 'value',
-			IsFavorite: false,
+	test('does not seed the cache from the item user data', async () => {
+		const { result } = await renderIsFavorite({
+			Id: 'rendered',
+			UserData: { Key: 'value', IsFavorite: false },
 		})
-		expect(queryClient.getQueryData(UserDataQueryKey(user, 'not-rendered'))).toBeUndefined()
+
+		expect(result.current.isPending).toBe(false)
+		expect(queryClient.getQueryData(UserDataQueryKey(user, 'rendered'))).toBeUndefined()
+	})
+
+	test('reflects favorites written to the cache after render', async () => {
+		const { result } = await renderIsFavorite({
+			Id: 'track',
+			UserData: { Key: 'value', IsFavorite: false },
+		})
+
+		queryClient.setQueryData(UserDataQueryKey(user, 'track'), { IsFavorite: true })
+
+		await waitFor(() => expect(result.current.data).toBe(true))
+		expect(fetchUserData).not.toHaveBeenCalled()
 	})
 
 	test('prefers cached user data over the item user data', async () => {
