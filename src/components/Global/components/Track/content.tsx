@@ -1,6 +1,6 @@
 import React from 'react'
 import type { EventHandler } from '../../../../types/Events'
-import { SizableText, Theme, XStack, YStack } from 'tamagui'
+import { SizableText, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../icon'
 import ItemImage from '../image'

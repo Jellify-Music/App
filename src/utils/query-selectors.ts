@@ -3,7 +3,6 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { InfiniteData } from '@tanstack/react-query'
 import { isString } from 'lodash'
-import { RefObject } from 'react'
 import { LibrarySectionListData } from '../components/Global/types'
 
 export type FlattenInfiniteQueryPagesOptions = {

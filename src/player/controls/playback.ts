@@ -1,4 +1,3 @@
-import { usePlayerQueueStore } from '../../stores/player/queue'
 import { TrackPlayer } from 'react-native-nitro-player'
 import { applyHapticFeedback } from '../../utils/haptics'
 

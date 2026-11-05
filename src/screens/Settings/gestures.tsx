@@ -1,5 +1,5 @@
 import React from 'react'
-import { YStack, XStack, SizableText, Paragraph, ScrollView, Separator } from 'tamagui'
+import { YStack, XStack, SizableText, ScrollView, Separator } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import ActionChip from '../../components/Settings/components/sections/action-chip'
