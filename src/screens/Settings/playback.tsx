@@ -170,6 +170,7 @@ export default function PlaybackScreen(): React.JSX.Element {
 
 						<Slider
 							value={lookaheadSharedValue}
+							onValueUpdate={handleLookaheadChange}
 							onValueChange={handleLookaheadChange}
 							maxValue={10}
 							thumbWidth={8}
@@ -177,6 +178,7 @@ export default function PlaybackScreen(): React.JSX.Element {
 							backgroundColor={neutral.val}
 							thumbShadowColor={'black'}
 							trackHeight={getTokenValue('2')}
+							step={1}
 						/>
 					</YStack>
 				</YStack>

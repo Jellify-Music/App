@@ -45,7 +45,7 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 		RecentPlaylists: {
 			screen: RecentPlaylistsScreen,
 			options: {
-				title: 'Recent Playlists',
+				title: 'Your Playlists',
 			},
 		},
 	},
