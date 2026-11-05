@@ -44,12 +44,10 @@ export default function flattenInfiniteQueryPages(
 		 */
 		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
 
-		if (listItems.has(letter)) {
-			const letterItems = listItems.get(letter)
-			listItems.set(letter, [...(letterItems ?? []), item])
-		} else {
-			listItems.set(letter, [item])
-		}
+		const letterItems = listItems.get(letter)
+
+		if (letterItems) letterItems.push(item)
+		else listItems.set(letter, [item])
 	})
 
 	return Array.from(listItems).map(([title, data]) => ({

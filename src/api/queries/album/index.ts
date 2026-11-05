@@ -23,12 +23,8 @@ const useAlbums = () => {
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const {
-		filters,
-		sortBy: librarySortByState,
-		sortDescending: librarySortDescendingState,
-	} = useLibraryStore()
-	const rawAlbumSortBy = librarySortByState.albums ?? ItemSortBy.SortName
+	const albumFilters = useLibraryStore((state) => state.filters.albums)
+	const rawAlbumSortBy = useLibraryStore((state) => state.sortBy.albums) ?? ItemSortBy.SortName
 	const albumSortByOptions = [
 		ItemSortBy.Name,
 		ItemSortBy.SortName,
@@ -41,10 +37,10 @@ const useAlbums = () => {
 	const librarySortBy = albumSortByOptions.includes(rawAlbumSortBy as ItemSortBy)
 		? (rawAlbumSortBy as ItemSortBy)
 		: ItemSortBy.Album
-	const sortDescending = librarySortDescendingState.albums ?? false
-	const isFavorites = filters.albums.isFavorites
-	const yearMin = filters.albums.yearMin
-	const yearMax = filters.albums.yearMax
+	const sortDescending = useLibraryStore((state) => state.sortDescending.albums) ?? false
+	const isFavorites = albumFilters.isFavorites
+	const yearMin = albumFilters.yearMin
+	const yearMax = albumFilters.yearMax
 
 	// Add letter sections when sorting by name/album/artist (for A-Z selector)
 	const isSortByLetter =

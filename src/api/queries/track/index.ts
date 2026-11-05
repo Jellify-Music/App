@@ -20,19 +20,15 @@ const useTracks = (
 	const api = getApi()
 	const user = getUser()
 	const [library] = useJellifyLibrary()
-	const {
-		filters,
-		sortBy: librarySortByState,
-		sortDescending: librarySortDescendingState,
-	} = useLibraryStore()
-	const librarySortBy = librarySortByState.tracks ?? undefined
-	const isLibrarySortDescending = librarySortDescendingState.tracks ?? false
-	const isLibraryFavorites = filters.tracks.isFavorites
-	const isDownloaded = filters.tracks.isDownloaded ?? false
-	const isLibraryUnplayed = filters.tracks.isUnplayed ?? false
-	const libraryGenreIds = filters.tracks.genreIds
-	const libraryYearMin = filters.tracks.yearMin
-	const libraryYearMax = filters.tracks.yearMax
+	const trackFilters = useLibraryStore((state) => state.filters.tracks)
+	const librarySortBy = useLibraryStore((state) => state.sortBy.tracks) ?? undefined
+	const isLibrarySortDescending = useLibraryStore((state) => state.sortDescending.tracks) ?? false
+	const isLibraryFavorites = trackFilters.isFavorites
+	const isDownloaded = trackFilters.isDownloaded ?? false
+	const isLibraryUnplayed = trackFilters.isUnplayed ?? false
+	const libraryGenreIds = trackFilters.genreIds
+	const libraryYearMin = trackFilters.yearMin
+	const libraryYearMax = trackFilters.yearMax
 
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
