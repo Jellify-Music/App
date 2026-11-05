@@ -1,4 +1,4 @@
-import { EventHandler } from '../../../../types/Events'
+import { EventHandler } from '../../types/Events'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 import { ThemeTokens } from 'tamagui'
 

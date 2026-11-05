@@ -19,7 +19,7 @@ import {
 } from './registery'
 import { SwipeableRowProvider } from './context'
 import { Pressable } from 'react-native'
-import { SwipeAction, QuickAction } from './types'
+import { SwipeAction, QuickAction } from '../../../../hooks/gestures/types'
 
 type SwipeableRowProps = {
 	children: React.ReactNode

@@ -8,10 +8,7 @@ import { Easing, SharedValue, useSharedValue, withTiming } from 'react-native-re
 import { runOnUI } from 'react-native-worklets'
 import { applyHapticFeedback } from '../../utils/haptics'
 import type { EventHandler } from '../../types/Events'
-import type {
-	QuickAction,
-	SwipeAction,
-} from '../../components/Global/components/SwipeableRow/types'
+import type { QuickAction, SwipeAction } from './types'
 
 // Distance a row must be swiped before it opens quick actions or triggers its action
 export const SWIPE_THRESHOLD = 80

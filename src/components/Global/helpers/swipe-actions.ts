@@ -1,4 +1,4 @@
-import { QuickAction, SwipeAction } from '../components/SwipeableRow/types'
+import { QuickAction, SwipeAction } from '../../../hooks/gestures/types'
 import type { EventHandler } from '../../../types/Events'
 import { SwipeActionType } from '../../../stores/settings/swipe'
 
