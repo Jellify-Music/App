@@ -5,14 +5,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
 import usePatrons from '../../api/queries/patrons'
+import useSpecialThanks from '../../api/queries/special-thanks'
 import { useInfoCaption } from '../../hooks/use-caption'
 import { version } from '../../../package.json'
 import { getStoredOtaVersion } from 'react-native-nitro-ota'
 import { downloadUpdate } from '../../services/ota'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
-import { SPECIAL_THANKS } from '../../configs/messaging/special-thanks'
+import type { Patron } from '../../types/patron'
 
-function PatronsList({ patrons }: { patrons: { fullName: string }[] | undefined }) {
+function PatronsList({ patrons }: { patrons: Patron[] | undefined }) {
 	if (!patrons?.length) return null
 	return (
 		<XStack flexWrap='wrap' gap='2' marginTop='2'>
@@ -27,23 +28,10 @@ function PatronsList({ patrons }: { patrons: { fullName: string }[] | undefined 
 	)
 }
 
-function SpecialThanksList() {
-	return (
-		<XStack flexWrap='wrap' gap='2' marginTop='2'>
-			{SPECIAL_THANKS.map((awesomePerson) => (
-				<XStack key={awesomePerson} alignItems='flex-start' maxWidth='20'>
-					<SizableText fontSize='2' numberOfLines={1} lineBreakStrategyIOS='standard'>
-						{awesomePerson}
-					</SizableText>
-				</XStack>
-			))}
-		</XStack>
-	)
-}
-
 export default function AboutScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
 	const patrons = usePatrons()
+	const specialThanks = useSpecialThanks()
 	const { data: caption } = useInfoCaption()
 	const otaVersion = getStoredOtaVersion()
 
@@ -216,7 +204,7 @@ export default function AboutScreen(): React.JSX.Element {
 						<SizableText fontSize='2' fontWeight='6'>
 							Special Thanks
 						</SizableText>
-						<SpecialThanksList />
+						<PatronsList patrons={specialThanks} />
 					</YStack>
 				</YStack>
 			</ScrollView>

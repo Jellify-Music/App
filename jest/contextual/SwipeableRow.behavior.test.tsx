@@ -1,11 +1,9 @@
 import React from 'react'
 import { render } from '@testing-library/react-native'
-import SwipeableRow, {
-	type QuickAction,
-	type SwipeAction,
-} from '../../src/components/Global/components/SwipeableRow'
+import type { QuickAction, SwipeAction } from '../../src/hooks/gestures/types'
 import { TamaguiProvider, Theme, SizableText } from 'tamagui'
 import config from '../../src/configs/tamagui.config'
+import SwipeableRow from '../../src/components/Global/components/SwipeableRow'
 
 /**
  * Expectation-driven tests for SwipeableRow.
