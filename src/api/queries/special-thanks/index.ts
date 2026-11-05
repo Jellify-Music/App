@@ -7,6 +7,7 @@ const useSpecialThanksQuery = () => {
 	return useQuery({
 		queryKey: [QueryKeys.SpecialThanks],
 		queryFn: ({ signal }) => fetchSpecialThanks(signal),
+		initialData: SPECIAL_THANKS,
 		refetchOnMount: 'always',
 		refetchOnWindowFocus: 'always',
 	})
@@ -15,6 +16,6 @@ const useSpecialThanksQuery = () => {
 /**
  * Falls back to the bundled list while loading, offline, or if the request fails
  */
-const useSpecialThanks = () => useSpecialThanksQuery().data ?? SPECIAL_THANKS
+const useSpecialThanks = () => useSpecialThanksQuery().data
 
 export default useSpecialThanks
