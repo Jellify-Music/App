@@ -6,14 +6,12 @@ import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { useStreamingDeviceProfileStore } from '../../stores/profile'
 import { getApi, getLibrary, getUser } from '../../stores/auth/utils'
 import useLibraryStore from '../../stores/library'
-import { queryClient } from '../../api/client'
-import UserDataQueryKey from '../../api/queries/user-data/keys'
+import { getIsFavoriteFromCache } from '../../api/queries/user-data/cache'
 import {
 	BaseItemKind,
 	ItemFields,
 	ItemFilter,
 	ItemSortBy,
-	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
 import { ApiLimits } from '../../configs/querying/index.config'
 import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
@@ -88,12 +86,9 @@ export async function handleLibraryShuffle() {
 
 				// Filter by favorites
 				if (isFavorites) {
-					filteredDownloads = filteredDownloads.filter((download) => {
-						const userData = queryClient.getQueryData(
-							UserDataQueryKey(user, download.originalTrack.id),
-						) as UserItemDataDto | undefined
-						return userData?.IsFavorite === true
-					})
+					filteredDownloads = filteredDownloads.filter((download) =>
+						getIsFavoriteFromCache(getTrackDto(download.originalTrack)),
+					)
 				}
 
 				// Shuffle the filtered downloads using Fisher-Yates shuffle

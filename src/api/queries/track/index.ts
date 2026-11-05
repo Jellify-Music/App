@@ -1,17 +1,10 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { TracksQueryKey } from './keys'
 import fetchTracks from './utils'
-import {
-	BaseItemDto,
-	ItemSortBy,
-	SortOrder,
-	UserItemDataDto,
-} from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits } from '../../../configs/querying/index.config'
-import { queryClient } from '../../client'
-import UserDataQueryKey from '../user-data/keys'
-import { JellifyUser } from '@/src/types/JellifyUser'
+import { getIsFavoriteFromCache } from '../user-data/cache'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import useLibraryStore from '../../../stores/library'
@@ -121,7 +114,7 @@ const useTracks = (
 					.filter((track) => track !== undefined)
 					.filter((track) => {
 						if (!isFavorites) return true
-						else return isDownloadedTrackAlsoFavorite(user, track.Id)
+						else return getIsFavoriteFromCache(track)
 					})
 			}
 		},
@@ -191,17 +184,6 @@ export const useArtistTracks = (
 	return artistTracksInfiniteQuery
 }
 export default useTracks
-
-function isDownloadedTrackAlsoFavorite(
-	user: JellifyUser | undefined,
-	trackId: string | null | undefined,
-): boolean {
-	if (!user) return false
-
-	const userData = queryClient.getQueryData<UserItemDataDto>(UserDataQueryKey(user!, trackId!))
-
-	return userData?.IsFavorite ?? false
-}
 
 function getSortValue(item: BaseItemDto, sortBy: ItemSortBy): string | number {
 	switch (sortBy) {
