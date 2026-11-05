@@ -1,4 +1,4 @@
-import ItemList from '../../components/Global/components/Lists/item-list'
+import InfiniteItemList from '../../components/Global/components/Lists/item-list'
 import { useDiscoverAlbums } from '../../api/queries/suggestions'
 import { DiscoverAlbumScreenType, DiscoverAlbumsProps } from './types'
 import { useRecentlyAddedAlbums } from '../../api/queries/album'
@@ -12,5 +12,5 @@ export default function DiscoverAlbums({ route }: DiscoverAlbumsProps): React.JS
 			? recentlyAddedAlbumsQuery
 			: suggestedAlbumsQuery
 
-	return <ItemList query={query} />
+	return <InfiniteItemList infiniteQuery={query} />
 }

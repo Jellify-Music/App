@@ -27,6 +27,7 @@ export const useAddPlaylist = () => {
 				Name: name,
 				CanDelete: true,
 				Type: 'Playlist',
+				DateCreated: new Date().toISOString(),
 			})
 
 			refreshAndroidAutoLibrary()

@@ -9,7 +9,7 @@ import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { useNavigation } from '@react-navigation/native'
-import ItemList from '../Global/components/Lists/item-list'
+import InfiniteItemList from '../Global/components/Lists/item-list'
 import ItemSectionList from '../Global/components/Lists/item-section-list'
 
 interface TracksProps {
@@ -30,7 +30,11 @@ export default function Tracks(props: TracksProps): React.JSX.Element {
 }
 
 function TracksList({ tracksInfiniteQuery }: TracksProps) {
-	return <ItemList query={tracksInfiniteQuery as UseInfiniteQueryResult<BaseItemDto[], Error>} />
+	return (
+		<InfiniteItemList
+			infiniteQuery={tracksInfiniteQuery as UseInfiniteQueryResult<BaseItemDto[], Error>}
+		/>
+	)
 }
 
 function TracksSectionList({
