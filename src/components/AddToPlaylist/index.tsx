@@ -7,7 +7,7 @@ import { AddToPlaylistMutation } from './types'
 import ItemImage from '../Global/components/image'
 import { Ticker } from '../../components/Global/helpers/Animated/text'
 import { getItemName } from '../../utils/formatting/item-names'
-import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
+import { usePlaylistTracks, useRecentlyUpdatedPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores/auth/utils'
 import { appendPlaylistTracks } from '../../api/queries/playlist/cache'
 import List from '../Global/components/Lists/utils'
@@ -25,7 +25,7 @@ export default function AddToPlaylist({
 		data: playlists,
 		isPending: playlistsFetchPending,
 		isSuccess: playlistsFetchSuccess,
-	} = useUserPlaylists()
+	} = useRecentlyUpdatedPlaylists()
 
 	const { bottom } = useSafeAreaInsets()
 

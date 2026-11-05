@@ -20,6 +20,8 @@ const PLAYLIST_FIELDS = [
 	ItemFields.Genres,
 	ItemFields.ChildCount,
 	ItemFields.ItemCounts,
+	ItemFields.DateCreated,
+	ItemFields.DateLastMediaAdded,
 ]
 
 /**

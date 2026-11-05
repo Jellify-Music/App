@@ -68,8 +68,13 @@ export function removeCachedPlaylist(playlistId: string) {
 	queryClient.removeQueries({ queryKey: PlaylistTracksQueryKey({ Id: playlistId }) })
 }
 
+/**
+ * Also bumps the playlist's `DateLastMediaAdded`, matching what Jellyfin does,
+ * so it moves to the top of the recently updated playlists
+ */
 export function appendPlaylistTracks(playlist: BaseItemDto, tracks: BaseItemDto[]) {
 	updateItems(PlaylistTracksQueryKey(playlist), (prev) => [...prev, ...tracks])
+	updateCachedPlaylist(playlist.Id!, { DateLastMediaAdded: new Date().toISOString() })
 }
 
 /**

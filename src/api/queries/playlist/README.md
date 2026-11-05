@@ -15,9 +15,12 @@ In components, use the hooks from `index.ts`:
 
 ```ts
 const { data: playlists } = useUserPlaylists()
+const { data: recentPlaylists } = useRecentlyUpdatedPlaylists()
 const { data: publicPlaylists } = usePublicPlaylists()
 const { data: tracks } = usePlaylistTracks(playlist)
 ```
+
+`useUserPlaylists` is sorted by name. `useRecentlyUpdatedPlaylists` reads the same cache, sorted by when tracks were last added (`DateLastMediaAdded`, falling back to `DateCreated`), most recent first. Jellyfin can't sort playlists by this server side, and doesn't return `DateLastSaved`, so the sorting happens in the query's `select`.
 
 Outside React (i.e. Android Auto, CarPlay, prefetching), use the helpers from `cache.ts`:
 
@@ -35,7 +38,7 @@ After a mutation, update the caches with the helpers in `cache.ts` instead of ca
 | `addUserPlaylist` | Creating a playlist |
 | `updateCachedPlaylist` | Renaming or otherwise changing a playlist |
 | `removeCachedPlaylist` | Deleting a playlist (also drops its cached tracks) |
-| `appendPlaylistTracks` | Adding tracks |
+| `appendPlaylistTracks` | Adding tracks (also bumps the playlist's `DateLastMediaAdded`) |
 | `setPlaylistTracks` | Reordering or removing tracks |
 | `invalidatePlaylistTracks` | Refetching one playlist's tracks |
 | `invalidatePlaylists` | Refetching everything, i.e. after changing libraries |
