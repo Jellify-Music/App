@@ -38,7 +38,6 @@ export default function ArtistHeader(): React.JSX.Element {
 
 			await loadNewQueue({
 				track: allTracks[0],
-				index: 0,
 				tracklist: allTracks,
 				queue: artist,
 				shuffled,

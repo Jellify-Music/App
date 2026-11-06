@@ -89,7 +89,6 @@ function PlaylistHeaderControls({
 
 		await loadNewQueue({
 			track: playlistTracks[0],
-			index: 0,
 			tracklist: playlistTracks,
 			queue: playlist,
 			shuffled,
