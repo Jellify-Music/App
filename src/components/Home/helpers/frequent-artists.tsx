@@ -11,6 +11,7 @@ import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import AnimatedRow from '../../Global/helpers/Animated/row'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function FrequentArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -18,7 +19,7 @@ export default function FrequentArtists(): React.JSX.Element {
 
 	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
 
-	const renderItem = ({ item: artist }: { item: BaseItemDto }) => (
+	const renderItem = ({ item: artist }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
 			item={artist}
 			caption={artist.Name ?? 'Unknown Artist'}
@@ -34,7 +35,6 @@ export default function FrequentArtists(): React.JSX.Element {
 					navigation,
 				})
 			}}
-			size={'10'}
 		/>
 	)
 

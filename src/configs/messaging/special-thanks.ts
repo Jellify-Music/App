@@ -1,4 +1,9 @@
-export const SPECIAL_THANKS = [
+import type { Patron } from '../../types/patron'
+
+/**
+ * Bundled fallback for the list served by the patrons API
+ */
+export const SPECIAL_THANKS: Patron[] = [
 	'Bill Thornton',
 	'@BotBlake',
 	'@Chaphasilor',
@@ -11,4 +16,4 @@ export const SPECIAL_THANKS = [
 	'Thalia Fields',
 	'@skalthoff',
 	'@skribe',
-]
+].map((fullName) => ({ fullName }))

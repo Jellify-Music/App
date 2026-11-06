@@ -15,7 +15,6 @@
 
 import {
 	DeviceProfile,
-	DirectPlayProfile,
 	DlnaProfileType,
 	EncodingContext,
 	MediaStreamProtocol,
@@ -25,7 +24,7 @@ import { SourceType } from '../../types/JellifyTrack'
 import { StreamingQuality, DownloadQuality } from '../../enums/audio-quality'
 import uuid from 'react-native-uuid'
 import { Platform } from 'react-native'
-import { AudioQuality } from '../../types/audio/quality'
+import { AudioQuality } from '../../types/Audio/quality'
 
 /**
  * Gets quality-specific parameters for transcoding

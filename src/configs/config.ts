@@ -11,4 +11,8 @@ export const MONOCHROME_ICON_URL =
 
 export const LOGGING_PROVIDER_PRIVACY_POLICY_URL = 'https://glitchtip.com/legal/privacy'
 
-export const PATRON_API_ENDPOINT = 'https://patrons.jellify.app'
+const PATRON_API_BASE_URL = 'https://patrons.jellify.app/api/v1'
+
+export const PATRON_API_ENDPOINT = `${PATRON_API_BASE_URL}/patrons`
+
+export const SPECIAL_THANKS_API_ENDPOINT = `${PATRON_API_BASE_URL}/special-thanks`

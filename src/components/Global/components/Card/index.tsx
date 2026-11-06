@@ -1,5 +1,5 @@
 import React from 'react'
-import { CardProps as TamaguiCardProps, useTheme } from 'tamagui'
+import { CardProps as TamaguiCardProps } from 'tamagui'
 import { Card as TamaguiCard, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import useItemContext from '../../../../hooks/use-item-context'
@@ -7,15 +7,13 @@ import { usePerformanceMonitor } from '../../../../hooks/use-performance-monitor
 import ItemCardBackground from './background'
 import ItemCardCaption from './caption'
 import ItemCardFooter from './footer'
-import { CardSizeToken } from './types'
-import { StyleSheet } from 'react-native'
+import { CardCaptionAlign, CardSizeToken } from './types'
 
 interface CardProps extends Omit<TamaguiCardProps, 'size'> {
 	caption?: string | null | undefined
 	subCaption?: string | null | undefined
 	item: BaseItemDto
-	squared?: boolean
-	captionAlign?: 'center' | 'left' | 'right'
+	captionAlign?: CardCaptionAlign
 	/** Single source of truth for the card's width/height; the caption is capped to the same width */
 	size?: CardSizeToken
 }
@@ -31,7 +29,6 @@ export default function ItemCard({
 	caption,
 	subCaption,
 	item,
-	squared,
 	onPress,
 	captionAlign = 'center',
 	size = '10',
@@ -42,6 +39,8 @@ export default function ItemCard({
 	const warmContext = useItemContext()
 
 	const handlePressIn = () => (item.Type !== 'Audio' ? warmContext(item) : undefined)
+
+	const squared = item.Type !== BaseItemKind.MusicArtist
 
 	return (
 		<YStack alignItems='center' marginHorizontal='1' marginTop='2'>

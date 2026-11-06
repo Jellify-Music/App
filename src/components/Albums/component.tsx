@@ -6,7 +6,7 @@ import ItemRow from '../Global/components/item-row'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
 import ItemSectionList from '../Global/components/Lists/item-section-list'
-import ItemList from '../Global/components/Lists/item-list'
+import InfiniteItemList from '../Global/components/Lists/item-list'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
@@ -51,6 +51,8 @@ export default function Albums({
 			sortDescending={sortDescending}
 		/>
 	) : (
-		<ItemList query={albumsInfiniteQuery as UseInfiniteQueryResult<BaseItemDto[], Error>} />
+		<InfiniteItemList
+			infiniteQuery={albumsInfiniteQuery as UseInfiniteQueryResult<BaseItemDto[], Error>}
+		/>
 	)
 }

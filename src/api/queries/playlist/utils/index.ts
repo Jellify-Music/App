@@ -23,6 +23,8 @@ const PLAYLIST_FIELDS = [
 	ItemFields.ItemCounts,
 	// Changes whenever a playlist is edited, so cached summaries can tell when they're out of date
 	ItemFields.Etag,
+	ItemFields.DateCreated,
+	ItemFields.DateLastMediaAdded,
 ]
 
 /**
@@ -35,7 +37,7 @@ const PLAYLIST_FIELDS = [
  * @param signal Optional AbortSignal to cancel the request
  * @param user The {@link JellifyUser} to fetch playlists for, defaults to the signed in user
  * @param api The {@link Api} instance, defaults to the current one
- * @returns The user's playlists, sorted by name
+ * @returns The user's playlists, most recently updated first
  */
 export async function fetchUserPlaylists(
 	signal?: AbortSignal,
@@ -52,8 +54,8 @@ export async function fetchUserPlaylists(
 				fields: PLAYLIST_FIELDS,
 				includeItemTypes: [BaseItemKind.Playlist],
 				recursive: true,
-				sortBy: [ItemSortBy.SortName],
-				sortOrder: [SortOrder.Ascending],
+				sortBy: [ItemSortBy.DateLastContentAdded, ItemSortBy.SortName],
+				sortOrder: [SortOrder.Descending, SortOrder.Ascending],
 				enableUserData: true,
 			},
 			{
