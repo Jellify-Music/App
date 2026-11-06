@@ -1,0 +1,87 @@
+appId: com.cosmonautical.jellify
+---
+# Playlist Users Test
+# Jerry shares "Jerry's Mix" with Bobby, then unshares it so the demo server
+# is left as it was and the flow can be re-run
+
+# Open Jerry's Mix from the Library playlists tab
+- tapOn:
+    id: "library-playlists-tab-button"
+
+- waitForAnimationToEnd
+
+- tapOn: Jerry's Mix
+
+- waitForAnimationToEnd
+
+# Only shown for playlists Jerry owns
+- tapOn:
+    id: "playlist-users-button"
+
+- waitForAnimationToEnd
+
+- assertVisible: "Add Users to Playlist"
+
+- takeScreenshot: screenshots/playlist/playlist_users_initial_state
+
+# Narrow the list down to Bobby
+- tapOn:
+    id: "playlist-users-search-input"
+
+- inputText: "Bobby"
+
+- runFlow: ../../subflows/platform/hide-keyboard.yaml
+
+# A previous failed run may have left Bobby shared, so unshare first
+- runFlow:
+    when:
+      visible:
+        id: "playlist-user-remove-Bobby"
+    commands:
+      - tapOn:
+          id: "playlist-user-remove-Bobby"
+      - extendedWaitUntil:
+          visible:
+            id: "playlist-user-add-Bobby"
+          timeout: 10000
+
+# Share the playlist with Bobby
+- tapOn:
+    id: "playlist-user-add-Bobby"
+
+# Bobby moves into the "Shared With" section once the server responds
+- extendedWaitUntil:
+    visible:
+      id: "playlist-user-remove-Bobby"
+    timeout: 10000
+
+- assertNotVisible:
+    id: "playlist-user-add-Bobby"
+
+- takeScreenshot: screenshots/playlist/playlist_users_shared_with_bobby
+
+# Unshare to restore the server state
+- tapOn:
+    id: "playlist-user-remove-Bobby"
+
+- extendedWaitUntil:
+    visible:
+      id: "playlist-user-add-Bobby"
+    timeout: 10000
+
+- assertNotVisible:
+    id: "playlist-user-remove-Bobby"
+
+- takeScreenshot: screenshots/playlist/playlist_users_unshared_with_bobby
+
+# Close the sheet, then pop the playlist to return to the Library tab root
+- runFlow: ../../subflows/platform/dismiss-sheet.yaml
+
+- waitForAnimationToEnd
+
+- runFlow: ../../subflows/platform/back.yaml
+
+- waitForAnimationToEnd
+
+- assertVisible:
+    id: "library-playlists-tab-button"

@@ -13,3 +13,5 @@ appId: com.cosmonautical.jellify
 - takeScreenshot: screenshots/library/library_initial_state_screen
 
 - runFlow: library-tabs.yaml
+
+- runFlow: playlist-users.yaml

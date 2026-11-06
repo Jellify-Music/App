@@ -11,7 +11,7 @@ maestro/
 │   ├── setup/           # App launch, login, server & library selection
 │   ├── home/            # Home tab
 │   ├── quick-actions/   # Track row swipe actions & favouriting
-│   ├── library/         # Library tab
+│   ├── library/         # Library tab & playlist sharing
 │   ├── search/          # Search tab
 │   ├── discover/        # Discover tab
 │   ├── settings/        # Settings tab
@@ -36,7 +36,7 @@ Runs the complete test suite in sequence:
 1. **Setup** — clears app state, launches the app, handles permission dialogs, logs in, selects a server and library
 2. **Home** — exercises the home screen (recently played, etc.)
 3. **Quick Actions** — validates track-row swipe gestures and favouriting via swipe actions
-4. **Library** — exercises library browsing and tab navigation
+4. **Library** — exercises library browsing and tab navigation, and shares a playlist with another user
 5. **Search** — exercises the search tab
 6. **Discover** — exercises the discover tab
 7. **Settings** — exercises the settings tab
