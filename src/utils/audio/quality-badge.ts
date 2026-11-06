@@ -1,4 +1,4 @@
-import type { AudioBitrate } from '../../types/audio/quality'
+import type { AudioBitrate } from '../../types/Audio/quality'
 import { HIGH_BITRATE_THRESHOLD } from '../../configs/categorizing/audio'
 import { isAndroidTranscode } from './transcoding'
 

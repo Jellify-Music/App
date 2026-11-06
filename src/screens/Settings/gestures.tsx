@@ -1,5 +1,5 @@
 import React from 'react'
-import { YStack, XStack, SizableText, Paragraph, ScrollView, Separator } from 'tamagui'
+import { YStack, XStack, SizableText, ScrollView, Separator } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import ActionChip from '../../components/Settings/components/sections/action-chip'
@@ -54,7 +54,7 @@ export default function GesturesScreen(): React.JSX.Element {
 							<ActionChip
 								testID='swipe-left-chip-add-to-queue'
 								active={left.includes('AddToQueue')}
-								label='Add to Queue'
+								label='Play Later'
 								icon='playlist-play'
 								onPress={() => toggleLeft('AddToQueue')}
 							/>
@@ -90,7 +90,7 @@ export default function GesturesScreen(): React.JSX.Element {
 							<ActionChip
 								testID='swipe-right-chip-add-to-queue'
 								active={right.includes('AddToQueue')}
-								label='Add to Queue'
+								label='Play Later'
 								icon='playlist-play'
 								onPress={() => toggleRight('AddToQueue')}
 							/>

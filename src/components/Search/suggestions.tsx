@@ -1,5 +1,5 @@
 import ItemRow from '../Global/components/item-row'
-import { getTokenValue, SizableText, Spinner, YStack } from 'tamagui'
+import { SizableText, Spinner, YStack } from 'tamagui'
 import ItemCard from '../Global/components/Card'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import SearchParamList from '../../screens/Search/types'

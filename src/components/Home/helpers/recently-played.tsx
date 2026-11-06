@@ -1,5 +1,5 @@
 import React from 'react'
-import { H4, H5, XStack } from 'tamagui'
+import { H4, XStack } from 'tamagui'
 import ItemCard from '../../Global/components/Card'
 import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -11,6 +11,7 @@ import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import AnimatedRow from '../../Global/helpers/Animated/row'
 import { loadNewQueue } from '../../../player/queuing'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -36,6 +37,24 @@ export default function RecentlyPlayed(): React.JSX.Element {
 		}
 	}
 
+	const renderItem = ({ item, index }: LegendListRenderItemProps<BaseItemDto>) => (
+		<ItemCard
+			caption={item.Name}
+			subCaption={`${item.Artists?.join(', ')}`}
+			testID={`recently-played-${index}`}
+			item={item}
+			onPress={() => handleItemPress(item, index)}
+			onLongPress={() => {
+				rootNavigation.navigate('Context', {
+					item,
+					navigation,
+				})
+			}}
+			marginHorizontal={'1'}
+			captionAlign='left'
+		/>
+	)
+
 	return tracksInfiniteQuery.data ? (
 		<AnimatedRow testID='home-recently-played'>
 			<XStack
@@ -48,28 +67,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				<Icon name='arrow-right' />
 			</XStack>
 
-			<HorizontalCardList
-				data={tracksInfiniteQuery.data}
-				renderItem={({ index, item }) => (
-					<ItemCard
-						size={'10'}
-						caption={item.Name}
-						subCaption={`${item.Artists?.join(', ')}`}
-						squared
-						testID={`recently-played-${index}`}
-						item={item}
-						onPress={() => handleItemPress(item, index)}
-						onLongPress={() => {
-							rootNavigation.navigate('Context', {
-								item,
-								navigation,
-							})
-						}}
-						marginHorizontal={'1'}
-						captionAlign='left'
-					/>
-				)}
-			/>
+			<HorizontalCardList data={tracksInfiniteQuery.data} renderItem={renderItem} />
 		</AnimatedRow>
 	) : (
 		<></>

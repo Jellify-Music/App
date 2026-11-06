@@ -1,5 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { H5, ListItem, Separator, SizableText, Spacer, XStack, YGroup, YStack } from 'tamagui'
+import type { EventHandler } from '../../../types/Events'
+import { ListItem, SizableText, Spacer, XStack, YGroup, YStack } from 'tamagui'
 import ItemImage from './image'
 import Icon from './icon'
 
@@ -7,7 +8,7 @@ interface ListGroupProps {
 	items: BaseItemDto[] | undefined
 	limit?: number
 	circularImages?: boolean | undefined
-	seeMore?: () => void | undefined
+	seeMore?: EventHandler
 }
 
 export default function ListGroup({

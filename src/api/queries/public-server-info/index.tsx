@@ -1,8 +1,9 @@
 import { UndefinedInitialDataOptions, useQuery } from '@tanstack/react-query'
+import { QueryAges } from '../../../constants/durations'
 import { useJellyfinServer } from '../../../hooks/auth/server'
 import { PublicServerInfoQueryKey } from './keys'
 import fetchPublicServerInfo from './utils'
-import { ONE_DAY, queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../client'
 import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models/public-system-info'
 import { JellyfinServer } from '../../../types/JellyfinServer'
 import useJellifyStore from '../../../stores/auth'
@@ -17,7 +18,7 @@ const getPublicServerInfoQuery: (
 > = (server) => ({
 	queryKey: PublicServerInfoQueryKey(server),
 	queryFn: fetchPublicServerInfo,
-	staleTime: ONE_DAY,
+	staleTime: QueryAges.OneDay,
 })
 
 export const usePublicServerInfo = () => {

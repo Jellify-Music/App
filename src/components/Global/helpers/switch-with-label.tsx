@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
 import { applyHapticFeedback } from '../../../utils/haptics'
-import { SizeTokens, XStack, Separator, Switch, styled, Label } from 'tamagui'
+import { SizeTokens, XStack, Switch, styled, Label } from 'tamagui'
 
 interface SwitchWithLabelProps {
 	onCheckedChange: (value: boolean) => void

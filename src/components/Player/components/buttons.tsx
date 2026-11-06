@@ -1,6 +1,5 @@
 import { Circle, Spinner, View } from 'tamagui'
 import IconButton from '../../../components/Global/helpers/icon-button'
-import { isUndefined } from 'lodash'
 import React from 'react'
 import Icon from '../../Global/components/icon'
 import { togglePlayback } from '../../../player/controls/playback'

@@ -1,5 +1,5 @@
 import React from 'react'
-import { H4, H5, XStack } from 'tamagui'
+import { H4, XStack } from 'tamagui'
 import { RootStackParamList } from '../../../screens/types'
 import ItemCard from '../../Global/components/Card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -11,6 +11,7 @@ import { useRecentArtists } from '../../../api/queries/recents'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import AnimatedRow from '../../Global/helpers/Animated/row'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function RecentArtists(): React.JSX.Element {
 	const recentArtistsInfiniteQuery = useRecentArtists()
@@ -23,7 +24,7 @@ export default function RecentArtists(): React.JSX.Element {
 		navigation.navigate('RecentArtists')
 	}
 
-	const renderItem = ({ item: recentArtist }: { item: BaseItemDto }) => (
+	const renderItem = ({ item: recentArtist }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
 			item={recentArtist}
 			caption={recentArtist.Name ?? 'Unknown Artist'}
@@ -39,7 +40,6 @@ export default function RecentArtists(): React.JSX.Element {
 					navigation,
 				})
 			}}
-			size={'10'}
 		/>
 	)
 

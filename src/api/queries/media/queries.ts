@@ -6,9 +6,10 @@ import {
 	useStreamingDeviceProfileStore,
 } from '../../../stores/profile'
 import { SourceType } from '../../../types/JellifyTrack'
-import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
 import { QueryExecuteOptions } from '@tanstack/react-query'
+import { QueryAges } from '../../../constants/durations'
 
 export const MediaInfoQuery = (
 	itemId: string | null | undefined,
@@ -34,7 +35,8 @@ export const MediaInfoQuery = (
 		 * that the server tears down once playback of that session stops, so it must not
 		 * be reused for long or the player is handed a dead stream URL.
 		 */
-		staleTime: ONE_MINUTE * 5,
+		staleTime: QueryAges.OneMinute * 5,
+		gcTime: QueryAges.OneMinute * 5,
 	} as QueryExecuteOptions<PlaybackInfoResponse>
 }
 

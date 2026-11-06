@@ -1,21 +1,17 @@
 import { RecentlyPlayedArtistsQueryKey, RecentlyPlayedTracksQueryKey } from './keys'
-import {
-	InfiniteData,
-	QueryKey,
-	useInfiniteQuery,
-	UseInfiniteQueryOptions,
-} from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
+import type { BaseItemDtoInfiniteQueryOptions } from '@/src/api/types/infinite-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
 import { isUndefined } from 'lodash'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'
-import { ONE_HOUR } from '../../../constants/query-client'
+import { QueryAges } from '../../../constants/durations'
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
-const RECENTS_QUERY_CONFIG = {
-	staleTime: ONE_HOUR,
+const RECENTS_QUERY_CONFIG: Pick<BaseItemDtoInfiniteQueryOptions, 'staleTime' | 'maxPages'> = {
+	staleTime: QueryAges.OneHour,
 	maxPages: MaxPages.Home,
 }
 
@@ -27,9 +23,7 @@ export const useRecentlyPlayedTracks = () => {
 
 export const PlayItAgainQuery: (
 	library: JellifyLibrary | undefined,
-) => UseInfiniteQueryOptions<BaseItemDto[], Error, BaseItemDto[], QueryKey, number> = (
-	library: JellifyLibrary | undefined,
-) => {
+) => BaseItemDtoInfiniteQueryOptions = (library: JellifyLibrary | undefined) => {
 	const api = getApi()
 
 	const user = getUser()

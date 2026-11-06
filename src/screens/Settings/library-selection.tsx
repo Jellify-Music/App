@@ -3,7 +3,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { SettingsStackParamList } from './types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../enums/query-keys'
-import { queryClient } from '../../constants/query-client'
+import { queryClient } from '../../api/client'
 import Toast from 'react-native-toast-message'
 import LibrarySelector from '../../components/LibrarySelector'
 import { useJellifyLibrary } from '../../stores/auth'
@@ -29,8 +29,8 @@ export default function LibrarySelectionScreen(): React.JSX.Element {
 			})
 
 			// Invalidate all library-related queries to refresh the data
-			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllArtistsAlphabetical] })
-			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllAlbumsAlphabetical] })
+			queryClient.invalidateQueries({ queryKey: [QueryKeys.InfiniteArtists] })
+			queryClient.invalidateQueries({ queryKey: [QueryKeys.InfiniteAlbums] })
 			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllTracks] })
 			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllAlbums] })
 			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllArtists] })

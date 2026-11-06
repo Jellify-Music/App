@@ -1,4 +1,4 @@
-import { H4, H5, XStack } from 'tamagui'
+import { H4, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import ItemCard from '../../Global/components/Card'

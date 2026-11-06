@@ -2,7 +2,7 @@ import { isNull, isUndefined } from 'lodash'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import { DownloadedTrack, PlayerQueue } from 'react-native-nitro-player'
-import { AA_PLAYLIST_NAME_PREFIX } from '../../services/android-auto'
+import { AA_PLAYLIST_NAME_PREFIX } from '../../services/auto/android-auto'
 
 export async function clearPlaylists() {
 	await Promise.all(

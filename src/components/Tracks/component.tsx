@@ -9,7 +9,7 @@ import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { useNavigation } from '@react-navigation/native'
-import ItemList from '../Global/components/Lists/item-list'
+import InfiniteItemList from '../Global/components/Lists/item-list'
 import ItemSectionList from '../Global/components/Lists/item-section-list'
 
 interface TracksProps {
@@ -30,7 +30,11 @@ export default function Tracks(props: TracksProps): React.JSX.Element {
 }
 
 function TracksList({ tracksInfiniteQuery }: TracksProps) {
-	return <ItemList query={tracksInfiniteQuery as UseInfiniteQueryResult<BaseItemDto[], Error>} />
+	return (
+		<InfiniteItemList
+			infiniteQuery={tracksInfiniteQuery as UseInfiniteQueryResult<BaseItemDto[], Error>}
+		/>
+	)
 }
 
 function TracksSectionList({
@@ -46,18 +50,23 @@ function TracksSectionList({
 		(
 			tracksInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error>
 		).data?.flatMap((section) => section.data) ?? []
+	const trackIndices = new Map<string, number>(tracks.map((track, index) => [track.Id!, index]))
 
-	const renderItem = ({ item: track, index }: LibrarySectionListRenderItemInfo) => (
-		<Track
-			navigation={navigation}
-			showArtwork
-			index={0}
-			track={track}
-			testID={`track-item-${index}`}
-			tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
-			queue={queue}
-		/>
-	)
+	const renderItem = ({ item: track, index }: LibrarySectionListRenderItemInfo) => {
+		const trackIndex = trackIndices.get(track.Id!) ?? 0
+
+		return (
+			<Track
+				navigation={navigation}
+				showArtwork
+				index={0}
+				track={track}
+				testID={`track-item-${index}`}
+				tracklist={tracks.slice(trackIndex, trackIndex + 50)}
+				queue={queue}
+			/>
+		)
+	}
 
 	return (
 		<ItemSectionList

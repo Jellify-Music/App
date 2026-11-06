@@ -36,15 +36,15 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	}
 
 	return (
-		<YStack
-			flex={1}
-			backgroundColor='background'
-			margin='2'
-			testID='settings-screen-privacy-developer'
+		<ScrollView
+			contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
+			showsVerticalScrollIndicator={false}
 		>
-			<ScrollView
-				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
-				showsVerticalScrollIndicator={false}
+			<YStack
+				flex={1}
+				backgroundColor='background'
+				margin='2'
+				testID='settings-screen-privacy-developer'
 			>
 				<SettingsSection
 					title='Privacy'
@@ -107,6 +107,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 									value={localPrId}
 									onChangeText={setLocalPrId}
 									keyboardType='numeric'
+									flex={1}
 								/>
 								<Button
 									circular
@@ -123,7 +124,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 						</YStack>
 					)}
 				</SettingsSection>
-			</ScrollView>
-		</YStack>
+			</YStack>
+		</ScrollView>
 	)
 }

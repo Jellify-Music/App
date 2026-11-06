@@ -1,4 +1,5 @@
 import React from 'react'
+import type { EventHandler } from '../../../../types/Events'
 import { SizableText } from 'tamagui'
 import Button from '../../../Global/helpers/button'
 import Icon from '../../../Global/components/icon'
@@ -8,7 +9,7 @@ interface ActionChipProps {
 	active: boolean
 	label: string
 	icon: MaterialDesignIconsIconName
-	onPress: () => void
+	onPress: EventHandler
 	testID?: string
 }
 

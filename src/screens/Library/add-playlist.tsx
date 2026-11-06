@@ -1,6 +1,6 @@
 import Input from '../../components/Global/helpers/input'
 import React, { useState } from 'react'
-import { Label, Spinner, View, XStack, SizableText, YStack } from 'tamagui'
+import { Label, Spinner, XStack, SizableText, YStack } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { isEmpty } from 'lodash'

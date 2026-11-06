@@ -1,19 +1,26 @@
-if [ -z "$1" ]; then
-  echo "Error: Version argument is required"
-  echo "Usage: $0 <version>"
+set -euo pipefail
+
+if [ -z "${1:-}" ] || [[ "${2:-}" != "android" && "${2:-}" != "ios" ]]; then
+  echo "Error: PR number and platform are required"
+  echo "Usage: $0 <pr-number> <android|ios>"
   exit 1
 fi
 
 version="$1"
+platform="$2"
+
+if [ "$platform" = "android" ]; then
 target_branch="PULL_REQUEST_${version}_android"
 cd android
-git clone https://github.com/Jellify-Music/App-Bundles.git
-cd App-Bundles
-if git ls-remote --exit-code --heads origin "$target_branch" >/dev/null 2>&1; then
+rm -rf App-Bundles
+if git ls-remote --exit-code --heads https://github.com/Jellify-Music/App-Bundles.git "$target_branch" >/dev/null 2>&1; then
   echo "Branch '$target_branch' already exists on remote."
-  git checkout "$target_branch"
+  git clone --depth 1 --single-branch --branch "$target_branch" https://github.com/Jellify-Music/App-Bundles.git
+  cd App-Bundles
 else
   echo "Branch '$target_branch' does not exist on remote. Attempting to create it..."
+  git clone --depth 1 https://github.com/Jellify-Music/App-Bundles.git
+  cd App-Bundles
   git checkout -b "$target_branch"
 fi
 rm -rf ../App-Bundles-prev
@@ -29,18 +36,20 @@ git push https://x-access-token:$SIGNING_REPO_PAT@github.com/Jellify-Music/App-B
 cd ..
 rm -rf App-Bundles App-Bundles-prev
 cd ..
+fi
 
-
+if [ "$platform" = "ios" ]; then
 target_branch="PULL_REQUEST_${version}_ios"
 cd ios
 rm -rf App-Bundles
-git clone https://github.com/Jellify-Music/App-Bundles.git
-cd App-Bundles
-if git ls-remote --exit-code --heads origin "$target_branch" >/dev/null 2>&1; then
+if git ls-remote --exit-code --heads https://github.com/Jellify-Music/App-Bundles.git "$target_branch" >/dev/null 2>&1; then
   echo "Branch '$target_branch' already exists on remote."
-  git checkout "$target_branch"
+  git clone --depth 1 --single-branch --branch "$target_branch" https://github.com/Jellify-Music/App-Bundles.git
+  cd App-Bundles
 else
   echo "Branch '$target_branch' does not exist on remote. Attempting to create it..."
+  git clone --depth 1 https://github.com/Jellify-Music/App-Bundles.git
+  cd App-Bundles
   git checkout -b "$target_branch"
 fi
 rm -rf ../App-Bundles-prev
@@ -57,3 +66,4 @@ git push https://x-access-token:$SIGNING_REPO_PAT@github.com/Jellify-Music/App-B
 cd ..
 rm -rf App-Bundles App-Bundles-prev
 cd ..
+fi

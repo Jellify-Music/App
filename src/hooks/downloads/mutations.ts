@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { DownloadedTrack, DownloadManager } from 'react-native-nitro-player'
-import { queryClient } from '../../constants/query-client'
+import { queryClient } from '../../api/client'
 import ALL_DOWNLOADS_KEY from './keys'
 import { downloadItems } from './functions'
 
