@@ -1,64 +1,52 @@
-import {
-	PlaylistTracksQueryKey,
-	PlaylistUsersQueryKey,
-	PublicPlaylistsQueryKey,
-	UserPlaylistsQueryKey,
-} from './keys'
-import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
-import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
+import { PlaylistUsersQueryKey } from './keys'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { BaseItemDto, PlaylistUserPermissions, UserDto } from '@jellyfin/sdk/lib/generated-client'
-import { ApiLimits } from '../../../configs/querying/index.config'
-import { getApi, getUser } from '../../../stores/auth/utils'
 import { addPlaylistUser, getPlaylistUsers, removePlaylistUser } from './utils/users'
-import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
-import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import Toast from 'react-native-toast-message'
+import { PlaylistTracksQuery, PublicPlaylistsQuery, UserPlaylistsQuery } from './queries'
+import { sortPlaylistsByName } from './utils/sort'
+import { applyHapticFeedback } from '../../../utils/haptics'
+import { queryClient } from '../../client'
+import { QueryAges } from '../../../constants/durations'
 
-export const useUserPlaylists = () => {
-	const api = getApi()
-	const user = getUser()
+/**
+ * Fetches the user's playlists from the cache or server, sorted by name
+ *
+ * @returns The user's playlists, sorted by name
+ */
+export const useUserPlaylists = () =>
+	useQuery({ ...UserPlaylistsQuery(), select: sortPlaylistsByName })
 
-	return useInfiniteQuery({
-		queryKey: UserPlaylistsQueryKey(user),
-		queryFn: ({ pageParam, signal }) => fetchUserPlaylists(api, user, [], pageParam, signal),
-		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		// Pages are filtered client-side (see fetchUserPlaylists), so a short page
-		// doesn't mean we've reached the end - keep going until one comes back empty
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
-			lastPage && lastPage.length > 0 ? lastPageParam + 1 : undefined,
-		enabled: Boolean(api && user),
-	})
-}
+/**
+ * The user's playlists, most recently updated first
+ *
+ * Reads from the same cache as {@link useUserPlaylists}, which Jellyfin returns
+ * in this order, so it's kept in sync by the helpers in `cache.ts` without a
+ * second request to the server
+ *
+ * @returns The user's playlists, most recently updated first
+ */
+export const useRecentlyUpdatedPlaylists = () => useQuery(UserPlaylistsQuery())
 
+/**
+ * The "public" playlists, which are accessible to all users and
+ * are in the form of a .m3u or .m3u8 file in the music library.
+ *
+ * @returns The public playlists, sorted by name
+ */
+export const usePublicPlaylists = () => useQuery(PublicPlaylistsQuery())
+
+/**
+ * Fetches a playlist's tracks from the cache or server
+ *
+ * @param playlist The playlist whose tracks should be fetched
+ * @param disabled Whether the query should be disabled
+ * @returns The playlist's tracks
+ */
 export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | undefined) => {
-	const api = getApi()
+	const query = PlaylistTracksQuery(playlist)
 
-	return useInfiniteQuery({
-		queryKey: PlaylistTracksQueryKey(playlist),
-		queryFn: ({ pageParam, signal }) =>
-			fetchPlaylistTracks(api, playlist.Id!, pageParam, signal),
-		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam) => {
-			if (!lastPage) return undefined
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
-		},
-		enabled: Boolean(api && playlist.Id && !disabled),
-	})
-}
-
-export const usePublicPlaylists = () => {
-	const api = getApi()
-
-	return useInfiniteQuery({
-		queryKey: PublicPlaylistsQueryKey(),
-		queryFn: ({ pageParam, signal }) => fetchPublicPlaylists(api, pageParam, signal),
-		select: (data) => data.pages.flatMap((page) => page),
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
-			lastPage.length > 0 ? lastPageParam + 1 : undefined,
-		initialPageParam: 0,
-	})
+	return useQuery({ ...query, enabled: query.enabled && !disabled })
 }
 
 //hooks - used in react components
@@ -68,7 +56,7 @@ export const usePlaylistUsers = (playlist: BaseItemDto) => {
 	return useQuery({
 		queryKey: PlaylistUsersQueryKey(playlist),
 		queryFn: () => getPlaylistUsers(playlist.Id!),
-		staleTime: ONE_MINUTE * 15, //refreshes every 15mins
+		staleTime: QueryAges.OneMinute * 15, //refreshes every 15mins
 	})
 }
 
@@ -87,7 +75,7 @@ export const useAddPlaylistUser = () => {
 			addPlaylistUser(variables.playlist.Id!, variables.user.Id!, variables.CanEdit),
 
 		onSuccess: (data, variables) => {
-			triggerHaptic('notificationSuccess')
+			applyHapticFeedback('success')
 			queryClient.setQueryData<PlaylistUserPermissions[] | undefined>(
 				PlaylistUsersQueryKey(variables.playlist),
 				(previous: PlaylistUserPermissions[] | undefined) => {
@@ -119,7 +107,7 @@ export const useRemovePlaylistUser = () => {
 		mutationFn: (variables: removePlaylistUser) =>
 			removePlaylistUser(variables.playlist.Id!, variables.user.Id!),
 		onSuccess: (data, variables) => {
-			triggerHaptic('notificationSuccess')
+			applyHapticFeedback('success')
 			queryClient.setQueryData<PlaylistUserPermissions[] | undefined>(
 				PlaylistUsersQueryKey(variables.playlist),
 				(previous: PlaylistUserPermissions[] | undefined) => {

@@ -1,53 +1,35 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { useQuery } from '@tanstack/react-query'
+import { QueryAges } from '../../../constants/durations'
 import fetchUserData from './utils'
 import UserDataQueryKey from './keys'
-import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
 import { getUser } from '../../../stores/auth/utils'
-import { UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
 
+/**
+ * Whether an item is a favorite.
+ *
+ * Items from list queries already carry `UserData`, so those only observe the cache (where favorite
+ * mutations and the context sheet prefetch write fresher values) and never fetch or seed an entry.
+ * Seeding one per rendered row grew the persisted cache by an entry for every track ever scrolled
+ * past, and refetched every visible row once the entries went stale.
+ */
 export const useIsFavorite = (item: BaseItemDto) => {
 	const user = getUser()
 
-	return useQuery({
+	const hasItemUserData = Boolean(item.UserData)
+
+	const { data: cachedIsFavorite, isPending } = useQuery({
 		queryKey: UserDataQueryKey(user!, item.Id!),
 		queryFn: ({ signal }) => fetchUserData(item.Id!, signal),
 		select: ({ IsFavorite }) => IsFavorite || false,
-		enabled: !!item.Id, // Only run if we have the required data
-		staleTime: ONE_MINUTE * 15,
+		enabled: Boolean(item.Id) && !hasItemUserData,
+		staleTime: QueryAges.OneHour / 4,
 	})
-}
 
-export function setQueryUserDataForItems(items: BaseItemDto[]) {
-	const user = getUser()
-
-	if (!user) {
-		console.error('No user found in store')
-		return
+	return {
+		data:
+			cachedIsFavorite ??
+			(hasItemUserData ? (item.UserData?.IsFavorite ?? false) : undefined),
+		isPending: isPending && !hasItemUserData,
 	}
-
-	items.forEach((item) => {
-		if (!item.UserData) return
-
-		queryClient.setQueryData<UserItemDataDto>(UserDataQueryKey(user, item.Id!), () => {
-			return item.UserData
-		})
-	})
-}
-
-export function setQueryUserDataForItem(item: BaseItemDto, userItemData?: UserItemDataDto) {
-	const user = getUser()
-
-	const userData = userItemData || item.UserData
-
-	if (!user) {
-		console.error('No user found in store')
-		return
-	}
-
-	if (!userData) return
-
-	queryClient.setQueryData<UserItemDataDto>(UserDataQueryKey(user, item.Id!), () => {
-		return userData
-	})
 }

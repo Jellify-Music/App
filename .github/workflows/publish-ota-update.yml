@@ -30,7 +30,10 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
 
+      # Still attempt iOS when Android fails. The job fails if either does,
+      # and the release steps below only run when both published
       - name: 🍎 Publish iOS Update
+        if: ${{ !cancelled() }}
         run: bun run sendOTA:iOS
         env:
           SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}

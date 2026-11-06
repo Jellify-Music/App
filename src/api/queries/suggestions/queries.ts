@@ -4,7 +4,7 @@ import { fetchAlbumSuggestions, fetchArtistSuggestions } from './utils/suggestio
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { UndefinedInitialDataInfiniteOptions } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../client'
 
 export const DiscoverArtistsQuery = (
 	user: JellifyUser | undefined,

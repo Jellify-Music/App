@@ -1,6 +1,5 @@
 import { BaseStackParamList } from '../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 export enum DiscoverAlbumScreenType {
 	RecentlyAdded = 'RecentlyAdded',
@@ -12,14 +11,7 @@ type DiscoverStackParamList = BaseStackParamList & {
 	Albums: {
 		type: DiscoverAlbumScreenType
 	}
-	PublicPlaylists: {
-		playlists: BaseItemDto[] | undefined
-		fetchNextPage: () => void
-		hasNextPage: boolean
-		isPending: boolean
-		isFetchingNextPage: boolean
-		refetch: () => void
-	}
+	PublicPlaylists: undefined
 	SuggestedArtists: undefined
 }
 

@@ -48,20 +48,20 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 		applyHapticFeedback('success')
 		Toast.show({
 			text1:
-				variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Added to queue',
+				variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Playing later',
 			type: 'success',
 		})
 	} catch (error) {
 		applyHapticFeedback('error')
 		console.error(
-			`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'add to queue'}`,
+			`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'play later'}`,
 			error,
 		)
 		Toast.show({
 			text1:
 				variables.queuingType === QueuingType.PlayNext
 					? 'Failed to play next'
-					: 'Failed to add to queue',
+					: 'Failed to play later',
 			type: 'error',
 		})
 	}

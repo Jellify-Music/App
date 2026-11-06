@@ -6,12 +6,16 @@ interface PlayerContext {
 	activePage: number
 	freezeQueue: boolean
 	setPage: (page: number) => void
+	displayLyrics: boolean
+	setDisplayLyrics: (display: boolean) => void
 }
 
 const PlayerContext = createContext<PlayerContext>({
 	activePage: 0,
 	freezeQueue: true,
 	setPage: (page) => {},
+	displayLyrics: false,
+	setDisplayLyrics: (display) => {},
 })
 
 interface PlayerProviderProps {
@@ -24,6 +28,8 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 	const [offset, setOffset] = useState<number>(0.0)
 
 	const ref = useRef<PagerView>(null)
+
+	const [displayLyrics, setDisplayLyrics] = useState<boolean>(false)
 
 	/**
 	 * Sets the page of the {@link PagerView}.
@@ -70,6 +76,8 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 		activePage,
 		freezeQueue,
 		setPage,
+		displayLyrics,
+		setDisplayLyrics,
 	}
 
 	return (

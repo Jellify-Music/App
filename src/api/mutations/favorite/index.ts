@@ -1,6 +1,6 @@
-import { queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../client'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
-import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
+import { getUserDataApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
@@ -8,8 +8,10 @@ import { getApi, getUser, getLibrary } from '../../../stores/auth/utils'
 import { TrackQueryKeys } from '../../queries/track/keys'
 import { QueryKeys } from '../../../enums/query-keys'
 import { captureError, LoggingContext } from '../../../utils/logging'
-import { setQueryUserDataForItem } from '../../queries/user-data'
+import { setQueryUserDataForItem } from '../../queries/user-data/cache'
 import { applyHapticFeedback } from '../../../utils/haptics'
+
+export const FAVORITE_MUTATION_KEY = ['favorite']
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -74,13 +76,14 @@ function invalidateRelevantQueries(item: BaseItemDto): void {
 
 export const useAddFavorite = () => {
 	return useMutation({
+		mutationKey: FAVORITE_MUTATION_KEY,
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
 
 			if (isUndefined(api)) Promise.reject('API instance not defined')
 			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
 			else
-				return await getUserLibraryApi(api).markFavoriteItem({
+				return await getUserDataApi(api).markFavoriteItem({
 					itemId: item.Id,
 				})
 		},
@@ -111,13 +114,14 @@ export const useAddFavorite = () => {
 
 export const useRemoveFavorite = () => {
 	return useMutation({
+		mutationKey: FAVORITE_MUTATION_KEY,
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
 
 			if (isUndefined(api)) Promise.reject('API instance not defined')
 			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
 			else
-				return await getUserLibraryApi(api).unmarkFavoriteItem({
+				return await getUserDataApi(api).unmarkFavoriteItem({
 					itemId: item.Id,
 				})
 		},

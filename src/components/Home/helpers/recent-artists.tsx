@@ -1,17 +1,17 @@
 import React from 'react'
-import { H4, H5, XStack } from 'tamagui'
+import { H4, XStack } from 'tamagui'
 import { RootStackParamList } from '../../../screens/types'
 import ItemCard from '../../Global/components/Card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
-import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentArtists } from '../../../api/queries/recents'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function RecentArtists(): React.JSX.Element {
 	const recentArtistsInfiniteQuery = useRecentArtists()
@@ -20,13 +20,11 @@ export default function RecentArtists(): React.JSX.Element {
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const { horizontalItems } = useDisplayContext()
-
 	const handleHeaderPress = () => {
 		navigation.navigate('RecentArtists')
 	}
 
-	const renderItem = ({ item: recentArtist }: { item: BaseItemDto }) => (
+	const renderItem = ({ item: recentArtist }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
 			item={recentArtist}
 			caption={recentArtist.Name ?? 'Unknown Artist'}
@@ -42,7 +40,6 @@ export default function RecentArtists(): React.JSX.Element {
 					navigation,
 				})
 			}}
-			size={'10'}
 		/>
 	)
 
@@ -53,10 +50,7 @@ export default function RecentArtists(): React.JSX.Element {
 				<Icon name='arrow-right' />
 			</XStack>
 
-			<HorizontalCardList
-				data={recentArtistsInfiniteQuery.data.slice(0, horizontalItems)}
-				renderItem={renderItem}
-			/>
+			<HorizontalCardList data={recentArtistsInfiniteQuery.data} renderItem={renderItem} />
 		</AnimatedRow>
 	) : (
 		<></>

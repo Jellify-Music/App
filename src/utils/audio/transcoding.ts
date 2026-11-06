@@ -1,4 +1,4 @@
-import type { AudioBitrate } from '../../types/audio/quality'
+import type { AudioBitrate } from '../../types/Audio/quality'
 import { Platform } from 'react-native'
 
 export function parseBitrateFromTranscodingUrl(transcodingUrl: string): AudioBitrate {

@@ -46,7 +46,7 @@ export default function MiniPlayerProgress(): React.JSX.Element {
 	}))
 
 	return (
-		<YStack height='0-25' backgroundColor='borderColor' width={'100%'}>
+		<YStack height='0-25' backgroundColor='borderColor'>
 			<Animated.View
 				style={[
 					animatedStyle,
@@ -54,10 +54,10 @@ export default function MiniPlayerProgress(): React.JSX.Element {
 						height: '100%',
 						backgroundColor: theme.primary.val,
 						shadowColor: theme.darkBackground75.val,
-						shadowOffset: { width: 2, height: 0 },
+						shadowOffset: { width: 4, height: 0 },
 						shadowOpacity: 0.75,
-						shadowRadius: 1,
-						borderRadius: 4,
+						shadowRadius: 2,
+						borderRadius: 8,
 					},
 				]}
 			/>

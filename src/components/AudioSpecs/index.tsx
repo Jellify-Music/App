@@ -1,6 +1,6 @@
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ListItem, SizableText, View, YGroup, YStack } from 'tamagui'
+import { ListItem, SizableText, View, YGroup } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { RootStackParamList } from '../../screens/types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'

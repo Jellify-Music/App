@@ -1,12 +1,10 @@
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { H6, SizableText, XStack, YStack } from 'tamagui'
+import { SizableText, XStack, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
-import TextTicker from 'react-native-text-ticker'
-import { TextTickerConfig } from '../components/Player/component.config'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
 import { getApi, getLibrary } from '../stores/auth/utils'
@@ -29,6 +27,7 @@ import { useColorScheme } from 'react-native'
 import PlayerStack from './Player'
 import LoginStack from './Login'
 import PrivacyPolicyScreen from './PrivacyPolicy'
+import { Ticker } from '../components/Global/helpers/Animated/text'
 
 /**
  * The root navigation stack for Jellify. Contains all top level screens, such as the login screen
@@ -142,18 +141,18 @@ export default function Root(): React.JSX.Element {
 function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 	return (
 		<YStack gap='1' marginVertical='4' alignItems='center'>
-			<TextTicker {...TextTickerConfig}>
-				<H6 fontSize='4' fontWeight='6'>
+			<Ticker>
+				<SizableText fontSize='5' fontWeight='6'>
 					{getItemName(item)}
-				</H6>
-			</TextTicker>
+				</SizableText>
+			</Ticker>
 
 			{(item.ArtistItems?.length ?? 0) > 0 && (
-				<TextTicker {...TextTickerConfig}>
+				<Ticker>
 					<SizableText fontSize='3' fontWeight='6'>
 						{`${formatArtistNames(item.ArtistItems?.map((artist) => getItemName(artist)) ?? [])}`}
 					</SizableText>
-				</TextTicker>
+				</Ticker>
 			)}
 		</YStack>
 	)
@@ -174,11 +173,11 @@ function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
 				/>
 
 				<YStack gap={'$2'}>
-					<TextTicker {...TextTickerConfig}>
+					<Ticker>
 						<SizableText fontSize='3' fontWeight='6'>
 							{getItemName(playlist)}
 						</SizableText>
-					</TextTicker>
+					</Ticker>
 				</YStack>
 			</XStack>
 		</YStack>

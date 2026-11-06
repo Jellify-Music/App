@@ -1,6 +1,4 @@
 import { PlayerEngine } from '../../enums/player-engine'
-// Google Cast (react-native-google-cast) removed — casting is now handled
-// natively by react-native-nitro-player (it auto-routes playback to the device).
 import { useIsCasting as useNitroIsCasting, useCastState } from 'react-native-nitro-player'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'

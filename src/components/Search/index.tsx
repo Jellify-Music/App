@@ -117,6 +117,7 @@ export default function Search(): React.JSX.Element {
 										caption={formatArtistName(artistResult.Name)}
 									/>
 								)}
+								slice={false}
 							/>
 						</YStack>
 					)}

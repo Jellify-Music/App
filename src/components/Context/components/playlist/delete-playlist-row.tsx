@@ -1,35 +1,23 @@
 import navigationRef from '../../../../screens/navigation'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { StackActions } from '@react-navigation/native'
-import { ListItem, SizableText } from 'tamagui'
-import Icon from '../../../Global/components/icon'
+import { DeletePlaylistRowProps } from './types'
+import type { ContextMenuRowImageProp } from '../types'
+import ContextMenuRow from '..'
 
-export default function DeletePlaylistRow({
-	playlist,
-}: {
-	playlist: BaseItemDto
-}): React.JSX.Element {
-	return (
-		<ListItem
-			transition={'quick'}
-			opacity='1 press:0.5'
-			backgroundColor={'transparent'}
-			gap='3'
-			justifyContent='flex-start'
-			onPress={() => {
-				navigationRef.dispatch(
-					StackActions.push('DeletePlaylist', {
-						playlist,
-						onDelete: navigationRef.goBack,
-					}),
-				)
-			}}
-		>
-			<Icon size={'7'} name='delete' color='warning' />
+const IMAGE_PROP: ContextMenuRowImageProp = {
+	iconName: 'delete',
+	color: 'warning',
+}
 
-			<SizableText fontSize={'3'} fontWeight='6'>
-				Delete Playlist
-			</SizableText>
-		</ListItem>
-	)
+export default function DeletePlaylistRow({ playlist }: DeletePlaylistRowProps): React.JSX.Element {
+	const onPress = () => {
+		navigationRef.dispatch(
+			StackActions.push('DeletePlaylist', {
+				playlist,
+				onDelete: navigationRef.goBack,
+			}),
+		)
+	}
+
+	return <ContextMenuRow onPress={onPress} imageProp={IMAGE_PROP} label='Delete Playlist' />
 }

@@ -6,6 +6,7 @@ import { createContext, ReactNode, use } from 'react'
 import { isUndefined } from 'lodash'
 import { useArtistAlbums, useArtistFeaturedOn } from '../../api/queries/artist'
 import { getUser } from '../../stores/auth/utils'
+import { QueryAges } from '../../constants/durations'
 
 interface ArtistContext {
 	fetchingAlbums: boolean
@@ -58,6 +59,7 @@ export const ArtistProvider = ({
 		queryKey: [QueryKeys.SimilarItems, artist.Id],
 		queryFn: () => fetchSimilarArtists(user, artist.Id!),
 		enabled: !isUndefined(artist.Id),
+		gcTime: QueryAges.OneWeek,
 	})
 
 	const refresh = () => {

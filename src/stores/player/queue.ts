@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import { devtools, persist, PersistStorage, StorageValue } from 'zustand/middleware'
 import { RepeatMode, TrackItem } from 'react-native-nitro-player'
 import { useShallow } from 'zustand/react/shallow'
+import getTrackDto from '../../utils/mapping/track-extra-payload'
 
 /**
  * Maximum number of tracks to persist in storage.
@@ -136,6 +137,14 @@ export const useCurrentTrack = () =>
 	usePlayerQueueStore((state) =>
 		state.currentIndex !== undefined ? state.queue[state.currentIndex] : undefined,
 	)
+
+export const useCurrentTrackItemDto = () => {
+	const track = usePlayerQueueStore((state) =>
+		state.currentIndex !== undefined ? state.queue[state.currentIndex] : undefined,
+	)
+
+	return getTrackDto(track)
+}
 
 /**
  * Returns only the current track ID for efficient comparisons.

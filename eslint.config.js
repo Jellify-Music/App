@@ -4,6 +4,7 @@ const tsParser = require('@typescript-eslint/parser')
 const typescriptEslint = require('@typescript-eslint/eslint-plugin')
 const react = require('eslint-plugin-react')
 const reactNative = require('@react-native/eslint-plugin')
+const unusedImports = require('eslint-plugin-unused-imports')
 const globals = require('globals')
 const js = require('@eslint/js')
 
@@ -37,11 +38,13 @@ module.exports = defineConfig([
 			'@typescript-eslint': typescriptEslint,
 			'@react-native': reactNative,
 			react,
+			'unused-imports': unusedImports,
 		},
 
 		rules: {
 			'react/react-in-jsx-scope': 'off',
 			'@typescript-eslint/no-unused-vars': 'off',
+			'unused-imports/no-unused-imports': 'error',
 			'@typescript-eslint/no-require-imports': 'off',
 			'@typescript-eslint/no-empty-object-type': 'off',
 			'react/prop-types': 'off',
@@ -70,6 +73,21 @@ module.exports = defineConfig([
 			react: {
 				version: 'detect',
 			},
+		},
+	},
+	{
+		// Type-aware rules — these need the TypeScript program, so scope them to TS sources
+		files: ['**/*.ts', '**/*.tsx'],
+
+		languageOptions: {
+			parserOptions: {
+				projectService: true,
+				tsconfigRootDir: __dirname,
+			},
+		},
+
+		rules: {
+			'@typescript-eslint/no-deprecated': 'error',
 		},
 	},
 ])

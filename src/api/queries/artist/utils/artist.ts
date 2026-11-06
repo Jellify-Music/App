@@ -8,10 +8,9 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getArtistApi, getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/querying/index.config'
-import { setQueryUserDataForItems } from '../../user-data'
 import { getApi } from '../../../../stores/auth/utils'
 
 export function fetchArtists(
@@ -30,7 +29,9 @@ export function fetchArtists(
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
 
-		getArtistsApi(api)
+		getArtistApi(api)
+			// The SDK deprecates ArtistApi without a replacement — /Items has no album-artist filter
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			.getAlbumArtists(
 				{
 					parentId: library.musicLibraryId,
@@ -52,7 +53,6 @@ export function fetchArtists(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
@@ -69,8 +69,8 @@ export function fetchArtists(
  * @returns A promise that resolves to an array of {@link BaseItemDto}s
  */
 export function fetchArtistAlbums(
-	libraryId: string | undefined,
 	artist: BaseItemDto,
+	libraryId?: string,
 	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
@@ -79,7 +79,7 @@ export function fetchArtistAlbums(
 		if (!api) return reject('No API instance provided')
 		if (!libraryId) return reject('Library has not been set')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: libraryId,
@@ -102,7 +102,6 @@ export function fetchArtistAlbums(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
@@ -129,7 +128,7 @@ export function fetchArtistFeaturedOn(
 		if (!api) return reject('No API instance provided')
 		if (!libraryId) return reject('Library has not been set')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: libraryId,
@@ -152,7 +151,6 @@ export function fetchArtistFeaturedOn(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {

@@ -1,4 +1,4 @@
-import { queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../../api/client'
 import { PublicServerInfoQueryKey } from '../../../api/queries/public-server-info/keys'
 import JellifyStore, { JellifyStoreGet, JellifyStoreSet } from '../types'
 
