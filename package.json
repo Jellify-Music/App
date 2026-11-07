@@ -6,7 +6,7 @@
     "init-android": "bun i",
     "init-ios": "bun i && bun pod:install",
     "reinstall": "rm -rf ./node_modules && bun i",
-    "android": "react-native run-android",
+    "android": "react-native run-android --main-activity .MainActivity",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
