@@ -1536,6 +1536,29 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - react-native-app-icon-changer (1.4.2):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-blurhash (2.1.3):
     - hermes-engine
     - RCTRequired
@@ -2557,6 +2580,7 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - React-mutationobservernativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver`)
+  - react-native-app-icon-changer (from `../node_modules/react-native-app-icon-changer`)
   - react-native-blurhash (from `../node_modules/react-native-blurhash`)
   - react-native-carplay (from `../node_modules/react-native-carplay`)
   - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
@@ -2738,6 +2762,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
   React-mutationobservernativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver"
+  react-native-app-icon-changer:
+    :path: "../node_modules/react-native-app-icon-changer"
   react-native-blurhash:
     :path: "../node_modules/react-native-blurhash"
   react-native-carplay:
@@ -2914,6 +2940,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 50c4d7a1ff3f18413cbaf897c8b5ce46baa491b3
   React-microtasksnativemodule: 0207d6133274a7cbfc3d0dae326e3055c8cfcf9e
   React-mutationobservernativemodule: b97a67c29f724d18a92379e7390f24350acb433a
+  react-native-app-icon-changer: 0633ff6a25519cb5aecdc7a080bb6793c9e50bd3
   react-native-blurhash: ac6bcbc5ceeb75b207822c55c8d471b886d528e6
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
   react-native-keyboard-controller: a219cb62aef20ea0a57d849df7c03777e4492a8e

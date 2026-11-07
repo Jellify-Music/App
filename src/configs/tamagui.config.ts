@@ -75,10 +75,10 @@ type PresetModePalette = {
 
 /** Palettes per preset (purple = current Jellify themes), for Tamagui + nav */
 export const PRESET_PALETTES: Record<
-	'purple' | 'ocean' | 'forest' | 'sunset' | 'peanut',
+	'haze' | 'ocean' | 'forest' | 'sunset' | 'peanut',
 	{ light: PresetModePalette; dark: PresetModePalette; oled: PresetModePalette }
 > = {
-	purple: {
+	haze: {
 		// Matches current JellifyDarkTheme / JellifyLightTheme / JellifyOLEDTheme
 		dark: {
 			background: 'rgba(25, 24, 28, 1)',
@@ -361,7 +361,7 @@ export const PRESET_PALETTES: Record<
 	},
 }
 
-const presetNames = ['purple', 'ocean', 'forest', 'sunset', 'peanut'] as const
+const presetNames = ['haze', 'ocean', 'forest', 'sunset', 'peanut'] as const
 
 /**
  * Tamagui v3 components (ToggleGroup items, interactive frames, etc.) style their

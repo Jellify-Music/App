@@ -36,7 +36,7 @@ const JellifyFonts: Fonts = {
 }
 
 function paletteToNavTheme(
-	palette: (typeof PRESET_PALETTES)['purple']['dark'],
+	palette: (typeof PRESET_PALETTES)['haze']['dark'],
 	dark: boolean,
 ): Theme {
 	const base = dark ? DarkTheme : DefaultTheme
@@ -61,10 +61,10 @@ export function getJellifyNavTheme(preset: ColorPreset, mode: 'light' | 'dark' |
 }
 
 /** Purple dark — matches Tamagui purple_dark (current JellifyDarkTheme) */
-export const JellifyDarkTheme: Theme = paletteToNavTheme(PRESET_PALETTES.purple.dark, true)
+export const JellifyDarkTheme: Theme = paletteToNavTheme(PRESET_PALETTES.haze.dark, true)
 
 /** Purple light — matches Tamagui purple_light (current JellifyLightTheme) */
-export const JellifyLightTheme: Theme = paletteToNavTheme(PRESET_PALETTES.purple.light, false)
+export const JellifyLightTheme: Theme = paletteToNavTheme(PRESET_PALETTES.haze.light, false)
 
 /** Purple oled — matches Tamagui purple_oled (current JellifyOLEDTheme) */
-export const JellifyOLEDTheme: Theme = paletteToNavTheme(PRESET_PALETTES.purple.oled, true)
+export const JellifyOLEDTheme: Theme = paletteToNavTheme(PRESET_PALETTES.haze.oled, true)
