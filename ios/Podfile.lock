@@ -244,7 +244,7 @@ PODS:
   - React-Core (0.88.1):
     - React-Core-prebuilt
     - React-Core/Default (= 0.88.1)
-  - React-Core-prebuilt (0.88.0):
+  - React-Core-prebuilt (0.88.1):
     - ReactNativeDependencies
   - React-Core/CoreModulesHeaders (0.88.1):
     - React-Core-prebuilt
@@ -2369,7 +2369,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSentry (8.32.0):
+  - RNSentry (8.33.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2905,7 +2905,7 @@ SPEC CHECKSUMS:
   React-bridging: 48b96b1b423710103381dd90478513fff84456c4
   React-callinvoker: 8eb02682e7fc3ddc0e25a8d96eb5733c367436e8
   React-Core: 4cce9d3d50bd1544f33379cde3ae22175f6a1bcb
-  React-Core-prebuilt: 0fd2555a42f40e7770ced1c7dfc5ee1dbfe041cd
+  React-Core-prebuilt: dbd0bf94bbe1a1714bd4e27bc4f1bf33c02bb7b3
   React-CoreModules: c96f14c068269b233fcabc8add64963132a371a2
   React-cxxreact: 2956b35d64e2e5594607d359df31454a999acbed
   React-cxxstableapi: 7019410c5d74d0a60cae97b5a636cd42017370a3
@@ -2986,7 +2986,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: b5512a093e6923dd1c31fbdd8e6186cd0ebb3541
   RNReanimated: 3018727dbf272754d0f31ef73f619e49ade7baf0
   RNScreens: f15a5bda1ddeff8575b8ce41d83885b67129f84b
-  RNSentry: b9534e0dc7cf1dbea3bc185ef6ba7ac24cb30a75
+  RNSentry: 21d98c50f71f88a0197966f41c4529e044a9f11c
   RNSVG: c35beed3dcf6fd14b50ca1fc0d4214a17ec5334d
   RNWorklets: c05b04d721cccc1d44182425cd09efeddb6b1bbe
   SocketRocket: 37aec555668fb852ec12e3c0de59a86ca58f0871
