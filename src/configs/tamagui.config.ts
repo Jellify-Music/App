@@ -73,7 +73,7 @@ type PresetModePalette = {
 	albumButtonBackground: string
 }
 
-/** Palettes per preset (purple = current Jellify themes), for Tamagui + nav */
+/** Palettes per preset (haze = current Jellify themes), for Tamagui + nav */
 export const PRESET_PALETTES: Record<
 	'haze' | 'ocean' | 'forest' | 'sunset' | 'peanut',
 	{ light: PresetModePalette; dark: PresetModePalette; oled: PresetModePalette }

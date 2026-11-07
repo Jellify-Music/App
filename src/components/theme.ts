@@ -54,17 +54,17 @@ function paletteToNavTheme(
 	}
 }
 
-/** React Navigation theme for a given color preset and mode (purple_dark, ocean_light, etc.) */
+/** React Navigation theme for a given color preset and mode (haze_dark, ocean_light, etc.) */
 export function getJellifyNavTheme(preset: ColorPreset, mode: 'light' | 'dark' | 'oled'): Theme {
 	const palette = PRESET_PALETTES[preset][mode]
 	return paletteToNavTheme(palette, mode !== 'light')
 }
 
-/** Purple dark — matches Tamagui purple_dark (current JellifyDarkTheme) */
+/** Haze dark — matches Tamagui haze_dark (current JellifyDarkTheme) */
 export const JellifyDarkTheme: Theme = paletteToNavTheme(PRESET_PALETTES.haze.dark, true)
 
-/** Purple light — matches Tamagui purple_light (current JellifyLightTheme) */
+/** Haze light — matches Tamagui haze_light (current JellifyLightTheme) */
 export const JellifyLightTheme: Theme = paletteToNavTheme(PRESET_PALETTES.haze.light, false)
 
-/** Purple oled — matches Tamagui purple_oled (current JellifyOLEDTheme) */
+/** Haze oled — matches Tamagui haze_oled (current JellifyOLEDTheme) */
 export const JellifyOLEDTheme: Theme = paletteToNavTheme(PRESET_PALETTES.haze.oled, true)

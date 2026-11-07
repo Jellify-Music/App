@@ -39,8 +39,8 @@ function Row({
 }) {
 	return (
 		<GestureHandlerRootView>
-			<TamaguiProvider config={config} defaultTheme='purple_dark'>
-				<Theme name='purple_dark'>
+			<TamaguiProvider config={config} defaultTheme='haze_dark'>
+				<Theme name='haze_dark'>
 					<SwipeableRow
 						leftAction={leftAction ?? undefined}
 						leftActions={leftActions ?? undefined}

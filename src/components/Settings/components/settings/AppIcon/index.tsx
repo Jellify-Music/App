@@ -6,6 +6,8 @@ import { getActiveIcon, setIcon } from 'react-native-app-icon-changer'
 import { AppIconConfig, AppIconValue } from '../../../../../types/Artwork/icon'
 import { APP_ICONS } from '../../../../../configs/styling/icon'
 import AppIconCard from './card'
+import Toast from 'react-native-toast-message'
+import { applyHapticFeedback } from '../../../../../utils/haptics'
 
 export default function AppIconSettings(): React.JSX.Element {
 	const [selected, setSelected] = useState<AppIconValue>('Default')
@@ -22,13 +24,28 @@ export default function AppIconSettings(): React.JSX.Element {
 	const handleSelect = (appIcon: AppIconConfig) => {
 		if (appIcon.value === selected) return
 
+		applyHapticFeedback('info')
 		const previous = selected
 		setSelected(appIcon.value)
 
-		setIcon(appIcon.nativeName).catch((error) => {
-			console.warn('Unable to set app icon', error)
-			setSelected(previous)
-		})
+		setIcon(appIcon.nativeName)
+			.then(() => {
+				applyHapticFeedback('success')
+				if (Platform.OS !== 'ios') {
+					Toast.show({
+						type: 'success',
+						text1: `Updated app icon to ${appIcon.value.toLocaleLowerCase()}`,
+					})
+				}
+			})
+			.catch((error) => {
+				console.warn('Unable to set app icon', error)
+				Toast.show({
+					type: 'error',
+					text1: 'Unable to set app icon',
+				})
+				setSelected(previous)
+			})
 	}
 
 	return (
@@ -44,15 +61,23 @@ export default function AppIconSettings(): React.JSX.Element {
 				)}
 			</YStack>
 			<XStack gap='2'>
-				{APP_ICONS.map((appIcon) => (
-					<AppIconCard
-						key={appIcon.value}
-						appIcon={appIcon}
-						isSelected={selected === appIcon.value}
-						onPress={() => handleSelect(appIcon)}
-					/>
-				))}
+				<AppIconCards selected={selected} handleSelect={handleSelect} />
 			</XStack>
 		</YStack>
 	)
 }
+
+interface AppIconCardsProps {
+	selected: AppIconValue
+	handleSelect: (appIcon: AppIconConfig) => void
+}
+
+const AppIconCards = ({ selected, handleSelect }: AppIconCardsProps) =>
+	APP_ICONS.map((appIcon) => (
+		<AppIconCard
+			key={appIcon.value}
+			appIcon={appIcon}
+			isSelected={selected === appIcon.value}
+			onPress={() => handleSelect(appIcon)}
+		/>
+	))
