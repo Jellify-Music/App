@@ -8,6 +8,7 @@ import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-lab
 import { ColorPreset, ThemeSetting, useAppSettingsStore } from '../../stores/settings/app'
 import { PRESET_PALETTES } from '../../configs/tamagui.config'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
+import AppIconSettings from '../../components/Settings/components/settings/AppIcon'
 
 type ThemeOptionConfig = {
 	value: ThemeSetting
@@ -28,7 +29,7 @@ const THEME_OPTIONS: ThemeOptionConfig[] = [
 ]
 
 const COLOR_PRESETS: ColorPresetConfig[] = [
-	{ value: 'purple', label: 'Purple' },
+	{ value: 'haze', label: 'Haze' },
 	{ value: 'ocean', label: 'Ocean' },
 	{ value: 'forest', label: 'Forest' },
 	{ value: 'sunset', label: 'Sunset' },
@@ -153,6 +154,8 @@ export default function AppearanceScreen(): React.JSX.Element {
 							))}
 						</XStack>
 					</YStack>
+
+					<AppIconSettings />
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>

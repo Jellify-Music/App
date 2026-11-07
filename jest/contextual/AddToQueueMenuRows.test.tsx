@@ -23,7 +23,7 @@ describe('AddToQueueMenuRows', () => {
 
 	const renderRows = () =>
 		render(
-			<TamaguiProvider config={config} defaultTheme='purple_dark'>
+			<TamaguiProvider config={config} defaultTheme='haze_dark'>
 				<AddToQueueMenuRows tracks={tracks} />
 			</TamaguiProvider>,
 		)

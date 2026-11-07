@@ -11,7 +11,7 @@ describe('Input', () => {
 	// our numeric-only font sizes don't define, so the helper sets its own.
 	it('resolves its default font size to a number', async () => {
 		const screen = await render(
-			<TamaguiProvider config={config} defaultTheme='purple_dark'>
+			<TamaguiProvider config={config} defaultTheme='haze_dark'>
 				<Input testID='input' />
 			</TamaguiProvider>,
 		)

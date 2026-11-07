@@ -1,44 +1,13 @@
 import { Settings } from 'react-native-pulsar'
-import { mmkvStateStorage } from '../../constants/storage'
+import { mmkvStateStorage } from '../../../constants/storage'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
+import AppSettingsStore, { ColorPreset, ThemeSetting } from './types'
+import { setReducedHaptics } from './utils/set'
+import { migrate } from './utils/migrate'
 
-export type ThemeSetting = 'system' | 'light' | 'dark' | 'oled'
-export type ColorPreset = 'purple' | 'ocean' | 'forest' | 'sunset' | 'peanut'
-
-type AppSettingsStore = {
-	sendMetrics: boolean
-	setSendMetrics: (sendMetrics: boolean) => void
-
-	hideRunTimes: boolean
-	setHideRunTimes: (hideRunTimes: boolean) => void
-
-	reducedHaptics: boolean
-
-	/**
-	 * Sets the system setting for reduced haptics.
-	 *
-	 * Calls {@link Settings.enableHaptics} to enable / disable
-	 * haptics in `react-native-pulsar`
-	 *
-	 * @param reducedHaptics Whether haptics should be reduced
-	 */
-	setReducedHaptics: (reducedHaptics: boolean) => void
-
-	theme: ThemeSetting
-	setTheme: (theme: ThemeSetting) => void
-
-	/**
-	 * Hides the triangular indicators on the corners of albums and playlists on the
-	 * Home and Discover screens
-	 */
-	hideItemIndicators: boolean
-	setHideItemIndicators: (hideItemIndicators: boolean) => void
-
-	colorPreset: ColorPreset
-	setColorPreset: (colorPreset: ColorPreset) => void
-}
+export type { ColorPreset, ThemeSetting } from './types'
 
 export const useAppSettingsStore = create<AppSettingsStore>()(
 	devtools(
@@ -52,10 +21,7 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 
 				reducedHaptics: false,
 
-				setReducedHaptics: (reducedHaptics: boolean) => {
-					Settings.enableHaptics(!reducedHaptics)
-					set({ reducedHaptics })
-				},
+				setReducedHaptics: setReducedHaptics(set),
 
 				theme: 'system',
 				setTheme: (theme: ThemeSetting) => set({ theme }),
@@ -63,12 +29,14 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 				hideItemIndicators: false,
 				setHideItemIndicators: (hideItemIndicators: boolean) => set({ hideItemIndicators }),
 
-				colorPreset: 'purple',
+				colorPreset: 'haze',
 				setColorPreset: (colorPreset: ColorPreset) => set({ colorPreset }),
 			}),
 			{
 				name: 'app-settings-storage',
 				storage: createJSONStorage(() => mmkvStateStorage),
+				version: 1,
+				migrate,
 				onRehydrateStorage: ({ reducedHaptics }) => {
 					Settings.enableHaptics(!reducedHaptics)
 				},
