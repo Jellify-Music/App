@@ -125,7 +125,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.14.1)
-  - NitroPlayer (1.8.0):
+  - NitroPlayer (1.9.0-alpha.0):
     - google-cast-sdk (~> 4.8)
     - hermes-engine
     - NitroModules
@@ -1559,8 +1559,6 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-carplay (2.4.1-beta.0):
-    - React
   - react-native-keyboard-controller (1.22.9):
     - hermes-engine
     - RCTRequired
@@ -1631,7 +1629,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-pager-view (9.0.11):
+  - react-native-pager-view (8.0.4):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2558,7 +2556,6 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - React-mutationobservernativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver`)
   - react-native-blurhash (from `../node_modules/react-native-blurhash`)
-  - react-native-carplay (from `../node_modules/react-native-carplay`)
   - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
@@ -2740,8 +2737,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver"
   react-native-blurhash:
     :path: "../node_modules/react-native-blurhash"
-  react-native-carplay:
-    :path: "../node_modules/react-native-carplay"
   react-native-keyboard-controller:
     :path: "../node_modules/react-native-keyboard-controller"
   react-native-netinfo:
@@ -2870,7 +2865,7 @@ SPEC CHECKSUMS:
   NitroModules: c32f969b7c536e0b6b401a9dfdb35bb4eba071ef
   NitroOta: 69d600c03b82cb15bab1b9e7a110de60071db2e8
   NitroOtaBundleManager: 69b9999f64febbf2470c62bd76c90993daa75929
-  NitroPlayer: 2b6661d2b430412e488a85b2764e567c8543c3af
+  NitroPlayer: 5204b381c3d3c286c56606bebbd2b9fcb1ce53cc
   NitroSuperconfig: c58fbdb4a975776d2e2a0be596763d5a7513153f
   Pulsar: f6701d83d2995ffc8af1618fd1470946c4913143
   PulsarHaptics: 62d13e9ef63535263f110a925e587d5d027dc683
@@ -2915,10 +2910,9 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: 0207d6133274a7cbfc3d0dae326e3055c8cfcf9e
   React-mutationobservernativemodule: b97a67c29f724d18a92379e7390f24350acb433a
   react-native-blurhash: ac6bcbc5ceeb75b207822c55c8d471b886d528e6
-  react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
   react-native-keyboard-controller: a219cb62aef20ea0a57d849df7c03777e4492a8e
   react-native-netinfo: 687391ecedb199c6d67fbc46c87cbae3277de967
-  react-native-pager-view: b5d7055004441b835a643b927af7121d96f4c813
+  react-native-pager-view: b50ece85f1aa37b9ceeb8c421819012c66b7cf18
   react-native-safe-area-context: e6b7da4a15e6d491e90442715412d9dbb059ac4d
   react-native-turbo-image: 7b5b269e32c211a05e3c07d55695295ae294354c
   react-native-vector-icons-material-design-icons: 811f6c4447a60d8a66394644093dcffdc546772f

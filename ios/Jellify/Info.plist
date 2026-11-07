@@ -74,7 +74,7 @@
 					<key>UISceneConfigurationName</key>
 					<string>CarPlay</string>
 					<key>UISceneDelegateClassName</key>
-					<string>$(PRODUCT_MODULE_NAME).CarSceneDelegate</string>
+					<string>NitroPlayerCarPlaySceneDelegate</string>
 				</dict>
 			</array>
 			<key>UIWindowSceneSessionRoleApplication</key>
