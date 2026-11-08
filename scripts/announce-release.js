@@ -2,7 +2,8 @@
  * Announces a release on Discord.
  *
  * Reads DISCORD_WEBHOOK_URL, RELEASE_KIND (full or ota), RELEASE_TITLE, RELEASE_URL and
- * RELEASE_NOTES from the environment.
+ * RELEASE_NOTES from the environment. When DISCORD_RELEASE_ROLE_ID is set, the
+ * announcement pings that role.
  */
 
 const TESTFLIGHT_URL = 'https://testflight.apple.com/join/etVSc7ZQ'
@@ -16,6 +17,7 @@ const {
 	RELEASE_TITLE,
 	RELEASE_URL,
 	RELEASE_NOTES = '',
+	DISCORD_RELEASE_ROLE_ID,
 } = process.env
 
 if (!DISCORD_WEBHOOK_URL || !RELEASE_TITLE || !RELEASE_URL) {
@@ -47,7 +49,12 @@ const embed = {
 const res = await fetch(DISCORD_WEBHOOK_URL, {
 	method: 'POST',
 	headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ embeds: [embed] }),
+	// Mentions inside an embed never ping, so the role goes in the message content
+	body: JSON.stringify({
+		...(DISCORD_RELEASE_ROLE_ID && { content: `<@&${DISCORD_RELEASE_ROLE_ID}>` }),
+		embeds: [embed],
+		allowed_mentions: { roles: DISCORD_RELEASE_ROLE_ID ? [DISCORD_RELEASE_ROLE_ID] : [] },
+	}),
 })
 
 if (!res.ok) {
