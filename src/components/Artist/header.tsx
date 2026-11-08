@@ -15,6 +15,8 @@ import { useArtistTracks } from '../../api/queries/track'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { loadNewQueue } from '../../player/queuing'
 import { ImageUrlOptions } from '../../api/queries/image/utils'
+import { handleError } from '../../utils/errors'
+import { LoggingContext } from '../../utils/logging'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const api = getApi()
@@ -45,7 +47,7 @@ export default function ArtistHeader(): React.JSX.Element {
 				startPlayback: true,
 			})
 		} catch (error) {
-			console.error('Failed to play artist tracks:', error)
+			handleError(error, LoggingContext.Queue, `Failed to play ${artist.Name ?? 'artist'}`)
 		}
 	}
 

@@ -7,6 +7,8 @@ import { invalidatePlaylistTracks } from '../../../../api/queries/playlist/cache
 import { RemoveFromPlaylistRowProps } from './types'
 import type { ContextMenuRowImageProp } from '../types'
 import ContextMenuRow from '..'
+import { handleError } from '../../../../utils/errors'
+import { LoggingContext } from '../../../../utils/logging'
 
 const IMAGE_PROP: ContextMenuRowImageProp = {
 	iconName: 'playlist-remove',
@@ -26,8 +28,8 @@ export default function RemoveFromPlaylistRow({
 			invalidatePlaylistTracks(playlist)
 			navigationRef.goBack()
 		},
-		onError: () => {
-			applyHapticFeedback('error')
+		onError: (error) => {
+			handleError(error, LoggingContext.Playlist, 'Failed to remove from playlist')
 		},
 	})
 

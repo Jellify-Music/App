@@ -1,15 +1,16 @@
 import { useMutation } from '@tanstack/react-query'
 import { connectToServer } from './utils'
 import type { SetServerParams } from '../../../stores/auth/types'
-import { captureError, LoggingContext } from '../../../utils/logging'
 import useJellifyStore from '../../../stores/auth'
 import type {
 	ConnectToServerParams,
 	PublicSystemInfoMutation,
 	ConnectToServerResult,
 } from './types'
+import LoggingContext from '../../../utils/logging/enums'
+import { handleError } from '../../../utils/errors'
 
-const useConnectToServer = ({ onSuccess, onError }: ConnectToServerParams) =>
+const useConnectToServer = ({ onSuccess }: ConnectToServerParams) =>
 	useMutation<ConnectToServerResult, Error, PublicSystemInfoMutation>({
 		mutationFn: ({ serverAddress }) => connectToServer(serverAddress),
 		onSuccess: ({ publicSystemInfoResponse, resolvedUrl }, { serverAddress }) => {
@@ -29,16 +30,15 @@ const useConnectToServer = ({ onSuccess, onError }: ConnectToServerParams) =>
 
 			onSuccess?.(server)
 		},
-		onError: (error: Error) => {
-			captureError(
-				error,
-				LoggingContext.PublicSystemInfo,
-				'An error occurred connecting to the Jellyfin instance',
-			)
-
+		onError: (error: Error, { serverAddress }) => {
 			useJellifyStore.getState().setServer(undefined)
 
-			onError?.(error)
+			handleError(
+				error,
+				LoggingContext.PublicSystemInfo,
+				`Unable to connect to ${serverAddress}`,
+				'Unable to connect to server',
+			)
 		},
 	})
 
