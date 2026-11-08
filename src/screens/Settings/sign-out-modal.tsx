@@ -9,12 +9,15 @@ import { DownloadManager, TrackPlayer } from 'react-native-nitro-player'
 import navigationRef from '../navigation'
 import resetQueue from '../../player/queuing/reset'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useSignOut } from '../../stores/auth'
 
 export default function SignOutModal(): React.JSX.Element {
 	const { data: server } = usePublicServerInfo()
 
 	const settingsStackNavigation =
 		useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+
+	const signOut = useSignOut()
 
 	const clearDownloads = async () => {
 		await DownloadManager.deleteAllDownloads()
@@ -40,6 +43,7 @@ export default function SignOutModal(): React.JSX.Element {
 
 		await clearDownloads()
 		resetQueue()
+		signOut()
 	}
 
 	return (
