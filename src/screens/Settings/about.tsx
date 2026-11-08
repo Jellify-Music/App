@@ -54,17 +54,17 @@ export default function AboutScreen(): React.JSX.Element {
 					<YStack gap='1'>
 						<XStack alignItems='center' gap='2' testID='jellify-version-text'>
 							<Icon name='jellyfish' color='primary' />
-							<SizableText fontSize='3' fontWeight='6'>
+							<SizableText fontSize='4' fontWeight='6'>
 								Jellify {version}
 							</SizableText>
 						</XStack>
 						{caption && (
-							<SizableText fontSize='2' color='borderColor'>
+							<SizableText fontSize='3' color='borderColor'>
 								{caption}
 							</SizableText>
 						)}
 						{otaVersion && (
-							<SizableText fontSize='2' color='borderColor'>
+							<SizableText fontSize='3' color='borderColor'>
 								OTA Version: {otaVersion}
 							</SizableText>
 						)}
@@ -81,7 +81,7 @@ export default function AboutScreen(): React.JSX.Element {
 							testID='jellify-source-link'
 						>
 							<Icon name='code-tags' size='7' color='borderColor' />
-							<SizableText fontSize='2' fontWeight='4'>
+							<SizableText fontSize='3' fontWeight='4'>
 								Source
 							</SizableText>
 						</XStack>
@@ -94,7 +94,7 @@ export default function AboutScreen(): React.JSX.Element {
 							testID='jellify-privacy-link'
 						>
 							<Icon name='shield-account' size='7' color='borderColor' />
-							<SizableText fontSize='2' fontWeight='4'>
+							<SizableText fontSize='3' fontWeight='4'>
 								Privacy Policy
 							</SizableText>
 						</XStack>
@@ -106,14 +106,14 @@ export default function AboutScreen(): React.JSX.Element {
 							onPress={() => downloadUpdate(true)}
 						>
 							<Icon name='cellphone-arrow-down' size='7' color='success' />
-							<SizableText fontSize='2' fontWeight='4'>
+							<SizableText fontSize='3' fontWeight='4'>
 								Update
 							</SizableText>
 						</XStack>
 					</XStack>
 
 					<YStack gap='2'>
-						<SizableText fontSize='2' fontWeight='6'>
+						<SizableText fontSize='3' fontWeight='6'>
 							Caught a bug?
 						</SizableText>
 						<XStack gap='4' flexWrap='wrap'>
@@ -127,7 +127,7 @@ export default function AboutScreen(): React.JSX.Element {
 								testID='jellify-report-issue'
 							>
 								<Icon name='github' size='7' color='warning' />
-								<SizableText fontSize='2' fontWeight='4'>
+								<SizableText fontSize='3' fontWeight='4'>
 									Report Issue
 								</SizableText>
 							</XStack>
@@ -139,7 +139,7 @@ export default function AboutScreen(): React.JSX.Element {
 								testID='jellify-join-discord'
 							>
 								<Icon name='chat' size='7' color='secondary' />
-								<SizableText fontSize='2' fontWeight='4'>
+								<SizableText fontSize='3' fontWeight='4'>
 									Join Discord
 								</SizableText>
 							</XStack>
@@ -157,7 +157,7 @@ export default function AboutScreen(): React.JSX.Element {
 					borderWidth='1'
 					testID='jellify-wall-of-fame'
 				>
-					<SizableText fontSize='2' fontWeight='6'>
+					<SizableText fontSize='4' fontWeight='6'>
 						Wall of Fame
 					</SizableText>
 					<XStack gap='4' flexWrap='wrap'>
@@ -171,7 +171,7 @@ export default function AboutScreen(): React.JSX.Element {
 							testID='jellify-sponsors-link'
 						>
 							<Icon name='github' size='7' color='primary' />
-							<SizableText fontSize='2' fontWeight='4'>
+							<SizableText fontSize='3' fontWeight='4'>
 								Sponsors
 							</SizableText>
 						</XStack>
@@ -185,7 +185,7 @@ export default function AboutScreen(): React.JSX.Element {
 							testID='jellify-patreon-link'
 						>
 							<Icon name='patreon' size='7' color='danger' />
-							<SizableText fontSize='2' fontWeight='4'>
+							<SizableText fontSize='3' fontWeight='4'>
 								Patreon
 							</SizableText>
 						</XStack>
@@ -197,7 +197,7 @@ export default function AboutScreen(): React.JSX.Element {
 							testID='jellify-ko-fi-link'
 						>
 							<Icon name='coffee-outline' size='7' color='warning' />
-							<SizableText fontSize='2' fontWeight='4'>
+							<SizableText fontSize='3' fontWeight='4'>
 								Ko-fi
 							</SizableText>
 						</XStack>
@@ -215,7 +215,7 @@ export default function AboutScreen(): React.JSX.Element {
 					borderWidth='1'
 				>
 					<YStack gap='1'>
-						<SizableText fontSize='2' fontWeight='6'>
+						<SizableText fontSize='4' fontWeight='6'>
 							Special Thanks
 						</SizableText>
 						<PatronsList patrons={specialThanks} />
