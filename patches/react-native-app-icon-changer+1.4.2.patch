@@ -1,0 +1,56 @@
+diff --git a/node_modules/react-native-app-icon-changer/android/src/main/java/com/appiconchanger/AppIconChangerModule.kt b/node_modules/react-native-app-icon-changer/android/src/main/java/com/appiconchanger/AppIconChangerModule.kt
+index 30dea8c..ef60e52 100644
+--- a/node_modules/react-native-app-icon-changer/android/src/main/java/com/appiconchanger/AppIconChangerModule.kt
++++ b/node_modules/react-native-app-icon-changer/android/src/main/java/com/appiconchanger/AppIconChangerModule.kt
+@@ -50,6 +50,23 @@ class AppIconChangerModule(
+         return NAME
+     }
+ 
++    // The launching activity's class is the real MainActivity (whose namespace may differ from
++    // the applicationId), not the alias, so ask PackageManager which alias is enabled instead
++    private fun enabledAliasClass(): String? {
++        val packageManager = reactApplicationContext.packageManager
++        return packageManager.getPackageInfo(
++            packageName,
++            PackageManager.GET_ACTIVITIES or PackageManager.GET_DISABLED_COMPONENTS
++        ).activities?.firstOrNull { activityInfo ->
++            activityInfo.targetActivity != null &&
++                when (packageManager.getComponentEnabledSetting(ComponentName(packageName, activityInfo.name))) {
++                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
++                    PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> activityInfo.enabled
++                    else -> false
++                }
++        }?.name
++    }
++
+     @ReactMethod
+     fun getActiveIcon(promise: Promise) {
+         val activity: Activity? = reactApplicationContext.currentActivity
+@@ -58,7 +75,7 @@ class AppIconChangerModule(
+             return
+         }
+ 
+-        val activityName = activity.componentName.className
++        val activityName = pendingNewClass ?: enabledAliasClass() ?: activity.componentName.className
+ 
+         if (activityName.endsWith(MAIN_ACTIVITY_BASE_NAME)) {
+             promise.resolve("Default")
+@@ -189,7 +206,7 @@ class AppIconChangerModule(
+         }
+ 
+         if (componentClass.isEmpty()) {
+-            componentClass = activity.componentName.className
++            componentClass = enabledAliasClass() ?: "$packageName${MAIN_ACTIVITY_BASE_NAME}Default"
+             Log.d(TAG, "Initial component class set to: $componentClass")
+         }
+ 
+@@ -216,6 +233,9 @@ class AppIconChangerModule(
+             Log.d(TAG, "Added current class to kill list: $componentClass")
+         }
+ 
++        // Switching back (e.g. Default -> Trans -> Default) must not disable the target
++        classesToKill.remove(activeClass)
++
+         if (!isCallbackRegistered) {
+             try {
+                 unregisterCallbackIfNeeded()
