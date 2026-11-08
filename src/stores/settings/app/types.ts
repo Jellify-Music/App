@@ -1,7 +1,5 @@
 import { StateCreator } from 'zustand'
-
-export type ThemeSetting = 'system' | 'light' | 'dark' | 'oled'
-export type ColorPreset = 'haze' | 'ocean' | 'forest' | 'sunset' | 'peanut'
+import type { ColorPreset, Appearance } from '../../../types/theme'
 
 type AppSettingsStoreMutators = [['zustand/devtools', never], ['zustand/persist', unknown]]
 
@@ -28,8 +26,8 @@ type AppSettingsStore = {
 	 */
 	setReducedHaptics: (reducedHaptics: boolean) => void
 
-	theme: ThemeSetting
-	setTheme: (theme: ThemeSetting) => void
+	theme: Appearance
+	setTheme: (theme: Appearance) => void
 
 	/**
 	 * Hides the triangular indicators on the corners of albums and playlists on the
