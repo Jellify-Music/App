@@ -16,6 +16,8 @@ import { getApi } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import navigationRef from '../../../screens/navigation'
 import { applyHapticFeedback } from '../../../utils/haptics'
+import { handleError } from '../../../utils/errors'
+import { LoggingContext } from '../../../utils/logging'
 
 export const useAddPlaylist = () => {
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -43,8 +45,8 @@ export const useAddPlaylist = () => {
 
 			libraryStackNavigation.goBack()
 		},
-		onError: () => {
-			applyHapticFeedback('error')
+		onError: (error) => {
+			handleError(error, LoggingContext.Playlist, 'Failed to create playlist')
 		},
 	})
 }
@@ -65,8 +67,8 @@ export const useDeletePlaylist = () => {
 			navigationRef.goBack() // Dismiss DeletePlaylist sheet
 			navigationRef.goBack() // Pop Playlist screen or Context sheet if open
 		},
-		onError: () => {
-			applyHapticFeedback('error')
+		onError: (error) => {
+			handleError(error, LoggingContext.Playlist, 'Failed to delete playlist')
 		},
 	})
 }
@@ -106,7 +108,10 @@ export const useUpdatePlaylist = ({
 			refreshCarPlayLibrary(`playlist:${playlist.Id}`)
 			applyHapticFeedback('success')
 		},
-		onError: onError,
+		onError: (error) => {
+			handleError(error, LoggingContext.Playlist, 'Failed to update playlist')
+			onError?.()
+		},
 		onSettled: onSettled,
 	})
 }
