@@ -1,7 +1,7 @@
 import { DarkTheme, DefaultTheme } from '@react-navigation/native'
 import type { Theme } from '@react-navigation/native'
-import { PRESET_PALETTES } from '../configs/tamagui.config'
-import type { ColorPreset } from '../stores/settings/app'
+import { PRESET_PALETTES } from '../configs/styling/themes'
+import type { ColorPreset } from '../types/theme'
 
 interface Fonts {
 	regular: FontStyle

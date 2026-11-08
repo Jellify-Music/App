@@ -1,4 +1,5 @@
-import AppSettingsStore, { ColorPreset } from '../types'
+import AppSettingsStore from '../types'
+import type { ColorPreset } from '../../../../types/theme'
 
 export const migrate = (persistedState: unknown, version: number): AppSettingsStore => {
 	const state = persistedState as Omit<AppSettingsStore, 'colorPreset'> & {
