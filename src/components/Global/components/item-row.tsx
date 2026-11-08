@@ -22,7 +22,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { useSwipeableRowContext } from './SwipeableRow/context'
 import SwipeableRow from './SwipeableRow'
-import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
+import { useSwipeSettingsStore } from '../../../stores/settings/gestures'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'

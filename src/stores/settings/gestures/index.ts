@@ -1,18 +1,10 @@
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
-import { mmkvStateStorage } from '../../constants/storage'
+import { mmkvStateStorage } from '../../../constants/storage'
+import { SwipeActionType, SwipeSettingsStore } from './types'
+import { setLeft, setRight, toggleLeft, toggleRight } from './utils/set'
 
-export type SwipeActionType = 'AddToQueue' | 'ToggleFavorite' | 'AddToPlaylist' | 'PlayNext'
-
-type SwipeSettingsStore = {
-	left: SwipeActionType[] // actions when swiping LEFT on a track row
-	right: SwipeActionType[] // actions when swiping RIGHT on a track row
-
-	setLeft: (actions: SwipeActionType[]) => void
-	setRight: (actions: SwipeActionType[]) => void
-	toggleLeft: (action: SwipeActionType) => void
-	toggleRight: (action: SwipeActionType) => void
-}
+export type { SwipeActionType } from './types'
 
 const DEFAULT_LEFT: SwipeActionType[] = ['ToggleFavorite', 'AddToPlaylist']
 const DEFAULT_RIGHT: SwipeActionType[] = ['AddToQueue']
@@ -23,24 +15,10 @@ export const useSwipeSettingsStore = create<SwipeSettingsStore>()(
 			(set, get) => ({
 				left: DEFAULT_LEFT,
 				right: DEFAULT_RIGHT,
-				setLeft: (actions) => set({ left: actions }),
-				setRight: (actions) => set({ right: actions }),
-				toggleLeft: (action) => {
-					const cur = get().left
-					set({
-						left: cur.includes(action)
-							? cur.filter((a) => a !== action)
-							: [...cur, action],
-					})
-				},
-				toggleRight: (action) => {
-					const cur = get().right
-					set({
-						right: cur.includes(action)
-							? cur.filter((a) => a !== action)
-							: [...cur, action],
-					})
-				},
+				setLeft: setLeft(set),
+				setRight: setRight(set),
+				toggleLeft: toggleLeft(set, get),
+				toggleRight: toggleRight(set, get),
 			}),
 			{
 				name: 'swipe-settings-storage',
