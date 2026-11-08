@@ -15,12 +15,13 @@ import {
 	bottomSheetPresentation,
 	playerSheetPresentation,
 } from '../utils/navigating/form-sheet'
-import { createStaticNavigation } from '@react-navigation/native'
+import { createStaticNavigation, InitialState } from '@react-navigation/native'
 import navigationRef from './navigation'
 import { navigationIntegration } from '../utils/logging/sentry'
 import { getJellifyNavTheme } from '../components/theme'
 import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
 import { useColorScheme } from 'react-native'
+import { useState } from 'react'
 import PlayerStack from './Player'
 import LoginStack from './Login'
 import PrivacyPolicyScreen from './PrivacyPolicy'
@@ -32,7 +33,6 @@ import { Ticker } from '../components/Global/helpers/Animated/text'
  * the app (e.g. the player, context menu, filters, etc).
  */
 const RootStack = createNativeStackNavigator<RootStackParamList>({
-	initialRouteName: getApi() && getLibrary() ? 'Tabs' : 'Login',
 	screens: {
 		Login: {
 			screen: LoginStack,
@@ -116,9 +116,16 @@ export default function Root(): React.JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark'
 	const resolvedMode = theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme
 
+	// Resolved on mount rather than at module load, since Android can recreate the activity
+	// (e.g. after switching app icons) while the JS runtime, and the user's session, live on
+	const [initialState] = useState<InitialState>(() => ({
+		routes: [{ name: getApi() && getLibrary() ? 'Tabs' : 'Login' }],
+	}))
+
 	return (
 		<RootNavigation
 			ref={navigationRef}
+			initialState={initialState}
 			theme={getJellifyNavTheme(colorPreset, resolvedMode)}
 			onReady={() => navigationIntegration.registerNavigationContainer(navigationRef)}
 		/>
