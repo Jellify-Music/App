@@ -1,6 +1,6 @@
 import { QuickAction, SwipeAction } from '../../../hooks/gestures/types'
 import type { EventHandler } from '../../../types/Events'
-import { SwipeActionType } from '../../../stores/settings/swipe'
+import { SwipeActionType } from '../../../stores/settings/gestures'
 
 export type SwipeHandlers = {
 	addToQueue: EventHandler
