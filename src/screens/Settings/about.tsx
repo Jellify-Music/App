@@ -82,9 +82,23 @@ export default function AboutScreen(): React.JSX.Element {
 						>
 							<Icon name='code-tags' size='7' color='borderColor' />
 							<SizableText fontSize='2' fontWeight='4'>
-								View Source
+								Source
 							</SizableText>
 						</XStack>
+
+						<XStack
+							alignItems='center'
+							gap='1'
+							{...ICON_PRESS_STYLES}
+							onPress={() => Linking.openURL('https://jellify.app/privacy')}
+							testID='jellify-privacy-link'
+						>
+							<Icon name='shield-account' size='7' color='borderColor' />
+							<SizableText fontSize='2' fontWeight='4'>
+								Privacy Policy
+							</SizableText>
+						</XStack>
+
 						<XStack
 							alignItems='center'
 							gap='1'
