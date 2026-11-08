@@ -28,6 +28,7 @@ export default function RecentPlaylists(): React.JSX.Element {
 		<ItemCard
 			item={recentPlaylist}
 			caption={recentPlaylist.Name ?? 'Unknown Playlist'}
+			captionAlign='left'
 			subCaption={pickFirstGenre(recentPlaylist.Genres)}
 			onPress={() => {
 				navigation.navigate('Playlist', {

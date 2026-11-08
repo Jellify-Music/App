@@ -1,4 +1,5 @@
 import React from 'react'
+import { APP_REPO_URL, PRIVACY_POLICY_URL } from '../../configs/config'
 import { Linking } from 'react-native'
 import { YStack, XStack, SizableText, ScrollView, Separator, Spacer } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -77,14 +78,28 @@ export default function AboutScreen(): React.JSX.Element {
 							alignItems='center'
 							gap='1'
 							{...ICON_PRESS_STYLES}
-							onPress={() => Linking.openURL('https://github.com/Jellify-Music/App')}
+							onPress={() => Linking.openURL(APP_REPO_URL)}
 							testID='jellify-source-link'
 						>
 							<Icon name='code-tags' size='7' color='borderColor' />
 							<SizableText fontSize='2' fontWeight='4'>
-								View Source
+								Source
 							</SizableText>
 						</XStack>
+
+						<XStack
+							alignItems='center'
+							gap='1'
+							{...ICON_PRESS_STYLES}
+							onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+							testID='jellify-privacy-link'
+						>
+							<Icon name='shield-account' size='7' color='borderColor' />
+							<SizableText fontSize='2' fontWeight='4'>
+								Privacy Policy
+							</SizableText>
+						</XStack>
+
 						<XStack
 							alignItems='center'
 							gap='1'
@@ -143,7 +158,7 @@ export default function AboutScreen(): React.JSX.Element {
 					borderWidth='1'
 					testID='jellify-wall-of-fame'
 				>
-					<SizableText fontSize='2' fontWeight='6'>
+					<SizableText fontSize='3' fontWeight='6'>
 						Wall of Fame
 					</SizableText>
 					<XStack gap='4' flexWrap='wrap'>
@@ -201,7 +216,7 @@ export default function AboutScreen(): React.JSX.Element {
 					borderWidth='1'
 				>
 					<YStack gap='1'>
-						<SizableText fontSize='2' fontWeight='6'>
+						<SizableText fontSize='3' fontWeight='6'>
 							Special Thanks
 						</SizableText>
 						<PatronsList patrons={specialThanks} />
