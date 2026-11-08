@@ -1,4 +1,4 @@
-import React from 'react'
+import { PRIVACY_POLICY_URL } from '../../configs/config'
 import { Linking } from 'react-native'
 import { YStack, XStack, SizableText, ScrollView, Separator, Spacer } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -90,7 +90,7 @@ export default function AboutScreen(): React.JSX.Element {
 							alignItems='center'
 							gap='1'
 							{...ICON_PRESS_STYLES}
-							onPress={() => Linking.openURL('https://jellify.app/privacy')}
+							onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
 							testID='jellify-privacy-link'
 						>
 							<Icon name='shield-account' size='7' color='borderColor' />
