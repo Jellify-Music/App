@@ -3,17 +3,20 @@ import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
 import { JellifyUser } from '../../../types/JellifyUser'
 import { useApi, useJellifyUser } from '../../../stores/auth'
+import { usePublicServerInfo } from '../../queries/public-server-info'
 import authenticateUserByName from './utils'
-import { captureError, LoggingContext } from '../../../utils/logging'
+import { handleError } from '../../../utils/errors'
+import { LoggingContext } from '../../../utils/logging'
 
 interface AuthenticateUserByNameMutation {
 	onSuccess?: () => void
-	onError?: (error: Error) => void
 }
 
-const useAuthenticateUserByName = ({ onSuccess, onError }: AuthenticateUserByNameMutation) => {
+const useAuthenticateUserByName = ({ onSuccess }: AuthenticateUserByNameMutation) => {
 	const api = useApi()
 	const [, setUser] = useJellifyUser()
+
+	const { data: serverInfo } = usePublicServerInfo()
 
 	return useMutation({
 		mutationFn: (credentials: JellyfinCredentials) => {
@@ -31,13 +34,12 @@ const useAuthenticateUserByName = ({ onSuccess, onError }: AuthenticateUserByNam
 			if (onSuccess) onSuccess()
 		},
 		onError: (error: Error) => {
-			captureError(
+			handleError(
 				error,
 				LoggingContext.Authentication,
-				'An error occurred connecting to the Jellyfin instance',
+				`Unable to sign in to ${serverInfo?.ServerName ?? 'Jellyfin'}`,
+				'Unable to sign in to server',
 			)
-
-			if (onError) onError(error)
 		},
 		retry: 0,
 		gcTime: 0,

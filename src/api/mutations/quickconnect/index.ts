@@ -5,11 +5,12 @@ import { JellifyUser } from '../../../types/JellifyUser'
 import { isUndefined } from 'lodash'
 import { getAuthenticationApi } from '@jellyfin/sdk/lib/utils/api'
 import { useNavigation } from '@react-navigation/native'
-import LoginStackParamList from '@/src/screens/Login/types'
+import LoginStackParamList from '../../../screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyUser } from '../../../stores/auth'
-import Toast from 'react-native-toast-message'
+import { handleError } from '../../../utils/errors'
+import { LoggingContext } from '../../../utils/logging'
 
 export const useInitiateQuickConnect = () => {
 	const api = getApi()
@@ -21,12 +22,7 @@ export const useInitiateQuickConnect = () => {
 			return await getAuthenticationApi(api).initiateQuickConnect()
 		},
 		onError: async (error: Error) => {
-			Toast.show({
-				text1: 'Unable to initiate Quick Connect',
-				text2: error.message,
-				type: 'error',
-			})
-			console.error('An error occurred initiating Quick Connect', error)
+			handleError(error, LoggingContext.Authentication, 'Unable to initiate Quick Connect')
 		},
 		onSuccess: async ({ data }, variables) => {
 			console.log(`Successfully initiated Quick Connect. Code is ${data.Code}`)
@@ -87,7 +83,11 @@ const useAuthenticateWithQuickConnect = () => {
 			navigation.navigate('LibrarySelection')
 		},
 		onError: async (error: Error) => {
-			console.error('An error occurred connecting to the Jellyfin instance', error)
+			handleError(
+				error,
+				LoggingContext.Authentication,
+				'Unable to sign in with Quick Connect',
+			)
 		},
 		retry: 0,
 		gcTime: 0,

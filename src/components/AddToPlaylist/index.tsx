@@ -13,6 +13,8 @@ import { appendPlaylistTracks } from '../../api/queries/playlist/cache'
 import List from '../Global/components/Lists/utils'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { applyHapticFeedback } from '../../utils/haptics'
+import { handleError } from '../../utils/errors'
+import { LoggingContext } from '../../utils/logging'
 
 export default function AddToPlaylist({
 	tracks,
@@ -116,8 +118,11 @@ function AddToPlaylistRow({
 			appendPlaylistTracks(playlist, tracks)
 		},
 		onError: (error) => {
-			console.error(error)
-			applyHapticFeedback('error')
+			handleError(
+				error,
+				LoggingContext.Playlist,
+				`Failed to add to ${playlist.Name ?? 'playlist'}`,
+			)
 		},
 	})
 

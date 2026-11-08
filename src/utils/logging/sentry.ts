@@ -8,6 +8,19 @@ export const navigationIntegration = Sentry.reactNavigationIntegration({
 
 let started = false
 
+/**
+ * Strips the server address and query string from HTTP breadcrumbs before sending them to Sentry.
+ */
+const beforeBreadcrumb = (breadcrumb: Sentry.Breadcrumb) => {
+	if (
+		(breadcrumb.category === 'xhr' || breadcrumb.category === 'fetch') &&
+		typeof breadcrumb.data?.url === 'string'
+	) {
+		breadcrumb.data.url = breadcrumb.data.url.replace(/^[a-z]+:\/\/[^/]+/i, '').split('?')[0]
+	}
+	return breadcrumb
+}
+
 const startSentry = () => {
 	if (started || !GLITCHTIP_DSN) return
 	started = true
@@ -20,6 +33,9 @@ const startSentry = () => {
 		enableAutoSessionTracking: false,
 		sendDefaultPii: false,
 		enableLogs: true,
+		// HTTP breadcrumbs record the full request URL - strip the server's address
+		// and the query string (which can carry an api_key) so only the path is sent
+		beforeBreadcrumb,
 		integrations: [
 			navigationIntegration,
 			// console.log is left out - it's too noisy to ship, but still lands in breadcrumbs

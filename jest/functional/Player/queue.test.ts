@@ -891,6 +891,8 @@ describe('Queue - addToQueue', () => {
 		expect(mockToast.show).toHaveBeenCalledWith({
 			text1: 'Failed to play next',
 			type: 'error',
+			text2: expect.any(String),
+			onPress: expect.any(Function),
 		})
 	})
 
@@ -915,6 +917,8 @@ describe('Queue - addToQueue', () => {
 		expect(mockToast.show).toHaveBeenCalledWith({
 			text1: 'Failed to play later',
 			type: 'error',
+			text2: expect.any(String),
+			onPress: expect.any(Function),
 		})
 	})
 
