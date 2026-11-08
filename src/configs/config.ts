@@ -9,12 +9,8 @@ export { IS_MAESTRO_BUILD, GLITCHTIP_DSN, TELEMETRYDECK_APPID }
 export const MONOCHROME_ICON_URL =
 	'https://raw.githubusercontent.com/Jellify-Music/App/refs/heads/main/assets/monochrome-logo.svg'
 
+export const APP_REPO_URL = 'https://github.com/Jellify-Music/App'
+
 export const PRIVACY_POLICY_URL = 'https://jellify.app/privacy'
 
 export const LOGGING_PROVIDER_PRIVACY_POLICY_URL = 'https://glitchtip.com/legal/privacy'
-
-const PATRON_API_BASE_URL = 'https://patrons.jellify.app/api/v1'
-
-export const PATRON_API_ENDPOINT = `${PATRON_API_BASE_URL}/patrons`
-
-export const SPECIAL_THANKS_API_ENDPOINT = `${PATRON_API_BASE_URL}/special-thanks`

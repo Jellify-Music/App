@@ -1,4 +1,5 @@
-import { PRIVACY_POLICY_URL } from '../../configs/config'
+import React from 'react'
+import { APP_REPO_URL, PRIVACY_POLICY_URL } from '../../configs/config'
 import { Linking } from 'react-native'
 import { YStack, XStack, SizableText, ScrollView, Separator, Spacer } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -77,7 +78,7 @@ export default function AboutScreen(): React.JSX.Element {
 							alignItems='center'
 							gap='1'
 							{...ICON_PRESS_STYLES}
-							onPress={() => Linking.openURL('https://github.com/Jellify-Music/App')}
+							onPress={() => Linking.openURL(APP_REPO_URL)}
 							testID='jellify-source-link'
 						>
 							<Icon name='code-tags' size='7' color='borderColor' />
