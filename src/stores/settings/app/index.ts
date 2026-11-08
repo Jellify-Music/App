@@ -3,11 +3,10 @@ import { mmkvStateStorage } from '../../../constants/storage'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
-import AppSettingsStore, { ColorPreset, ThemeSetting } from './types'
+import AppSettingsStore from './types'
 import { setReducedHaptics } from './utils/set'
 import { migrate } from './utils/migrate'
-
-export type { ColorPreset, ThemeSetting } from './types'
+import { ColorPreset, Appearance } from '../../../types/theme'
 
 export const useAppSettingsStore = create<AppSettingsStore>()(
 	devtools(
@@ -24,7 +23,7 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 				setReducedHaptics: setReducedHaptics(set),
 
 				theme: 'system',
-				setTheme: (theme: ThemeSetting) => set({ theme }),
+				setTheme: (theme: Appearance) => set({ theme }),
 
 				hideItemIndicators: false,
 				setHideItemIndicators: (hideItemIndicators: boolean) => set({ hideItemIndicators }),
@@ -47,7 +46,7 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 
 export const getSendMetricsSetting = () => useAppSettingsStore.getState().sendMetrics
 
-export const useThemeSetting: () => [ThemeSetting, (theme: ThemeSetting) => void] = () => {
+export const useThemeSetting: () => [Appearance, (theme: Appearance) => void] = () => {
 	const theme = useAppSettingsStore((state) => state.theme)
 
 	const setTheme = useAppSettingsStore((state) => state.setTheme)
