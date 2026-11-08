@@ -8,6 +8,8 @@ import { APP_ICONS } from '../../../../../configs/styling/icon'
 import AppIconCard from './card'
 import Toast from 'react-native-toast-message'
 import { applyHapticFeedback } from '../../../../../utils/haptics'
+import { handleError } from '../../../../../utils/errors'
+import { LoggingContext } from '../../../../../utils/logging'
 
 export default function AppIconSettings(): React.JSX.Element {
 	const [selected, setSelected] = useState<AppIconValue>('Default')
@@ -39,11 +41,7 @@ export default function AppIconSettings(): React.JSX.Element {
 				}
 			})
 			.catch((error) => {
-				console.warn('Unable to set app icon', error)
-				Toast.show({
-					type: 'error',
-					text1: 'Unable to set app icon',
-				})
+				handleError(error, LoggingContext.UI, 'Unable to set app icon')
 				setSelected(previous)
 			})
 	}

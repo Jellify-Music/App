@@ -5,7 +5,6 @@ import LoginStackParamList from '../../screens/Login/types'
 import { useState } from 'react'
 import { isEmpty } from 'lodash'
 import useConnectToServer from '../../api/mutations/public-system-info'
-import Toast from 'react-native-toast-message'
 import Button from '../Global/helpers/button'
 import AddressInput from '../ServerAddress/components/address-input'
 import Heading from '../ServerAddress/components/heading'
@@ -17,12 +16,6 @@ export default function ServerAddress(): React.JSX.Element {
 
 	const { mutate: connectToServer, isPending } = useConnectToServer({
 		onSuccess: () => navigation.navigate('ServerAuthentication'),
-		onError: () =>
-			Toast.show({
-				text1: 'Unable to connect',
-				text2: `to ${serverAddress}`,
-				type: 'error',
-			}),
 	})
 
 	const connectWithAddress = () => {

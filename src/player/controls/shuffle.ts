@@ -18,10 +18,10 @@ import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { ShuffleResult } from '../interfaces'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
-import { captureError } from '../../utils/logging'
 import LoggingContext from '../../utils/logging/enums'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
+import { handleError } from '../../utils/errors'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
@@ -181,15 +181,7 @@ export async function handleLibraryShuffle() {
 			}
 		}
 	} catch (error) {
-		captureError(
-			error,
-			LoggingContext.NitroFetch,
-			'Failed to fetch random tracks for library shuffle',
-		)
-		Toast.show({
-			text1: 'Failed to fetch random tracks',
-			type: 'error',
-		})
+		handleError(error, LoggingContext.NitroFetch, 'Failed to fetch random tracks')
 	}
 }
 
@@ -232,7 +224,7 @@ export async function handleShuffle(): Promise<ShuffleResult | undefined> {
 
 		updatedQueue = tracks
 	} catch (error) {
-		captureError(error, LoggingContext.NitroFetch, 'Failed to shuffle tracks in the playlist')
+		handleError(error, LoggingContext.NitroFetch, 'Failed to shuffle queue')
 		return undefined
 	}
 
@@ -293,7 +285,7 @@ export async function handleDeshuffle(): Promise<ShuffleResult | undefined> {
 			await PlayerQueue.addTracksToPlaylist(playlistId, nextUnshuffledItems)
 		}
 	} catch (error) {
-		captureError(error, LoggingContext.NitroFetch, 'Failed to deshuffle tracks in the playlist')
+		handleError(error, LoggingContext.NitroFetch, 'Failed to unshuffle queue')
 		return undefined
 	}
 
