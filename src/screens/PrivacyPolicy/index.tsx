@@ -2,7 +2,7 @@ import { Paragraph, YStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { PrivacyPolicyProps } from '../types'
 import { Linking } from 'react-native'
-import { PRIVACY_POLICY_URL } from '../../configs/config'
+import { PRIVACY_POLICY_URL } from '../../configs/privacy.config'
 
 export default function PrivacyPolicyScreen(props: PrivacyPolicyProps): React.JSX.Element {
 	const { top, bottom } = useSafeAreaInsets()
