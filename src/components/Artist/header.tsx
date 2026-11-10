@@ -1,18 +1,14 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { H5, Paragraph, XStack, YStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
 import { useArtistContext } from '../../providers/Artist'
-import FavoriteButton from '../Global/components/favorite-button'
 import { InstantMixIconButton } from '../Global/components/instant-mix-button'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
-import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { getApi } from '../../stores/auth/utils'
 import Icon from '../Global/components/icon'
-import { useArtistTracks } from '../../api/queries/track'
-import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { loadNewQueue } from '../../player/queuing'
 import { ImageUrlOptions } from '../../api/queries/image/utils'
 import { handleError } from '../../utils/errors'
@@ -51,10 +47,8 @@ export default function ArtistHeader(): React.JSX.Element {
 		}
 	}
 
-	const tracksInfiniteQuery = useArtistTracks(artist.Id!)
-
 	return (
-		<YStack flex={1}>
+		<YStack>
 			<ItemImage
 				item={artist}
 				height={'14'}
@@ -63,54 +57,51 @@ export default function ArtistHeader(): React.JSX.Element {
 				imageOptions={backdropImageOptions}
 			/>
 
-			<YStack paddingHorizontal='2'>
-				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
-					<XStack alignItems='center' flex={1} justifyContent='space-between'>
-						<H5 flexGrow={1} fontWeight={'6'}>
-							{artist.Name}
-						</H5>
-					</XStack>
-				</XStack>
+			{/* box-none: the space between the pills is still the image's, not theirs */}
+			<XStack
+				position='absolute'
+				left='$2'
+				right='$2'
+				bottom='$2'
+				alignItems='center'
+				justifyContent='flex-end'
+				pointerEvents='box-none'
+			>
+				<ActionPill>
+					<Icon
+						size='7'
+						color='primary'
+						name='shuffle'
+						onPress={() => playArtist(true)}
+					/>
 
-				<XStack alignItems='center' justifyContent='space-between' flex={1}>
-					<XStack alignItems='center' gap='3' flex={1}>
-						<FavoriteButton item={artist} />
+					<InstantMixIconButton item={artist} navigation={navigation} />
 
-						<InstantMixIconButton item={artist} navigation={navigation} />
-					</XStack>
-
-					<XStack alignItems='center' justifyContent='flex-end' gap='3' flex={1}>
-						<Icon
-							size='7'
-							color='primary'
-							name='shuffle'
-							onPress={() => playArtist(true)}
-						/>
-						<IconButton circular name='play' onPress={() => playArtist(false)} />
-					</XStack>
-				</XStack>
-
-				<XStack
-					alignItems='center'
-					flex={1}
-					justifyContent='flex-start'
-					marginVertical='2'
-					{...ICON_PRESS_STYLES}
-					onPress={() =>
-						navigation.navigate('Tracks', {
-							tracksInfiniteQuery,
-							showAlphabeticalSelector: true,
-						})
-					}
-				>
-					<Paragraph fontWeight='6' fontSize='3'>
-						{`View Tracks`}
-					</Paragraph>
-
-					<Icon name='chevron-right' size='7' />
-				</XStack>
-			</YStack>
+					<Icon
+						size='7'
+						color='primary'
+						name='play-circle-outline'
+						onPress={() => playArtist(false)}
+					/>
+				</ActionPill>
+			</XStack>
 		</YStack>
+	)
+}
+
+/** A group of buttons on the artist's image, on a background that keeps them readable on any artwork */
+function ActionPill({ children }: { children: React.ReactNode }): React.JSX.Element {
+	return (
+		<XStack
+			alignItems='center'
+			gap='3'
+			paddingHorizontal='3'
+			paddingVertical='1'
+			borderRadius={999}
+			backgroundColor='$darkBackground'
+		>
+			{children}
+		</XStack>
 	)
 }
 
