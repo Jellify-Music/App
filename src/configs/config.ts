@@ -12,5 +12,3 @@ export const MONOCHROME_ICON_URL =
 export const APP_REPO_URL = 'https://github.com/Jellify-Music/App'
 
 export const PRIVACY_POLICY_URL = 'https://jellify.app/privacy'
-
-export const LOGGING_PROVIDER_PRIVACY_POLICY_URL = 'https://glitchtip.com/legal/privacy'
