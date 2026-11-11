@@ -4,7 +4,7 @@ import { create } from 'zustand'
 import { devtools, persist, PersistStorage, StorageValue } from 'zustand/middleware'
 import { RepeatMode, TrackItem } from 'react-native-nitro-player'
 import { useShallow } from 'zustand/react/shallow'
-import getTrackDto from '../../utils/mapping/track-extra-payload'
+import getTrackDto, { getTrackItemId } from '../../utils/mapping/track-extra-payload'
 
 /**
  * Maximum number of tracks to persist in storage.
@@ -147,12 +147,14 @@ export const useCurrentTrackItemDto = () => {
 }
 
 /**
- * Returns only the current track ID for efficient comparisons.
+ * Returns only the current track's Jellyfin item ID for efficient comparisons.
  * Use this in list items to avoid re-renders when other track properties change.
  */
 export const useCurrentTrackId = () =>
 	usePlayerQueueStore((state) =>
-		state.currentIndex !== undefined ? state.queue[state.currentIndex]?.id : undefined,
+		state.currentIndex !== undefined
+			? getTrackItemId(state.queue[state.currentIndex])
+			: undefined,
 	)
 
 export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)

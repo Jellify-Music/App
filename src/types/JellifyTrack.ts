@@ -1,5 +1,5 @@
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
-import getTrackDto from '../utils/mapping/track-extra-payload'
+import getTrackDto, { getTrackItemId } from '../utils/mapping/track-extra-payload'
 
 export type SourceType = 'stream' | 'download'
 
@@ -26,6 +26,15 @@ export type TrackExtraPayload = Record<string, unknown> & {
 	 * type safety (and convenience!)
 	 */
 	item: string
+
+	/**
+	 * The Jellyfin item ID of the track.
+	 *
+	 * Queued tracks are given a unique `id` per queue entry so the
+	 * same track can be queued more than once, so use {@link getTrackItemId}
+	 * rather than `track.id` when talking to Jellyfin or the download manager
+	 */
+	itemId?: string
 	sessionId: string
 
 	/**

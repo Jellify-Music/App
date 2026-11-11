@@ -5,7 +5,10 @@ import { TrackItem } from 'react-native-nitro-player'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
-import { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
+import {
+	getTrackItemId,
+	getTrackMediaSourceInfo,
+} from '../../../../utils/mapping/track-extra-payload'
 
 export default async function reportPlaybackStarted(
 	track: TrackItem,
@@ -26,7 +29,7 @@ export default async function reportPlaybackStarted(
 		await sessionApi.reportPlaybackStart({
 			playbackStartInfo: {
 				PlaySessionId: sessionId,
-				ItemId: track.id,
+				ItemId: getTrackItemId(track),
 				PositionTicks: position ? convertSecondsToRunTimeTicks(position) : 0,
 				PlayMethod: mediaSourceInfo?.TranscodingUrl
 					? PlayMethod.Transcode

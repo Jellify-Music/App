@@ -28,6 +28,7 @@ jest.mock('../../../src/utils/mapping/item-to-track', () => ({
 jest.mock('../../../src/player/utils/queue', () => ({
 	clearPlaylists: jest.fn().mockResolvedValue(undefined),
 	filterTracksOnNetworkStatus: jest.fn(),
+	toQueueEntries: jest.fn((tracks: unknown[]) => tracks),
 }))
 
 jest.mock('../../../src/stores/network', () => ({
@@ -423,7 +424,7 @@ describe('Queue - playNextInQueue', () => {
 		)
 	})
 
-	it('reorders existing tracks to play next position', async () => {
+	it('adds an already queued track again instead of moving it', async () => {
 		const trackA = createTrack('a')
 		const trackB = createTrack('b')
 		const trackC = createTrack('c')
@@ -438,10 +439,12 @@ describe('Queue - playNextInQueue', () => {
 
 		await playNextInQueue({ tracks: dtos, queuingType: QueuingType.PlayNext })
 
-		// Should call reorderTrackInPlaylist for track 'b' at position 1 (currentIndex + 1)
-		expect(PlayerQueue.reorderTrackInPlaylist).toHaveBeenCalledWith('playlist-1', 'b', 1)
-		// Should NOT call addTracksToPlaylist because track b is already in queue
-		expect(PlayerQueue.addTracksToPlaylist).not.toHaveBeenCalled()
+		expect(PlayerQueue.reorderTrackInPlaylist).not.toHaveBeenCalled()
+		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenCalledWith(
+			'playlist-1',
+			[expect.objectContaining({ id: 'b' })],
+			1,
+		)
 	})
 
 	it('adds new tracks to the queue at insert index', async () => {
@@ -468,10 +471,9 @@ describe('Queue - playNextInQueue', () => {
 		)
 	})
 
-	it('handles mixed tracks: reorder existing and add new', async () => {
+	it('adds queued and new tracks together at the insert index', async () => {
 		const trackA = createTrack('a')
 		const trackB = createTrack('b')
-		const trackC = createTrack('c')
 
 		mockGetState.mockReturnValue({
 			currentIndex: 0,
@@ -483,37 +485,12 @@ describe('Queue - playNextInQueue', () => {
 
 		await playNextInQueue({ tracks: dtos, queuingType: QueuingType.PlayNext })
 
-		// Should reorder track 'b' at position 1
-		expect(PlayerQueue.reorderTrackInPlaylist).toHaveBeenCalledWith('playlist-1', 'b', 1)
-		// Should add track 'c' at position 1
+		expect(PlayerQueue.reorderTrackInPlaylist).not.toHaveBeenCalled()
 		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenCalledWith(
 			'playlist-1',
-			expect.arrayContaining([expect.objectContaining({ id: 'c' })]),
+			[expect.objectContaining({ id: 'b' }), expect.objectContaining({ id: 'c' })],
 			1,
 		)
-	})
-
-	it('uses Promise.all for parallel reordering of multiple existing tracks', async () => {
-		const trackA = createTrack('a')
-		const trackB = createTrack('b')
-		const trackC = createTrack('c')
-		const trackD = createTrack('d')
-
-		mockGetState.mockReturnValue({
-			currentIndex: 0,
-			queue: [trackA, trackB, trackC, trackD],
-			unShuffledQueue: [trackA, trackB, trackC, trackD],
-		})
-
-		const dtos: BaseItemDto[] = [{ Id: 'c' } as BaseItemDto, { Id: 'd' } as BaseItemDto]
-
-		await playNextInQueue({ tracks: dtos, queuingType: QueuingType.PlayNext })
-
-		// Should reorder both tracks with correct offsets
-		expect(PlayerQueue.reorderTrackInPlaylist).toHaveBeenCalledWith('playlist-1', 'c', 1)
-		expect(PlayerQueue.reorderTrackInPlaylist).toHaveBeenCalledWith('playlist-1', 'd', 2)
-		// Should be called exactly twice
-		expect(PlayerQueue.reorderTrackInPlaylist).toHaveBeenCalledTimes(2)
 	})
 
 	it('calculates correct insert index with currentIndex in middle of queue', async () => {
@@ -759,7 +736,6 @@ describe('Queue - addToQueue', () => {
 			queuingType: QueuingType.PlayNext,
 		})
 
-		// Should allow reordering by not filtering
 		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenCalled()
 	})
 
@@ -795,7 +771,7 @@ describe('Queue - addToQueue', () => {
 		},
 	)
 
-	it('filters out existing tracks for PlayLater queuing type', async () => {
+	it('adds already queued tracks again for PlayLater queuing type', async () => {
 		const trackA = createTrack('a')
 
 		mockGetState.mockReturnValue({
@@ -816,14 +792,13 @@ describe('Queue - addToQueue', () => {
 			queuingType: QueuingType.PlayLater,
 		})
 
-		// Should only add track 'b', not 'a'
-		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenCalledWith(
-			'playlist-1',
-			expect.arrayContaining([expect.objectContaining({ id: 'b' })]),
-		)
+		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenCalledWith('playlist-1', [
+			expect.objectContaining({ id: 'a' }),
+			expect.objectContaining({ id: 'b' }),
+		])
 	})
 
-	it('reorders existing track when added with PlayNext queuing type', async () => {
+	it('adds an already queued track again for PlayNext queuing type', async () => {
 		const trackA = createTrack('a')
 		const trackB = createTrack('b')
 
@@ -842,8 +817,12 @@ describe('Queue - addToQueue', () => {
 			queuingType: QueuingType.PlayNext,
 		})
 
-		// Should reorder track 'b' instead of adding
-		expect(PlayerQueue.reorderTrackInPlaylist).toHaveBeenCalledWith('playlist-1', 'b', 1)
+		expect(PlayerQueue.reorderTrackInPlaylist).not.toHaveBeenCalled()
+		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenCalledWith(
+			'playlist-1',
+			[expect.objectContaining({ id: 'b' })],
+			1,
+		)
 	})
 
 	it('shows success toast on successful operation', async () => {

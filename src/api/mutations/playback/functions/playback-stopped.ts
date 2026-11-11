@@ -5,6 +5,7 @@ import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { getApi } from '../../../../stores/auth/utils'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
+import { getTrackItemId } from '../../../../utils/mapping/track-extra-payload'
 
 export default async function reportPlaybackStopped(
 	track: TrackItem,
@@ -15,7 +16,7 @@ export default async function reportPlaybackStopped(
 	if (!api) return Promise.reject('API instance not set')
 
 	const { sessionId } = track.extraPayload as TrackExtraPayload
-	const { id } = track
+	const id = getTrackItemId(track)
 
 	const sessionApi = new SessionApi(api.configuration, api.basePath, api.axiosInstance)
 

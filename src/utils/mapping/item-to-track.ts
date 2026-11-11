@@ -79,6 +79,7 @@ export function mapDtoToTrack(
 		// All extraPayload properties to conform to Nitro Modules AnyMap
 		extraPayload: {
 			item: JSON.stringify(slimifyDto(item)),
+			itemId: item.Id ?? '',
 			mediaSourceInfo: JSON.stringify(mediaSourceInfo), // This will be populated later in the playback flow when we have the MediaSourceInfo available
 			sessionId: '',
 			blurhash: getBlurhashFromDto(item),

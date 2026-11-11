@@ -5,7 +5,10 @@ import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { getApi } from '../../../../stores/auth/utils'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
-import { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
+import {
+	getTrackItemId,
+	getTrackMediaSourceInfo,
+} from '../../../../utils/mapping/track-extra-payload'
 import { throttle } from 'lodash'
 import { REPORTING_INTERVAL } from '../../../../configs/player/reporting.config'
 
@@ -23,7 +26,7 @@ async function reportPlaybackProgressInner(
 
 	if (!api) return Promise.reject('API instance not set')
 
-	const { id } = track
+	const id = getTrackItemId(track)
 
 	const { sessionId } = track.extraPayload as TrackExtraPayload
 

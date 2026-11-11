@@ -22,6 +22,7 @@ import LoggingContext from '../../utils/logging/enums'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { handleError } from '../../utils/errors'
+import { toQueueEntries } from '../utils/queue'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
@@ -154,7 +155,7 @@ export async function handleLibraryShuffle() {
 
 			if (randomTracks && randomTracks.length > 0) {
 				const startIndex: number = 0
-				const finalQueue: TrackItem[] = randomTracks
+				const finalQueue: TrackItem[] = toQueueEntries(randomTracks)
 
 				if (finalQueue.length === 0) {
 					Toast.show({ text1: 'No tracks to shuffle', type: 'info' })
@@ -269,9 +270,7 @@ export async function handleDeshuffle(): Promise<ShuffleResult | undefined> {
 	// Remove all tracks except the current track from the current playlist in one native pass.
 	// Removal is by id, so the current track's id is excluded to keep the playing copy.
 	try {
-		const idsToRemove = [
-			...new Set(playQueue.map(({ id }) => id).filter((id) => id !== currentTrack.id)),
-		]
+		const idsToRemove = playQueue.map(({ id }) => id).filter((id) => id !== currentTrack.id)
 
 		if (idsToRemove.length > 0) {
 			await PlayerQueue.removeTracksFromPlaylist(playlistId, idsToRemove)
