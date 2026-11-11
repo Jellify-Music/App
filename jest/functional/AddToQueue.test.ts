@@ -2,7 +2,7 @@ import { PlayerQueue } from 'react-native-nitro-player'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getApi } from '../../src/stores/auth/utils'
 import playLaterInQueue from '../../src/player/queuing/play-later'
-import { getTrackItemId } from '../../src/utils/mapping/track-extra-payload'
+import getTrackDto from '../../src/utils/mapping/track-extra-payload'
 
 jest.mock('../../src/stores/auth/utils')
 
@@ -36,10 +36,10 @@ describe('Play Later - playLaterInQueue', () => {
 
 		const callArg = (PlayerQueue.addTracksToPlaylist as jest.Mock).mock.calls[0][1]
 		expect(Array.isArray(callArg)).toBe(true)
-		expect(getTrackItemId(callArg[0])).toBe('t1')
+		expect(getTrackDto(callArg[0])?.Id).toBe('t1')
 	})
 
-	it('gives each copy of the same track its own queue entry ID', async () => {
+	it('gives each copy of the same track its own ID', async () => {
 		const track: BaseItemDto = {
 			Id: 't1',
 			Name: 'Test Track',
@@ -55,7 +55,7 @@ describe('Play Later - playLaterInQueue', () => {
 		const [first, second] = (PlayerQueue.addTracksToPlaylist as jest.Mock).mock.calls[0][1]
 		expect(first.id).not.toBe(second.id)
 		expect(first.id).not.toBe('t1')
-		expect(getTrackItemId(first)).toBe('t1')
-		expect(getTrackItemId(second)).toBe('t1')
+		expect(getTrackDto(first)?.Id).toBe('t1')
+		expect(getTrackDto(second)?.Id).toBe('t1')
 	})
 })

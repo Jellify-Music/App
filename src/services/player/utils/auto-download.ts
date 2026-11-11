@@ -4,7 +4,7 @@ import { DownloadManager } from 'react-native-nitro-player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import { TrackItem } from 'react-native-nitro-player/lib/types/PlayerQueue'
 import resolveTrackUrls from '../../../utils/fetching/track-media-info'
-import { getTrackItemId } from '../../../utils/mapping/track-extra-payload'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
 
 // Prevents redundant DownloadManager checks on every progress tick after the 30% threshold.
 const autoDownloadTriggered = new Set<string>()
@@ -18,7 +18,7 @@ export default async function handleAutoDownload(
 
 	if (position / totalDuration > 0.3 && track && autoDownload) {
 		// Downloads are keyed by Jellyfin ID, not the queue entry ID
-		const itemId = getTrackItemId(track)
+		const itemId = getTrackDto(track)?.Id ?? track.id
 
 		// Fail fast if we've already triggered an auto-download for this track this session
 		if (autoDownloadTriggered.has(itemId)) return

@@ -1,10 +1,7 @@
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { SessionApi } from '@jellyfin/sdk/lib/generated-client'
 import { TrackItem } from 'react-native-nitro-player'
-import getTrackDto, {
-	getTrackItemId,
-	getTrackMediaSourceInfo,
-} from '../../../../utils/mapping/track-extra-payload'
+import getTrackDto, { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
 import { getApi } from '../../../../stores/auth/utils'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
@@ -14,7 +11,7 @@ export default async function reportPlaybackCompleted(track: TrackItem): Promise
 
 	if (!api) return Promise.reject('API instance not set')
 
-	const id = getTrackItemId(track)
+	const id = getTrackDto(track)?.Id
 	const { sessionId } = track.extraPayload as TrackExtraPayload
 
 	const item = getTrackDto(track)

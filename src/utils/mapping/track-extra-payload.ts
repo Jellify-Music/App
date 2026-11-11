@@ -16,24 +16,6 @@ export default function getTrackDto(track: TrackItem | undefined): BaseItemDto |
 	return item
 }
 
-/**
- * Get the Jellyfin item ID of a track.
- *
- * A queued track's {@link TrackItem.id} is unique to its queue entry, so this
- * should be used whenever the Jellyfin ID is needed (playback reporting, lyrics,
- * downloads). Falls back to the track ID for tracks mapped before the item ID
- * was stored in the payload, like existing downloads.
- *
- * @param track The track to get the Jellyfin item ID of
- * @returns The Jellyfin item ID of the track
- */
-export function getTrackItemId(track: TrackItem): string
-export function getTrackItemId(track: TrackItem | undefined): string | undefined
-export function getTrackItemId(track: TrackItem | undefined): string | undefined {
-	if (!track) return undefined
-	return (track.extraPayload as TrackExtraPayload | undefined)?.itemId || track.id
-}
-
 export function getTrackMediaSourceInfo(track: TrackItem | undefined): MediaSourceInfo | undefined {
 	const mediaSourceInfo = JSON.parse(
 		(track?.extraPayload as TrackExtraPayload)?.mediaSourceInfo ?? '{}',

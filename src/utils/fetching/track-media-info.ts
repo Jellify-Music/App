@@ -2,7 +2,7 @@ import queryForMediaInfo from '../../api/queries/media/queries'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
 import { TrackItem } from 'react-native-nitro-player'
 import buildAudioApiUrl, { buildTranscodedAudioApiUrl } from '../mapping/item-to-audio-api-url'
-import getTrackDto, { getTrackItemId } from '../mapping/track-extra-payload'
+import getTrackDto from '../mapping/track-extra-payload'
 import { convertRunTimeTicksToSeconds } from '../mapping/ticks-to-seconds'
 import { SourceType } from '@/src/types/JellifyTrack'
 
@@ -13,7 +13,11 @@ export default async function resolveTrackUrls(
 ): Promise<TrackItem[]> {
 	const playbackInfoEntries = await Promise.allSettled(
 		trackItems.map(async (track) => {
-			const playbackInfo = await queryForMediaInfo(getTrackItemId(track), source, signal)
+			const playbackInfo = await queryForMediaInfo(
+				getTrackDto(track)?.Id ?? '',
+				source,
+				signal,
+			)
 			return [track.id, playbackInfo] as [string, PlaybackInfoResponse]
 		}),
 	)

@@ -1,9 +1,9 @@
 import { TrackItem } from 'react-native-nitro-player'
-import { getTrackItemId } from '../../../utils/mapping/track-extra-payload'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
 
 const LyricsQueryKey = (track: TrackItem | null) => [
 	'TRACK_LYRICS',
-	getTrackItemId(track ?? undefined),
+	getTrackDto(track ?? undefined)?.Id,
 ]
 
 export default LyricsQueryKey

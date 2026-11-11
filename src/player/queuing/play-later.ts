@@ -4,12 +4,11 @@ import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import { isNull } from 'lodash'
 import { PlayerQueue, TrackPlayer } from 'react-native-nitro-player'
 import { AddToQueueMutation } from '../interfaces'
-import { toQueueEntries } from '../utils/queue'
 
 const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const downloadedTracks = await ensureDownloadedTracks()
 
-	const newTracks = toQueueEntries(mapDtosToTracks(tracks, downloadedTracks))
+	const newTracks = mapDtosToTracks(tracks, downloadedTracks)
 
 	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 

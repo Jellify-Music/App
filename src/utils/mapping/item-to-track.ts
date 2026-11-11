@@ -10,6 +10,7 @@ import { slimifyDto } from './slimify-dto'
 import { getItemImageUrl } from '../../api/queries/image/utils'
 import { getTrackMediaSourceInfo } from './track-extra-payload'
 import { getItemName } from '../formatting/item-names'
+import uuid from 'react-native-uuid'
 
 export function mapDtosToTracks(
 	items: BaseItemDto[],
@@ -58,7 +59,8 @@ export function mapDtoToTrack(
 
 	return {
 		...(headers ? { headers } : {}),
-		id: item.Id ?? '',
+		// Unique per track so the same track can be queued more than once. Use getTrackDto for the Jellyfin ID
+		id: uuid.v4(),
 		url: downloadedTrack?.localPath ? `file://${downloadedTrack.localPath}` : '',
 		artwork: downloadedTrack?.localArtworkPath
 			? `file://${downloadedTrack.localArtworkPath}`
@@ -79,7 +81,6 @@ export function mapDtoToTrack(
 		// All extraPayload properties to conform to Nitro Modules AnyMap
 		extraPayload: {
 			item: JSON.stringify(slimifyDto(item)),
-			itemId: item.Id ?? '',
 			mediaSourceInfo: JSON.stringify(mediaSourceInfo), // This will be populated later in the playback flow when we have the MediaSourceInfo available
 			sessionId: '',
 			blurhash: getBlurhashFromDto(item),

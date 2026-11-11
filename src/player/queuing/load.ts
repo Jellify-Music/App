@@ -5,7 +5,7 @@ import { setPlaybackPosition } from '../../stores/player/playback'
 import { usePlayerQueueStore, setNewQueue } from '../../stores/player/queue'
 import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
-import { filterTracksOnNetworkStatus, clearPlaylists, toQueueEntries } from '../utils/queue'
+import { filterTracksOnNetworkStatus, clearPlaylists } from '../utils/queue'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import { QueueMutation } from '../interfaces'
 import { LoadQueueResult } from './types'
@@ -33,7 +33,7 @@ export default async function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let playlist = toQueueEntries(mapDtosToTracks(availableAudioItems, downloadedTracks))
+	let playlist = mapDtosToTracks(availableAudioItems, downloadedTracks)
 
 	// Look up the starting track by position, since the tracklist may contain the same track more than once
 	const mappedStartingTrack = playlist[availableAudioItems.indexOf(startingTrack)]

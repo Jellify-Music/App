@@ -22,7 +22,7 @@ import LoggingContext from '../../utils/logging/enums'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { handleError } from '../../utils/errors'
-import { toQueueEntries } from '../utils/queue'
+import uuid from 'react-native-uuid'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
@@ -93,7 +93,11 @@ export async function handleLibraryShuffle() {
 				}
 
 				// Shuffle the filtered downloads using Fisher-Yates shuffle
-				const shuffled = [...(filteredDownloads as unknown as TrackItem[])]
+				// Downloads are keyed by Jellyfin ID, so give each one its own queue ID
+				const shuffled: TrackItem[] = filteredDownloads.map((download) => ({
+					...download.originalTrack,
+					id: uuid.v4(),
+				}))
 				for (let i = shuffled.length - 1; i > 0; i--) {
 					const j = Math.floor(Math.random() * (i + 1))
 					;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
@@ -155,7 +159,7 @@ export async function handleLibraryShuffle() {
 
 			if (randomTracks && randomTracks.length > 0) {
 				const startIndex: number = 0
-				const finalQueue: TrackItem[] = toQueueEntries(randomTracks)
+				const finalQueue: TrackItem[] = randomTracks
 
 				if (finalQueue.length === 0) {
 					Toast.show({ text1: 'No tracks to shuffle', type: 'info' })

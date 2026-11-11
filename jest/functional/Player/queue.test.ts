@@ -28,7 +28,6 @@ jest.mock('../../../src/utils/mapping/item-to-track', () => ({
 jest.mock('../../../src/player/utils/queue', () => ({
 	clearPlaylists: jest.fn().mockResolvedValue(undefined),
 	filterTracksOnNetworkStatus: jest.fn(),
-	toQueueEntries: jest.fn((tracks: unknown[]) => tracks),
 }))
 
 jest.mock('../../../src/stores/network', () => ({
