@@ -12,7 +12,7 @@ import { getApi, getUser } from '../../stores/auth/utils'
 import { appendPlaylistTracks } from '../../api/queries/playlist/cache'
 import { AnimatedList } from '../Global/components/Lists/utils'
 import type { LegendListRenderItemProps } from '@legendapp/list/react-native'
-import { LinearTransition, useReducedMotion } from 'react-native-reanimated'
+import { SequencedTransition, useReducedMotion } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { handleError } from '../../utils/errors'
@@ -89,7 +89,7 @@ export default function AddToPlaylist({
 				// Adding to a playlist moves it to the front of the list, so animate the reorder
 				<AnimatedList<BaseItemDto>
 					data={playlists}
-					itemLayoutAnimation={reducedMotion ? undefined : LinearTransition.springify()}
+					itemLayoutAnimation={reducedMotion ? undefined : SequencedTransition}
 					renderItem={renderItem}
 					contentContainerStyle={{
 						paddingBottom: bottom,
@@ -173,18 +173,37 @@ function AddToPlaylistRow({
 				>{`${playlistTracks?.length ?? 0} tracks`}</SizableText>
 			</YStack>
 
-			{isInPlaylist ? (
-				<Icon
-					name='check-circle-outline'
-					color={'success'}
-					transition={'quick'}
-					opacity='1 enter:0 exit:0'
-				/>
-			) : fetchingPlaylistTracks || useAddToPlaylist.isPending ? (
-				<Spinner color='primary' />
-			) : (
-				<Spacer flex={1} />
-			)}
+			<AddToPlaylistEndAccessory
+				isInPlaylist={isInPlaylist}
+				isFetching={fetchingPlaylistTracks || useAddToPlaylist.isPending}
+			/>
 		</XStack>
 	)
+}
+
+interface AddToPlaylistEndAccessoryProps {
+	isInPlaylist: boolean
+	isFetching: boolean
+}
+
+function AddToPlaylistEndAccessory({
+	isInPlaylist,
+	isFetching,
+}: AddToPlaylistEndAccessoryProps): React.JSX.Element {
+	if (isInPlaylist) {
+		return (
+			<Icon
+				name='check-circle-outline'
+				color={'success'}
+				transition={'quick'}
+				opacity='1 enter:0 exit:0'
+			/>
+		)
+	}
+
+	if (isFetching) {
+		return <Spinner color='primary' />
+	}
+
+	return <Spacer width='4' />
 }
