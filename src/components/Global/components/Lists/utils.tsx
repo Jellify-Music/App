@@ -31,7 +31,7 @@ type ListProps<T extends ListType> = Omit<LegendListProps<T>, 'keyExtractor' | '
  * @param param0 The props for the list component
  * @returns The rendered list component
  */
-export function List<T extends ListType>({
+export default function List<T extends ListType>({
 	horizontal,
 	contentContainerStyle,
 	...props
@@ -46,8 +46,6 @@ export function List<T extends ListType>({
 		/>
 	)
 }
-
-export default List
 
 type AnimatedListProps<T extends ListType> = Omit<
 	AnimatedLegendListProps<T>,
