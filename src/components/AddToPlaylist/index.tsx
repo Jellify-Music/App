@@ -10,7 +10,9 @@ import { getItemName } from '../../utils/formatting/item-names'
 import { usePlaylistTracks, useRecentlyUpdatedPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores/auth/utils'
 import { appendPlaylistTracks } from '../../api/queries/playlist/cache'
-import List from '../Global/components/Lists/utils'
+import { AnimatedList } from '../Global/components/Lists/utils'
+import type { LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { LinearTransition, useReducedMotion } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { handleError } from '../../utils/errors'
@@ -31,6 +33,8 @@ export default function AddToPlaylist({
 
 	const { bottom } = useSafeAreaInsets()
 
+	const reducedMotion = useReducedMotion()
+
 	const { darkBackground75 } = useTheme()
 
 	const headerShadowStyle = {
@@ -45,6 +49,13 @@ export default function AddToPlaylist({
 		],
 	}
 
+	const renderItem = ({ item: playlist }: LegendListRenderItemProps<BaseItemDto>) => (
+		<AddToPlaylistRow
+			playlist={playlist}
+			tracks={tracks ? tracks : tracks[0] ? [tracks[0]] : []}
+		/>
+	)
+
 	return (
 		<View flex={1}>
 			{(source ?? tracks[0]) && (
@@ -53,7 +64,7 @@ export default function AddToPlaylist({
 						item={source ?? tracks[0]}
 						width={'6'}
 						height={'6'}
-						imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 90 }}
+						imageOptions={{ maxWidth: 150, maxHeight: 150, quality: 90 }}
 					/>
 
 					<YStack justifyContent='space-evenly'>
@@ -75,15 +86,11 @@ export default function AddToPlaylist({
 			)}
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
-				<List
+				// Adding to a playlist moves it to the front of the list, so animate the reorder
+				<AnimatedList<BaseItemDto>
 					data={playlists}
-					renderItem={({ item: playlist }) => (
-						<AddToPlaylistRow
-							key={playlist.Id}
-							playlist={playlist}
-							tracks={tracks ? tracks : tracks[0] ? [tracks[0]] : []}
-						/>
-					)}
+					itemLayoutAnimation={reducedMotion ? undefined : LinearTransition.springify()}
+					renderItem={renderItem}
 					contentContainerStyle={{
 						paddingBottom: bottom,
 					}}

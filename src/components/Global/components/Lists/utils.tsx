@@ -1,9 +1,21 @@
 import { ItemKeyExtractor } from '../../../../utils/parsing/key-extractor'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { LegendList, LegendListProps, LegendListRef } from '@legendapp/list/react-native'
+import { AnimatedLegendList, AnimatedLegendListProps } from '@legendapp/list/reanimated'
 import { Ref } from 'react'
+import { StyleProp, ViewStyle } from 'react-native'
 
 type ListType = (BaseItemDto | string | number) | BaseItemDto
+
+/**
+ * Applies horizontal margins to vertical lists, keeping any style the caller passes
+ */
+function getContentContainerStyle(
+	horizontal: boolean | null | undefined,
+	contentContainerStyle: StyleProp<ViewStyle>,
+): StyleProp<ViewStyle> {
+	return [!horizontal && { marginHorizontal: 8 }, contentContainerStyle]
+}
 
 type ListProps<T extends ListType> = Omit<LegendListProps<T>, 'keyExtractor' | 'recycleItems'> & {
 	ref?: Ref<LegendListRef>
@@ -19,20 +31,48 @@ type ListProps<T extends ListType> = Omit<LegendListProps<T>, 'keyExtractor' | '
  * @param param0 The props for the list component
  * @returns The rendered list component
  */
-export default function List<T extends ListType>({ horizontal, ...props }: ListProps<T>) {
-	const contentContainerStyle = horizontal
-		? undefined
-		: {
-				marginHorizontal: 8,
-			}
-
+export function List<T extends ListType>({
+	horizontal,
+	contentContainerStyle,
+	...props
+}: ListProps<T>) {
 	return (
 		<LegendList<T>
 			horizontal={horizontal}
 			{...props}
 			keyExtractor={ItemKeyExtractor}
 			recycleItems
-			contentContainerStyle={contentContainerStyle}
+			contentContainerStyle={getContentContainerStyle(horizontal, contentContainerStyle)}
+		/>
+	)
+}
+
+export default List
+
+type AnimatedListProps<T extends ListType> = Omit<
+	AnimatedLegendListProps<T>,
+	'keyExtractor' | 'recycleItems'
+>
+
+/**
+ * An animated variant of {@link List}, wrapping the {@link AnimatedLegendList} component
+ * so items can use Reanimated layout animations via `itemLayoutAnimation`
+ *
+ * @param param0 The props for the list component
+ * @returns The rendered list component
+ */
+export function AnimatedList<T extends ListType>({
+	horizontal,
+	contentContainerStyle,
+	...props
+}: AnimatedListProps<T>) {
+	return (
+		<AnimatedLegendList<T>
+			horizontal={horizontal}
+			{...props}
+			keyExtractor={ItemKeyExtractor}
+			recycleItems
+			contentContainerStyle={getContentContainerStyle(horizontal, contentContainerStyle)}
 		/>
 	)
 }
