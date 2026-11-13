@@ -1,6 +1,6 @@
 import LookaheadSettings from '../../components/Settings/components/settings/lookahead'
 import SettingsNavRow from '../../components/Settings/components/settings-nav-row'
-import { YStack, XStack, SizableText, RadioGroup, ScrollView, useTheme } from 'tamagui'
+import { YStack, XStack, SizableText, RadioGroup, ScrollView, useTheme, Separator } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
@@ -29,16 +29,8 @@ export default function PlaybackScreen(): React.JSX.Element {
 			showsVerticalScrollIndicator={false}
 			testID='settings-screen-playback'
 		>
-			<SettingsNavRow
-				testID='settings-nav-equalizer'
-				title='Equalizer'
-				icon='equalizer'
-				route='Equalizer'
-				iconColor='success'
-			/>
-
-			<YStack gap='4' margin='4'>
-				<YStack gap='3'>
+			<YStack gap='2'>
+				<YStack gap='3' margin='2'>
 					<YStack gap='1'>
 						<SizableText fontSize='3' fontWeight='6'>
 							Streaming Quality
@@ -75,7 +67,9 @@ export default function PlaybackScreen(): React.JSX.Element {
 					</RadioGroup>
 				</YStack>
 
-				<XStack alignItems='center' justifyContent='space-between'>
+				<Separator borderColor='borderColor' />
+
+				<XStack margin='2' alignItems='center' justifyContent='space-between'>
 					<YStack flex={1}>
 						<SizableText fontSize='3' fontWeight='6'>
 							Audio Normalization
@@ -91,7 +85,9 @@ export default function PlaybackScreen(): React.JSX.Element {
 					/>
 				</XStack>
 
-				<XStack alignItems='center' justifyContent='space-between'>
+				<Separator borderColor='borderColor' />
+
+				<XStack margin='2' alignItems='center' justifyContent='space-between'>
 					<YStack flex={1}>
 						<SizableText fontSize='3' fontWeight='6'>
 							Quality Badge
@@ -107,8 +103,20 @@ export default function PlaybackScreen(): React.JSX.Element {
 					/>
 				</XStack>
 
+				<Separator borderColor='borderColor' />
+
 				<LookaheadSettings />
 			</YStack>
+
+			<Separator marginTop='4' borderColor='borderColor' />
+
+			<SettingsNavRow
+				testID='settings-nav-equalizer'
+				title='Equalizer'
+				icon='equalizer'
+				route='Equalizer'
+				iconColor='success'
+			/>
 		</ScrollView>
 	)
 }

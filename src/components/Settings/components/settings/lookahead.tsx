@@ -12,7 +12,7 @@ export default function LookaheadSettings() {
 	const lookaheadSharedValue = useSharedValue(lookahead)
 
 	return (
-		<YStack gap='3'>
+		<YStack gap='3' margin='2'>
 			<XStack alignItems='center' justifyContent='space-between' width='100%'>
 				<YStack flex={1}>
 					<SizableText fontSize='3' fontWeight='6'>
