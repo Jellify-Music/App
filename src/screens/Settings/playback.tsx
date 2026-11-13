@@ -1,16 +1,15 @@
 import LookaheadSettings from '../../components/Settings/components/settings/lookahead'
 import SettingsNavRow from '../../components/Settings/components/settings-nav-row'
-import { YStack, XStack, SizableText, RadioGroup, ScrollView, useTheme, Separator } from 'tamagui'
+import { RadioGroup, ScrollView, Separator } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
 import { RadioGroupItemWithLabel } from '../../components/Global/utils/radio-group-item-with-label'
 import { usePlayerSettingsStore } from '../../stores/settings/player'
 import { StreamingQuality } from '../../enums/audio-quality'
+import { Setting } from '../../components/Settings/components/sections'
 
 export default function PlaybackScreen(): React.JSX.Element {
-	const { primary, neutral } = useTheme()
-
 	const { bottom } = useSafeAreaInsets()
 
 	const {
@@ -20,7 +19,6 @@ export default function PlaybackScreen(): React.JSX.Element {
 		setEnableAudioNormalization,
 		displayAudioQualityBadge,
 		setDisplayAudioQualityBadge,
-		setLookahead,
 	} = usePlayerSettingsStore()
 
 	return (
@@ -28,87 +26,74 @@ export default function PlaybackScreen(): React.JSX.Element {
 			contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
 			showsVerticalScrollIndicator={false}
 			testID='settings-screen-playback'
+			gap='2'
 		>
-			<YStack gap='2'>
-				<YStack gap='3' margin='2'>
-					<YStack gap='1'>
-						<SizableText fontSize='3' fontWeight='6'>
-							Streaming Quality
-						</SizableText>
-						<SizableText fontSize='2' color='borderColor'>
-							Changes apply to new tracks
-						</SizableText>
-					</YStack>
-					<RadioGroup
-						value={streamingQuality}
-						onValueChange={(value) => setStreamingQuality(value as StreamingQuality)}
-						gap='3'
-					>
-						<RadioGroupItemWithLabel
-							size='3'
-							value={StreamingQuality.Original}
-							label='Original Quality'
-						/>
-						<RadioGroupItemWithLabel
-							size='3'
-							value={StreamingQuality.High}
-							label='High (320kbps)'
-						/>
-						<RadioGroupItemWithLabel
-							size='3'
-							value={StreamingQuality.Medium}
-							label='Medium (256kbps)'
-						/>
-						<RadioGroupItemWithLabel
-							size='3'
-							value={StreamingQuality.Low}
-							label='Low (192kbps)'
-						/>
-					</RadioGroup>
-				</YStack>
-
-				<Separator borderColor='borderColor' />
-
-				<XStack margin='2' alignItems='center' justifyContent='space-between'>
-					<YStack flex={1}>
-						<SizableText fontSize='3' fontWeight='6'>
-							Audio Normalization
-						</SizableText>
-						<SizableText fontSize='2' color='borderColor'>
-							Normalize volume between tracks
-						</SizableText>
-					</YStack>
-					<SwitchWithLabel
-						checked={enableAudioNormalization}
-						onCheckedChange={setEnableAudioNormalization}
-						size='2'
+			<Setting
+				title='Streaming Quality'
+				description='Changes apply to new tracks'
+				orientation='vertical'
+			>
+				<RadioGroup
+					value={streamingQuality}
+					onValueChange={(value) => setStreamingQuality(value as StreamingQuality)}
+					gap='3'
+				>
+					<RadioGroupItemWithLabel
+						size='3'
+						value={StreamingQuality.Original}
+						label='Original Quality'
 					/>
-				</XStack>
-
-				<Separator borderColor='borderColor' />
-
-				<XStack margin='2' alignItems='center' justifyContent='space-between'>
-					<YStack flex={1}>
-						<SizableText fontSize='3' fontWeight='6'>
-							Quality Badge
-						</SizableText>
-						<SizableText fontSize='2' color='borderColor'>
-							Display audio quality in player
-						</SizableText>
-					</YStack>
-					<SwitchWithLabel
-						checked={displayAudioQualityBadge}
-						onCheckedChange={setDisplayAudioQualityBadge}
-						size='2'
+					<RadioGroupItemWithLabel
+						size='3'
+						value={StreamingQuality.High}
+						label='High (320kbps)'
 					/>
-				</XStack>
+					<RadioGroupItemWithLabel
+						size='3'
+						value={StreamingQuality.Medium}
+						label='Medium (256kbps)'
+					/>
+					<RadioGroupItemWithLabel
+						size='3'
+						value={StreamingQuality.Low}
+						label='Low (192kbps)'
+					/>
+				</RadioGroup>
+			</Setting>
 
-				<Separator borderColor='borderColor' />
+			<Separator borderColor='borderColor' />
 
-				<LookaheadSettings />
-			</YStack>
+			<Setting
+				title='Audio Normalization'
+				description='Normalize volume between tracks'
+				orientation='horizontal'
+			>
+				<SwitchWithLabel
+					checked={enableAudioNormalization}
+					onCheckedChange={setEnableAudioNormalization}
+					size='2'
+				/>
+			</Setting>
 
-			<Separator marginTop='4' borderColor='borderColor' />
+			<Separator borderColor='borderColor' />
+
+			<Setting
+				title='Quality Badge'
+				description='Display audio quality in player'
+				orientation='horizontal'
+			>
+				<SwitchWithLabel
+					checked={displayAudioQualityBadge}
+					onCheckedChange={setDisplayAudioQualityBadge}
+					size='2'
+				/>
+			</Setting>
+
+			<Separator borderColor='borderColor' />
+
+			<LookaheadSettings />
+
+			<Separator borderColor='borderColor' />
 
 			<SettingsNavRow
 				testID='settings-nav-equalizer'
