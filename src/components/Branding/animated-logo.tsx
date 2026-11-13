@@ -12,7 +12,7 @@ import {
 	withTiming,
 } from 'react-native-reanimated'
 import { useTheme } from 'tamagui'
-import { AnimatedPath, AnimatedSvg } from '../Global/helpers/Animated/svg'
+import { AnimatedPath, AnimatedSvg } from '../Global/utils/Animated/svg'
 
 interface JellifyLogoProps {
 	rotateColor?: boolean

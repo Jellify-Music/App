@@ -7,7 +7,7 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
-import AnimatedRow from '../../Global/helpers/Animated/row'
+import AnimatedRow from '../../Global/utils/Animated/row'
 import { loadNewQueue } from '../../../player/queuing'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
@@ -51,8 +51,11 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('MostPlayedTracks')
 				}}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
 			>
-				<H4 marginLeft='2'>On Repeat</H4>
+				<H4 userSelect='none'>On Repeat</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

@@ -28,7 +28,6 @@ export async function fetchSearchSuggestions(
 
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User has not been set')
-		if (isUndefined(libraryId)) return reject('Library has not been set')
 
 		getLibraryApi(api)
 			.getItems(
@@ -72,7 +71,6 @@ export async function fetchArtistSuggestions(
 
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User has not been set')
-		if (isUndefined(libraryId)) return reject('Library has not been set')
 
 		getArtistApi(api)
 			// The SDK deprecates ArtistApi without a replacement — /Items has no album-artist filter
@@ -115,7 +113,6 @@ export async function fetchAlbumSuggestions(
 
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User has not been set')
-		if (isUndefined(libraryId)) return reject('Library has not been set')
 
 		console.debug(`fetching albums at page ${page}`)
 

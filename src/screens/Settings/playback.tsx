@@ -2,8 +2,8 @@ import LookaheadSettings from '../../components/Settings/components/settings/loo
 import { YStack, XStack, SizableText, RadioGroup, ScrollView, useTheme } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
-import { RadioGroupItemWithLabel } from '../../components/Global/helpers/radio-group-item-with-label'
+import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
+import { RadioGroupItemWithLabel } from '../../components/Global/utils/radio-group-item-with-label'
 import { usePlayerSettingsStore } from '../../stores/settings/player'
 import { StreamingQuality } from '../../enums/audio-quality'
 

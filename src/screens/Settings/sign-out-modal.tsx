@@ -1,6 +1,6 @@
 import { H5, XStack, YStack } from 'tamagui'
 import { SettingsStackParamList } from './types'
-import Button from '../../components/Global/helpers/button'
+import Button from '../../components/Global/utils/button'
 import Icon from '../../components/Global/components/icon'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
 import { CommonActions, useNavigation } from '@react-navigation/native'

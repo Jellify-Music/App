@@ -44,7 +44,7 @@ export async function handleLibraryShuffle() {
 		const library = getLibrary()
 		const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
 
-		if (!api || !user || !library || !deviceProfile) {
+		if (!api || !user || !deviceProfile) {
 			Toast.show({
 				text1: 'Unable to fetch random tracks',
 				type: 'error',
@@ -132,7 +132,7 @@ export async function handleLibraryShuffle() {
 
 				// Fetch random tracks from Jellyfin with filters
 				const { data } = await getLibraryApi(api).getItems({
-					parentId: library.musicLibraryId,
+					parentId: library?.musicLibraryId,
 					userId: user.id,
 					includeItemTypes: [BaseItemKind.Audio],
 					recursive: true,

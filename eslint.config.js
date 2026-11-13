@@ -64,6 +64,12 @@ module.exports = defineConfig([
 							message:
 								"Import RefreshControl from 'react-native' instead. The gesture-handler version uses deprecated findNodeHandle which causes warnings in StrictMode.",
 						},
+						{
+							name: 'react',
+							importNames: ['useMemo', 'useCallback'],
+							message:
+								'`useMemo` and `useCallback` are not necessary since this project uses the React Compiler for automatic memoization.',
+						},
 					],
 				},
 			],

@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
-import AnimatedRow from '../../Global/helpers/Animated/row'
+import AnimatedRow from '../../Global/utils/Animated/row'
 import { loadNewQueue } from '../../../player/queuing'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
@@ -62,8 +62,11 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('RecentTracks')
 				}}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
 			>
-				<H4 marginLeft='2'>Play it again</H4>
+				<H4 userSelect='none'>Play it again</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

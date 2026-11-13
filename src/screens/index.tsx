@@ -7,7 +7,7 @@ import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
-import { getApi, getLibrary } from '../stores/auth/utils'
+import { getApi, getUser } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import {
@@ -25,7 +25,7 @@ import { useState } from 'react'
 import PlayerStack from './Player'
 import LoginStack from './Login'
 import PrivacyPolicyScreen from './PrivacyPolicy'
-import { Ticker } from '../components/Global/helpers/Animated/text'
+import { Ticker } from '../components/Global/utils/Animated/text'
 
 /**
  * The root navigation stack for Jellify. Contains all top level screens, such as the login screen
@@ -119,7 +119,7 @@ export default function Root(): React.JSX.Element {
 	// Resolved on mount rather than at module load, since Android can recreate the activity
 	// (e.g. after switching app icons) while the JS runtime, and the user's session, live on
 	const [initialState] = useState<InitialState>(() => ({
-		routes: [{ name: getApi() && getLibrary() ? 'Tabs' : 'Login' }],
+		routes: [{ name: getApi() ? 'Tabs' : 'Login' }],
 	}))
 
 	return (

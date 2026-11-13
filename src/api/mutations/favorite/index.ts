@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import { getApi, getUser, getLibrary } from '../../../stores/auth/utils'
 import { TrackQueryKeys } from '../../queries/track/keys'
+import { MusicLibraryQueryKey } from '../../queries/libraries/keys'
 import { QueryKeys } from '../../../enums/query-keys'
 import { LoggingContext } from '../../../utils/logging'
 import { setQueryUserDataForItem } from '../../queries/user-data/cache'
@@ -25,13 +26,9 @@ interface SetFavoriteMutation {
  * This prevents unnecessary refetches of large lists when filters aren't active.
  */
 function invalidateRelevantQueries(item: BaseItemDto): void {
-	const library = getLibrary()
-
 	// Only invalidate if favorites filter is active, or always invalidate favorites-filtered queries
 	// (so they're fresh when user turns on filter later)
-	if (!library) return
-
-	const libraryId = library.musicLibraryId
+	const libraryId = MusicLibraryQueryKey(getLibrary()?.musicLibraryId)
 
 	// Determine which query to invalidate based on item type
 	// Always invalidate favorites-filtered queries so they're fresh when filter is turned on

@@ -7,50 +7,58 @@ import HorizontalCardList from '../../../components/Global/components/horizontal
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
-import { useRecentArtists } from '../../../api/queries/recents'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import AnimatedRow from '../../Global/helpers/Animated/row'
+import AnimatedRow from '../../Global/utils/Animated/row'
+import { useRecentlyUpdatedPlaylists } from '../../../api/queries/playlist'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
-export default function RecentArtists(): React.JSX.Element {
-	const recentArtistsInfiniteQuery = useRecentArtists()
+export default function RecentPlaylists(): React.JSX.Element {
+	const recentPlaylistsQuery = useRecentlyUpdatedPlaylists()
 
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const handleHeaderPress = () => {
-		navigation.navigate('RecentArtists')
+		navigation.navigate('RecentPlaylists')
 	}
 
-	const renderItem = ({ item: recentArtist }: LegendListRenderItemProps<BaseItemDto>) => (
+	const renderItem = ({ item: recentPlaylist }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
-			item={recentArtist}
-			caption={recentArtist.Name ?? 'Unknown Artist'}
-			subCaption={pickFirstGenre(recentArtist.Genres)}
+			item={recentPlaylist}
+			caption={recentPlaylist.Name ?? 'Unknown Playlist'}
+			captionAlign='left'
+			subCaption={pickFirstGenre(recentPlaylist.Genres)}
 			onPress={() => {
-				navigation.navigate('Artist', {
-					artist: recentArtist,
+				navigation.navigate('Playlist', {
+					playlist: recentPlaylist,
+					canEdit: true,
 				})
 			}}
 			onLongPress={() => {
 				rootNavigation.navigate('Context', {
-					item: recentArtist,
+					item: recentPlaylist,
 					navigation,
 				})
 			}}
 		/>
 	)
 
-	return recentArtistsInfiniteQuery.data ? (
-		<AnimatedRow testID='home-recent-artists'>
-			<XStack alignItems='center' onPress={handleHeaderPress}>
-				<H4 marginLeft='2'>Recent Artists</H4>
+	return recentPlaylistsQuery.data ? (
+		<AnimatedRow testID='home-recent-playlists'>
+			<XStack
+				alignItems='center'
+				onPress={handleHeaderPress}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
+			>
+				<H4 userSelect='none'>Your Playlists</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 
-			<HorizontalCardList data={recentArtistsInfiniteQuery.data} renderItem={renderItem} />
+			<HorizontalCardList data={recentPlaylistsQuery.data} renderItem={renderItem} />
 		</AnimatedRow>
 	) : (
 		<></>

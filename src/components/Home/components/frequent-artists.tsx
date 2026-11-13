@@ -10,7 +10,7 @@ import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
-import AnimatedRow from '../../Global/helpers/Animated/row'
+import AnimatedRow from '../../Global/utils/Animated/row'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function FrequentArtists(): React.JSX.Element {
@@ -45,8 +45,11 @@ export default function FrequentArtists(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('MostPlayedArtists')
 				}}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
 			>
-				<H4 marginLeft='2'>Most Played</H4>
+				<H4 userSelect='none'>Most Played</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

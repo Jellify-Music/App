@@ -1,76 +1,67 @@
-import React from 'react'
-import { APP_GITHUB_URL } from '../../configs/ota.config'
-import { PRIVACY_POLICY_URL } from '../../configs/privacy.config'
-import { Linking } from 'react-native'
-import { YStack, XStack, SizableText, ScrollView, Separator, Spacer } from 'tamagui'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-
-import Icon from '../../components/Global/components/icon'
 import usePatrons from '../../api/queries/patrons'
 import useSpecialThanks from '../../api/queries/special-thanks'
-import { useInfoCaption } from '../../hooks/use-caption'
-import { version } from '../../../package.json'
-import { getStoredOtaVersion } from 'react-native-nitro-ota'
-import { downloadUpdate } from '../../services/ota'
+import { APP_GITHUB_URL } from '../../configs/ota.config'
+import { PRIVACY_POLICY_URL } from '../../configs/privacy.config'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
-import type { Patron } from '../../types/patron'
+import { useInfoCaption } from '../../hooks/use-caption'
+import { downloadUpdate } from '../../services/ota'
+import React from 'react'
+import { version } from '../../../package.json'
+import { Linking } from 'react-native'
+import { getStoredOtaVersion } from 'react-native-nitro-ota'
+import { YStack, XStack, SizableText, Separator, Spacer, ScrollView, H4 } from 'tamagui'
+import SupporterList from './components/supporter-list'
+import Icon from '../Global/components/icon'
+import JellifyLogo from '../Branding/logo'
 
-function PatronsList({ patrons }: { patrons: Patron[] | undefined }) {
-	if (!patrons?.length) return null
-	return (
-		<XStack flexWrap='wrap' gap='2' marginTop='2'>
-			{patrons.map((patron, index) => (
-				<XStack key={index} alignItems='flex-start' maxWidth='20'>
-					<SizableText fontSize='2' numberOfLines={1} lineBreakStrategyIOS='standard'>
-						{patron.fullName}
-					</SizableText>
-				</XStack>
-			))}
-		</XStack>
-	)
-}
-
-export default function AboutScreen(): React.JSX.Element {
-	const { bottom } = useSafeAreaInsets()
+export default function About(): React.JSX.Element {
 	const patrons = usePatrons()
 	const specialThanks = useSpecialThanks()
 	const { data: caption } = useInfoCaption()
 	const otaVersion = getStoredOtaVersion()
 
 	return (
-		<YStack flex={1} backgroundColor='background' testID='settings-screen-about'>
-			<ScrollView
-				contentContainerStyle={{
-					paddingBottom: Math.max(bottom, 16) + 16,
-					paddingHorizontal: '2',
-				}}
-				showsVerticalScrollIndicator={false}
-			>
+		<ScrollView padding='2' showsVerticalScrollIndicator={false}>
+			<YStack testID='settings-screen-about'>
 				<YStack
 					padding='4'
-					gap='4'
+					gap='2'
 					borderRadius='2'
 					borderColor='borderColor'
 					borderWidth='1'
 				>
-					<YStack gap='1'>
-						<XStack alignItems='center' gap='2' testID='jellify-version-text'>
-							<Icon name='jellyfish' color='primary' />
-							<SizableText fontSize='3' fontWeight='6'>
-								Jellify {version}
-							</SizableText>
+					<YStack gap='2'>
+						<XStack gap='2' alignItems='center' testID='jellify-version-text'>
+							<JellifyLogo size='75' />
+
+							<YStack
+								gap='1'
+								flex={1}
+								alignContent={'space-evenly'}
+								justifyContent='center'
+							>
+								<H4 fontWeight='6'>Jellify</H4>
+								<SizableText fontSize='4' fontWeight='6'>
+									{version}
+								</SizableText>
+								{otaVersion && (
+									<SizableText fontSize='2' color='borderColor'>
+										OTA Version: {otaVersion}
+									</SizableText>
+								)}
+							</YStack>
 						</XStack>
-						{caption && (
-							<SizableText fontSize='2' color='borderColor'>
-								{caption}
-							</SizableText>
-						)}
-						{otaVersion && (
-							<SizableText fontSize='2' color='borderColor'>
-								OTA Version: {otaVersion}
-							</SizableText>
-						)}
 					</YStack>
+					{caption && (
+						<SizableText
+							fontSize='2'
+							fontWeight='4'
+							color='borderColor'
+							fontStyle='italic'
+						>
+							{caption}
+						</SizableText>
+					)}
 
 					<Separator borderColor='borderColor' />
 
@@ -204,7 +195,7 @@ export default function AboutScreen(): React.JSX.Element {
 							</SizableText>
 						</XStack>
 					</XStack>
-					<PatronsList patrons={patrons} />
+					<SupporterList patrons={patrons} />
 				</YStack>
 
 				<Spacer />
@@ -220,10 +211,10 @@ export default function AboutScreen(): React.JSX.Element {
 						<SizableText fontSize='3' fontWeight='6'>
 							Special Thanks
 						</SizableText>
-						<PatronsList patrons={specialThanks} />
+						<SupporterList patrons={specialThanks} />
 					</YStack>
 				</YStack>
-			</ScrollView>
-		</YStack>
+			</YStack>
+		</ScrollView>
 	)
 }

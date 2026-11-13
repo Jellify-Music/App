@@ -1,7 +1,7 @@
 import React from 'react'
 import type { EventHandler } from '../../../../types/Events'
 import { SizableText } from 'tamagui'
-import Button from '../../../Global/helpers/button'
+import Button from '../../../Global/utils/button'
 import Icon from '../../../Global/components/icon'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 

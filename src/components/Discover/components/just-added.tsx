@@ -1,43 +1,45 @@
-import navigationRef from '../../../screens/navigation'
-import { formatArtistNames } from '../../../utils/formatting/artist-names'
-import ItemCard from '../../Global/components/Card'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../Global/components/horizontal-list'
+import ItemCard from '../../Global/components/Card'
 import { H4, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
-import { useDiscoverAlbums } from '../../../api/queries/suggestions'
-import AnimatedRow from '../../Global/helpers/Animated/row'
+import navigationRef from '../../../screens/navigation'
+import { useRecentlyAddedAlbums } from '../../../api/queries/album'
+import AnimatedRow from '../../Global/utils/Animated/row'
 
-export default function SuggestedAlbums() {
-	const suggestedAlbumsInfiniteQuery = useDiscoverAlbums()
+export default function RecentlyAdded(): React.JSX.Element {
+	const recentlyAddedAlbumsInfinityQuery = useRecentlyAddedAlbums()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
 
-	const suggestedAlbumsExist =
-		suggestedAlbumsInfiniteQuery.data && suggestedAlbumsInfiniteQuery.data.length > 0
+	const recentlyAddedExists =
+		recentlyAddedAlbumsInfinityQuery.data && recentlyAddedAlbumsInfinityQuery.data.length > 0
 
-	return suggestedAlbumsExist ? (
-		<AnimatedRow testID='discover-suggested-albums'>
+	return recentlyAddedExists ? (
+		<AnimatedRow testID='discover-recently-added'>
 			<XStack
 				alignItems='center'
-				marginLeft='2'
 				onPress={() => {
 					navigation.navigate('Albums', {
-						type: DiscoverAlbumScreenType.Suggested,
+						type: DiscoverAlbumScreenType.RecentlyAdded,
 					})
 				}}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
 			>
-				<H4>More from the Vault</H4>
+				<H4 userSelect='none'>Recently Added</H4>
 				<Icon name='arrow-right' />
 			</XStack>
+
 			<HorizontalCardList
-				data={suggestedAlbumsInfiniteQuery.data}
+				data={recentlyAddedAlbumsInfinityQuery.data}
 				renderItem={({ item }) => (
 					<ItemCard
 						caption={item.Name}
-						subCaption={formatArtistNames(item.Artists)}
+						subCaption={`${item.Artists?.join(', ')}`}
 						size={'10'}
 						item={item}
 						onPress={() => {
@@ -45,12 +47,12 @@ export default function SuggestedAlbums() {
 								album: item,
 							})
 						}}
-						onLongPress={() =>
+						onLongPress={() => {
 							navigationRef.navigate('Context', {
 								item,
 								navigation,
 							})
-						}
+						}}
 						captionAlign='left'
 					/>
 				)}

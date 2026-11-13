@@ -4,12 +4,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import ItemCard from '../../Global/components/Card'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
-import AnimatedRow from '../../Global/helpers/Animated/row'
+import AnimatedRow from '../../Global/utils/Animated/row'
 
 export default function PublicPlaylists(): React.JSX.Element {
 	const result = usePublicPlaylists()
@@ -17,8 +16,6 @@ export default function PublicPlaylists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
 
 	const { data: server } = usePublicServerInfo()
-
-	const { width } = useSafeAreaFrame()
 
 	const publicPlaylistsExist = result.data && result.data.length > 0
 
@@ -29,8 +26,11 @@ export default function PublicPlaylists(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('PublicPlaylists')
 				}}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
 			>
-				<H4 marginLeft='2' maxWidth={width * 0.8} lineBreakStrategyIOS='standard'>
+				<H4 userSelect='none' numberOfLines={1} lineBreakStrategyIOS='standard'>
 					Playlists on {server?.ServerName ?? 'Jellyfin'}
 				</H4>
 				<Icon name='arrow-right' />
