@@ -4,6 +4,7 @@ import { fetchRawLyrics } from './utils'
 import { getApi } from '../../../stores/auth/utils'
 import { useNowPlaying } from 'react-native-nitro-player'
 import { QueryAges } from '../../../constants/durations'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
 
 /**
  * A hook that will return a {@link useQuery}
@@ -16,7 +17,7 @@ const useRawLyrics = () => {
 
 	return useQuery({
 		queryKey: LyricsQueryKey(currentTrack),
-		queryFn: ({ signal }) => fetchRawLyrics(api, currentTrack!.id!, signal),
+		queryFn: ({ signal }) => fetchRawLyrics(api, getTrackDto(currentTrack!)!.Id!, signal),
 		enabled: Boolean(currentTrack),
 		staleTime: ({ state }) => (state.data ? QueryAges.OneDay : 0),
 		gcTime: QueryAges.OneWeek,

@@ -24,7 +24,6 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 export const addToQueue = async (variables: AddToQueueMutation) => {
 	try {
 		const actualQueue = await TrackPlayer.getActualQueue()
-		const actualQueueIds = actualQueue.map((t) => t.id)
 		const playlistId = await PlayerQueue.getCurrentPlaylistId()
 
 		// With nothing queued there's no playlist to insert into,
@@ -37,14 +36,9 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 				startPlayback: true,
 			})
 		} else if (variables.queuingType === QueuingType.PlayNext) {
-			// For PlayNext, pass all tracks so we can reorder existing ones
 			await playNextInQueue(variables)
 		} else {
-			// For PlayLater, only add new tracks
-			const tracksToAdd = variables.tracks.filter(
-				(item) => !actualQueueIds.includes(item.Id!),
-			)
-			await playLaterInQueue({ ...variables, tracks: tracksToAdd })
+			await playLaterInQueue(variables)
 		}
 
 		applyHapticFeedback('success')

@@ -1,11 +1,12 @@
 import { PlayMethod, SessionApi } from '@jellyfin/sdk/lib/generated-client'
+import { ApiNotAvailableError } from '../../../../types/errors'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { getApi } from '../../../../stores/auth/utils'
 import { TrackItem } from 'react-native-nitro-player'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
-import { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
+import getTrackDto, { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
 
 export default async function reportPlaybackStarted(
 	track: TrackItem,
@@ -13,7 +14,7 @@ export default async function reportPlaybackStarted(
 ) {
 	const api = getApi()
 
-	if (!api) return Promise.reject('API instance not set')
+	if (!api) return Promise.reject(new ApiNotAvailableError())
 
 	const { sessionId } = track.extraPayload as TrackExtraPayload
 
@@ -26,7 +27,7 @@ export default async function reportPlaybackStarted(
 		await sessionApi.reportPlaybackStart({
 			playbackStartInfo: {
 				PlaySessionId: sessionId,
-				ItemId: track.id,
+				ItemId: getTrackDto(track)?.Id,
 				PositionTicks: position ? convertSecondsToRunTimeTicks(position) : 0,
 				PlayMethod: mediaSourceInfo?.TranscodingUrl
 					? PlayMethod.Transcode

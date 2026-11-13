@@ -147,12 +147,14 @@ export const useCurrentTrackItemDto = () => {
 }
 
 /**
- * Returns only the current track ID for efficient comparisons.
+ * Returns only the current track's Jellyfin item ID for efficient comparisons.
  * Use this in list items to avoid re-renders when other track properties change.
  */
 export const useCurrentTrackId = () =>
 	usePlayerQueueStore((state) =>
-		state.currentIndex !== undefined ? state.queue[state.currentIndex]?.id : undefined,
+		state.currentIndex !== undefined
+			? getTrackDto(state.queue[state.currentIndex])?.Id
+			: undefined,
 	)
 
 export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)

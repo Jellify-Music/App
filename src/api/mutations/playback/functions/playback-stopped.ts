@@ -1,10 +1,12 @@
 import { SessionApi } from '@jellyfin/sdk/lib/generated-client'
+import { ApiNotAvailableError } from '../../../../types/errors'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { TrackItem } from 'react-native-nitro-player'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { getApi } from '../../../../stores/auth/utils'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
+import getTrackDto from '../../../../utils/mapping/track-extra-payload'
 
 export default async function reportPlaybackStopped(
 	track: TrackItem,
@@ -12,10 +14,10 @@ export default async function reportPlaybackStopped(
 ): Promise<void> {
 	const api = getApi()
 
-	if (!api) return Promise.reject('API instance not set')
+	if (!api) return Promise.reject(new ApiNotAvailableError())
 
 	const { sessionId } = track.extraPayload as TrackExtraPayload
-	const { id } = track
+	const id = getTrackDto(track)?.Id
 
 	const sessionApi = new SessionApi(api.configuration, api.basePath, api.axiosInstance)
 

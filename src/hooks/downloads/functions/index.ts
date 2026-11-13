@@ -3,6 +3,7 @@ import { mapDtosToTracks } from '../../../utils/mapping/item-to-track'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { DownloadManager } from 'react-native-nitro-player'
 import { ensureDownloadedTracks } from '../utils'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
 
 export async function downloadItems(items: BaseItemDto[]) {
 	// Filter out items that are already downloaded
@@ -14,5 +15,10 @@ export async function downloadItems(items: BaseItemDto[]) {
 
 	const resolvedTracks = await resolveTrackUrls(tracks, 'download')
 
-	await Promise.all(resolvedTracks.map((track) => DownloadManager.downloadTrack(track)))
+	// Downloads are keyed by Jellyfin ID rather than the track's unique ID
+	await Promise.all(
+		resolvedTracks.map((track) =>
+			DownloadManager.downloadTrack({ ...track, id: getTrackDto(track)?.Id ?? track.id }),
+		),
+	)
 }

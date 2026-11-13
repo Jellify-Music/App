@@ -38,6 +38,11 @@ export interface TrackProps {
 	sortingByAlbum?: boolean | undefined
 	sortingByReleasedDate?: boolean | undefined
 	sortingByPlayCount?: boolean | undefined
+	/**
+	 * Overrides the now playing check, which otherwise matches on the Jellyfin item ID.
+	 * Used by the queue, where the same item can appear more than once.
+	 */
+	isPlaying?: boolean | undefined
 }
 
 export default function Track({
@@ -56,6 +61,7 @@ export default function Track({
 	sortingByAlbum,
 	sortingByReleasedDate,
 	sortingByPlayCount,
+	isPlaying: isPlayingOverride,
 }: TrackProps): React.JSX.Element {
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
@@ -73,7 +79,7 @@ export default function Track({
 	const rightSettings = useSwipeSettingsStore((s) => s.right)
 
 	// Memoize expensive computations
-	const isPlaying = currentTrackId === track.Id
+	const isPlaying = isPlayingOverride ?? currentTrackId === track.Id
 
 	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
 

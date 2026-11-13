@@ -22,6 +22,7 @@ import LoggingContext from '../../utils/logging/enums'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { handleError } from '../../utils/errors'
+import uuid from 'react-native-uuid'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
@@ -92,7 +93,11 @@ export async function handleLibraryShuffle() {
 				}
 
 				// Shuffle the filtered downloads using Fisher-Yates shuffle
-				const shuffled = [...(filteredDownloads as unknown as TrackItem[])]
+				// Downloads are keyed by Jellyfin ID, so give each one its own queue ID
+				const shuffled: TrackItem[] = filteredDownloads.map((download) => ({
+					...download.originalTrack,
+					id: uuid.v4(),
+				}))
 				for (let i = shuffled.length - 1; i > 0; i--) {
 					const j = Math.floor(Math.random() * (i + 1))
 					;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
@@ -269,9 +274,7 @@ export async function handleDeshuffle(): Promise<ShuffleResult | undefined> {
 	// Remove all tracks except the current track from the current playlist in one native pass.
 	// Removal is by id, so the current track's id is excluded to keep the playing copy.
 	try {
-		const idsToRemove = [
-			...new Set(playQueue.map(({ id }) => id).filter((id) => id !== currentTrack.id)),
-		]
+		const idsToRemove = playQueue.map(({ id }) => id).filter((id) => id !== currentTrack.id)
 
 		if (idsToRemove.length > 0) {
 			await PlayerQueue.removeTracksFromPlaylist(playlistId, idsToRemove)
