@@ -116,7 +116,7 @@ export default function EqualizerScreen(): React.JSX.Element {
 						</XStack>
 					</YStack>
 
-					<YStack gap='3'>
+					<YStack gap='4'>
 						<XStack alignItems='center' justifyContent='space-between'>
 							<SizableText size='$4' fontWeight='$6'>
 								Bands
