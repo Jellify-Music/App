@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { XStack, YStack, SizableText } from 'tamagui'
 import ItemImage from '../../Global/components/image'
-import { Ticker } from '../../../components/Global/helpers/Animated/text'
+import { Ticker } from '../../Global/utils/Animated/text'
 import { getItemName } from '../../../utils/formatting/item-names'
 import { StyleSheet } from 'react-native'
 

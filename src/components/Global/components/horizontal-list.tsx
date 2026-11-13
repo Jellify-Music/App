@@ -21,7 +21,7 @@ type HorizontalCardListProps = AnimatedListProps<BaseItemDto> & {
 export default function HorizontalCardList({
 	data,
 	renderItem,
-	estimatedItemSize = 150,
+	estimatedItemSize = 100,
 	slice = true,
 	...props
 }: HorizontalCardListProps): React.JSX.Element {

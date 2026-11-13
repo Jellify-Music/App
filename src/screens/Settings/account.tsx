@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import Icon from '../../components/Global/components/icon'
-import Button from '../../components/Global/helpers/button'
+import Button from '../../components/Global/utils/button'
 import SettingsSection from '../../components/Settings/components/settings-section'
 import { SettingsStackParamList } from './types'
 import { useJellifyUser, useJellifyLibrary } from '../../stores/auth'

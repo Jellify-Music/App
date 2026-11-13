@@ -25,7 +25,7 @@ import { useState } from 'react'
 import PlayerStack from './Player'
 import LoginStack from './Login'
 import PrivacyPolicyScreen from './PrivacyPolicy'
-import { Ticker } from '../components/Global/helpers/Animated/text'
+import { Ticker } from '../components/Global/utils/Animated/text'
 
 /**
  * The root navigation stack for Jellify. Contains all top level screens, such as the login screen

@@ -4,7 +4,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { XStack, YStack, SizableText, Spinner, View } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import ItemImage from '../../Global/components/image'
-import { Ticker } from '../../Global/helpers/Animated/text'
+import { Ticker } from '../../Global/utils/Animated/text'
 
 /**
  * Props for the AddToPlaylistRow component

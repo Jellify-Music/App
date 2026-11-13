@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { getTokenValue, SizableText, Spacer, useTheme, XStack, YStack } from 'tamagui'
-import {
-	calculateRunTimeFromSeconds,
-	RunTimeSeconds,
-} from '../../../components/Global/helpers/time-codes'
+import { calculateRunTimeFromSeconds, RunTimeSeconds } from '../../Global/utils/time-codes'
 import { useProgress } from '../../../player'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'

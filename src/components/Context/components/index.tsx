@@ -3,7 +3,7 @@ import { ListItem, SizableText } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import ItemImage from '../../Global/components/image'
 import CircularProgressIndicator from '../../Global/components/DownloadIndicator/circular-progress-indicator'
-import { Ticker } from '../../Global/helpers/Animated/text'
+import { Ticker } from '../../Global/utils/Animated/text'
 import { ContextMenuRowImageProp, ContextMenuRowProps } from './types'
 
 export default function ContextMenuRow({
