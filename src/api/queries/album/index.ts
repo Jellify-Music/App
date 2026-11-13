@@ -108,10 +108,10 @@ export const useRefetchRecentlyAdded: () => () => void = () => {
 		})
 }
 
-export const useAlbumDiscs = (album: BaseItemDto) => {
+export const useAlbumDiscs = (album: BaseItemDto, enabled: boolean = true) => {
 	const api = getApi()
 
-	return useQuery(AlbumDiscsQuery(api, album))
+	return useQuery({ ...AlbumDiscsQuery(api, album), enabled })
 }
 
 export async function refreshAlbumDiscs(album: BaseItemDto) {
