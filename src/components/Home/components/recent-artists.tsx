@@ -45,8 +45,14 @@ export default function RecentArtists(): React.JSX.Element {
 
 	return recentArtistsInfiniteQuery.data ? (
 		<AnimatedRow testID='home-recent-artists'>
-			<XStack alignItems='center' onPress={handleHeaderPress}>
-				<H4 marginLeft='2'>Recent Artists</H4>
+			<XStack
+				alignItems='center'
+				onPress={handleHeaderPress}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
+			>
+				<H4 userSelect='none'>Recent Artists</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

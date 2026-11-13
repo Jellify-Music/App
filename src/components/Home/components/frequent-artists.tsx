@@ -45,8 +45,11 @@ export default function FrequentArtists(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('MostPlayedArtists')
 				}}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
 			>
-				<H4 marginLeft='2'>Most Played</H4>
+				<H4 userSelect='none'>Most Played</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

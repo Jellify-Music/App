@@ -45,10 +45,12 @@ export default function SuggestedArtists(): React.JSX.Element {
 		<AnimatedRow testID='discover-suggested-artists'>
 			<XStack
 				alignItems='center'
-				marginLeft='2'
+				marginHorizontal='2'
 				onPress={() => navigation.navigate('SuggestedArtists')}
+				transition='quick'
+				opacity='1 press:0.6'
 			>
-				<H4>Artists for You</H4>
+				<H4 userSelect='none'>Artists for You</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList data={suggestedArtistsInfiniteQuery.data} renderItem={renderItem} />
