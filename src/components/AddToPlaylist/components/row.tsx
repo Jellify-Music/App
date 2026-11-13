@@ -53,7 +53,7 @@ export default function AddToPlaylistRow({
 			transition={'quick'}
 			alignItems='center'
 			gap='2'
-			margin='2'
+			marginVertical='2'
 			opacity={`1 press:0.6`}
 			onPress={onPress}
 		>
@@ -65,7 +65,7 @@ export default function AddToPlaylistRow({
 				elevate
 			/>
 
-			<YStack alignItems='flex-start' justifyContent='space-evenly' flex={1}>
+			<YStack alignItems='flex-start' flex={1}>
 				<Ticker>
 					<SizableText fontWeight='6' fontSize='3' numberOfLines={1}>
 						{playlist.Name ?? 'Untitled Playlist'}
@@ -73,7 +73,7 @@ export default function AddToPlaylistRow({
 				</Ticker>
 
 				<SizableText
-					color={'neutral'}
+					color={'borderColor'}
 					fontSize='2'
 				>{`${playlistTracks?.length ?? 0} tracks`}</SizableText>
 			</YStack>

@@ -31,7 +31,7 @@ export default function AddToPlaylist({
 	)
 
 	return (
-		<View>
+		<View flex={1}>
 			<AddToPlaylistHeader source={source} tracks={tracks} />
 			{!playlistsFetchPending && playlistsFetchSuccess && (
 				// Adding to a playlist moves it to the front of the list, so animate the reorder
@@ -40,7 +40,7 @@ export default function AddToPlaylist({
 					itemLayoutAnimation={LinearTransition.springify()}
 					renderItem={renderItem}
 					contentContainerStyle={{
-						marginTop: 12,
+						marginTop: 8,
 						paddingBottom: bottom,
 					}}
 				/>

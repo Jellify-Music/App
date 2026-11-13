@@ -25,7 +25,7 @@ export default function AddToPlaylistHeader({
 }: AddToPlaylistHeaderProps): React.JSX.Element {
 	return (
 		(source ?? tracks[0]) && (
-			<XStack gap='3' padding='3' boxShadow={'0 2px 8px 0 black75'}>
+			<XStack gap='2' padding='2' boxShadow={'0 2px 8px 0 black75'}>
 				<ItemImage
 					item={source ?? tracks[0]}
 					width={'6'}
@@ -36,7 +36,7 @@ export default function AddToPlaylistHeader({
 
 				<YStack justifyContent='space-evenly'>
 					<Ticker>
-						<SizableText fontWeight='6' fontSize={'3'}>
+						<SizableText fontWeight='6' fontSize='4'>
 							{getItemName(source ?? tracks[0])}
 						</SizableText>
 					</Ticker>
