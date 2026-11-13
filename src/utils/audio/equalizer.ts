@@ -1,26 +1,9 @@
-/**
- * The minimum gain in decibels that can be applied to an equalizer band.
- */
-export const EQ_GAIN_MIN = -12
-
-/**
- * The maximum gain in decibels that can be applied to an equalizer band.
- */
-export const EQ_GAIN_MAX = 12
-
-/**
- * The maximum value of a band slider.
- *
- * Band sliders run from zero to this value since the slider component
- * doesn't support negative values, so slider values are shifted by
- * {@link EQ_GAIN_MIN} to get the gain in decibels.
- */
-export const EQ_SLIDER_MAX = EQ_GAIN_MAX - EQ_GAIN_MIN
-
-/**
- * The step in decibels that band gains are rounded to when committed.
- */
-export const EQ_GAIN_STEP = 0.5
+import {
+	EQ_SLIDER_MAX,
+	EQ_GAIN_MIN,
+	EQ_GAIN_STEP,
+	EQ_GAIN_MAX,
+} from '../../configs/player/equalizer.config'
 
 /**
  * Converts a band slider value to a gain in decibels.

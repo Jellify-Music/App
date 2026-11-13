@@ -11,7 +11,7 @@ import {
 	type EqualizerPreset,
 } from 'react-native-nitro-player'
 
-import EqualizerScreen from '../../src/screens/Settings/equalizer'
+import EqualizerScreen from '../../src/components/Equalizer/index'
 import { useIsCasting } from '../../src/stores/player/engine'
 import config from '../../src/configs/tamagui.config'
 

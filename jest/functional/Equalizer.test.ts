@@ -1,11 +1,5 @@
-import {
-	EQ_GAIN_MAX,
-	EQ_GAIN_MIN,
-	EQ_SLIDER_MAX,
-	dbToSliderValue,
-	formatGainLabel,
-	sliderValueToDb,
-} from '../../src/utils/audio/equalizer'
+import { dbToSliderValue, formatGainLabel, sliderValueToDb } from '../../src/utils/audio/equalizer'
+import { EQ_SLIDER_MAX, EQ_GAIN_MIN, EQ_GAIN_MAX } from '../../src/configs/player/equalizer.config'
 
 describe('Equalizer Mapping Module', () => {
 	it('maps slider extremes and midpoint to dB', () => {
