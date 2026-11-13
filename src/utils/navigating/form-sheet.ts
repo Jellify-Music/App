@@ -10,6 +10,13 @@ export const bottomSheetPresentation: 'formSheet' | 'modal' = canUseFormSheet
 export const playerSheetPresentation: 'formSheet' | 'modal' =
 	canUseFormSheet && Platform.OS !== 'ios' ? 'formSheet' : 'modal'
 
-export const addToPlaylistSheetPresentation: 'formSheet' | 'modal' = canUseFormSheet
-	? 'formSheet'
-	: 'modal'
+/**
+ * Determines the presentation style for the "Add to Playlist" sheet.
+ * Uses 'formSheet' if supported and not on iOS, otherwise falls back to 'modal'.
+ *
+ * IDK why iOS doesn't work with 'formSheet' here, but 'modal' works fine.
+ *
+ * @returns 'formSheet' if supported and not on iOS, otherwise 'modal'.
+ */
+export const addToPlaylistSheetPresentation: 'formSheet' | 'modal' =
+	canUseFormSheet && Platform.OS !== 'ios' ? 'formSheet' : 'modal'
