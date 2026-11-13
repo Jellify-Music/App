@@ -35,14 +35,12 @@ export default function EqualizerScreen(): React.JSX.Element {
 	const sectionsDisabled = !isEnabled || isLoading
 
 	const handleEnabledChange = (enabled: boolean) => {
-		applyHapticFeedback('info')
 		setEnabled(enabled).catch(() => {
 			captureWarning(LoggingContext.Equalizer, 'Failed to toggle equalizer')
 		})
 	}
 
 	const handleGainChange = (bandIndex: number, gainDb: number) => {
-		applyHapticFeedback('info')
 		setBandGain(bandIndex, gainDb).catch(() => {
 			captureWarning(LoggingContext.Equalizer, `Failed to set gain for band ${bandIndex}`)
 		})
@@ -194,6 +192,8 @@ function EqualizerBandRow({ band, onGainChange }: EqualizerBandRowProps): React.
 	}, [band.gainDb])
 
 	const handleValueChange = (value: number) => {
+		applyHapticFeedback('info')
+
 		const gainDb = sliderValueToDb(value)
 
 		// Snap the thumb to the committed step
