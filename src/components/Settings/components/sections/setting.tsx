@@ -3,7 +3,7 @@ import { SizableText, View, XStack, YStack } from 'tamagui'
 
 interface SettingProps {
 	title: string
-	description?: string
+	description?: string | React.JSX.Element
 	indicator?: React.JSX.Element
 	children: React.JSX.Element
 	orientation?: 'horizontal' | 'vertical'
@@ -41,10 +41,12 @@ export default function Setting({
 					<SizableText fontSize='3' fontWeight='6'>
 						{title}
 					</SizableText>
-					{description && (
+					{typeof description === 'string' ? (
 						<SizableText fontSize='2' color='borderColor'>
 							{description}
 						</SizableText>
+					) : (
+						description
 					)}
 				</YStack>
 				{indicator && indicator}

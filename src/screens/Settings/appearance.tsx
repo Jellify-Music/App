@@ -1,7 +1,7 @@
 import React from 'react'
 import type { EventHandler } from '../../types/Events'
 import type { Appearance, ColorPreset } from '../../types/theme'
-import { YStack, XStack, SizableText, ScrollView } from 'tamagui'
+import { YStack, XStack, SizableText, ScrollView, Separator } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
@@ -10,6 +10,7 @@ import { useAppSettingsStore } from '../../stores/settings/app'
 import { PRESET_PALETTES } from '../../configs/styling/themes'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 import AppIconSettings from '../../components/Settings/components/settings/AppIcon'
+import { Setting } from '../../components/Settings/components/sections'
 
 type ThemeOptionConfig = {
 	value: Appearance
@@ -118,79 +119,71 @@ export default function AppearanceScreen(): React.JSX.Element {
 	} = useAppSettingsStore()
 
 	return (
-		<YStack flex={1} backgroundColor='background' testID='settings-screen-appearance'>
-			<ScrollView
-				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
-				showsVerticalScrollIndicator={false}
+		<ScrollView
+			contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
+			showsVerticalScrollIndicator={false}
+			testID='settings-screen-appearance'
+			gap='2'
+		>
+			<Setting title='Theme' orientation='vertical'>
+				<XStack flexWrap='wrap' gap='2'>
+					{THEME_OPTIONS.map((option) => (
+						<ThemeOptionCard
+							key={option.value}
+							option={option}
+							isSelected={themeSetting === option.value}
+							onPress={() => setThemeSetting(option.value)}
+						/>
+					))}
+				</XStack>
+			</Setting>
+
+			<Separator borderColor='borderColor' />
+
+			<Setting title='Color Scheme' orientation='vertical'>
+				<XStack flexWrap='wrap' gap='2'>
+					{COLOR_PRESET_LABELS.map((preset) => (
+						<ColorPresetCard
+							key={preset.value}
+							preset={preset}
+							isSelected={colorPreset === preset.value}
+							onPress={() => setColorPreset(preset.value)}
+						/>
+					))}
+				</XStack>
+			</Setting>
+
+			<Separator borderColor='borderColor' />
+
+			<AppIconSettings />
+
+			<Separator borderColor='borderColor' />
+
+			<Setting
+				title='Hide Runtimes'
+				description='Hide track duration lengths'
+				orientation='horizontal'
 			>
-				<YStack padding='4' gap='6'>
-					<YStack gap='3'>
-						<SizableText fontSize='3' fontWeight='6'>
-							Theme
-						</SizableText>
-						<XStack flexWrap='wrap' gap='2'>
-							{THEME_OPTIONS.map((option) => (
-								<ThemeOptionCard
-									key={option.value}
-									option={option}
-									isSelected={themeSetting === option.value}
-									onPress={() => setThemeSetting(option.value)}
-								/>
-							))}
-						</XStack>
-					</YStack>
+				<SwitchWithLabel
+					checked={hideRunTimes}
+					onCheckedChange={setHideRunTimes}
+					size='2'
+				/>
+			</Setting>
 
-					<YStack gap='3'>
-						<SizableText fontSize='3' fontWeight='6'>
-							Color Scheme
-						</SizableText>
-						<XStack flexWrap='wrap' gap='2'>
-							{COLOR_PRESET_LABELS.map((preset) => (
-								<ColorPresetCard
-									key={preset.value}
-									preset={preset}
-									isSelected={colorPreset === preset.value}
-									onPress={() => setColorPreset(preset.value)}
-								/>
-							))}
-						</XStack>
-					</YStack>
+			<Separator borderColor='borderColor' />
 
-					<AppIconSettings />
-
-					<XStack alignItems='center' justifyContent='space-between'>
-						<YStack flex={1}>
-							<SizableText fontSize='3' fontWeight='6'>
-								Hide Runtimes
-							</SizableText>
-							<SizableText fontSize='2' color='borderColor'>
-								Hide track duration lengths
-							</SizableText>
-						</YStack>
-						<SwitchWithLabel
-							checked={hideRunTimes}
-							onCheckedChange={setHideRunTimes}
-							size='2'
-						/>
-					</XStack>
-
-					<XStack alignItems='center' justifyContent='space-between'>
-						<YStack flex={1}>
-							<SizableText fontSize='3' fontWeight='6'>
-								Hide Card Indicators
-							</SizableText>
-							<SizableText fontSize='2' color='borderColor'>
-								Hide indicators on card corners
-							</SizableText>
-						</YStack>
-						<SwitchWithLabel
-							checked={hideItemIndicators}
-							onCheckedChange={setHideItemIndicators}
-							size='2'
-						/>
-					</XStack>
-				</YStack>
-			</ScrollView>
-		</YStack>
+			<Setting
+				title='Hide Card Indicators'
+				description='Hide indicators on card corners'
+				orientation='horizontal'
+			>
+				<SwitchWithLabel
+					checked={hideItemIndicators}
+					onCheckedChange={setHideItemIndicators}
+					size='2'
+				/>
+			</Setting>
+		</ScrollView>
 	)
 }

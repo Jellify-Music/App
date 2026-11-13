@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { Alert } from 'react-native'
-import { YStack, XStack, SizableText, ScrollView } from 'tamagui'
+import { YStack, XStack, SizableText, ScrollView, Separator } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
 import Button from '../../components/Global/utils/button'
 import Input from '../../components/Global/utils/input'
 import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
-import SettingsSection from '../../components/Settings/components/settings-section'
+import { Setting } from '../../components/Settings/components/sections'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { useDeveloperOptionsEnabled, usePrId } from '../../stores/settings/developer'
 import { downloadPRUpdate } from '../../services/ota/pull-request'
@@ -39,68 +39,50 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 		<ScrollView
 			contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
 			showsVerticalScrollIndicator={false}
+			testID='settings-screen-privacy-developer'
+			gap='2'
 		>
-			<YStack
-				flex={1}
-				backgroundColor='background'
-				margin='2'
-				testID='settings-screen-privacy-developer'
+			<SendMetricsAndCrashDataSetting />
+
+			<Separator borderColor='borderColor' />
+
+			<Setting
+				title='Reduce Haptics'
+				description='Reduce haptic feedback intensity'
+				orientation='horizontal'
 			>
-				<SettingsSection
-					title='Privacy'
-					icon='shield-account'
-					iconColor='success'
-					defaultExpanded
-					collapsible={false}
-				>
-					<SendMetricsAndCrashDataSetting />
+				<SwitchWithLabel
+					checked={reducedHaptics}
+					onCheckedChange={setReducedHaptics}
+					size='2'
+				/>
+			</Setting>
 
-					<XStack alignItems='center' justifyContent='space-between'>
-						<YStack flex={1}>
-							<SizableText fontSize='3' fontWeight='6'>
-								Reduce Haptics
-							</SizableText>
-							<SizableText fontSize='2' color='borderColor'>
-								Reduce haptic feedback intensity
-							</SizableText>
-						</YStack>
-						<SwitchWithLabel
-							checked={reducedHaptics}
-							onCheckedChange={setReducedHaptics}
-							size='2'
-						/>
-					</XStack>
-				</SettingsSection>
+			<Separator borderColor='borderColor' />
 
-				<SettingsSection
-					title='Developer'
-					icon='code-braces'
-					iconColor='borderColor'
-					defaultExpanded
-					collapsible={false}
-				>
-					<XStack alignItems='center' justifyContent='space-between'>
-						<YStack flex={1}>
-							<SizableText fontSize='3' fontWeight='6'>
-								Developer Options
-							</SizableText>
-							<SizableText fontSize='2' color='borderColor'>
-								Enable advanced developer features
-							</SizableText>
-						</YStack>
-						<SwitchWithLabel
-							testID='developer-options-switch'
-							checked={developerOptionsEnabled}
-							onCheckedChange={setDeveloperOptionsEnabled}
-							size='2'
-						/>
-					</XStack>
+			<Setting
+				title='Developer Options'
+				description='Enable advanced developer features'
+				orientation='horizontal'
+			>
+				<SwitchWithLabel
+					testID='developer-options-switch'
+					checked={developerOptionsEnabled}
+					onCheckedChange={setDeveloperOptionsEnabled}
+					size='2'
+				/>
+			</Setting>
 
-					{developerOptionsEnabled && (
-						<YStack gap='2' paddingTop='1'>
-							<SizableText fontSize='2' color='borderColor'>
-								Enter PR ID to test pull request builds
-							</SizableText>
+			{developerOptionsEnabled && (
+				<>
+					<Separator borderColor='borderColor' />
+
+					<Setting
+						title='Pull Request Build'
+						description='Enter PR ID to test pull request builds'
+						orientation='vertical'
+					>
+						<YStack gap='2'>
 							<XStack gap='2' alignItems='center'>
 								<Input
 									placeholder='Enter PR ID'
@@ -122,9 +104,9 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 								</SizableText>
 							)}
 						</YStack>
-					)}
-				</SettingsSection>
-			</YStack>
+					</Setting>
+				</>
+			)}
 		</ScrollView>
 	)
 }
