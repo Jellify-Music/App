@@ -31,7 +31,7 @@ export default function AddToPlaylist({
 	)
 
 	return (
-		<View flex={1}>
+		<View>
 			<AddToPlaylistHeader source={source} tracks={tracks} />
 			{!playlistsFetchPending && playlistsFetchSuccess && (
 				// Adding to a playlist moves it to the front of the list, so animate the reorder

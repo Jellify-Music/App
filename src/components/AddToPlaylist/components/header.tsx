@@ -3,7 +3,6 @@ import { XStack, YStack, SizableText } from 'tamagui'
 import ItemImage from '../../Global/components/image'
 import { Ticker } from '../../Global/utils/Animated/text'
 import { getItemName } from '../../../utils/formatting/item-names'
-import { StyleSheet } from 'react-native'
 
 /**
  * Props for the AddToPlaylistHeader component
@@ -26,7 +25,7 @@ export default function AddToPlaylistHeader({
 }: AddToPlaylistHeaderProps): React.JSX.Element {
 	return (
 		(source ?? tracks[0]) && (
-			<XStack gap='3' padding='3' style={styles.headerShadowStyle}>
+			<XStack gap='3' padding='3' boxShadow={'0 2px 8px 0 black75'}>
 				<ItemImage
 					item={source ?? tracks[0]}
 					width={'6'}
@@ -54,17 +53,3 @@ export default function AddToPlaylistHeader({
 		)
 	)
 }
-
-const styles = StyleSheet.create({
-	headerShadowStyle: {
-		boxShadow: [
-			{
-				offsetY: 4,
-				offsetX: 0,
-				blurRadius: 20,
-				spreadDistance: 1,
-				color: 'darkgray',
-			},
-		],
-	},
-})
