@@ -88,7 +88,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 				thumbWidth={getTokenValue('3')}
 				trackHeight={getTokenValue('2')}
 				gestureActiveRef={isSeeking}
-				thumbShadowColor={theme.black75.val}
+				thumbShadowColor='darkgray'
 			/>
 
 			{/* Time display and quality badge */}

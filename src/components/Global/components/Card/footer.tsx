@@ -69,7 +69,7 @@ export default function ItemCardFooter({ size, type }: ItemCardComponentFooterPr
 
 const styles = StyleSheet.create({
 	icon: {
-		shadowColor: 'black',
+		shadowColor: 'darkgray',
 		shadowRadius: 3,
 		shadowOpacity: 0.1,
 		shadowOffset: {
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
 				offsetX: 0,
 				blurRadius: 6,
 				spreadDistance: 1,
-				color: 'black',
+				color: 'darkgray',
 			},
 		],
 	},
