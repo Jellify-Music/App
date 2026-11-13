@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Platform } from 'react-native'
-import { YStack, XStack, SizableText } from 'tamagui'
+import { XStack } from 'tamagui'
 import { getActiveIcon, setIcon } from 'react-native-app-icon-changer'
 
 import { AppIconConfig, AppIconValue } from '../../../../../types/Artwork/icon'
@@ -10,6 +10,7 @@ import Toast from 'react-native-toast-message'
 import { applyHapticFeedback } from '../../../../../utils/haptics'
 import { handleError } from '../../../../../utils/errors'
 import { LoggingContext } from '../../../../../utils/logging'
+import { Setting } from '../../sections'
 
 export default function AppIconSettings(): React.JSX.Element {
 	const [selected, setSelected] = useState<AppIconValue>('Default')
@@ -47,21 +48,19 @@ export default function AppIconSettings(): React.JSX.Element {
 	}
 
 	return (
-		<YStack gap='3'>
-			<YStack>
-				<SizableText fontSize='3' fontWeight='6'>
-					App Icon
-				</SizableText>
-				{Platform.OS === 'android' && (
-					<SizableText fontSize='2' color='borderColor'>
-						Your new icon will appear after leaving the app
-					</SizableText>
-				)}
-			</YStack>
+		<Setting
+			title='App Icon'
+			description={
+				Platform.OS === 'android'
+					? 'Your new icon will appear after leaving the app'
+					: undefined
+			}
+			orientation='vertical'
+		>
 			<XStack gap='2'>
 				<AppIconCards selected={selected} handleSelect={handleSelect} />
 			</XStack>
-		</YStack>
+		</Setting>
 	)
 }
 

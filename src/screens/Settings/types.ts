@@ -11,6 +11,7 @@ export type SettingsStackParamList = {
 	Appearance: undefined
 	Gestures: undefined
 	Playback: undefined
+	Equalizer: undefined
 	PrivacyDeveloper: undefined
 	About: undefined
 }

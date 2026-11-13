@@ -205,6 +205,16 @@ appId: com.cosmonautical.jellify
     text: 'Quality Badge'
 - takeScreenshot: screenshots/settings/playback_scrolled
 
+# ============================================================
+# EQUALIZER — reached from Playback; enable, apply presets,
+# adjust band gains, reset
+# ============================================================
+- scrollUntilVisible:
+    element:
+      id: 'settings-nav-equalizer'
+    direction: UP
+- runFlow: equalizer.yaml
+
 # Return to hub via back
 - runFlow: ../../subflows/platform/back.yaml
 - waitForAnimationToEnd

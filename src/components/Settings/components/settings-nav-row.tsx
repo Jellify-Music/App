@@ -26,18 +26,17 @@ export default function SettingsNavRow({
 }: SettingsNavRowProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
+	const onPress = () => navigation.navigate(route)
+
 	return (
 		<Card
 			testID={testID}
-			borderWidth={'1'}
+			borderBottomWidth={'0-5'}
 			borderColor='borderColor'
 			backgroundColor='background'
-			marginHorizontal='3'
-			marginVertical='1-5'
-			padding='0'
+			marginVertical='1'
 			opacity='1 press:0.7'
-			borderRadius='4'
-			onPress={() => navigation.navigate(route)}
+			onPress={onPress}
 		>
 			<XStack
 				paddingHorizontal='3'
