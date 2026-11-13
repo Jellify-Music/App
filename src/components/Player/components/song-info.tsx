@@ -1,13 +1,12 @@
-import TextTicker from 'react-native-text-ticker'
-import { H6, Paragraph, SizableText, XStack, YStack } from 'tamagui'
-import { TextTickerConfig } from '../component.config'
+import { Ticker } from '../../Global/utils/Animated/text'
+import { SizableText, XStack, YStack } from 'tamagui'
 import React from 'react'
 import FavoriteButton from '../../Global/components/favorite-button'
 import Icon from '../../Global/components/icon'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import { isExplicit } from '../../../utils/trackDetails'
+import { isExplicit } from '../../../utils/audio/explicit'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
@@ -84,10 +83,7 @@ export default function SongInfo(): React.JSX.Element {
 					key={`${currentTrack?.id ?? 'unknown-track'}-song-info`}
 				>
 					<YStack gap={'1'}>
-						<TextTicker
-							{...TextTickerConfig}
-							key={`${currentTrack?.id ?? 'no-track'}-title`}
-						>
+						<Ticker key={`${currentTrack?.id ?? 'no-track'}-title`}>
 							<SizableText
 								fontSize='4'
 								fontWeight='6'
@@ -96,12 +92,9 @@ export default function SongInfo(): React.JSX.Element {
 							>
 								{trackTitle}
 							</SizableText>
-						</TextTicker>
+						</Ticker>
 
-						<TextTicker
-							{...TextTickerConfig}
-							key={`${currentTrack?.id ?? 'no-track'}-artist`}
-						>
+						<Ticker key={`${currentTrack?.id ?? 'no-track'}-artist`}>
 							<SizableText
 								fontSize='4'
 								{...ICON_PRESS_STYLES}
@@ -114,7 +107,7 @@ export default function SongInfo(): React.JSX.Element {
 									<Icon name='alpha-e-box-outline' color={'color'} size='5' />
 								</XStack>
 							)}
-						</TextTicker>
+						</Ticker>
 					</YStack>
 				</Animated.View>
 			</YStack>

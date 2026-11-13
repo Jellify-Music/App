@@ -3,7 +3,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { SettingsStackParamList } from './types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../enums/query-keys'
-import { queryClient } from '../../constants/query-client'
+import { queryClient } from '../../api/client'
 import Toast from 'react-native-toast-message'
 import LibrarySelector from '../../components/LibrarySelector'
 import { useJellifyLibrary } from '../../stores/auth'
@@ -15,22 +15,27 @@ export default function LibrarySelectionScreen(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
 	const handleLibrarySelected = useCallback(
-		(libraryId: string, selectedLibrary: BaseItemDto) => {
+		(selectedLibrary: BaseItemDto | undefined) => {
 			// Don't proceed if the same library is selected
-			if (libraryId === library?.musicLibraryId) {
+			if (selectedLibrary?.Id === library?.musicLibraryId) {
 				navigation.goBack()
 				return
 			}
 
-			setLibrary({
-				musicLibraryId: libraryId,
-				musicLibraryName: selectedLibrary.Name ?? 'No library name',
-				musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
-			})
+			// Without a selected library, Jellify uses every music library
+			setLibrary(
+				selectedLibrary
+					? {
+							musicLibraryId: selectedLibrary.Id!,
+							musicLibraryName: selectedLibrary.Name ?? 'No library name',
+							musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
+						}
+					: undefined,
+			)
 
 			// Invalidate all library-related queries to refresh the data
-			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllArtistsAlphabetical] })
-			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllAlbumsAlphabetical] })
+			queryClient.invalidateQueries({ queryKey: [QueryKeys.InfiniteArtists] })
+			queryClient.invalidateQueries({ queryKey: [QueryKeys.InfiniteAlbums] })
 			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllTracks] })
 			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllAlbums] })
 			queryClient.invalidateQueries({ queryKey: [QueryKeys.AllArtists] })
@@ -48,7 +53,9 @@ export default function LibrarySelectionScreen(): React.JSX.Element {
 
 			Toast.show({
 				text1: 'Library changed',
-				text2: `Now using ${selectedLibrary.Name}`,
+				text2: selectedLibrary
+					? `Now using ${selectedLibrary.Name}`
+					: 'Now using all music libraries',
 				type: 'success',
 			})
 

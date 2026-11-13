@@ -1,23 +1,21 @@
 import { Spacer, useTheme, XStack, YStack } from 'tamagui'
-
 import Icon from '../../Global/components/icon'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useNavigation } from '@react-navigation/native'
-import { PlayerParamList } from '../../../screens/Player/types'
-import useRawLyrics from '../../../api/queries/lyrics'
 import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { CastButton, CastState } from 'react-native-nitro-player'
 import { usePlayerContext } from '../../../providers/Player'
 import { StyleSheet } from 'react-native'
+import useRawLyrics from '../../../api/queries/lyrics'
 
 export default function Footer(): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
-
 	const { setPage } = usePlayerContext()
 
 	const theme = useTheme()
 
-	const { data: lyrics } = useRawLyrics()
+	const { displayLyrics, setDisplayLyrics } = usePlayerContext()
+
+	const rawLyricsQuery = useRawLyrics()
+
+	const displayLyricsAvailable = rawLyricsQuery.data || displayLyrics
 
 	return (
 		<XStack justifyContent='center' alignItems='center' gap='3'>
@@ -33,14 +31,15 @@ export default function Footer(): React.JSX.Element {
 
 			<Spacer flex={1} />
 
-			{lyrics && (
+			{displayLyricsAvailable && (
 				<Icon
 					size='7'
 					name='message-text-outline'
-					onPress={() => navigation.navigate('LyricsScreen', { lyrics: lyrics })}
+					onPress={() => setDisplayLyrics(!displayLyrics)}
 					{...ICON_PRESS_STYLES}
 					opacity='1 hover:0.8 press:0.6 enter:0 exit:0'
 					transition={'quick'}
+					color={displayLyrics ? 'primary' : 'color'}
 				/>
 			)}
 

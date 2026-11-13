@@ -6,8 +6,8 @@ import Slider, { SliderOrientations } from '@jellify-music/react-native-reanimat
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import Icon from '../../components/Global/components/icon'
-import Button from '../../components/Global/helpers/button'
-import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
+import Button from '../../components/Global/utils/button'
+import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
 import ActionChip from '../../components/Settings/components/sections/action-chip'
 import { useIsCasting } from '../../stores/player/engine'
 import {

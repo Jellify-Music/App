@@ -1,26 +1,54 @@
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { InfiniteData, useMutation } from '@tanstack/react-query'
-import { refreshAndroidAutoLibrary } from '../../../services/android-auto'
-import { createPlaylist, deletePlaylist, updatePlaylist } from './utils/playlists'
+import { useMutation } from '@tanstack/react-query'
+import { refreshAndroidAutoLibrary } from '../../../services/auto/android-auto'
+import { refreshCarPlayLibrary } from '../../../services/auto/carplay'
+import {
+	addManyToPlaylist,
+	createPlaylist,
+	deletePlaylist,
+	removeFromPlaylist,
+	updatePlaylist,
+} from './utils/playlists'
 import Toast from 'react-native-toast-message'
-import { queryClient } from '../../../constants/query-client'
-import { PlaylistTracksQueryKey, UserPlaylistsQueryKey } from '../../queries/playlist/keys'
+import {
+	addUserPlaylist,
+	appendPlaylistTracks,
+	removeCachedPlaylist,
+	removePlaylistTracks,
+	setPlaylistTracks,
+	updateCachedPlaylist,
+} from '../../queries/playlist/cache'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import navigationRef from '../../../screens/navigation'
 import { applyHapticFeedback } from '../../../utils/haptics'
+import { handleError } from '../../../utils/errors'
+import { LoggingContext } from '../../../utils/logging'
+import { AddToPlaylistMutation, RemoveFromPlaylistMutation, UseUpdatePlaylistParams } from './types'
 
+/**
+ * Hook to create a new playlist
+ *
+ * @returns A mutation object for creating the playlist
+ */
 export const useAddPlaylist = () => {
-	const user = getUser()
-
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	return useMutation({
 		mutationFn: ({ name }: { name: string }) => createPlaylist(name),
 		onSuccess: async (data: string, { name }: { name: string }) => {
+			addUserPlaylist({
+				Id: data,
+				Name: name,
+				CanDelete: true,
+				Type: 'Playlist',
+				DateCreated: new Date().toISOString(),
+			})
+
 			refreshAndroidAutoLibrary()
+			refreshCarPlayLibrary('playlists')
 			applyHapticFeedback('success')
 
 			Toast.show({
@@ -30,34 +58,18 @@ export const useAddPlaylist = () => {
 			})
 
 			libraryStackNavigation.goBack()
-
-			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-				UserPlaylistsQueryKey(user),
-				(oldData) => {
-					if (!oldData) return oldData
-
-					const newPlaylist: BaseItemDto = {
-						Id: data,
-						Name: name,
-						CanDelete: true,
-						Type: 'Playlist',
-					} as BaseItemDto
-
-					return {
-						...oldData,
-						pages: oldData.pages.map((page, index) =>
-							index === 0 ? [newPlaylist, ...page] : page,
-						),
-					}
-				},
-			)
 		},
-		onError: () => {
-			applyHapticFeedback('error')
+		onError: (error) => {
+			handleError(error, LoggingContext.Playlist, 'Failed to create playlist')
 		},
 	})
 }
 
+/**
+ * Hook to delete a playlist
+ *
+ * @returns A mutation object for deleting the playlist
+ */
 export const useDeletePlaylist = () => {
 	return useMutation({
 		mutationFn: (playlist: BaseItemDto) => {
@@ -65,41 +77,29 @@ export const useDeletePlaylist = () => {
 			return deletePlaylist(api, playlist.Id!)
 		},
 		onSuccess: async (data: void, playlist: BaseItemDto) => {
+			removeCachedPlaylist(playlist.Id!)
 			refreshAndroidAutoLibrary()
-			const user = getUser()
+			refreshCarPlayLibrary('playlists')
 
 			applyHapticFeedback('success')
 
 			navigationRef.goBack() // Dismiss DeletePlaylist sheet
 			navigationRef.goBack() // Pop Playlist screen or Context sheet if open
-
-			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-				UserPlaylistsQueryKey(user),
-				(oldData) => {
-					if (!oldData) return oldData
-
-					return {
-						...oldData,
-						pages: oldData.pages.map((page) =>
-							page.filter((item) => item.Id !== playlist.Id),
-						),
-					}
-				},
-			)
 		},
-		onError: () => {
-			applyHapticFeedback('error')
+		onError: (error) => {
+			handleError(error, LoggingContext.Playlist, 'Failed to delete playlist')
 		},
 	})
 }
 
-export const useUpdatePlaylist = ({
-	onSettled,
-	onError,
-}: {
-	onSettled?: () => void
-	onError?: () => void
-}) => {
+/**
+ * Hook to update a playlist's tracks and name
+ *
+ * @param param0 The parameters for updating the playlist, including onSettled and onError handlers
+ *
+ * @returns A mutation object for updating the playlist
+ */
+export const useUpdatePlaylist = ({ onSettled, onError }: UseUpdatePlaylistParams) => {
 	const api = getApi()
 
 	return useMutation({
@@ -119,26 +119,79 @@ export const useUpdatePlaylist = ({
 				tracks.map((track) => track.Id!),
 			)
 		},
-		onSuccess: (_, { playlist, tracks }) => {
+		onSuccess: (_, { playlist, tracks, newName }) => {
+			setPlaylistTracks(playlist, tracks)
+			updateCachedPlaylist(playlist.Id!, { Name: newName })
+
 			refreshAndroidAutoLibrary()
+			refreshCarPlayLibrary('playlists')
+			refreshCarPlayLibrary(`playlist:${playlist.Id}`)
 			applyHapticFeedback('success')
-
-			// Refresh playlist component data
-			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-				PlaylistTracksQueryKey(playlist),
-				(prev) => {
-					if (!prev) return prev
-
-					return {
-						...prev,
-						pages: prev.pages.map((page: BaseItemDto[]) =>
-							page.filter((track) => tracks.some((t) => t.Id === track.Id)),
-						),
-					}
-				},
-			)
 		},
-		onError: onError,
+		onError: (error) => {
+			handleError(error, LoggingContext.Playlist, 'Failed to update playlist')
+			onError?.()
+		},
 		onSettled: onSettled,
 	})
 }
+
+/**
+ * Hook to add tracks to a playlist
+ *
+ * @param playlist The playlist to add tracks to
+ *
+ * @returns A mutation object for adding tracks to the playlist
+ *
+ */
+export const useAddToPlaylist = (playlist: BaseItemDto) =>
+	useMutation({
+		mutationFn: ({ playlist, tracks }: AddToPlaylistMutation) => {
+			applyHapticFeedback('info')
+
+			const api = getApi()
+			const user = getUser()
+
+			return addManyToPlaylist(api, user, tracks, playlist)
+		},
+		onSuccess: (_, { tracks }) => {
+			applyHapticFeedback('success')
+
+			appendPlaylistTracks(playlist, tracks)
+		},
+		onError: (error) => {
+			handleError(
+				error,
+				LoggingContext.Playlist,
+				`Failed to add to ${playlist.Name ?? 'playlist'}`,
+			)
+		},
+	})
+
+/**
+ * Hook to remove tracks from a playlist
+ *
+ * @param playlist The playlist to remove tracks from
+ *
+ * @returns A mutation object for removing tracks from the playlist
+ */
+export const useRemoveFromPlaylist = (playlist: BaseItemDto) =>
+	useMutation({
+		mutationFn: ({ playlist, tracks }: RemoveFromPlaylistMutation) => {
+			applyHapticFeedback('info')
+
+			return removeFromPlaylist(tracks, playlist)
+		},
+		onSuccess: (_, { tracks }) => {
+			applyHapticFeedback('success')
+
+			removePlaylistTracks(playlist, tracks)
+		},
+		onError: (error) => {
+			handleError(
+				error,
+				LoggingContext.Playlist,
+				`Failed to remove from ${playlist.Name ?? 'playlist'}`,
+			)
+		},
+	})

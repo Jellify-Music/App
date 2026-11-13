@@ -1,6 +1,6 @@
 import { H5, XStack, YStack } from 'tamagui'
 import { SettingsStackParamList } from './types'
-import Button from '../../components/Global/helpers/button'
+import Button from '../../components/Global/utils/button'
 import Icon from '../../components/Global/components/icon'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
 import { CommonActions, useNavigation } from '@react-navigation/native'
@@ -9,12 +9,15 @@ import { DownloadManager, TrackPlayer } from 'react-native-nitro-player'
 import navigationRef from '../navigation'
 import resetQueue from '../../player/queuing/reset'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useSignOut } from '../../stores/auth'
 
 export default function SignOutModal(): React.JSX.Element {
 	const { data: server } = usePublicServerInfo()
 
 	const settingsStackNavigation =
 		useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+
+	const signOut = useSignOut()
 
 	const clearDownloads = async () => {
 		await DownloadManager.deleteAllDownloads()
@@ -26,11 +29,8 @@ export default function SignOutModal(): React.JSX.Element {
 		settingsStackNavigation.goBack()
 
 		navigationRef.dispatch(
-			CommonActions.navigate({
-				name: 'Login',
-				params: {
-					screen: 'ServerAddress',
-				},
+			CommonActions.navigate('Login', {
+				screen: 'ServerAddress',
 			}),
 		)
 
@@ -43,6 +43,7 @@ export default function SignOutModal(): React.JSX.Element {
 
 		await clearDownloads()
 		resetQueue()
+		signOut()
 	}
 
 	return (

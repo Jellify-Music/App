@@ -1,5 +1,6 @@
 import React from 'react'
-import { SizableText, Theme, XStack, YStack } from 'tamagui'
+import type { EventHandler } from '../../../../types/Events'
+import { SizableText, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../icon'
 import ItemImage from '../image'
@@ -7,7 +8,7 @@ import FavoriteIcon from '../favorite-icon'
 import DownloadIndicator from '../DownloadIndicator'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from '../SwipeableRow/context'
-import { isExplicit } from '../../../../utils/trackDetails'
+import { isExplicit } from '../../../../utils/audio/explicit'
 
 export interface TrackRowContentProps {
 	track: BaseItemDto
@@ -20,7 +21,7 @@ export interface TrackRowContentProps {
 	artistsText: string
 	runtimeComponent: React.ReactNode
 	editing?: boolean
-	handleIconPress: () => void
+	handleIconPress: EventHandler
 	testID?: string
 }
 

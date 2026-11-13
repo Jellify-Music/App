@@ -2,13 +2,10 @@ import { SizableText, Spinner, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LoginStackParamList from '../../screens/Login/types'
-import { useEffect, useState } from 'react'
-import { useSignOut } from '../../stores/auth'
+import { useState } from 'react'
 import { isEmpty } from 'lodash'
 import useConnectToServer from '../../api/mutations/public-system-info'
-import { sleepify } from '../../utils/sleep'
-import Toast from 'react-native-toast-message'
-import Button from '../Global/helpers/button'
+import Button from '../Global/utils/button'
 import AddressInput from '../ServerAddress/components/address-input'
 import Heading from '../ServerAddress/components/heading'
 
@@ -17,20 +14,8 @@ export default function ServerAddress(): React.JSX.Element {
 
 	const [serverAddress, setServerAddress] = useState<string | undefined>(undefined)
 
-	const signOut = useSignOut()
-
-	useEffect(() => {
-		sleepify(1000).then(() => signOut())
-	}, [])
-
 	const { mutate: connectToServer, isPending } = useConnectToServer({
 		onSuccess: () => navigation.navigate('ServerAuthentication'),
-		onError: () =>
-			Toast.show({
-				text1: 'Unable to connect',
-				text2: `to ${serverAddress}`,
-				type: 'error',
-			}),
 	})
 
 	const connectWithAddress = () => {

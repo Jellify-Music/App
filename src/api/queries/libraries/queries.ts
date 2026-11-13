@@ -1,5 +1,5 @@
 import { Api } from '@jellyfin/sdk'
-import { LibrariesQueryKey, LibraryQueryKeys, PlaylistLibraryQueryKey } from './keys'
+import { LibrariesQueryKey, PlaylistLibraryQueryKey } from './keys'
 import { fetchPlaylistLibrary, fetchUserViews } from './utils'
 import { JellifyUser } from '../../../types/JellifyUser'
 import { UndefinedInitialDataOptions } from '@tanstack/react-query'

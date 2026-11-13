@@ -27,6 +27,8 @@ enum LoggingContext {
 	MediaInfo = 'MediaInfo',
 	NitroPlayer = 'Nitro Player',
 	Equalizer = 'Equalizer',
+	ImageCache = 'Image Cache',
+	Downloads = 'Downloads',
 }
 
 export default LoggingContext

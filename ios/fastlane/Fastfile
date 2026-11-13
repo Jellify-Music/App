@@ -22,11 +22,11 @@ platform :ios do
     setup_ci
     match(
       type: "appstore",
-      app_identifier: "com.cosmonautical.jellify",
+      app_identifier: ["com.cosmonautical.jellify", "com.cosmonautical.jellify.stickers"],
     )
     match(
       type: "development",
-      app_identifier: "com.cosmonautical.jellify",
+      app_identifier: ["com.cosmonautical.jellify", "com.cosmonautical.jellify.stickers"],
     )
     appIdentifier = "com.cosmonautical.jellify"
     
@@ -38,7 +38,8 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "com.cosmonautical.jellify" => "match AppStore com.cosmonautical.jellify"
+          "com.cosmonautical.jellify" => "match AppStore com.cosmonautical.jellify",
+          "com.cosmonautical.jellify.stickers" => "match AppStore com.cosmonautical.jellify.stickers"
         }
       }
     )
@@ -48,7 +49,7 @@ platform :ios do
     setup_ci
     match(
       type: "appstore",
-      app_identifier: "com.cosmonautical.jellify",
+      app_identifier: ["com.cosmonautical.jellify", "com.cosmonautical.jellify.stickers"],
     )
 
     build_app(
@@ -84,8 +85,8 @@ platform :ios do
   end
 
   lane :installProfile do
-    sync_code_signing(app_identifier: ["com.cosmonautical.jellify"], type: "development" , readonly: true)
-    sync_code_signing(app_identifier: ["com.cosmonautical.jellify"], type: "appstore" , readonly: true)
-    sync_code_signing(app_identifier: ["com.cosmonautical.jellify"], type: "adhoc" , readonly: true)
+    sync_code_signing(app_identifier: ["com.cosmonautical.jellify", "com.cosmonautical.jellify.stickers"], type: "development" , readonly: true)
+    sync_code_signing(app_identifier: ["com.cosmonautical.jellify", "com.cosmonautical.jellify.stickers"], type: "appstore" , readonly: true)
+    sync_code_signing(app_identifier: ["com.cosmonautical.jellify", "com.cosmonautical.jellify.stickers"], type: "adhoc" , readonly: true)
   end
 end

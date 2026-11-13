@@ -6,8 +6,9 @@ import { getUser } from '../../../stores/auth/utils'
 import { isUndefined } from 'lodash'
 import fetchSimilarArtists, { fetchSimilarItems } from './utils/similar'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
-import { ONE_DAY } from '../../../constants/query-client'
+import { QueryAges } from '../../../constants/durations'
 import { DiscoverAlbumsQuery, DiscoverArtistsQuery } from './queries'
+import { MusicLibraryQueryKey } from '../libraries/keys'
 
 export const useSearchSuggestions = () => {
 	const [library] = useJellifyLibrary()
@@ -15,9 +16,12 @@ export const useSearchSuggestions = () => {
 	const user = getUser()
 
 	return useQuery({
-		queryKey: [SuggestionQueryKeys.SearchSuggestions, library?.musicLibraryId],
+		queryKey: [
+			SuggestionQueryKeys.SearchSuggestions,
+			MusicLibraryQueryKey(library?.musicLibraryId),
+		],
 		queryFn: () => fetchSearchSuggestions(user, library?.musicLibraryId),
-		enabled: !isUndefined(library),
+		enabled: !isUndefined(user),
 	})
 }
 
@@ -47,6 +51,7 @@ export const useSimilarItems = (item: BaseItemDto) => {
 				? fetchSimilarArtists(user, item.Id!, undefined, signal)
 				: fetchSimilarItems(user, item.Id!, undefined, signal),
 		enabled: !isUndefined(item.Id),
-		staleTime: ONE_DAY,
+		staleTime: QueryAges.OneDay,
+		gcTime: QueryAges.OneWeek,
 	})
 }

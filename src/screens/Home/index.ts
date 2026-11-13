@@ -3,6 +3,7 @@ import { stackScreenOptions } from '../navigation'
 import { Home as HomeComponent } from '../../components/Home'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
+import RecentPlaylistsScreen from './playlists'
 import HomeStackParamList from './types'
 import { BaseStackScreens } from '../base-stack'
 
@@ -39,6 +40,12 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 			screen: HomeTracksScreen,
 			options: {
 				title: 'On Repeat',
+			},
+		},
+		RecentPlaylists: {
+			screen: RecentPlaylistsScreen,
+			options: {
+				title: 'Your Playlists',
 			},
 		},
 	},

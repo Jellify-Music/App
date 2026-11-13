@@ -1,8 +1,9 @@
+import { ApiNotAvailableError } from '../../../../types/errors'
 import { getApi, getUser } from '../../../../stores/auth/utils'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { BaseItemDto, MediaType } from '@jellyfin/sdk/lib/generated-client/models'
-import { getLibraryApi, getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi, getPlaylistApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
 
 /**
@@ -28,7 +29,7 @@ export async function addToPlaylist(
 
 		if (isUndefined(user)) return reject(new Error('No user available'))
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.addItemToPlaylist(
 				{
 					ids: [track.Id!],
@@ -72,7 +73,7 @@ export async function addManyToPlaylist(
 
 		if (ids.length === 0) return resolve()
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.addItemToPlaylist(
 				{
 					ids,
@@ -97,31 +98,26 @@ export async function addManyToPlaylist(
  * Removes a track from a Jellyfin playlist.
  *
  * @param api The Jellyfin {@link Api} client
- * @param track The {@link BaseItemDto} to remove
+ * @param tracks The array of {@link BaseItemDto} to remove
  * @param playlist The {@link BaseItemDto} playlist to remove the track from
  * @returns
  */
-export async function removeFromPlaylist(
-	api: Api | undefined,
-	track: BaseItemDto,
-	playlist: BaseItemDto,
-) {
-	return new Promise<void>((resolve, reject) => {
-		if (isUndefined(api)) return reject(new Error('No API client available'))
+export async function removeFromPlaylist(tracks: BaseItemDto[], playlist: BaseItemDto) {
+	const api = getApi()
+	if (isUndefined(api)) return Promise.reject(new ApiNotAvailableError())
 
-		getPlaylistsApi(api)
-			.removeItemFromPlaylist({
-				playlistId: playlist.Id!,
-				entryIds: [track.Id!],
-			})
-			.then(() => {
-				resolve()
-			})
-			.catch((error) => {
-				reject(error)
-				console.error(error)
-			})
-	})
+	return await getPlaylistApi(api)
+		.removeItemFromPlaylist({
+			playlistId: playlist.Id!,
+			entryIds: tracks.map((t) => t.Id!).filter(Boolean),
+		})
+		.then(() => {
+			return Promise.resolve()
+		})
+		.catch((error) => {
+			console.error(error)
+			return Promise.reject(error)
+		})
 }
 
 /**
@@ -142,7 +138,7 @@ export async function reorderPlaylist(
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.moveItem({
 				playlistId,
 				itemId,
@@ -173,7 +169,7 @@ export async function createPlaylist(name: string) {
 
 		if (isUndefined(user)) return reject(new Error('No user available'))
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.createPlaylist({
 				userId: user.id,
 				mediaType: MediaType.Audio,
@@ -237,7 +233,7 @@ export async function updatePlaylist(
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.updatePlaylist({
 				playlistId,
 				updatePlaylistDto: {

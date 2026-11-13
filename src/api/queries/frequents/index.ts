@@ -3,11 +3,15 @@ import { FrequentlyPlayedArtistsQueryKey } from './keys'
 import { fetchFrequentlyPlayedArtists } from './utils/frequents'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyLibrary } from '../../../stores/auth'
-import { ONE_DAY } from '../../../constants/query-client'
+import { QueryAges } from '../../../constants/durations'
 import { FrequentlyPlayedTracksQuery } from './queries'
+import { BaseItemDtoInfiniteQueryOptions } from '../../types/infinite-query'
 
-const FREQUENTS_QUERY_CONFIG = {
-	staleTime: ONE_DAY,
+const FREQUENTS_QUERY_CONFIG: Pick<
+	BaseItemDtoInfiniteQueryOptions,
+	'staleTime' | 'refetchOnMount'
+> = {
+	staleTime: QueryAges.OneDay,
 	refetchOnMount: false,
 } as const
 

@@ -35,7 +35,7 @@ export default function SettingsSection({
 			borderWidth={'1'}
 			borderColor='borderColor'
 			backgroundColor='background'
-			marginVertical='1-5'
+			margin='2'
 			padding='0'
 			borderRadius='4'
 		>

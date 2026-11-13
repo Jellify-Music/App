@@ -6,16 +6,16 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
 import { isEmpty, isNull, isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { JellifyUser } from '@/src/types/JellifyUser'
-import { queryClient } from '../../../../constants/query-client'
+import { queryClient } from '../../../client'
 import { FrequentlyPlayedTracksQuery } from '../queries'
 import { ArtistQueryKey } from '../../artist/keys'
-import { setQueryUserDataForItem, setQueryUserDataForItems } from '../../user-data'
+import { setQueryUserDataForItem } from '../../user-data/cache'
 
 /**
  * Fetches the 100 most frequently played items from the user's library
@@ -33,13 +33,12 @@ export function fetchFrequentlyPlayed(
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 
-		getItemsApi(api!)
+		getLibraryApi(api!)
 			.getItems(
 				{
 					includeItemTypes: [BaseItemKind.Audio],
-					parentId: library!.musicLibraryId,
+					parentId: library?.musicLibraryId,
 					recursive: true,
 					limit: ApiLimits.Frequents,
 					startIndex: page * ApiLimits.Frequents,
@@ -54,7 +53,6 @@ export function fetchFrequentlyPlayed(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
@@ -81,7 +79,6 @@ export function fetchFrequentlyPlayedArtists(
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 
 		queryClient
 			.infiniteQuery({
@@ -127,7 +124,7 @@ export function fetchFrequentlyPlayedArtists(
 
 				// Fetch full artist details to get ImageTags
 				if (uniqueArtistIds.length > 0) {
-					const { data } = await getItemsApi(api!).getItems({
+					const { data } = await getLibraryApi(api!).getItems({
 						ids: uniqueArtistIds,
 						includeItemTypes: [BaseItemKind.MusicArtist],
 						fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],

@@ -4,7 +4,8 @@ import { fetchAlbumSuggestions, fetchArtistSuggestions } from './utils/suggestio
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { UndefinedInitialDataInfiniteOptions } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../client'
+import { MusicLibraryQueryKey } from '../libraries/keys'
 
 export const DiscoverArtistsQuery = (
 	user: JellifyUser | undefined,
@@ -14,7 +15,7 @@ export const DiscoverArtistsQuery = (
 		queryKey: [
 			SuggestionQueryKeys.InfiniteArtistSuggestions,
 			user?.id,
-			library?.musicLibraryId,
+			MusicLibraryQueryKey(library?.musicLibraryId),
 		],
 		queryFn: ({ pageParam, signal }) =>
 			fetchArtistSuggestions(user, library?.musicLibraryId, pageParam, signal),
@@ -47,7 +48,11 @@ export const DiscoverAlbumsQuery = (
 	library: JellifyLibrary | undefined,
 ) => {
 	return {
-		queryKey: [SuggestionQueryKeys.InfiniteAlbumSuggestions, user?.id, library?.musicLibraryId],
+		queryKey: [
+			SuggestionQueryKeys.InfiniteAlbumSuggestions,
+			user?.id,
+			MusicLibraryQueryKey(library?.musicLibraryId),
+		],
 		queryFn: ({ pageParam, signal }) =>
 			fetchAlbumSuggestions(user, library?.musicLibraryId, pageParam, signal),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>

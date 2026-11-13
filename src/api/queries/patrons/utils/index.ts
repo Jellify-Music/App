@@ -1,25 +1,14 @@
-import { Api } from '@jellyfin/sdk'
 import { fetch } from 'react-native-nitro-fetch'
+import type { Patron } from '../../../../types/patron'
 
-const PATRON_API_ENDPOINT = 'https://patrons.jellify.app'
+import { PATRON_API_ENDPOINT } from '../../../../configs/patrons.config'
 
-interface Patron {
-	fullName: string
+export default async function fetchPatrons(signal?: AbortSignal): Promise<Patron[]> {
+	const response = await fetch(PATRON_API_ENDPOINT, { signal })
+	return parsePatronsResponse(response)
 }
 
-export default async function fetchPatrons(
-	api: Api | undefined,
-	signal?: AbortSignal,
-): Promise<Patron[]> {
-	return new Promise((resolve, reject) => {
-		if (!api) return reject(new Error('No API instance provided'))
-
-		fetch(PATRON_API_ENDPOINT, { signal })
-			.then(async (res) => {
-				if (!res.ok) throw new Error(`Request failed with status ${res.status}`)
-				const patrons = (await res.json()) as Patron[]
-				resolve(patrons)
-			})
-			.catch((err) => reject(err))
-	})
+async function parsePatronsResponse(response: globalThis.Response): Promise<Patron[]> {
+	if (!response.ok) throw new Error(`Request failed with status ${response.status}`)
+	return (await response.json()) as Patron[]
 }

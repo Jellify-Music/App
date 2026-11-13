@@ -1,4 +1,4 @@
-import { queryClient } from '../../constants/query-client'
+import { queryClient } from '../../api/client'
 import { DownloadedTrack } from 'react-native-nitro-player'
 import ALL_DOWNLOADS_QUERY from './queries'
 

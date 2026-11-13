@@ -9,7 +9,8 @@ import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk'
 import { JellyfinInfo } from '../../api/info'
 import AXIOS_INSTANCE from '../../configs/networking/axios.config'
-import { queryClient } from '../../constants/query-client'
+import { queryClient } from '../../api/client'
+import { clearImageCache } from '../../services/storage/images'
 import JellifyStore from './types'
 import { setServer, setUser } from './utils/set'
 
@@ -84,6 +85,8 @@ export const useSignOut = () => {
 		queryClient.clear()
 
 		storage.clearAll()
+
+		clearImageCache()
 	}
 }
 

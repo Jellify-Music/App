@@ -1,31 +1,42 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { LegendListProps } from '@legendapp/list/react-native'
+import { LinearTransition } from 'react-native-reanimated'
 import React from 'react'
-import List from './Lists/utils'
+import { AnimatedList, AnimatedListProps } from './Lists/utils'
 import { StyleSheet } from 'react-native'
+import { useDisplayContext } from '../../../providers/Display/display-provider'
 
-type HorizontalCardListProps = LegendListProps<BaseItemDto>
+// Cards slide to their new positions when a refresh reorders the list
+const itemLayoutAnimation = LinearTransition.springify()
+
+type HorizontalCardListProps = AnimatedListProps<BaseItemDto> & {
+	slice?: boolean
+}
 
 /**
- * Displays a Horizontal FlatList of 20 ItemCards
- * then shows a "See More" button
- * @param param0
- * @returns
+ * Displays a horizontal list of ItemCards
+ *
+ * @param slice Whether to cap the list at the display's `horizontalItems`
+ * (15, or 30 on wide screens). Defaults to `true` - pass `false` to show every item
  */
 export default function HorizontalCardList({
 	data,
 	renderItem,
-	estimatedItemSize = 150,
+	estimatedItemSize = 100,
+	slice = true,
 	...props
 }: HorizontalCardListProps): React.JSX.Element {
+	const { horizontalItems } = useDisplayContext()
+
+	const slicedData = slice ? data?.slice(0, horizontalItems) : data
+
 	return (
-		<List<BaseItemDto>
+		<AnimatedList<BaseItemDto>
 			horizontal
-			data={data}
+			data={slicedData}
 			renderItem={renderItem}
 			estimatedItemSize={estimatedItemSize}
-			recycleItems
 			style={styles.list}
+			itemLayoutAnimation={itemLayoutAnimation}
 			{...props}
 		/>
 	)

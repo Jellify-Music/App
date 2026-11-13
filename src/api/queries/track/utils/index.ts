@@ -12,8 +12,7 @@ import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { setQueryUserDataForItems } from '../../user-data'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 
 export default function fetchTracks(
 	api: Api | undefined,
@@ -32,7 +31,6 @@ export default function fetchTracks(
 ) {
 	return new Promise<BaseItemDto[]>((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
 
 		// SortName includes track numbers (e.g. "0001 - 0001 - Title"),
@@ -50,11 +48,11 @@ export default function fetchTracks(
 
 		const yearsParam = buildYearsParam(yearMin, yearMax)
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					includeItemTypes: [BaseItemKind.Audio],
-					parentId: library.musicLibraryId,
+					parentId: library?.musicLibraryId,
 					userId: user.id,
 					recursive: true,
 					filters: filters.length > 0 ? filters : undefined,
@@ -74,7 +72,6 @@ export default function fetchTracks(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {

@@ -1,53 +1,44 @@
-import { PlaylistTracksQueryKey, PublicPlaylistsQueryKey, UserPlaylistsQueryKey } from './keys'
-import { useInfiniteQuery } from '@tanstack/react-query'
-import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
-import { ApiLimits } from '../../../configs/querying/index.config'
-import { getApi, getUser } from '../../../stores/auth/utils'
+import { useQuery } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { PlaylistTracksQuery, PublicPlaylistsQuery, UserPlaylistsQuery } from './queries'
+import { sortPlaylistsByName } from './utils/sort'
 
-export const useUserPlaylists = () => {
-	const api = getApi()
-	const user = getUser()
+/**
+ * Fetches the user's playlists from the cache or server, sorted by name
+ *
+ * @returns The user's playlists, sorted by name
+ */
+export const useUserPlaylists = () =>
+	useQuery({ ...UserPlaylistsQuery(), select: sortPlaylistsByName })
 
-	return useInfiniteQuery({
-		queryKey: UserPlaylistsQueryKey(user),
-		queryFn: ({ pageParam, signal }) => fetchUserPlaylists(api, user, [], pageParam, signal),
-		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		// Pages are filtered client-side (see fetchUserPlaylists), so a short page
-		// doesn't mean we've reached the end - keep going until one comes back empty
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
-			lastPage && lastPage.length > 0 ? lastPageParam + 1 : undefined,
-		enabled: Boolean(api && user),
-	})
-}
+/**
+ * The user's playlists, most recently updated first
+ *
+ * Reads from the same cache as {@link useUserPlaylists}, which Jellyfin returns
+ * in this order, so it's kept in sync by the helpers in `cache.ts` without a
+ * second request to the server
+ *
+ * @returns The user's playlists, most recently updated first
+ */
+export const useRecentlyUpdatedPlaylists = () => useQuery(UserPlaylistsQuery())
 
+/**
+ * The "public" playlists, which are accessible to all users and
+ * are in the form of a .m3u or .m3u8 file in the music library.
+ *
+ * @returns The public playlists, sorted by name
+ */
+export const usePublicPlaylists = () => useQuery(PublicPlaylistsQuery())
+
+/**
+ * Fetches a playlist's tracks from the cache or server
+ *
+ * @param playlist The playlist whose tracks should be fetched
+ * @param disabled Whether the query should be disabled
+ * @returns The playlist's tracks
+ */
 export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | undefined) => {
-	const api = getApi()
+	const query = PlaylistTracksQuery(playlist)
 
-	return useInfiniteQuery({
-		queryKey: PlaylistTracksQueryKey(playlist),
-		queryFn: ({ pageParam, signal }) =>
-			fetchPlaylistTracks(api, playlist.Id!, pageParam, signal),
-		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam) => {
-			if (!lastPage) return undefined
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
-		},
-		enabled: Boolean(api && playlist.Id && !disabled),
-	})
-}
-
-export const usePublicPlaylists = () => {
-	const api = getApi()
-
-	return useInfiniteQuery({
-		queryKey: PublicPlaylistsQueryKey(),
-		queryFn: ({ pageParam, signal }) => fetchPublicPlaylists(api, pageParam, signal),
-		select: (data) => data.pages.flatMap((page) => page),
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
-			lastPage.length > 0 ? lastPageParam + 1 : undefined,
-		initialPageParam: 0,
-	})
+	return useQuery({ ...query, enabled: query.enabled && !disabled })
 }

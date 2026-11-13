@@ -1,15 +1,13 @@
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { H6, SizableText, YStack } from 'tamagui'
+import { SizableText, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
-import TextTicker from 'react-native-text-ticker'
-import { TextTickerConfig } from '../components/Player/component.config'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
-import { getApi, getLibrary } from '../stores/auth/utils'
+import { getApi } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import {
@@ -17,15 +15,17 @@ import {
 	bottomSheetPresentation,
 	playerSheetPresentation,
 } from '../utils/navigating/form-sheet'
-import { createStaticNavigation } from '@react-navigation/native'
+import { createStaticNavigation, InitialState } from '@react-navigation/native'
 import navigationRef from './navigation'
 import { navigationIntegration } from '../utils/logging/sentry'
 import { getJellifyNavTheme } from '../components/theme'
 import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
 import { useColorScheme } from 'react-native'
+import { useState } from 'react'
 import PlayerStack from './Player'
 import LoginStack from './Login'
 import PrivacyPolicyScreen from './PrivacyPolicy'
+import { Ticker } from '../components/Global/utils/Animated/text'
 
 /**
  * The root navigation stack for Jellify. Contains all top level screens, such as the login screen
@@ -33,7 +33,6 @@ import PrivacyPolicyScreen from './PrivacyPolicy'
  * the app (e.g. the player, context menu, filters, etc).
  */
 const RootStack = createNativeStackNavigator<RootStackParamList>({
-	initialRouteName: getApi() && getLibrary() ? 'Tabs' : 'Login',
 	screens: {
 		Login: {
 			screen: LoginStack,
@@ -117,9 +116,16 @@ export default function Root(): React.JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark'
 	const resolvedMode = theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme
 
+	// Resolved on mount rather than at module load, since Android can recreate the activity
+	// (e.g. after switching app icons) while the JS runtime, and the user's session, live on
+	const [initialState] = useState<InitialState>(() => ({
+		routes: [{ name: getApi() ? 'Tabs' : 'Login' }],
+	}))
+
 	return (
 		<RootNavigation
 			ref={navigationRef}
+			initialState={initialState}
 			theme={getJellifyNavTheme(colorPreset, resolvedMode)}
 			onReady={() => navigationIntegration.registerNavigationContainer(navigationRef)}
 		/>
@@ -129,18 +135,18 @@ export default function Root(): React.JSX.Element {
 function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 	return (
 		<YStack gap='1' marginVertical='4' alignItems='center'>
-			<TextTicker {...TextTickerConfig}>
-				<H6 fontSize='4' fontWeight='6'>
+			<Ticker>
+				<SizableText fontSize='5' fontWeight='6'>
 					{getItemName(item)}
-				</H6>
-			</TextTicker>
+				</SizableText>
+			</Ticker>
 
 			{(item.ArtistItems?.length ?? 0) > 0 && (
-				<TextTicker {...TextTickerConfig}>
+				<Ticker>
 					<SizableText fontSize='3' fontWeight='6'>
 						{`${formatArtistNames(item.ArtistItems?.map((artist) => getItemName(artist)) ?? [])}`}
 					</SizableText>
-				</TextTicker>
+				</Ticker>
 			)}
 		</YStack>
 	)

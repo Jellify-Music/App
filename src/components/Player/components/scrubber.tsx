@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { SizableText, Spacer, useTheme, XStack, YStack } from 'tamagui'
-import {
-	calculateRunTimeFromSeconds,
-	RunTimeSeconds,
-} from '../../../components/Global/helpers/time-codes'
+import { getTokenValue, SizableText, Spacer, useTheme, XStack, YStack } from 'tamagui'
+import { calculateRunTimeFromSeconds, RunTimeSeconds } from '../../Global/utils/time-codes'
 import { useProgress } from '../../../player'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
@@ -78,18 +75,17 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	}
 
 	return (
-		<YStack alignItems='stretch' gap='3'>
+		<YStack alignItems='stretch' gap='4'>
 			<Slider
 				value={displayPosition}
 				maxValue={totalDuration}
 				backgroundColor={theme.neutral.val}
 				color={theme.primary.val}
 				onValueChange={handleValueChange}
-				thumbWidth={6}
-				trackHeight={4}
+				thumbWidth={getTokenValue('3')}
+				trackHeight={getTokenValue('2')}
 				gestureActiveRef={isSeeking}
-				thumbShadowColor={theme.black75.val}
-				hitSlop={12}
+				thumbShadowColor='black'
 			/>
 
 			{/* Time display and quality badge */}

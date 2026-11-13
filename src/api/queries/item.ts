@@ -5,14 +5,14 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { groupBy, isEmpty, isEqual, isUndefined } from 'lodash'
 import { SectionList } from 'react-native'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
-import QueryConfig from '../../configs/querying/index.config'
+import { ApiLimits } from '../../configs/querying/index.config'
 import { JellifyUser } from '../../types/JellifyUser'
-import { setQueryUserDataForItems } from './user-data'
+import { getApi } from '../../stores/auth/utils'
 
 /**
  * Fetches a single Jellyfin item by it's ID
@@ -21,19 +21,20 @@ import { setQueryUserDataForItems } from './user-data'
  * @returns The item - a {@link BaseItemDto}
  */
 export async function fetchItem(
-	api: Api | undefined,
-	itemId: string,
+	itemId: BaseItemDto['Id'],
 	signal?: AbortSignal,
+	api: Api | undefined = getApi(),
 ): Promise<BaseItemDto> {
 	return new Promise((resolve, reject) => {
-		if (isEmpty(itemId)) return reject('No item ID proviced')
+		if (!itemId || isEmpty(itemId)) return reject('No item ID provided or it is empty')
 		if (isUndefined(api)) return reject('Client not initialized')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					ids: [itemId],
 					fields: [ItemFields.Tags, ItemFields.Genres],
+					enableUserData: true,
 				},
 				{
 					signal,
@@ -79,22 +80,22 @@ export async function fetchItems(
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client not initialized')
 		if (isUndefined(user)) return reject('User not initialized')
-		if (isUndefined(library)) return reject('Library not initialized')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
-					parentId: parentId ?? library.musicLibraryId,
+					parentId: parentId ?? library?.musicLibraryId,
 					userId: user.id,
 					includeItemTypes: types,
 					sortBy: sortBy,
 					recursive: true,
 					sortOrder: sortOrder,
 					fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
-					startIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
-					limit: QueryConfig.limits.library,
+					startIndex: typeof page === 'number' ? page * ApiLimits.Items : 0,
+					limit: ApiLimits.Items,
 					isFavorite: isFavorite,
 					ids: ids,
+					enableUserData: true,
 				},
 				{
 					signal,
@@ -129,7 +130,7 @@ export async function fetchAlbumDiscs(
 
 		sortBy = [ItemSortBy.ParentIndexNumber, ItemSortBy.IndexNumber, ItemSortBy.SortName]
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: album.Id!,
@@ -160,7 +161,6 @@ export async function fetchAlbumDiscs(
 						)
 					: [{ title: '1', data: [] }]
 
-				setQueryUserDataForItems(data.Items ?? [])
 				resolve(discs)
 			})
 			.catch((error) => {

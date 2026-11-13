@@ -5,7 +5,7 @@ import playLaterInQueue from '../../src/player/queuing/play-later'
 
 jest.mock('../../src/stores/auth/utils')
 
-describe('Add to Queue - playLaterInQueue', () => {
+describe('Play Later - playLaterInQueue', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
 	})
