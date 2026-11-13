@@ -1,22 +1,20 @@
 import React from 'react'
-import { YStack, XStack, SizableText, ScrollView, Avatar, Card, ThemeTokens } from 'tamagui'
+import { YStack, XStack, SizableText, ScrollView, Avatar, Card } from 'tamagui'
 import { useJellyfinServer } from '../../hooks/auth/server'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
-import Icon from '../../components/Global/components/icon'
-import Button from '../../components/Global/utils/button'
-import SettingsSection from '../../components/Settings/components/settings-section'
-import { SettingsStackParamList } from './types'
+import Icon from '../Global/components/icon'
+import Button from '../Global/utils/button'
+import SettingsSection from '../Settings/components/settings-section'
+import { SettingsStackParamList } from '../../screens/Settings/types'
 import { useJellifyUser, useJellifyLibrary } from '../../stores/auth'
 import HTTPS from '../../constants/protocols'
 import getUserImageUrl from '../../api/queries/image/utils/avatar'
-import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
+import ServerInfoChip from './components/chip'
 
-export default function AccountScreen(): React.JSX.Element {
-	const { bottom } = useSafeAreaInsets()
+export default function Account(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
 	const [server] = useJellyfinServer()
@@ -29,11 +27,8 @@ export default function AccountScreen(): React.JSX.Element {
 	const userAvatarUrl = getUserImageUrl()
 
 	return (
-		<YStack flex={1} backgroundColor='background' testID='settings-screen-account'>
-			<ScrollView
-				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
-				showsVerticalScrollIndicator={false}
-			>
+		<ScrollView showsVerticalScrollIndicator={false}>
+			<YStack testID='settings-screen-account'>
 				{/* Profile Header */}
 				<Card
 					backgroundColor='primary'
@@ -74,7 +69,6 @@ export default function AccountScreen(): React.JSX.Element {
 						alignItems='center'
 						justifyContent='space-between'
 						padding='2'
-						backgroundColor='background-focus'
 						borderRadius='3'
 					>
 						<XStack alignItems='center' gap='3' flex={1}>
@@ -156,41 +150,7 @@ export default function AccountScreen(): React.JSX.Element {
 						</XStack>
 					</YStack>
 				</SettingsSection>
-			</ScrollView>
-		</YStack>
-	)
-}
-
-function ServerInfoChip({
-	label,
-	value,
-	icon,
-	color = 'borderColor',
-}: {
-	label: string
-	value: string
-	icon: MaterialDesignIconsIconName
-	color?: ThemeTokens
-}) {
-	return (
-		<XStack
-			flex={1}
-			minWidth={140}
-			alignItems='center'
-			gap='2'
-			padding='2'
-			backgroundColor='background-focus'
-			borderRadius='3'
-		>
-			<Icon name={icon} color={color} size='7' />
-			<YStack flex={1}>
-				<SizableText fontSize='2' fontWeight='6' numberOfLines={1}>
-					{value}
-				</SizableText>
-				<SizableText fontSize='2' color='borderColor'>
-					{label}
-				</SizableText>
 			</YStack>
-		</XStack>
+		</ScrollView>
 	)
 }
