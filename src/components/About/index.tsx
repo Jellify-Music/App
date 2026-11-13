@@ -21,11 +21,11 @@ export default function About(): React.JSX.Element {
 	const otaVersion = getStoredOtaVersion()
 
 	return (
-		<ScrollView padding='4' showsVerticalScrollIndicator={false}>
+		<ScrollView padding='2' showsVerticalScrollIndicator={false}>
 			<YStack testID='settings-screen-about'>
 				<YStack
 					padding='4'
-					gap='4'
+					gap='2'
 					borderRadius='2'
 					borderColor='borderColor'
 					borderWidth='1'
@@ -49,18 +49,19 @@ export default function About(): React.JSX.Element {
 										OTA Version: {otaVersion}
 									</SizableText>
 								)}
-								{caption && (
-									<SizableText
-										fontSize='2'
-										color='borderColor'
-										fontStyle='italic'
-									>
-										{caption}
-									</SizableText>
-								)}
 							</YStack>
 						</XStack>
 					</YStack>
+					{caption && (
+						<SizableText
+							fontSize='2'
+							fontWeight='4'
+							color='borderColor'
+							fontStyle='italic'
+						>
+							{caption}
+						</SizableText>
+					)}
 
 					<Separator borderColor='borderColor' />
 

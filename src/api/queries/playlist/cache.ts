@@ -105,6 +105,26 @@ export function appendPlaylistTracks(playlist: BaseItemDto, tracks: BaseItemDto[
 }
 
 /**
+ * Removes tracks from a playlist's cached track list
+ *
+ * Also moves the playlist to the front of the user's playlists, matching
+ * Jellyfin's `DateLastContentAdded` sort, so it tops the recently updated playlists
+ *
+ * @param playlist The playlist to remove tracks from
+ * @param tracks The tracks to remove
+ */
+export function removePlaylistTracks(playlist: BaseItemDto, tracks: BaseItemDto[]) {
+	updateItems(PlaylistTracksQueryKey(playlist), (prev) =>
+		prev.filter((track) => !tracks.some((t) => t.Id === track.Id)),
+	)
+	updateItems(UserPlaylistsQueryKey(getUser()), (playlists) => {
+		const updated = playlists.find(({ Id }) => Id === playlist.Id)
+
+		return updated ? [updated, ...playlists.filter(({ Id }) => Id !== playlist.Id)] : playlists
+	})
+}
+
+/**
  * Replaces a playlist's cached tracks, i.e. after it's been reordered or had tracks removed
  *
  * @param playlist The playlist to set tracks for

@@ -5,7 +5,7 @@ import { YStack, XStack, SizableText, ScrollView } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
-import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
+import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
 import { useAppSettingsStore } from '../../stores/settings/app'
 import { PRESET_PALETTES } from '../../configs/styling/themes'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'

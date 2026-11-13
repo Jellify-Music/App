@@ -1,7 +1,7 @@
 import { SizableText, Spinner, ToggleGroup, XStack, YGroup, YStack } from 'tamagui'
 import React, { useEffect, useState } from 'react'
 import type { EventHandler } from '../../types/Events'
-import Button from '../Global/helpers/button'
+import Button from '../Global/utils/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../Global/components/icon'
 import { useJellifyLibrary } from '../../stores/auth'

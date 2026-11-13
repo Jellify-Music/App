@@ -22,7 +22,7 @@ export default function RemoveFromPlaylistRow({
 	const api = useApi()
 
 	const { mutate: removeTrack, isPending } = useMutation({
-		mutationFn: () => removeFromPlaylist(api, track, playlist),
+		mutationFn: () => removeFromPlaylist([track], playlist),
 		onSuccess: () => {
 			applyHapticFeedback('success')
 			invalidatePlaylistTracks(playlist)
