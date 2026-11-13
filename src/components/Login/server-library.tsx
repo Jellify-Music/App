@@ -9,7 +9,7 @@ import { XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import navigationRef from '../../screens/navigation'
-import Button from '../Global/helpers/button'
+import Button from '../Global/utils/button'
 
 export default function ServerLibrary(): React.JSX.Element {
 	const [, setLibrary] = useJellifyLibrary()
@@ -18,12 +18,17 @@ export default function ServerLibrary(): React.JSX.Element {
 
 	const initiateQuickConnect = useInitiateQuickConnect()
 
-	const handleLibrarySelected = (libraryId: string, selectedLibrary: BaseItemDto) => {
-		setLibrary({
-			musicLibraryId: libraryId,
-			musicLibraryName: selectedLibrary.Name ?? 'No library name',
-			musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
-		})
+	const handleLibrarySelected = (selectedLibrary: BaseItemDto | undefined) => {
+		// Without a selected library, Jellify uses every music library
+		setLibrary(
+			selectedLibrary
+				? {
+						musicLibraryId: selectedLibrary.Id!,
+						musicLibraryName: selectedLibrary.Name ?? 'No library name',
+						musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
+					}
+				: undefined,
+		)
 
 		navigationRef.navigate('Tabs')
 	}

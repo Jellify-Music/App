@@ -12,7 +12,6 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
-import { setQueryUserDataForItems } from '../../user-data'
 
 export function fetchAlbums(
 	api: Api | undefined,
@@ -29,14 +28,13 @@ export function fetchAlbums(
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
 		if (!user) return reject('No user provided')
-		if (!library) return reject('Library has not been set')
 
 		const yearsParam = buildYearsParam(yearMin, yearMax)
 
 		getLibraryApi(api)
 			.getItems(
 				{
-					parentId: library.musicLibraryId,
+					parentId: library?.musicLibraryId,
 					includeItemTypes: [BaseItemKind.MusicAlbum],
 					userId: user.id,
 					sortBy: sortBy,
@@ -55,7 +53,6 @@ export function fetchAlbums(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
@@ -71,7 +68,7 @@ export function fetchAlbumById(
 	signal?: AbortSignal,
 ): Promise<BaseItemDto> {
 	return new Promise((resolve, reject) => {
-		fetchItem(api, albumId, signal)
+		fetchItem(albumId, signal)
 			.then((item) => {
 				resolve(item)
 			})

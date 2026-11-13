@@ -4,7 +4,7 @@ import { BaseStackParamList, RootStackParamList } from '@/src/screens/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ListRenderItemInfo, StyleSheet, View } from 'react-native'
+import { ListRenderItemInfo, StyleSheet } from 'react-native'
 import { DraxHandle } from 'react-native-drax'
 import Icon from '../../Global/components/icon'
 import Track from '../../Global/components/Track'
@@ -36,7 +36,7 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 	const onRemove = () => onRemoveTrack(track)
 
 	return editing ? (
-		<XStack alignItems='center' backgroundColor='background' marginHorizontal='3'>
+		<XStack alignItems='center' backgroundColor='background' marginHorizontal='2'>
 			<DraxHandle style={styles.handle}>
 				<Icon hitSlop={20} marginRight={'2'} size='7' name='drag-horizontal-variant' />
 			</DraxHandle>
@@ -58,8 +58,8 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 				size='7'
 				name='minus-circle-outline'
 				color={'warning'}
-				flexShrink={1}
 				onPress={onRemove}
+				marginLeft={'2'}
 			/>
 		</XStack>
 	) : (

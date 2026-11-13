@@ -11,7 +11,9 @@
 		01C6DE367C98997686D89A3C /* libPods-Jellify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F4260714751F88E499E3D6A /* libPods-Jellify.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		217EBE16A3E8C5FBF476C905 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F757EB73303E0AC21EF34F64 /* PrivacyInfo.xcprivacy */; };
+		58CF5C84B0FCC5F0802FDF6D /* JellifyStickers.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 476E0A1068C8C1A80E963B38 /* JellifyStickers.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		A9BF370EB50BE9A08FAA19E4 /* Stickers.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B301C4EEB8109D8C24E55044 /* Stickers.xcassets */; };
 		CF46C0532FD849AF00F42BC4 /* teal-icon-composer.icon in Resources */ = {isa = PBXBuildFile; fileRef = CF46C0522FD849AF00F42BC4 /* teal-icon-composer.icon */; };
 		CF46C0632FD867D200F42BC4 /* trans-icon-composer.icon in Resources */ = {isa = PBXBuildFile; fileRef = CF46C0622FD867D200F42BC4 /* trans-icon-composer.icon */; };
 		CF46C0652FD867E100F42BC4 /* gay-icon-composer.icon in Resources */ = {isa = PBXBuildFile; fileRef = CF46C0642FD867E100F42BC4 /* gay-icon-composer.icon */; };
@@ -29,7 +31,6 @@
 		CF605E762DF95BAB00858968 /* Figtree-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E692DF95BAB00858968 /* Figtree-SemiBold.otf */; };
 		CF605E772DF95BAB00858968 /* Figtree-SemiBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E6A2DF95BAB00858968 /* Figtree-SemiBoldItalic.otf */; };
 		CF605E782DF95BAB00858968 /* Figtree-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E682DF95BAB00858968 /* Figtree-Regular.otf */; };
-		CF98CA472D3E99E0003D88B7 /* CarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA452D3E99DF003D88B7 /* CarScene.swift */; };
 		CF98CA482D3E99E0003D88B7 /* PhoneScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA462D3E99DF003D88B7 /* PhoneScene.swift */; };
 		CF98CA492D3E99E0003D88B7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA442D3E99DF003D88B7 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -42,7 +43,28 @@
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = Jellify;
 		};
+		DE741FE357990E3F981D8F7A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7BEF66CBAB6F46CE5A363878;
+			remoteInfo = JellifyStickers;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0DCD7F5C7A0770603ABD54B2 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				58CF5C84B0FCC5F0802FDF6D /* JellifyStickers.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* JellifyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JellifyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -56,10 +78,12 @@
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Jellify/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1B11DD756F3A49939D34FD1B /* Figtree-Black.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Black.otf"; path = "../assets/fonts/Figtree-Black.otf"; sourceTree = "<group>"; };
 		2F5D67B394724F1B97DE0CA1 /* Figtree-BlackItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-BlackItalic.otf"; path = "../assets/fonts/Figtree-BlackItalic.otf"; sourceTree = "<group>"; };
+		476E0A1068C8C1A80E963B38 /* JellifyStickers.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = JellifyStickers.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		49B52B8BEDDF4BEDBD4265DD /* Figtree-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Medium.otf"; path = "../assets/fonts/Figtree-Medium.otf"; sourceTree = "<group>"; };
 		530483661D3447FBBB171F49 /* Figtree-MediumItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-MediumItalic.otf"; path = "../assets/fonts/Figtree-MediumItalic.otf"; sourceTree = "<group>"; };
 		5DE4B5F2208F4966A8FB3045 /* Figtree-BoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-BoldItalic.otf"; path = "../assets/fonts/Figtree-BoldItalic.otf"; sourceTree = "<group>"; };
 		6D530F1FFB1A4A1AB8DBCBB5 /* Figtree-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Light.otf"; path = "../assets/fonts/Figtree-Light.otf"; sourceTree = "<group>"; };
+		6E2CE299F7FF385080C2E97C /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		700121E1AAA5485EA4215C17 /* Figtree-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Bold.otf"; path = "../assets/fonts/Figtree-Bold.otf"; sourceTree = "<group>"; };
 		73F5649796BB4A29AF608270 /* Figtree-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Italic.otf"; path = "../assets/fonts/Figtree-Italic.otf"; sourceTree = "<group>"; };
 		7D2BAACBD08E405DA9C124A7 /* Figtree-ExtraBoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-ExtraBoldItalic.otf"; path = "../assets/fonts/Figtree-ExtraBoldItalic.otf"; sourceTree = "<group>"; };
@@ -67,6 +91,7 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Jellify/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8798FC37A1454014A7B318F9 /* Figtree-SemiBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-SemiBold.otf"; path = "../assets/fonts/Figtree-SemiBold.otf"; sourceTree = "<group>"; };
 		8B91428F7F524687A96EE362 /* Figtree-LightItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-LightItalic.otf"; path = "../assets/fonts/Figtree-LightItalic.otf"; sourceTree = "<group>"; };
+		B301C4EEB8109D8C24E55044 /* Stickers.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Stickers.xcassets; sourceTree = "<group>"; };
 		B500E8EB5FF2F421C209C097 /* Pods-Jellify.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.release.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.release.xcconfig"; sourceTree = "<group>"; };
 		CF46C0522FD849AF00F42BC4 /* teal-icon-composer.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "teal-icon-composer.icon"; sourceTree = "<group>"; };
 		CF46C0622FD867D200F42BC4 /* trans-icon-composer.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "trans-icon-composer.icon"; sourceTree = "<group>"; };
@@ -88,7 +113,6 @@
 		CF6588752D25C12400AECE18 /* Jellify.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Jellify.entitlements; path = Jellify/Jellify.entitlements; sourceTree = "<group>"; };
 		CF7179092CBC486C0021BCA3 /* Jellify-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Jellify-Bridging-Header.h"; sourceTree = "<group>"; };
 		CF98CA442D3E99DF003D88B7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		CF98CA452D3E99DF003D88B7 /* CarScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarScene.swift; sourceTree = "<group>"; };
 		CF98CA462D3E99DF003D88B7 /* PhoneScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneScene.swift; sourceTree = "<group>"; };
 		DEF20584B68B4278A94DE482 /* Figtree-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Regular.otf"; path = "../assets/fonts/Figtree-Regular.otf"; sourceTree = "<group>"; };
 		E431B2EF5BD1E467BD2406A3 /* Pods-Jellify.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.debug.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.debug.xcconfig"; sourceTree = "<group>"; };
@@ -147,7 +171,6 @@
 			isa = PBXGroup;
 			children = (
 				CF98CA442D3E99DF003D88B7 /* AppDelegate.swift */,
-				CF98CA452D3E99DF003D88B7 /* CarScene.swift */,
 				CF98CA462D3E99DF003D88B7 /* PhoneScene.swift */,
 				CF6588752D25C12400AECE18 /* Jellify.entitlements */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -193,6 +216,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		6DC9181C1E521CC94ABF6256 /* JellifyStickers */ = {
+			isa = PBXGroup;
+			children = (
+				B301C4EEB8109D8C24E55044 /* Stickers.xcassets */,
+				6E2CE299F7FF385080C2E97C /* Info.plist */,
+			);
+			name = JellifyStickers;
+			path = JellifyStickers;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -211,6 +244,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
 				2A501C162584451593F3C639 /* Resources */,
+				6DC9181C1E521CC94ABF6256 /* JellifyStickers */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -222,6 +256,7 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* Jellify.app */,
 				00E356EE1AD99517003FC87E /* JellifyTests.xctest */,
+				476E0A1068C8C1A80E963B38 /* JellifyStickers.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -296,6 +331,7 @@
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
+				0DCD7F5C7A0770603ABD54B2 /* Embed Foundation Extensions */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				DA73B104C6D3216B8DA2CD31 /* [CP] Embed Pods Frameworks */,
 				5D6FE189CFE25851EB1634E3 /* [CP] Copy Pods Resources */,
@@ -303,6 +339,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				8BC791603725D13B008B1A1E /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				CFE47DDB2EA56B0200EB6067 /* icons */,
@@ -311,6 +348,21 @@
 			productName = Jellify;
 			productReference = 13B07F961A680F5B00A75B9A /* Jellify.app */;
 			productType = "com.apple.product-type.application";
+		};
+		7BEF66CBAB6F46CE5A363878 /* JellifyStickers */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 17291D459C7D757538EE55F2 /* Build configuration list for PBXNativeTarget "JellifyStickers" */;
+			buildPhases = (
+				F617CEFA67E2FDF863DDFC7C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JellifyStickers;
+			productName = JellifyStickers;
+			productReference = 476E0A1068C8C1A80E963B38 /* JellifyStickers.appex */;
+			productType = "com.apple.product-type.app-extension.messages-sticker-pack";
 		};
 /* End PBXNativeTarget section */
 
@@ -327,6 +379,9 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1600;
+					};
+					7BEF66CBAB6F46CE5A363878 = {
+						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
@@ -345,6 +400,7 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* Jellify */,
 				00E356ED1AD99517003FC87E /* JellifyTests */,
+				7BEF66CBAB6F46CE5A363878 /* JellifyStickers */,
 			);
 		};
 /* End PBXProject section */
@@ -381,6 +437,14 @@
 				CF605E772DF95BAB00858968 /* Figtree-SemiBoldItalic.otf in Resources */,
 				CF605E782DF95BAB00858968 /* Figtree-Regular.otf in Resources */,
 				217EBE16A3E8C5FBF476C905 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F617CEFA67E2FDF863DDFC7C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9BF370EB50BE9A08FAA19E4 /* Stickers.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -474,7 +538,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CF98CA472D3E99E0003D88B7 /* CarScene.swift in Sources */,
 				CF98CA482D3E99E0003D88B7 /* PhoneScene.swift in Sources */,
 				CF98CA492D3E99E0003D88B7 /* AppDelegate.swift in Sources */,
 			);
@@ -487,6 +550,12 @@
 			isa = PBXTargetDependency;
 			target = 13B07F861A680F5B00A75B9A /* Jellify */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
+		};
+		8BC791603725D13B008B1A1E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = JellifyStickers;
+			target = 7BEF66CBAB6F46CE5A363878 /* JellifyStickers */;
+			targetProxy = DE741FE357990E3F981D8F7A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -544,10 +613,32 @@
 			};
 			name = Release;
 		};
+		0F719B16CD76C9521004D257 /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 317;
+				DEVELOPMENT_TEAM = WAH9CZ8BPG;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
+				INFOPLIST_FILE = JellifyStickers/Info.plist;
+				MARKETING_VERSION = 1.4.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cosmonautical.jellify.stickers;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.cosmonautical.jellify.stickers";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = DevRelease;
+		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E431B2EF5BD1E467BD2406A3 /* Pods-Jellify.debug.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "trans-icon-composer gay-icon-composer";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "teal-icon-composer";
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -555,7 +646,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 315;
+				CURRENT_PROJECT_VERSION = 317;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_BITCODE = NO;
@@ -566,7 +657,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.1;
+				MARKETING_VERSION = 1.4.1;
 				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -590,6 +681,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B500E8EB5FF2F421C209C097 /* Pods-Jellify.release.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "trans-icon-composer gay-icon-composer";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "teal-icon-composer";
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -597,7 +689,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 315;
+				CURRENT_PROJECT_VERSION = 317;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -607,7 +699,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.1;
+				MARKETING_VERSION = 1.4.1;
 				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -840,6 +932,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0C3B82772445E273BFA924F7 /* Pods-Jellify.devrelease.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "trans-icon-composer gay-icon-composer";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "teal-icon-composer";
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -847,7 +940,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 315;
+				CURRENT_PROJECT_VERSION = 317;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -858,7 +951,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.1;
+				MARKETING_VERSION = 1.4.1;
 				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -975,6 +1068,48 @@
 			};
 			name = DevRelease;
 		};
+		D6BB81EF248121CB1EA5C772 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 317;
+				DEVELOPMENT_TEAM = WAH9CZ8BPG;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
+				INFOPLIST_FILE = JellifyStickers/Info.plist;
+				MARKETING_VERSION = 1.4.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cosmonautical.jellify.stickers;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.cosmonautical.jellify.stickers";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E4C239BC4636F583779C0D43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 317;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
+				INFOPLIST_FILE = JellifyStickers/Info.plist;
+				MARKETING_VERSION = 1.4.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cosmonautical.jellify.stickers;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.cosmonautical.jellify.stickers";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -994,6 +1129,16 @@
 				13B07F941A680F5B00A75B9A /* Debug */,
 				13B07F951A680F5B00A75B9A /* Release */,
 				CFDEVREL001 /* DevRelease */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		17291D459C7D757538EE55F2 /* Build configuration list for PBXNativeTarget "JellifyStickers" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E4C239BC4636F583779C0D43 /* Debug */,
+				D6BB81EF248121CB1EA5C772 /* Release */,
+				0F719B16CD76C9521004D257 /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

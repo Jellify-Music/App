@@ -3,6 +3,7 @@ import InstantMixQueryKey from './keys'
 import { useQuery } from '@tanstack/react-query'
 import { fetchInstantMixFromItem } from './utils'
 import { useInstantMixContext, InstantMixProvider } from '../../../providers/InstantMix'
+import { QueryAges } from '../../../constants/durations'
 
 /**
  * A query hook that returns the result of an Instant Mix
@@ -22,6 +23,7 @@ const useInstantMix = () => {
 	return useQuery({
 		queryKey: InstantMixQueryKey(item),
 		queryFn: ({ signal }) => fetchInstantMixFromItem(api, user, item, signal),
+		gcTime: QueryAges.OneHour,
 	})
 }
 

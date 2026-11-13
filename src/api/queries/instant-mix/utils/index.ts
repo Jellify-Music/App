@@ -28,6 +28,7 @@ export function fetchInstantMixFromItem(
 					itemId: item.Id!,
 					userId: user.id,
 					limit: ApiLimits.InstantMix,
+					enableUserData: true,
 				},
 				{
 					signal,

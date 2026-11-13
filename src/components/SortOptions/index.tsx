@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { SizableText, YStack } from 'tamagui'
 import { RadioGroup } from 'tamagui'
-import { RadioGroupItemWithLabel } from '../Global/helpers/radio-group-item-with-label'
+import { RadioGroupItemWithLabel } from '../Global/utils/radio-group-item-with-label'
 import useLibraryStore, { LibraryTab } from '../../stores/library'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'

@@ -7,12 +7,11 @@ import { useState } from 'react'
 import LoginStackParamList from '../../screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
-import Toast from 'react-native-toast-message'
-import Input from '../Global/helpers/input'
+import Input from '../Global/utils/input'
 import { GestureResponderEvent, StyleSheet } from 'react-native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
-import Button from '../Global/helpers/button'
+import Button from '../Global/utils/button'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
 
 export default function ServerAuthentication(): React.JSX.Element {
@@ -25,13 +24,6 @@ export default function ServerAuthentication(): React.JSX.Element {
 
 	const { mutate: authenticateUserByName, isPending } = useAuthenticateUserByName({
 		onSuccess: () => navigation.navigate('LibrarySelection'),
-		onError: (error: Error) => {
-			Toast.show({
-				text1: `Unable to sign in to ${serverInfo?.ServerName ?? 'Jellyfin'}`,
-				text2: error.message,
-				type: 'error',
-			})
-		},
 	})
 
 	const onSubmitEditing = () => {

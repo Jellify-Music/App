@@ -1,15 +1,16 @@
-import { queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../client'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
-import { getLibraryApi, getUserDataApi } from '@jellyfin/sdk/lib/utils/api'
+import { getUserDataApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
-import Toast from 'react-native-toast-message'
 import { getApi, getUser, getLibrary } from '../../../stores/auth/utils'
 import { TrackQueryKeys } from '../../queries/track/keys'
+import { MusicLibraryQueryKey } from '../../queries/libraries/keys'
 import { QueryKeys } from '../../../enums/query-keys'
-import { captureError, LoggingContext } from '../../../utils/logging'
-import { setQueryUserDataForItem } from '../../queries/user-data'
+import { LoggingContext } from '../../../utils/logging'
+import { setQueryUserDataForItem } from '../../queries/user-data/cache'
 import { applyHapticFeedback } from '../../../utils/haptics'
+import { handleError } from '../../../utils/errors'
 
 export const FAVORITE_MUTATION_KEY = ['favorite']
 
@@ -25,13 +26,9 @@ interface SetFavoriteMutation {
  * This prevents unnecessary refetches of large lists when filters aren't active.
  */
 function invalidateRelevantQueries(item: BaseItemDto): void {
-	const library = getLibrary()
-
 	// Only invalidate if favorites filter is active, or always invalidate favorites-filtered queries
 	// (so they're fresh when user turns on filter later)
-	if (!library) return
-
-	const libraryId = library.musicLibraryId
+	const libraryId = MusicLibraryQueryKey(getLibrary()?.musicLibraryId)
 
 	// Determine which query to invalidate based on item type
 	// Always invalidate favorites-filtered queries so they're fresh when filter is turned on
@@ -99,15 +96,8 @@ export const useAddFavorite = () => {
 			// Optimized: Only invalidate the relevant query based on item type and filter state
 			invalidateRelevantQueries(item)
 		},
-		onError: (error, variables) => {
-			captureError(error, LoggingContext.Favorites, 'Unable to set favorite for item')
-
-			applyHapticFeedback('error')
-
-			Toast.show({
-				text1: 'Failed to add favorite',
-				type: 'error',
-			})
+		onError: (error) => {
+			handleError(error, LoggingContext.Favorites, 'Failed to add favorite')
 		},
 	})
 }
@@ -135,15 +125,8 @@ export const useRemoveFavorite = () => {
 			// Optimized: Only invalidate the relevant query based on item type and filter state
 			invalidateRelevantQueries(item)
 		},
-		onError: (error, variables) => {
-			captureError(error, LoggingContext.Favorites, 'Unable to remove favorite for item')
-
-			applyHapticFeedback('error')
-
-			Toast.show({
-				text1: 'Failed to remove favorite',
-				type: 'error',
-			})
+		onError: (error) => {
+			handleError(error, LoggingContext.Favorites, 'Failed to remove favorite')
 		},
 	})
 }

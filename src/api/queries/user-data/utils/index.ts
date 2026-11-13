@@ -1,5 +1,4 @@
 import { getApi, getUser } from '../../../../stores/auth/utils'
-import { Api } from '@jellyfin/sdk/lib/api'
 import { UserItemDataDto } from '@jellyfin/sdk/lib/generated-client/models/user-item-data-dto'
 import { getUserDataApi } from '@jellyfin/sdk/lib/utils/api/user-data-api'
 import { isUndefined } from 'lodash'

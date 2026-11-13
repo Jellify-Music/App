@@ -227,7 +227,6 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [Pulsar](https://github.com/software-mansion/pulsar)\
 [React Navigation](https://reactnavigation.org/)\
 [React Native Blurhash](https://github.com/mrousavy/react-native-blurhash)\
-[React Native CarPlay](https://github.com/birkir/react-native-carplay)\
 [React Native Drax](https://github.com/nuclearpasta/react-native-drax)\
 [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)\
 [React Native Toast Message](https://github.com/calintamas/react-native-toast-message)\

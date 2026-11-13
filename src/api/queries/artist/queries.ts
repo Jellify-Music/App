@@ -1,19 +1,28 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { isUndefined } from 'lodash'
-import { ArtistAlbumsQueryKey } from './keys'
-import { JellifyLibrary } from '@/src/types/JellifyLibrary'
+import { ArtistAlbumsQueryKey, ArtistQueryKey } from './keys'
+import type { BaseItemDtoQueryOptions } from '../../types/query'
 import { fetchArtistAlbums } from './utils/artist'
-import { queryClient } from '../../../constants/query-client'
 import { getLibrary } from '../../../stores/auth/utils'
+import { JellifyLibrary } from '../../../types/JellifyLibrary'
+import { QueryAges } from '../../../constants/durations'
+import { fetchItem } from '../item'
 
-export const artistAlbumsQuery = (library: JellifyLibrary, artist: BaseItemDto) => ({
-	queryKey: ArtistAlbumsQueryKey(artist.Id),
-	queryFn: ({ signal }: { signal: AbortSignal }) =>
-		fetchArtistAlbums(library?.musicLibraryId, artist, signal),
-	enabled: !isUndefined(artist.Id),
+export const artistQuery: (artistId: BaseItemDto['Id']) => BaseItemDtoQueryOptions = (
+	artistId: BaseItemDto['Id'],
+) => ({
+	queryKey: ArtistQueryKey(artistId),
+	queryFn: ({ signal }) => fetchItem(artistId, signal),
 })
 
-export async function ensureArtistAlbumsQueryData(artist: BaseItemDto) {
-	const library = getLibrary()
-	return await queryClient.query({ ...artistAlbumsQuery(library!, artist), staleTime: 'static' })
+export const artistAlbumsQuery = (
+	artist: BaseItemDto,
+	library: JellifyLibrary | undefined = getLibrary(),
+) => {
+	return {
+		queryKey: ArtistAlbumsQueryKey(artist.Id, library?.musicLibraryId),
+		queryFn: ({ signal }: { signal: AbortSignal }) =>
+			fetchArtistAlbums(artist, library?.musicLibraryId, signal),
+		enabled: Boolean(artist.Id),
+		gcTime: QueryAges.OneWeek,
+	}
 }

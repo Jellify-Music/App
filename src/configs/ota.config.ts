@@ -2,10 +2,12 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { githubOTA } from 'react-native-nitro-ota'
 import Config from 'react-native-superconfig'
+import { GITHUB_ORG_URL } from './config'
 
 export const OTA_UPDATE_ENABLED = Config.OTA_UPDATE_ENABLED === 'true'
 
-const OTA_GITHUB_URL = 'https://github.com/Jellify-Music/App-Bundles'
+export const APP_GITHUB_URL = `${GITHUB_ORG_URL}/App`
+export const OTA_GITHUB_URL = `${GITHUB_ORG_URL}/App-Bundles`
 
 const version = DeviceInfo.getVersion()
 

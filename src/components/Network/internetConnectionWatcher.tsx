@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Platform } from 'react-native'
-import { getTokenValue, Paragraph, SizableText, YStack } from 'tamagui'
+import { getTokenValue, SizableText, YStack } from 'tamagui'
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,

@@ -4,9 +4,9 @@ import { YStack, XStack, SizableText, ScrollView } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
-import Button from '../../components/Global/helpers/button'
-import Input from '../../components/Global/helpers/input'
-import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
+import Button from '../../components/Global/utils/button'
+import Input from '../../components/Global/utils/input'
+import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
 import SettingsSection from '../../components/Settings/components/settings-section'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { useDeveloperOptionsEnabled, usePrId } from '../../stores/settings/developer'
@@ -36,15 +36,15 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	}
 
 	return (
-		<YStack
-			flex={1}
-			backgroundColor='background'
-			margin='2'
-			testID='settings-screen-privacy-developer'
+		<ScrollView
+			contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
+			showsVerticalScrollIndicator={false}
 		>
-			<ScrollView
-				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
-				showsVerticalScrollIndicator={false}
+			<YStack
+				flex={1}
+				backgroundColor='background'
+				margin='2'
+				testID='settings-screen-privacy-developer'
 			>
 				<SettingsSection
 					title='Privacy'
@@ -107,6 +107,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 									value={localPrId}
 									onChangeText={setLocalPrId}
 									keyboardType='numeric'
+									flex={1}
 								/>
 								<Button
 									circular
@@ -123,7 +124,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 						</YStack>
 					)}
 				</SettingsSection>
-			</ScrollView>
-		</YStack>
+			</YStack>
+		</ScrollView>
 	)
 }

@@ -5,6 +5,7 @@ import { GenresQueryKey } from './keys'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { ApiLimits } from '../../../configs/querying/index.config'
+import { uniqBy } from 'lodash'
 
 export const useGenres = (): UseInfiniteQueryResult<BaseItemDto[], Error> => {
 	const api = getApi()
@@ -16,8 +17,9 @@ export const useGenres = (): UseInfiniteQueryResult<BaseItemDto[], Error> => {
 		queryFn: ({ pageParam, signal }) => fetchGenres(api, user, library, pageParam, signal),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam) => {
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+			// Pages merged from several music libraries can hold more than one page's worth
+			return lastPage.length >= ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
-		select: (data) => data.pages.flatMap((page) => page),
+		select: (data) => uniqBy(data.pages.flat(), ({ Id }) => Id),
 	})
 }

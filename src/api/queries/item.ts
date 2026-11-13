@@ -12,7 +12,7 @@ import { Api } from '@jellyfin/sdk/lib/api'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
 import { ApiLimits } from '../../configs/querying/index.config'
 import { JellifyUser } from '../../types/JellifyUser'
-import { setQueryUserDataForItems } from './user-data'
+import { getApi } from '../../stores/auth/utils'
 
 /**
  * Fetches a single Jellyfin item by it's ID
@@ -21,12 +21,12 @@ import { setQueryUserDataForItems } from './user-data'
  * @returns The item - a {@link BaseItemDto}
  */
 export async function fetchItem(
-	api: Api | undefined,
-	itemId: string,
+	itemId: BaseItemDto['Id'],
 	signal?: AbortSignal,
+	api: Api | undefined = getApi(),
 ): Promise<BaseItemDto> {
 	return new Promise((resolve, reject) => {
-		if (isEmpty(itemId)) return reject('No item ID proviced')
+		if (!itemId || isEmpty(itemId)) return reject('No item ID provided or it is empty')
 		if (isUndefined(api)) return reject('Client not initialized')
 
 		getLibraryApi(api)
@@ -34,6 +34,7 @@ export async function fetchItem(
 				{
 					ids: [itemId],
 					fields: [ItemFields.Tags, ItemFields.Genres],
+					enableUserData: true,
 				},
 				{
 					signal,
@@ -79,12 +80,11 @@ export async function fetchItems(
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client not initialized')
 		if (isUndefined(user)) return reject('User not initialized')
-		if (isUndefined(library)) return reject('Library not initialized')
 
 		getLibraryApi(api)
 			.getItems(
 				{
-					parentId: parentId ?? library.musicLibraryId,
+					parentId: parentId ?? library?.musicLibraryId,
 					userId: user.id,
 					includeItemTypes: types,
 					sortBy: sortBy,
@@ -95,6 +95,7 @@ export async function fetchItems(
 					limit: ApiLimits.Items,
 					isFavorite: isFavorite,
 					ids: ids,
+					enableUserData: true,
 				},
 				{
 					signal,
@@ -160,7 +161,6 @@ export async function fetchAlbumDiscs(
 						)
 					: [{ title: '1', data: [] }]
 
-				setQueryUserDataForItems(data.Items ?? [])
 				resolve(discs)
 			})
 			.catch((error) => {

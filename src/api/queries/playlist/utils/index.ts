@@ -11,7 +11,6 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/querying/index.config'
-import { setQueryUserDataForItems } from '../../user-data'
 import { captureError, LoggingContext } from '../../../../utils/logging'
 import { ApiNotAvailableError } from '../../../../types/errors'
 
@@ -21,6 +20,8 @@ const PLAYLIST_FIELDS = [
 	ItemFields.Genres,
 	ItemFields.ChildCount,
 	ItemFields.ItemCounts,
+	ItemFields.DateCreated,
+	ItemFields.DateLastMediaAdded,
 ]
 
 /**
@@ -33,7 +34,7 @@ const PLAYLIST_FIELDS = [
  * @param signal Optional AbortSignal to cancel the request
  * @param user The {@link JellifyUser} to fetch playlists for, defaults to the signed in user
  * @param api The {@link Api} instance, defaults to the current one
- * @returns The user's playlists, sorted by name
+ * @returns The user's playlists, most recently updated first
  */
 export async function fetchUserPlaylists(
 	signal?: AbortSignal,
@@ -50,8 +51,8 @@ export async function fetchUserPlaylists(
 				fields: PLAYLIST_FIELDS,
 				includeItemTypes: [BaseItemKind.Playlist],
 				recursive: true,
-				sortBy: [ItemSortBy.SortName],
-				sortOrder: [SortOrder.Ascending],
+				sortBy: [ItemSortBy.DateLastContentAdded, ItemSortBy.SortName],
+				sortOrder: [SortOrder.Descending, SortOrder.Ascending],
 				enableUserData: true,
 			},
 			{
@@ -61,7 +62,6 @@ export async function fetchUserPlaylists(
 
 		if (data.Items) {
 			const playlists = data.Items.filter((playlist) => playlist.Path?.includes('data'))
-			setQueryUserDataForItems(playlists)
 			return playlists
 		} else return []
 	} catch (error) {
@@ -103,7 +103,6 @@ export async function fetchPublicPlaylists(
 		if (data.Items) {
 			// Playlists must not be stored in Jellyfin's internal config directory
 			const playlists = data.Items.filter((playlist) => !playlist.Path?.includes('data'))
-			setQueryUserDataForItems(playlists)
 			return playlists
 		} else return []
 	} catch (error) {
@@ -133,25 +132,33 @@ export async function fetchPlaylistTracks(
 	const tracks: BaseItemDto[] = []
 
 	for (let page = 0; ; page++) {
-		const { data } = await getPlaylistApi(api).getPlaylistItems(
-			{
-				playlistId,
-				fields: [
-					ItemFields.MediaSources,
-					ItemFields.ParentId,
-					ItemFields.Path,
-					ItemFields.SortName,
-				],
-			},
-			{
-				signal,
-			},
-		)
+		try {
+			const { data } = await getPlaylistApi(api).getPlaylistItems(
+				{
+					playlistId,
+					startIndex: page * ApiLimits.Library,
+					limit: ApiLimits.Library,
+					fields: [
+						ItemFields.MediaSources,
+						ItemFields.ParentId,
+						ItemFields.Path,
+						ItemFields.SortName,
+					],
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 
-		const items = data.Items ?? []
+			const items = data.Items ?? []
 
-		tracks.push(...items)
+			tracks.push(...items)
 
-		if (items.length < ApiLimits.Library) return tracks
+			if (items.length < ApiLimits.Library) return tracks
+		} catch (error) {
+			captureError(error, LoggingContext.Playlist, `Failed to fetch tracks for playlist`)
+			return Promise.reject(error)
+		}
 	}
 }

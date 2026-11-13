@@ -2,7 +2,7 @@ import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/mo
 import { XStack, YStack, getToken, SizableText } from 'tamagui'
 import Icon from './icon'
 import { QueuingType } from '../../../enums/queuing-type'
-import { RunTimeTicks } from '../helpers/time-codes'
+import { RunTimeTicks } from '../utils/time-codes'
 import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
 import navigationRef from '../../../screens/navigation'
@@ -11,6 +11,7 @@ import { BaseStackParamList } from '../../../screens/types'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import React from 'react'
+import type { EventHandler } from '../../../types/Events'
 import { LayoutChangeEvent } from 'react-native'
 import Animated, {
 	SharedValue,
@@ -21,8 +22,8 @@ import Animated, {
 } from 'react-native-reanimated'
 import { useSwipeableRowContext } from './SwipeableRow/context'
 import SwipeableRow from './SwipeableRow'
-import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
-import { buildSwipeConfig } from '../helpers/swipe-actions'
+import { useSwipeSettingsStore } from '../../../stores/settings/gestures'
+import { buildSwipeConfig } from '../utils/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
@@ -33,8 +34,8 @@ import { addToQueue, loadNewQueue } from '../../../player/queuing'
 interface ItemRowProps {
 	item: BaseItemDto
 	circular?: boolean
-	onPress?: () => void
-	onLongPress?: () => void
+	onPress?: EventHandler
+	onLongPress?: EventHandler
 	queueName?: Queue
 	sortingByReleasedDate?: boolean | undefined
 	testID?: string
@@ -73,8 +74,13 @@ function ItemRow({
 
 	const onPressIn = () => warmContext(item)
 
-	const handleLongPress = () => {
-		if (onLongPress) onLongPress()
+	/**
+	 * Handles the long press event for the item row.
+	 * If an `onLongPress` prop is provided, it will be called.
+	 * Otherwise, it navigates to the context menu for the item.
+	 */
+	const onLongPressCallback = async () => {
+		if (onLongPress) await onLongPress()
 		else
 			navigationRef.navigate('Context', {
 				item,
@@ -82,11 +88,18 @@ function ItemRow({
 			})
 	}
 
+	/**
+	 * Handles the press event for the item row.
+	 * If an `onPress` prop is provided, it will be called.
+	 * Otherwise, it performs the default action based on the item type,
+	 * which is to load the item into the queue if it is an audio track or
+	 * navigates to the appropriate screen for other item types.
+	 */
 	const onPressCallback = async () => {
 		if (onPress) await onPress()
 		else
 			switch (item.Type) {
-				case 'Audio': {
+				case BaseItemKind.Audio: {
 					loadNewQueue({
 						track: item,
 						tracklist: [item],
@@ -96,17 +109,17 @@ function ItemRow({
 					})
 					break
 				}
-				case 'MusicArtist': {
+				case BaseItemKind.MusicArtist: {
 					navigation?.navigate('Artist', { artist: item })
 					break
 				}
 
-				case 'MusicAlbum': {
+				case BaseItemKind.MusicAlbum: {
 					navigation?.navigate('Album', { album: item })
 					break
 				}
 
-				case 'Playlist': {
+				case BaseItemKind.Playlist: {
 					navigation?.navigate('Playlist', { playlist: item, canEdit: true })
 					break
 				}
@@ -118,10 +131,10 @@ function ItemRow({
 
 	const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
 
-	const isAudio = item.Type === 'Audio'
+	const isAudio = item.Type === BaseItemKind.Audio
 
 	const playlistTrackCount =
-		item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined
+		item.Type === BaseItemKind.Playlist ? (item.SongCount ?? item.ChildCount ?? 0) : undefined
 
 	const leftSettings = useSwipeSettingsStore.getState().left
 	const rightSettings = useSwipeSettingsStore.getState().right
@@ -168,7 +181,7 @@ function ItemRow({
 				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
-				onLongPress={handleLongPress}
+				onLongPress={onLongPressCallback}
 			>
 				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
 				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
@@ -178,16 +191,14 @@ function ItemRow({
 				<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
 					{renderRunTime ? (
 						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
-					) : item.Type === 'Playlist' ? (
+					) : item.Type === BaseItemKind.Playlist ? (
 						<SizableText fontSize='2' color={'borderColor'}>
 							{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
 						</SizableText>
 					) : null}
 					<FavoriteIcon item={item} />
 
-					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
-						<Icon name='dots-horizontal' onPress={onLongPress} />
-					) : null}
+					<Icon name='dots-horizontal' onPress={onLongPressCallback} />
 				</XStack>
 			</XStack>
 		)
@@ -197,7 +208,7 @@ function ItemRow({
 			id={item.Id}
 			disabled={!isAudio}
 			{...swipeConfig}
-			onLongPress={handleLongPress}
+			onLongPress={onLongPressCallback}
 			onPress={onPressCallback}
 		>
 			<XStack
@@ -210,7 +221,7 @@ function ItemRow({
 				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
-				onLongPress={handleLongPress}
+				onLongPress={onLongPressCallback}
 			>
 				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
 				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
@@ -221,7 +232,7 @@ function ItemRow({
 					{renderRunTime ? (
 						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
 					) : (
-						item.Type === 'Playlist' && (
+						item.Type === BaseItemKind.Playlist && (
 							<SizableText fontSize='2' color={'borderColor'}>
 								{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
 							</SizableText>
@@ -229,7 +240,7 @@ function ItemRow({
 					)}
 					<FavoriteIcon item={item} />
 
-					<Icon name='dots-horizontal' onPress={onLongPress} />
+					<Icon name='dots-horizontal' onPress={onLongPressCallback} />
 				</XStack>
 			</XStack>
 		</SwipeableRow>
@@ -246,11 +257,14 @@ function ItemRowDetails({
 	const route = useRoute<RouteProp<BaseStackParamList>>()
 
 	const shouldRenderArtistName =
-		item.Type === 'Audio' || (item.Type === 'MusicAlbum' && !route.name.includes('Artist'))
+		item.Type === BaseItemKind.Audio ||
+		(item.Type === BaseItemKind.MusicAlbum && !route.name.includes('Artist'))
 
-	const shouldRenderProductionYear = item.Type === 'MusicAlbum' && route.name.includes('Artist')
+	const shouldRenderProductionYear =
+		item.Type === BaseItemKind.MusicAlbum && route.name.includes('Artist')
 
-	const shouldRenderGenres = item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist
+	const shouldRenderGenres =
+		item.Type === BaseItemKind.Playlist || item.Type === BaseItemKind.MusicArtist
 
 	return (
 		<YStack alignContent='center' justifyContent='center' flexGrow={1}>
@@ -333,7 +347,7 @@ function HideableArtwork({
 					height={'4'}
 					width={'4'}
 					elevate
-					circular={item.Type === 'MusicArtist' || circular}
+					circular={item.Type === BaseItemKind.MusicArtist || circular}
 					imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 				/>
 			</XStack>

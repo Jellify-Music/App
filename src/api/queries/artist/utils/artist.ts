@@ -11,7 +11,6 @@ import {
 import { getArtistApi, getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/querying/index.config'
-import { setQueryUserDataForItems } from '../../user-data'
 import { getApi } from '../../../../stores/auth/utils'
 
 export function fetchArtists(
@@ -28,14 +27,13 @@ export function fetchArtists(
 
 		if (!api) return reject('No API instance provided')
 		if (!user) return reject('No user provided')
-		if (!library) return reject('Library has not been set')
 
 		getArtistApi(api)
 			// The SDK deprecates ArtistApi without a replacement — /Items has no album-artist filter
 			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			.getAlbumArtists(
 				{
-					parentId: library.musicLibraryId,
+					parentId: library?.musicLibraryId,
 					userId: user.id,
 					sortBy: sortBy,
 					sortOrder: sortOrder,
@@ -54,7 +52,6 @@ export function fetchArtists(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
@@ -65,21 +62,20 @@ export function fetchArtists(
 
 /**
  * Fetches all albums for an artist
- * @param libraryId The ID of the library to fetch albums from
+ * @param libraryId The ID of the library to fetch albums from, or `undefined` for all music libraries
  * @param artist The artist to fetch albums for
  * @param signal Optional AbortSignal to cancel the request
  * @returns A promise that resolves to an array of {@link BaseItemDto}s
  */
 export function fetchArtistAlbums(
-	libraryId: string | undefined,
 	artist: BaseItemDto,
+	libraryId?: string,
 	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
 
 		if (!api) return reject('No API instance provided')
-		if (!libraryId) return reject('Library has not been set')
 
 		getLibraryApi(api)
 			.getItems(
@@ -104,7 +100,6 @@ export function fetchArtistAlbums(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
@@ -129,7 +124,6 @@ export function fetchArtistFeaturedOn(
 		const api = getApi()
 
 		if (!api) return reject('No API instance provided')
-		if (!libraryId) return reject('Library has not been set')
 
 		getLibraryApi(api)
 			.getItems(
@@ -154,7 +148,6 @@ export function fetchArtistFeaturedOn(
 			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Spacer, XStack, getToken } from 'tamagui'
+import { Spacer, XStack } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
 import { useRepeatMode, useShuffle } from '../../../stores/player/queue'
