@@ -5,7 +5,7 @@ import LoginStackParamList from '../../screens/Login/types'
 import { useState } from 'react'
 import { isEmpty } from 'lodash'
 import useConnectToServer from '../../api/mutations/public-system-info'
-import Button from '../Global/helpers/button'
+import Button from '../Global/utils/button'
 import AddressInput from '../ServerAddress/components/address-input'
 import Heading from '../ServerAddress/components/heading'
 

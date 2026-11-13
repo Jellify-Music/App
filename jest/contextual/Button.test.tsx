@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native'
 import { fireEvent, render } from '@testing-library/react-native'
 import { TamaguiProvider } from 'tamagui'
 import config from '../../src/configs/tamagui.config'
-import Button from '../../src/components/Global/helpers/button'
+import Button from '../../src/components/Global/utils/button'
 
 describe('Button', () => {
 	it.each([

@@ -29,13 +29,13 @@ function JellifyToast(
 			paddingLeft: 12,
 		},
 		text1Style: {
-			fontSize: 16,
+			fontSize: 14,
 			fontFamily: 'Figtree-Bold',
 			fontWeight: 'normal',
 			color: theme.color.val,
 		},
 		text2Style: {
-			fontSize: 14,
+			fontSize: 12,
 			fontFamily: 'Figtree-Bold',
 			fontWeight: 'normal',
 			color: theme.neutral.val,

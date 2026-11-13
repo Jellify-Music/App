@@ -1,7 +1,7 @@
 import { useTheme, XStack, YStack, SizableText, Spacer } from 'tamagui'
 import { useQueueRef } from '../../../stores/player/queue'
 import React from 'react'
-import { Ticker } from '../../../components/Global/helpers/Animated/text'
+import { Ticker } from '../../Global/utils/Animated/text'
 import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../screens/navigation'
 

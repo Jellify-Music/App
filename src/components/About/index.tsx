@@ -9,9 +9,10 @@ import React from 'react'
 import { version } from '../../../package.json'
 import { Linking } from 'react-native'
 import { getStoredOtaVersion } from 'react-native-nitro-ota'
-import { YStack, XStack, SizableText, Separator, Spacer, ScrollView } from 'tamagui'
+import { YStack, XStack, SizableText, Separator, Spacer, ScrollView, H4 } from 'tamagui'
 import SupporterList from './components/supporter-list'
 import Icon from '../Global/components/icon'
+import JellifyLogo from '../Branding/logo'
 
 export default function About(): React.JSX.Element {
 	const patrons = usePatrons()
@@ -20,33 +21,47 @@ export default function About(): React.JSX.Element {
 	const otaVersion = getStoredOtaVersion()
 
 	return (
-		<ScrollView padding='4' showsVerticalScrollIndicator={false}>
+		<ScrollView padding='2' showsVerticalScrollIndicator={false}>
 			<YStack testID='settings-screen-about'>
 				<YStack
 					padding='4'
-					gap='4'
+					gap='2'
 					borderRadius='2'
 					borderColor='borderColor'
 					borderWidth='1'
 				>
-					<YStack gap='1'>
-						<XStack alignItems='center' gap='2' testID='jellify-version-text'>
-							<Icon name='jellyfish' color='primary' />
-							<SizableText fontSize='3' fontWeight='6'>
-								Jellify {version}
-							</SizableText>
+					<YStack gap='2'>
+						<XStack gap='2' alignItems='center' testID='jellify-version-text'>
+							<JellifyLogo size='75' />
+
+							<YStack
+								gap='1'
+								flex={1}
+								alignContent={'space-evenly'}
+								justifyContent='center'
+							>
+								<H4 fontWeight='6'>Jellify</H4>
+								<SizableText fontSize='4' fontWeight='6'>
+									{version}
+								</SizableText>
+								{otaVersion && (
+									<SizableText fontSize='2' color='borderColor'>
+										OTA Version: {otaVersion}
+									</SizableText>
+								)}
+							</YStack>
 						</XStack>
-						{caption && (
-							<SizableText fontSize='2' color='borderColor'>
-								{caption}
-							</SizableText>
-						)}
-						{otaVersion && (
-							<SizableText fontSize='2' color='borderColor'>
-								OTA Version: {otaVersion}
-							</SizableText>
-						)}
 					</YStack>
+					{caption && (
+						<SizableText
+							fontSize='2'
+							fontWeight='4'
+							color='borderColor'
+							fontStyle='italic'
+						>
+							{caption}
+						</SizableText>
+					)}
 
 					<Separator borderColor='borderColor' />
 
