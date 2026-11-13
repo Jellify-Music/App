@@ -107,8 +107,8 @@ function renderScreen() {
 					insets: { top: 0, left: 0, right: 0, bottom: 0 },
 				}}
 			>
-				<TamaguiProvider config={config} defaultTheme='purple_dark'>
-					<Theme name='purple_dark'>
+				<TamaguiProvider config={config} defaultTheme='haze_dark'>
+					<Theme name='haze_dark'>
 						<EqualizerScreen />
 					</Theme>
 				</TamaguiProvider>

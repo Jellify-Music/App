@@ -1,4 +1,5 @@
 import LookaheadSettings from '../../components/Settings/components/settings/lookahead'
+import SettingsNavRow from '../../components/Settings/components/settings-nav-row'
 import { YStack, XStack, SizableText, RadioGroup, ScrollView, useTheme } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -28,6 +29,14 @@ export default function PlaybackScreen(): React.JSX.Element {
 			showsVerticalScrollIndicator={false}
 			testID='settings-screen-playback'
 		>
+			<SettingsNavRow
+				testID='settings-nav-equalizer'
+				title='Equalizer'
+				icon='equalizer'
+				route='Equalizer'
+				iconColor='success'
+			/>
+
 			<YStack gap='4' margin='4'>
 				<YStack gap='3'>
 					<YStack gap='1'>

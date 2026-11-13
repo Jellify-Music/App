@@ -124,7 +124,13 @@ export default function EqualizerScreen(): React.JSX.Element {
 								Bands
 							</SizableText>
 
-							<Icon name='backup-restore' color='warning' size='6' onPress={reset} />
+							<Icon
+								name='backup-restore'
+								color='warning'
+								size='6'
+								onPress={reset}
+								testID='equalizer-reset-button'
+							/>
 						</XStack>
 
 						{bands.map((band) => (

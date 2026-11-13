@@ -2,7 +2,7 @@ appId: com.cosmonautical.jellify
 ---
 # Equalizer screen — enable the EQ, apply presets, and drag band sliders
 # to make sure adjusting gains doesn't crash the native audio engine.
-# Expects to start on the Settings hub; returns there when done.
+# Expects to start on the Playback settings screen; returns there when done.
 
 - tapOn:
     id: 'settings-nav-equalizer'
@@ -48,7 +48,7 @@ appId: com.cosmonautical.jellify
     timeout: 5000
 
 # ============================================================
-# BANDS — boost the lowest band, cut the highest, and tap a middle
+# BANDS — boost the lowest band (swipe right), cut the highest (swipe left), and tap a middle
 # band. Any manual gain change drops the preset to Custom.
 # ============================================================
 - scrollUntilVisible:
@@ -58,7 +58,7 @@ appId: com.cosmonautical.jellify
 - swipe:
     from:
       id: 'equalizer-band-slider-0'
-    direction: UP
+    direction: RIGHT
     duration: 600
 - extendedWaitUntil:
     visible:
@@ -83,7 +83,7 @@ appId: com.cosmonautical.jellify
 - swipe:
     from:
       id: 'equalizer-band-slider-9'
-    direction: DOWN
+    direction: LEFT
     duration: 600
 - assertVisible:
     id: 'settings-screen-equalizer'
@@ -93,17 +93,17 @@ appId: com.cosmonautical.jellify
 - swipe:
     from:
       id: 'equalizer-band-slider-9'
-    direction: UP
+    direction: RIGHT
     duration: 300
 - swipe:
     from:
       id: 'equalizer-band-slider-9'
-    direction: DOWN
+    direction: LEFT
     duration: 300
 - swipe:
     from:
       id: 'equalizer-band-slider-9'
-    direction: UP
+    direction: RIGHT
     duration: 300
 - assertVisible:
     id: 'settings-screen-equalizer'
@@ -135,10 +135,10 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     id: 'settings-screen-equalizer'
 
-# Return to hub via back
+# Return to Playback via back
 - runFlow: ../../subflows/platform/back.yaml
 - waitForAnimationToEnd
 - extendedWaitUntil:
     visible:
-      id: 'settings-screen-root'
+      id: 'settings-screen-playback'
     timeout: 5000
