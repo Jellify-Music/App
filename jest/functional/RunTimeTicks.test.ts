@@ -30,6 +30,12 @@ describe('RunTimeTicks Conversion', () => {
 			expect(result).toBe(15000000)
 		})
 
+		it('should round sub-tick precision to a whole number of ticks', () => {
+			const result = convertSecondsToRunTimeTicks(0.1234567891)
+			expect(result).toBe(1234568)
+			expect(Number.isInteger(result)).toBe(true)
+		})
+
 		it('should handle large numbers', () => {
 			const result = convertSecondsToRunTimeTicks(86400) // 24 hours
 			expect(result).toBe(864000000000)
