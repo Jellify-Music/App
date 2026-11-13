@@ -9,7 +9,7 @@ import React from 'react'
 import { version } from '../../../package.json'
 import { Linking } from 'react-native'
 import { getStoredOtaVersion } from 'react-native-nitro-ota'
-import { YStack, XStack, SizableText, Separator, Spacer, ScrollView } from 'tamagui'
+import { YStack, XStack, SizableText, Separator, Spacer, ScrollView, H4 } from 'tamagui'
 import SupporterList from './components/supporter-list'
 import Icon from '../Global/components/icon'
 import JellifyLogo from '../Branding/logo'
@@ -31,12 +31,18 @@ export default function About(): React.JSX.Element {
 					borderWidth='1'
 				>
 					<YStack gap='2'>
-						<XStack gap='2' testID='jellify-version-text'>
-							<JellifyLogo size='70' />
+						<XStack gap='2' alignItems='center' testID='jellify-version-text'>
+							<JellifyLogo size='75' />
 
-							<YStack flex={1} justifyContent='center'>
+							<YStack
+								gap='1'
+								flex={1}
+								alignContent={'space-evenly'}
+								justifyContent='center'
+							>
+								<H4 fontWeight='6'>Jellify</H4>
 								<SizableText fontSize='4' fontWeight='6'>
-									Jellify {version}
+									{version}
 								</SizableText>
 								{otaVersion && (
 									<SizableText fontSize='2' color='borderColor'>
