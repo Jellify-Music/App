@@ -152,7 +152,7 @@ async function getItems(params: Parameters<ReturnType<typeof getLibraryApi>['get
 	return data.Items ?? []
 }
 
-function favoriteTracks(musicLibraryId: string) {
+function favoriteTracks(musicLibraryId: string | undefined) {
 	return getItems({
 		parentId: musicLibraryId,
 		includeItemTypes: [BaseItemKind.Audio],
@@ -231,7 +231,7 @@ function albumTiles(items: BaseItemDto[]): CarPlayImageRow | undefined {
 async function home(
 	api: NonNullable<ReturnType<typeof getApi>>,
 	user: NonNullable<ReturnType<typeof getUser>>,
-	library: NonNullable<ReturnType<typeof getLibrary>>,
+	library: ReturnType<typeof getLibrary>,
 ): Promise<CarPlayListSection[]> {
 	const [results, downloads] = await Promise.all([
 		Promise.allSettled([
@@ -276,15 +276,14 @@ async function load(templateId: string): Promise<CarPlayListSection[]> {
 	const api = getApi()
 	const user = getUser()
 	const library = getLibrary()
-	if (!api || !user || !library)
-		return [{ items: [message('Open Jellify on your phone to sign in')] }]
+	if (!api || !user) return [{ items: [message('Open Jellify on your phone to sign in')] }]
 
 	const [base, offsetText] = templateId.split('@')
 	const offset = Number(offsetText) || 0
 	const separator = base.indexOf(':')
 	const kind = separator < 0 ? base : base.slice(0, separator)
 	const id = separator < 0 ? '' : base.slice(separator + 1)
-	const musicLibraryId = library.musicLibraryId
+	const musicLibraryId = library?.musicLibraryId
 	const page = { startIndex: offset, limit: PAGE_SIZE + 1 }
 
 	switch (kind) {

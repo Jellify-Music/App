@@ -18,12 +18,17 @@ export default function ServerLibrary(): React.JSX.Element {
 
 	const initiateQuickConnect = useInitiateQuickConnect()
 
-	const handleLibrarySelected = (libraryId: string, selectedLibrary: BaseItemDto) => {
-		setLibrary({
-			musicLibraryId: libraryId,
-			musicLibraryName: selectedLibrary.Name ?? 'No library name',
-			musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
-		})
+	const handleLibrarySelected = (selectedLibrary: BaseItemDto | undefined) => {
+		// Without a selected library, Jellify uses every music library
+		setLibrary(
+			selectedLibrary
+				? {
+						musicLibraryId: selectedLibrary.Id!,
+						musicLibraryName: selectedLibrary.Name ?? 'No library name',
+						musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
+					}
+				: undefined,
+		)
 
 		navigationRef.navigate('Tabs')
 	}

@@ -84,7 +84,9 @@ export default function Account(): React.JSX.Element {
 							</YStack>
 							<YStack flex={1}>
 								<SizableText fontSize='2' fontWeight='6'>
-									{library?.musicLibraryName ?? 'Unknown Library'}
+									{library
+										? (library.musicLibraryName ?? 'Unknown Library')
+										: 'All Libraries'}
 								</SizableText>
 								<SizableText fontSize='2' color='borderColor'>
 									Current library
