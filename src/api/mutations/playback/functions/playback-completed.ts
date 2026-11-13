@@ -5,11 +5,12 @@ import getTrackDto, { getTrackMediaSourceInfo } from '../../../../utils/mapping/
 import { getApi } from '../../../../stores/auth/utils'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
+import { ApiNotAvailableError } from '../../../../types/errors'
 
 export default async function reportPlaybackCompleted(track: TrackItem): Promise<void> {
 	const api = getApi()
 
-	if (!api) return Promise.reject('API instance not set')
+	if (!api) return Promise.reject(new ApiNotAvailableError())
 
 	const id = getTrackDto(track)?.Id
 	const { sessionId } = track.extraPayload as TrackExtraPayload

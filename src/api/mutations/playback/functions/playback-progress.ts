@@ -8,6 +8,7 @@ import LoggingContext from '../../../../utils/logging/enums'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
 import { throttle } from 'lodash'
 import { REPORTING_INTERVAL } from '../../../../configs/player/reporting.config'
+import { ApiNotAvailableError } from '../../../../types/errors'
 
 const reportPlaybackProgress = throttle(reportPlaybackProgressInner, REPORTING_INTERVAL, {
 	leading: true,
@@ -21,7 +22,7 @@ async function reportPlaybackProgressInner(
 ): Promise<void> {
 	const api = getApi()
 
-	if (!api) return Promise.reject('API instance not set')
+	if (!api) return Promise.reject(new ApiNotAvailableError())
 
 	const id = getTrackDto(track)?.Id
 
