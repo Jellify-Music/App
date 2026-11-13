@@ -26,8 +26,11 @@ export default function RecentlyAdded(): React.JSX.Element {
 						type: DiscoverAlbumScreenType.RecentlyAdded,
 					})
 				}}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
 			>
-				<H4 marginLeft='2'>Recently Added</H4>
+				<H4 userSelect='none'>Recently Added</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

@@ -51,8 +51,11 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('MostPlayedTracks')
 				}}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
 			>
-				<H4 marginLeft='2'>On Repeat</H4>
+				<H4 userSelect='none'>On Repeat</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 
