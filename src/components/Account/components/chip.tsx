@@ -16,14 +16,7 @@ export default function ServerInfoChip({
 	color = 'borderColor',
 }: ServerInfoChipProps) {
 	return (
-		<XStack
-			flex={1}
-			minWidth={140}
-			alignItems='center'
-			gap='2'
-			padding='2'
-			borderRadius='3'
-		>
+		<XStack flex={1} minWidth={140} alignItems='center' gap='2' padding='2' borderRadius='3'>
 			{icon && <Icon name={icon} color={color} size='7' />}
 			<YStack flex={1}>
 				<SizableText fontSize='2' fontWeight='6' numberOfLines={1}>
