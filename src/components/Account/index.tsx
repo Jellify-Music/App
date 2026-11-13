@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import Icon from '../Global/components/icon'
-import Button from '../Global/helpers/button'
+import Button from '../Global/utils/button'
 import SettingsSection from '../Settings/components/settings-section'
 import { SettingsStackParamList } from '../../screens/Settings/types'
 import { useJellifyUser, useJellifyLibrary } from '../../stores/auth'
@@ -28,7 +28,7 @@ export default function Account(): React.JSX.Element {
 	const userAvatarUrl = getUserImageUrl()
 
 	return (
-		<ScrollView padding='4' showsVerticalScrollIndicator={false}>
+		<ScrollView showsVerticalScrollIndicator={false}>
 			<YStack testID='settings-screen-account'>
 				{/* Profile Header */}
 				<Card
@@ -70,7 +70,6 @@ export default function Account(): React.JSX.Element {
 						alignItems='center'
 						justifyContent='space-between'
 						padding='2'
-						backgroundColor='background-focus'
 						borderRadius='3'
 					>
 						<XStack alignItems='center' gap='3' flex={1}>

@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import AnimatedRow from '../../Global/helpers/Animated/row'
+import AnimatedRow from '../../Global/utils/Animated/row'
 import { useRecentlyUpdatedPlaylists } from '../../../api/queries/playlist'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 

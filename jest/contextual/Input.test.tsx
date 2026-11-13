@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native'
 import { render } from '@testing-library/react-native'
 import { TamaguiProvider } from 'tamagui'
 import config from '../../src/configs/tamagui.config'
-import Input from '../../src/components/Global/helpers/input'
+import Input from '../../src/components/Global/utils/input'
 
 describe('Input', () => {
 	// Android's TextInput crashes on launch when fontSize reaches it as a

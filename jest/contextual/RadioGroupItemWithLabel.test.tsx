@@ -2,7 +2,7 @@ import React from 'react'
 import { fireEvent, render } from '@testing-library/react-native'
 import { RadioGroup, TamaguiProvider } from 'tamagui'
 import config from '../../src/configs/tamagui.config'
-import { RadioGroupItemWithLabel } from '../../src/components/Global/helpers/radio-group-item-with-label'
+import { RadioGroupItemWithLabel } from '../../src/components/Global/utils/radio-group-item-with-label'
 
 describe('RadioGroupItemWithLabel', () => {
 	it.each([

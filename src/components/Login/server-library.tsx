@@ -9,7 +9,7 @@ import { XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import navigationRef from '../../screens/navigation'
-import Button from '../Global/helpers/button'
+import Button from '../Global/utils/button'
 
 export default function ServerLibrary(): React.JSX.Element {
 	const [, setLibrary] = useJellifyLibrary()

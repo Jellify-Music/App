@@ -22,7 +22,6 @@ export default function ServerInfoChip({
 			alignItems='center'
 			gap='2'
 			padding='2'
-			backgroundColor='background-focus'
 			borderRadius='3'
 		>
 			{icon && <Icon name={icon} color={color} size='7' />}
