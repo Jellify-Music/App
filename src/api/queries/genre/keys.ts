@@ -1,5 +1,7 @@
+import { MusicLibraryQueryKey } from '../libraries/keys'
+
 export const GenresQueryKey = (libraryId: string | undefined, userId: string | undefined) => [
 	'Genres',
-	libraryId,
+	MusicLibraryQueryKey(libraryId),
 	userId,
 ]

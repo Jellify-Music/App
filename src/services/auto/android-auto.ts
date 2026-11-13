@@ -114,7 +114,7 @@ async function getItems(params: Parameters<ReturnType<typeof getLibraryApi>['get
 	return data.Items ?? []
 }
 
-function favoriteTracks(musicLibraryId: string) {
+function favoriteTracks(musicLibraryId: string | undefined) {
 	return getItems({
 		parentId: musicLibraryId,
 		includeItemTypes: [BaseItemKind.Audio],
@@ -140,14 +140,14 @@ async function loadChildren(parentId: string): Promise<MediaItem[] | null> {
 	const api = getApi()
 	const user = getUser()
 	const library = getLibrary()
-	if (!api || !user || !library) return [message('Open Jellify on your phone to sign in')]
+	if (!api || !user) return [message('Open Jellify on your phone to sign in')]
 
 	const [base, offsetText] = parentId.split('@')
 	const offset = Number(offsetText) || 0
 	const separator = base.indexOf(':')
 	const kind = separator < 0 ? base : base.slice(0, separator)
 	const id = separator < 0 ? '' : base.slice(separator + 1)
-	const musicLibraryId = library.musicLibraryId
+	const musicLibraryId = library?.musicLibraryId
 	const page = { startIndex: offset, limit: PAGE_SIZE + 1 }
 
 	switch (kind) {
@@ -281,11 +281,11 @@ async function search(query: string): Promise<MediaItem[]> {
 	const api = getApi()
 	const user = getUser()
 	const library = getLibrary()
-	if (!api || !user || !library) return [message('Open Jellify on your phone to sign in')]
+	if (!api || !user) return [message('Open Jellify on your phone to sign in')]
 
 	const [items, artists, playlists] = await Promise.all([
 		getItems({
-			parentId: library.musicLibraryId,
+			parentId: library?.musicLibraryId,
 			searchTerm: query,
 			recursive: true,
 			includeItemTypes: [BaseItemKind.Audio, BaseItemKind.MusicAlbum],
@@ -293,7 +293,7 @@ async function search(query: string): Promise<MediaItem[]> {
 			fields: TRACK_FIELDS,
 		}),
 		getItems({
-			parentId: library.musicLibraryId,
+			parentId: library?.musicLibraryId,
 			searchTerm: query,
 			recursive: true,
 			includeItemTypes: [BaseItemKind.MusicArtist],

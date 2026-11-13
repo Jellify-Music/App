@@ -11,9 +11,13 @@ import OneLibraryMessage from './components/one-library'
 import Heading from './components/heading'
 import NoLibrariesMessage from './components/no-libraries'
 import LoadErrorMessage from './components/loading-error'
+import { ALL_MUSIC_LIBRARIES } from '../../api/queries/libraries/keys'
 
 interface LibrarySelectorProps {
-	onLibrarySelected: (libraryId: string, selectedLibrary: BaseItemDto) => void
+	/**
+	 * Called with the selected music library, or `undefined` when all music libraries are selected
+	 */
+	onLibrarySelected: (selectedLibrary: BaseItemDto | undefined) => void
 	onCancel: EventHandler
 	primaryButtonText: string
 	primaryButtonIcon: MaterialDesignIconsIconName
@@ -41,17 +45,17 @@ export default function LibrarySelector({
 
 	const [musicLibraries, setMusicLibraries] = useState<BaseItemDto[]>([])
 
-	const [selectedLibraryId, setSelectedLibraryId] = useState<string | undefined>(
-		library?.musicLibraryId,
+	const [selectedLibraryId, setSelectedLibraryId] = useState<string>(
+		library?.musicLibraryId ?? ALL_MUSIC_LIBRARIES,
 	)
 
 	const handleLibrarySelection = () => {
-		if (!selectedLibraryId || !libraries) return
+		if (selectedLibraryId === ALL_MUSIC_LIBRARIES) return onLibrarySelected(undefined)
 
-		const selectedLibrary = libraries.find((lib) => lib.Id === selectedLibraryId)
+		const selectedLibrary = libraries?.find((lib) => lib.Id === selectedLibraryId)
 
 		if (selectedLibrary) {
-			onLibrarySelected(selectedLibraryId, selectedLibrary)
+			onLibrarySelected(selectedLibrary)
 		}
 	}
 
@@ -63,15 +67,13 @@ export default function LibrarySelector({
 				(library) => library.CollectionType === CollectionType.Music,
 			)
 			setMusicLibraries(filteredMusicLibraries)
-
-			// Auto-select if there's only one music library
-			if (filteredMusicLibraries.length === 1 && !selectedLibraryId) {
-				setSelectedLibraryId(filteredMusicLibraries[0].Id)
-			}
 		}
 	}, [isPending, isSuccess, libraries])
 
-	const libraryToggleItems = musicLibraries.map((library) => {
+	const libraryToggleItems = [
+		{ Id: ALL_MUSIC_LIBRARIES, Name: 'All Libraries' },
+		...musicLibraries,
+	].map((library) => {
 		const isSelected: boolean = selectedLibraryId === library.Id!
 
 		return (
@@ -144,7 +146,7 @@ export default function LibrarySelector({
 					<Button
 						variant='outlined'
 						borderColor={'primary'}
-						disabled={!selectedLibraryId}
+						disabled={musicLibraries.length === 0}
 						icon={<Icon name={primaryButtonIcon} size='7' color='primary' />}
 						onPress={handleLibrarySelection}
 						testID='let_s_go_button'
