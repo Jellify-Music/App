@@ -46,7 +46,7 @@ export default function LookaheadSettings() {
 				thumbWidth={8}
 				color={primary.val}
 				backgroundColor={neutral.val}
-				thumbShadowColor='darkgray'
+				thumbShadowColor='black'
 				trackHeight={getTokenValue('2')}
 				step={1}
 			/>
