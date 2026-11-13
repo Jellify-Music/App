@@ -8,7 +8,7 @@ export interface UseUpdatePlaylistParams {
 	/**
 	 * The error handler for the mutation
 	 */
-	onError?: EventHandler<Error>
+	onError?: EventHandler
 
 	/**
 	 * The settled handler for the mutation
