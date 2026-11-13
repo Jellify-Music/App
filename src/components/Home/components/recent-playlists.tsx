@@ -47,8 +47,14 @@ export default function RecentPlaylists(): React.JSX.Element {
 
 	return recentPlaylistsQuery.data ? (
 		<AnimatedRow testID='home-recent-playlists'>
-			<XStack alignItems='center' onPress={handleHeaderPress}>
-				<H4 marginLeft='2'>Your Playlists</H4>
+			<XStack
+				alignItems='center'
+				onPress={handleHeaderPress}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
+			>
+				<H4 userSelect='none'>Your Playlists</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

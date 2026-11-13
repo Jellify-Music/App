@@ -62,8 +62,11 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('RecentTracks')
 				}}
+				transition='quick'
+				opacity='1 press:0.6'
+				marginHorizontal='2'
 			>
-				<H4 marginLeft='2'>Play it again</H4>
+				<H4 userSelect='none'>Play it again</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

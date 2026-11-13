@@ -22,14 +22,16 @@ export default function SuggestedAlbums() {
 		<AnimatedRow testID='discover-suggested-albums'>
 			<XStack
 				alignItems='center'
-				marginLeft='2'
+				marginHorizontal='2'
 				onPress={() => {
 					navigation.navigate('Albums', {
 						type: DiscoverAlbumScreenType.Suggested,
 					})
 				}}
+				transition='quick'
+				opacity='1 press:0.6'
 			>
-				<H4>More from the Vault</H4>
+				<H4 userSelect='none'>More from the Vault</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
