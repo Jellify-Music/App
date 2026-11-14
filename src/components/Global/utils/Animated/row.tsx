@@ -37,7 +37,5 @@ export default function AnimatedRow({ children, testID }: AnimatedRowProps) {
 const animatedRowStyle = StyleSheet.create({
 	row: {
 		flex: 1,
-		alignItems: 'flex-start',
-		justifyContent: 'space-between',
 	},
 })
