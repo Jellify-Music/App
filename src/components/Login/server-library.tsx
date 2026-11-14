@@ -2,6 +2,7 @@ import { useInitiateQuickConnect } from '../../api/mutations/quickconnect'
 import LoginStackParamList from '../../screens/Login/types'
 import { useJellifyLibrary } from '../../stores/auth'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibrarySelector from '../LibrarySelector'
@@ -10,6 +11,7 @@ import Icon from '../Global/components/icon'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import navigationRef from '../../screens/navigation'
 import Button from '../Global/utils/button'
+import { useLibraries } from '../../api/queries/libraries'
 
 export default function ServerLibrary(): React.JSX.Element {
 	const [, setLibrary] = useJellifyLibrary()
@@ -17,6 +19,13 @@ export default function ServerLibrary(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
 	const initiateQuickConnect = useInitiateQuickConnect()
+
+	const { data: libraries, isSuccess } = useLibraries()
+
+	const musicLibraryCount = libraries?.length ?? 0
+
+	// Filtering by library only matters with more than one, so skip the step otherwise
+	const skipLibrarySelection = isSuccess && musicLibraryCount === 1
 
 	const handleLibrarySelected = (selectedLibrary: BaseItemDto | undefined) => {
 		// Without a selected library, Jellify uses every music library
@@ -32,6 +41,10 @@ export default function ServerLibrary(): React.JSX.Element {
 
 		navigationRef.navigate('Tabs')
 	}
+
+	useEffect(() => {
+		if (skipLibrarySelection) handleLibrarySelected(undefined)
+	}, [skipLibrarySelection])
 
 	const handleCancel = () => {
 		initiateQuickConnect.reset()

@@ -17,12 +17,13 @@ appId: com.cosmonautical.jellify
     env:
       button_id: sign_in_button
 
-# Wait for library selection screen
+# Wait for sign in to finish. Library selection comes next, unless the
+# server has a single music library, in which case onboarding skips it
 - extendedWaitUntil:
-    visible:
-      id: "library_selection_screen"
+    notVisible:
+      id: "server_authentication_screen"
     timeout: 30000
 
-# Take screenshot of library selection
+# Take screenshot of the screen after sign in
 - takeScreenshot: screenshots/setup/login_result_screen
 
