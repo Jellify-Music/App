@@ -89,11 +89,23 @@ export default function LibrarySelector({
 
 	return (
 		<YStack flex={1} margin='4' testID='library_selection_screen' justifyContent='flex-end'>
-			<YStack flex={1} justifyContent='center'>
-				<Heading title={title} />
-			</YStack>
+			<Heading title={title} />
 
 			{!hasMultipleLibraries && !isOnboarding && <OneLibraryMessage />}
+
+			{hasMultipleLibraries && (
+				<SizableText
+					fontSize='3'
+					color='borderColor'
+					textAlign='center'
+					marginBottom='4'
+					testID='library_filter_hint'
+				>
+					{!selectedLibraryId
+						? 'Showing music from all libraries'
+						: 'Tap the selected library again for all libraries'}
+				</SizableText>
+			)}
 
 			<YStack flexShrink={1}>
 				{isPending ? (
@@ -118,20 +130,6 @@ export default function LibrarySelector({
 					>
 						<YGroup>{libraryToggleItems}</YGroup>
 					</ToggleGroup>
-				)}
-
-				{hasMultipleLibraries && (
-					<SizableText
-						fontSize='3'
-						color='borderColor'
-						textAlign='center'
-						marginBottom='4'
-						testID='library_filter_hint'
-					>
-						{!selectedLibraryId
-							? 'Showing music from all libraries'
-							: 'Tap the selected library again to show music from all libraries'}
-					</SizableText>
 				)}
 
 				<XStack flexShrink={1} alignItems='flex-end' gap='3'>
