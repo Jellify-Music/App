@@ -35,8 +35,9 @@ export default function HorizontalCardList({
 			data={slicedData}
 			renderItem={renderItem}
 			estimatedItemSize={estimatedItemSize}
-			style={styles.list}
 			itemLayoutAnimation={itemLayoutAnimation}
+			contentContainerStyle={styles.contentContainer}
+			style={styles.list}
 			{...props}
 		/>
 	)
@@ -45,6 +46,8 @@ export default function HorizontalCardList({
 const styles = StyleSheet.create({
 	list: {
 		overflow: 'hidden',
-		paddingLeft: 5,
+	},
+	contentContainer: {
+		paddingHorizontal: 4,
 	},
 })
