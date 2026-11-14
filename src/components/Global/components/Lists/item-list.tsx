@@ -1,21 +1,51 @@
-import { UseInfiniteQueryResult } from '@tanstack/react-query'
+import {
+	UseInfiniteQueryResult,
+	UseQueryResult,
+	InfiniteQueryObserverResult,
+} from '@tanstack/react-query'
 import List from './utils'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import { RefreshControl } from 'react-native'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 import ItemRow from '../item-row'
-import { Queue } from '@/src/services/types/queue-item'
+import { Queue } from '../../../../services/types/queue-item'
 import Track from '../Track'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '@/src/screens/types'
+import { BaseStackParamList } from '../../../../screens/types'
+import { EventHandler } from '../../../../types/Events'
 
-interface ItemListProps {
-	query: UseInfiniteQueryResult<BaseItemDto[], Error>
+interface InfiniteItemListProps {
+	infiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	queue?: Queue
 }
 
-export default function ItemList({ query, queue }: ItemListProps): React.JSX.Element {
+export default function InfiniteItemList({
+	infiniteQuery,
+	queue,
+}: InfiniteItemListProps): React.JSX.Element {
+	const onEndReached = () =>
+		infiniteQuery.hasNextPage ? infiniteQuery.fetchNextPage() : undefined
+
+	return <BaseItemList query={infiniteQuery} queue={queue} onEndReached={onEndReached} />
+}
+
+interface ItemListProps {
+	query: UseQueryResult<BaseItemDto[], Error>
+	queue?: Queue
+}
+
+export function ItemList({ query, queue }: ItemListProps): React.JSX.Element {
+	return <BaseItemList query={query} queue={queue} />
+}
+
+interface BaseItemListProps {
+	query: UseQueryResult<BaseItemDto[], Error> | UseInfiniteQueryResult<BaseItemDto[], Error>
+	queue?: Queue
+	onEndReached?: EventHandler<InfiniteQueryObserverResult<BaseItemDto[], Error> | undefined>
+}
+
+function BaseItemList({ query, queue, onEndReached }: BaseItemListProps): React.JSX.Element {
 	const tracks = query.data?.filter(({ Type }) => Type === BaseItemKind.Audio) ?? []
 	const trackIds = new Map<string, number>(tracks.map((track, index) => [track.Id!, index]))
 
@@ -42,8 +72,6 @@ export default function ItemList({ query, queue }: ItemListProps): React.JSX.Ele
 			/>
 		)
 	}
-
-	const onEndReached = () => query.hasNextPage && query.fetchNextPage()
 
 	const onRefresh = async () => {
 		await query.refetch()

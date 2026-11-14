@@ -15,6 +15,7 @@ import { QueryAges } from '../../../constants/durations'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
 import { AlbumQuery, RecentlyAddedQuery } from './queries'
+import { MusicLibraryQueryKey } from '../libraries/keys'
 
 export const useAlbum = (album: BaseItemDto) => useQuery(AlbumQuery(album))
 
@@ -23,12 +24,8 @@ const useAlbums = () => {
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const {
-		filters,
-		sortBy: librarySortByState,
-		sortDescending: librarySortDescendingState,
-	} = useLibraryStore()
-	const rawAlbumSortBy = librarySortByState.albums ?? ItemSortBy.SortName
+	const albumFilters = useLibraryStore((state) => state.filters.albums)
+	const rawAlbumSortBy = useLibraryStore((state) => state.sortBy.albums) ?? ItemSortBy.SortName
 	const albumSortByOptions = [
 		ItemSortBy.Name,
 		ItemSortBy.SortName,
@@ -41,10 +38,10 @@ const useAlbums = () => {
 	const librarySortBy = albumSortByOptions.includes(rawAlbumSortBy as ItemSortBy)
 		? (rawAlbumSortBy as ItemSortBy)
 		: ItemSortBy.Album
-	const sortDescending = librarySortDescendingState.albums ?? false
-	const isFavorites = filters.albums.isFavorites
-	const yearMin = filters.albums.yearMin
-	const yearMax = filters.albums.yearMax
+	const sortDescending = useLibraryStore((state) => state.sortDescending.albums) ?? false
+	const isFavorites = albumFilters.isFavorites
+	const yearMin = albumFilters.yearMin
+	const yearMax = albumFilters.yearMax
 
 	// Add letter sections when sorting by name/album/artist (for A-Z selector)
 	const isSortByLetter =
@@ -61,7 +58,7 @@ const useAlbums = () => {
 		queryKey: [
 			QueryKeys.InfiniteAlbums,
 			isFavorites,
-			library?.musicLibraryId,
+			MusicLibraryQueryKey(library?.musicLibraryId),
 			librarySortBy,
 			sortDescending,
 			yearMin,
@@ -108,14 +105,17 @@ export const useRefetchRecentlyAdded: () => () => void = () => {
 
 	return () =>
 		queryClient.invalidateQueries({
-			queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
+			queryKey: [
+				QueryKeys.RecentlyAddedAlbums,
+				MusicLibraryQueryKey(library?.musicLibraryId),
+			],
 		})
 }
 
-export const useAlbumDiscs = (album: BaseItemDto) => {
+export const useAlbumDiscs = (album: BaseItemDto, enabled: boolean = true) => {
 	const api = getApi()
 
-	return useQuery(AlbumDiscsQuery(api, album))
+	return useQuery({ ...AlbumDiscsQuery(api, album), enabled })
 }
 
 export async function refreshAlbumDiscs(album: BaseItemDto) {

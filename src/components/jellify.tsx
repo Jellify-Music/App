@@ -24,7 +24,7 @@ export default function Jellify(): React.JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark'
 
 	const resolvedMode = theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme
-	const themeName = `${colorPreset}_${resolvedMode}` // e.g. 'purple_dark'
+	const themeName = `${colorPreset}_${resolvedMode}` // e.g. 'haze_dark'
 
 	return (
 		<Theme name={themeName as ThemeName | null}>

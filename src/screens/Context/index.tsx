@@ -7,7 +7,6 @@ export default function ItemContextScreen({ route }: ContextProps): React.JSX.El
 			item={route.params.item}
 			playlist={route.params.playlist}
 			stackNavigation={route.params.navigation}
-			navigationCallback={route.params.navigationCallback}
 			streamingMediaSourceInfo={route.params.streamingMediaSourceInfo}
 			downloadedMediaSourceInfo={route.params.downloadedMediaSourceInfo}
 		/>

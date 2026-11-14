@@ -1,11 +1,12 @@
 import { useAppSettingsStore } from '../../stores/settings/app'
 import React from 'react'
+import type { EventHandler } from '../../types/Events'
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
 import * as Sentry from '@sentry/react-native'
 
 type Props = {
 	reloader: number
-	onRetry: () => void
+	onRetry: EventHandler
 	onError?: (error: Error, info: React.ErrorInfo) => void
 	children: React.ReactNode
 }

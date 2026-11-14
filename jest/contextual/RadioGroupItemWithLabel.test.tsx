@@ -2,7 +2,7 @@ import React from 'react'
 import { fireEvent, render } from '@testing-library/react-native'
 import { RadioGroup, TamaguiProvider } from 'tamagui'
 import config from '../../src/configs/tamagui.config'
-import { RadioGroupItemWithLabel } from '../../src/components/Global/helpers/radio-group-item-with-label'
+import { RadioGroupItemWithLabel } from '../../src/components/Global/utils/radio-group-item-with-label'
 
 describe('RadioGroupItemWithLabel', () => {
 	it.each([
@@ -10,7 +10,7 @@ describe('RadioGroupItemWithLabel', () => {
 		['4', 22],
 	] as const)('renders size %s as a visible circle', async (size, diameter) => {
 		const screen = await render(
-			<TamaguiProvider config={config} defaultTheme='purple_dark'>
+			<TamaguiProvider config={config} defaultTheme='haze_dark'>
 				<RadioGroup defaultValue='original'>
 					<RadioGroupItemWithLabel size={size} value='original' label='Original' />
 					<RadioGroupItemWithLabel size={size} value='high' label='High' />
@@ -42,7 +42,7 @@ describe('RadioGroupItemWithLabel', () => {
 	it('changes selection by pressing the radio or its label', async () => {
 		const onValueChange = jest.fn()
 		const screen = await render(
-			<TamaguiProvider config={config} defaultTheme='purple_dark'>
+			<TamaguiProvider config={config} defaultTheme='haze_dark'>
 				<RadioGroup defaultValue='original' onValueChange={onValueChange}>
 					<RadioGroupItemWithLabel size='3' value='original' label='Original' />
 					<RadioGroupItemWithLabel size='3' value='high' label='High' />
@@ -64,7 +64,7 @@ describe('RadioGroupItemWithLabel', () => {
 		const firstChange = jest.fn()
 		const secondChange = jest.fn()
 		const screen = await render(
-			<TamaguiProvider config={config} defaultTheme='purple_dark'>
+			<TamaguiProvider config={config} defaultTheme='haze_dark'>
 				<RadioGroup defaultValue='original' onValueChange={firstChange}>
 					<RadioGroupItemWithLabel size='3' value='original' label='Stream original' />
 					<RadioGroupItemWithLabel size='3' value='high' label='Stream high' />

@@ -1,5 +1,6 @@
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { JellifyUser } from '@/src/types/JellifyUser'
+import { MusicLibraryQueryKey } from '../libraries/keys'
 
 enum RecentsQueryKeys {
 	RecentlyPlayedTracks = 'RECENTLY_PLAYED_TRACKS',
@@ -11,7 +12,7 @@ const RecentsQueryKey = (
 	key: RecentsQueryKeys,
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
-) => [key, user?.id, library?.musicLibraryId]
+) => [key, user?.id, MusicLibraryQueryKey(library?.musicLibraryId)]
 
 export const RecentlyPlayedTracksQueryKey = (
 	user: JellifyUser | undefined,

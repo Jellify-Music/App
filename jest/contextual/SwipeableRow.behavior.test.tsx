@@ -1,11 +1,9 @@
 import React from 'react'
 import { render } from '@testing-library/react-native'
-import SwipeableRow, {
-	type QuickAction,
-	type SwipeAction,
-} from '../../src/components/Global/components/SwipeableRow'
+import type { QuickAction, SwipeAction } from '../../src/hooks/gestures/types'
 import { TamaguiProvider, Theme, SizableText } from 'tamagui'
 import config from '../../src/configs/tamagui.config'
+import SwipeableRow from '../../src/components/Global/components/SwipeableRow'
 
 /**
  * Expectation-driven tests for SwipeableRow.
@@ -41,8 +39,8 @@ function Row({
 }) {
 	return (
 		<GestureHandlerRootView>
-			<TamaguiProvider config={config} defaultTheme='purple_dark'>
-				<Theme name='purple_dark'>
+			<TamaguiProvider config={config} defaultTheme='haze_dark'>
+				<Theme name='haze_dark'>
 					<SwipeableRow
 						leftAction={leftAction ?? undefined}
 						leftActions={leftActions ?? undefined}
@@ -74,7 +72,7 @@ describe('SwipeableRow behavior (expectations)', () => {
 		const left: SwipeAction = {
 			label: 'Fav',
 			icon: 'heart',
-			color: '$primary',
+			color: 'primary',
 			onTrigger,
 		}
 
@@ -95,7 +93,7 @@ describe('SwipeableRow behavior (expectations)', () => {
 
 	it('quick actions on right: pressing an action calls handler and closes', async () => {
 		const act1 = jest.fn()
-		const actions: QuickAction[] = [{ icon: 'download', color: '$primary', onPress: act1 }]
+		const actions: QuickAction[] = [{ icon: 'download', color: 'primary', onPress: act1 }]
 
 		const { getByTestId } = await render(<Row rightActions={actions} testID='row-b' />)
 
@@ -116,12 +114,12 @@ describe('SwipeableRow behavior (expectations)', () => {
 			<>
 				<Row
 					rightActions={[
-						{ icon: 'playlist-music', color: '$primary', onPress: jest.fn() },
+						{ icon: 'playlist-music', color: 'primary', onPress: jest.fn() },
 					]}
 					testID='r1'
 				/>
 				<Row
-					rightActions={[{ icon: 'plus-circle', color: '$primary', onPress: jest.fn() }]}
+					rightActions={[{ icon: 'plus-circle', color: 'primary', onPress: jest.fn() }]}
 					testID='r2'
 				/>
 			</>,
@@ -139,7 +137,7 @@ describe('SwipeableRow behavior (expectations)', () => {
 	it('scroll begin elsewhere closes any open menu (via registry)', async () => {
 		const { rerender } = await render(
 			<Row
-				rightActions={[{ icon: 'playlist-music', color: '$primary', onPress: jest.fn() }]}
+				rightActions={[{ icon: 'playlist-music', color: 'primary', onPress: jest.fn() }]}
 				testID='scroll-row'
 			/>,
 		)

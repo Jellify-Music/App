@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import Input from '../Global/helpers/input'
+import Input from '../Global/utils/input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H3, H5, SizableText, Spinner, YStack } from 'tamagui'

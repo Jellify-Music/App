@@ -3,10 +3,10 @@ import React from 'react'
 import Icon from './icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import Button from '../helpers/button'
+import Button from '../utils/button'
 import { CommonActions } from '@react-navigation/native'
 import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
-import { Paragraph, SizableText, Text } from 'tamagui'
+import { SizableText } from 'tamagui'
 
 export function InstantMixIconButton({
 	item,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
+import type { EventHandler } from '../../../../types/Events'
 import { getToken } from 'tamagui'
-import { RunTimeTicks } from '../../helpers/time-codes'
+import { RunTimeTicks } from '../../utils/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueuingType } from '../../../../enums/queuing-type'
 import { Queue } from '../../../../services/types/queue-item'
@@ -10,8 +11,8 @@ import navigationRef from '../../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../../screens/types'
 import SwipeableRow from '../SwipeableRow'
-import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
-import { buildSwipeConfig } from '../../helpers/swipe-actions'
+import { useSwipeSettingsStore } from '../../../../stores/settings/gestures'
+import { buildSwipeConfig } from '../../utils/swipe-actions'
 import { useIsFavorite } from '../../../../api/queries/user-data'
 import { useCurrentTrackId } from '../../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
@@ -29,8 +30,8 @@ export interface TrackProps {
 	queue: Queue
 	playlist?: BaseItemDto
 	showArtwork?: boolean | undefined
-	onPress?: () => Promise<void> | undefined
-	onLongPress?: () => void | undefined
+	onPress?: EventHandler
+	onLongPress?: EventHandler
 	isNested?: boolean | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined

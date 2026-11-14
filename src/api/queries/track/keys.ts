@@ -1,4 +1,5 @@
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
+import { MusicLibraryQueryKey } from '../libraries/keys'
 
 export enum TrackQueryKeys {
 	AllTracks = 'ALL_TRACKS',
@@ -20,7 +21,7 @@ export const TracksQueryKey = (
 	yearMax?: number,
 ) => [
 	TrackQueryKeys.AllTracks,
-	library?.musicLibraryId,
+	MusicLibraryQueryKey(library?.musicLibraryId),
 	`favorites:${isFavorites}`,
 	`unplayed:${isUnplayed}`,
 	isDownloaded ? `${isDownloaded} - ${downloads}` : isDownloaded,

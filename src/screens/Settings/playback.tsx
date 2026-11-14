@@ -1,23 +1,11 @@
-import React from 'react'
-import {
-	YStack,
-	XStack,
-	SizableText,
-	RadioGroup,
-	ScrollView,
-	useTheme,
-	getTokenValue,
-} from 'tamagui'
+import LookaheadSettings from '../../components/Settings/components/settings/lookahead'
+import { YStack, XStack, SizableText, RadioGroup, ScrollView, useTheme } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
-import { RadioGroupItemWithLabel } from '../../components/Global/helpers/radio-group-item-with-label'
+import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
+import { RadioGroupItemWithLabel } from '../../components/Global/utils/radio-group-item-with-label'
 import { usePlayerSettingsStore } from '../../stores/settings/player'
 import { StreamingQuality } from '../../enums/audio-quality'
-import { DEFAULT_PLAYER_LOOKAHEAD } from '../../configs/player/index.config'
-import Slider from '@jellify-music/react-native-reanimated-slider'
-import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated'
-import { runOnJS } from 'react-native-worklets'
 
 export default function PlaybackScreen(): React.JSX.Element {
 	const { primary, neutral } = useTheme()
@@ -31,31 +19,8 @@ export default function PlaybackScreen(): React.JSX.Element {
 		setEnableAudioNormalization,
 		displayAudioQualityBadge,
 		setDisplayAudioQualityBadge,
-		lookahead,
 		setLookahead,
 	} = usePlayerSettingsStore()
-
-	const lookaheadSharedValue = useSharedValue(lookahead)
-
-	const handleLookaheadChange = async (value: number) => {
-		const roundedValue = Math.round(value)
-
-		if (isNaN(roundedValue) || roundedValue < 1 || roundedValue > 10) {
-			await setLookahead(DEFAULT_PLAYER_LOOKAHEAD)
-		} else {
-			await setLookahead(roundedValue)
-		}
-	}
-
-	useAnimatedReaction(
-		() => lookaheadSharedValue,
-		(prepared) => {
-			const rounded = Math.round(prepared.value)
-			if (rounded !== lookahead) {
-				runOnJS(handleLookaheadChange)(rounded)
-			}
-		},
-	)
 
 	return (
 		<YStack flex={1} backgroundColor='background' testID='settings-screen-playback'>
@@ -142,43 +107,7 @@ export default function PlaybackScreen(): React.JSX.Element {
 						/>
 					</XStack>
 
-					<YStack alignItems='flex-start' gap='3'>
-						<XStack alignItems='center' justifyContent='space-between' width='100%'>
-							<YStack flex={1}>
-								<SizableText fontSize='3' fontWeight='6'>
-									Track Lookahead
-								</SizableText>
-								<SizableText fontSize='2' color='borderColor'>
-									Number of upcoming tracks to prefetch
-								</SizableText>
-							</YStack>
-
-							<SizableText
-								fontSize='4'
-								fontWeight='6'
-								fontVariant={['tabular-nums']}
-								color='primary'
-								flexShrink={1}
-								borderWidth={'1'}
-								borderRadius={'2'}
-								borderColor='primary'
-								padding='2'
-							>
-								{lookahead}
-							</SizableText>
-						</XStack>
-
-						<Slider
-							value={lookaheadSharedValue}
-							onValueChange={handleLookaheadChange}
-							maxValue={10}
-							thumbWidth={8}
-							color={primary.val}
-							backgroundColor={neutral.val}
-							thumbShadowColor={'black'}
-							trackHeight={getTokenValue('2')}
-						/>
-					</YStack>
+					<LookaheadSettings />
 				</YStack>
 			</ScrollView>
 		</YStack>

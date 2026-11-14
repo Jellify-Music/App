@@ -1,17 +1,10 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { TracksQueryKey } from './keys'
 import fetchTracks from './utils'
-import {
-	BaseItemDto,
-	ItemSortBy,
-	SortOrder,
-	UserItemDataDto,
-} from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits } from '../../../configs/querying/index.config'
-import { queryClient } from '../../client'
-import UserDataQueryKey from '../user-data/keys'
-import { JellifyUser } from '@/src/types/JellifyUser'
+import { getIsFavoriteFromCache } from '../user-data/cache'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import useLibraryStore from '../../../stores/library'
@@ -27,19 +20,15 @@ const useTracks = (
 	const api = getApi()
 	const user = getUser()
 	const [library] = useJellifyLibrary()
-	const {
-		filters,
-		sortBy: librarySortByState,
-		sortDescending: librarySortDescendingState,
-	} = useLibraryStore()
-	const librarySortBy = librarySortByState.tracks ?? undefined
-	const isLibrarySortDescending = librarySortDescendingState.tracks ?? false
-	const isLibraryFavorites = filters.tracks.isFavorites
-	const isDownloaded = filters.tracks.isDownloaded ?? false
-	const isLibraryUnplayed = filters.tracks.isUnplayed ?? false
-	const libraryGenreIds = filters.tracks.genreIds
-	const libraryYearMin = filters.tracks.yearMin
-	const libraryYearMax = filters.tracks.yearMax
+	const trackFilters = useLibraryStore((state) => state.filters.tracks)
+	const librarySortBy = useLibraryStore((state) => state.sortBy.tracks) ?? undefined
+	const isLibrarySortDescending = useLibraryStore((state) => state.sortDescending.tracks) ?? false
+	const isLibraryFavorites = trackFilters.isFavorites
+	const isDownloaded = trackFilters.isDownloaded ?? false
+	const isLibraryUnplayed = trackFilters.isUnplayed ?? false
+	const libraryGenreIds = trackFilters.genreIds
+	const libraryYearMin = trackFilters.yearMin
+	const libraryYearMax = trackFilters.yearMax
 
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
@@ -121,7 +110,7 @@ const useTracks = (
 					.filter((track) => track !== undefined)
 					.filter((track) => {
 						if (!isFavorites) return true
-						else return isDownloadedTrackAlsoFavorite(user, track.Id)
+						else return getIsFavoriteFromCache(track)
 					})
 			}
 		},
@@ -191,17 +180,6 @@ export const useArtistTracks = (
 	return artistTracksInfiniteQuery
 }
 export default useTracks
-
-function isDownloadedTrackAlsoFavorite(
-	user: JellifyUser | undefined,
-	trackId: string | null | undefined,
-): boolean {
-	if (!user) return false
-
-	const userData = queryClient.getQueryData<UserItemDataDto>(UserDataQueryKey(user!, trackId!))
-
-	return userData?.IsFavorite ?? false
-}
 
 function getSortValue(item: BaseItemDto, sortBy: ItemSortBy): string | number {
 	switch (sortBy) {

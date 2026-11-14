@@ -9,6 +9,7 @@ import { useJellifyLibrary, useJellifyUser } from '../../../stores/auth'
 import useLibraryStore from '../../../stores/library'
 import { artistAlbumsQuery, artistQuery } from './queries'
 import { QueryAges } from '../../../constants/durations'
+import { MusicLibraryQueryKey } from '../libraries/keys'
 
 export const useArtist = (artistId: BaseItemDto['Id']) =>
 	useQuery({
@@ -26,7 +27,11 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	const [library] = useJellifyLibrary()
 
 	return useQuery({
-		queryKey: [QueryKeys.ArtistFeaturedOn, library?.musicLibraryId, artist.Id],
+		queryKey: [
+			QueryKeys.ArtistFeaturedOn,
+			MusicLibraryQueryKey(library?.musicLibraryId),
+			artist.Id,
+		],
 		queryFn: ({ signal }) => fetchArtistFeaturedOn(library?.musicLibraryId, artist, signal),
 		enabled: !isUndefined(artist.Id),
 		gcTime: QueryAges.OneWeek,
@@ -37,16 +42,20 @@ export const useAlbumArtists = () => {
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const { filters, sortDescending: librarySortDescendingState } = useLibraryStore()
-	const sortDescending = librarySortDescendingState.artists ?? false
-	const isFavorites = filters.artists.isFavorites
+	const sortDescending = useLibraryStore((state) => state.sortDescending.artists) ?? false
+	const isFavorites = useLibraryStore((state) => state.filters.artists.isFavorites)
 
 	const selectArtists = (data: InfiniteData<BaseItemDto[], unknown>) => {
 		return flattenInfiniteQueryPages(data)
 	}
 
 	return useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
+		queryKey: [
+			QueryKeys.InfiniteArtists,
+			isFavorites,
+			sortDescending,
+			MusicLibraryQueryKey(library?.musicLibraryId),
+		],
 		queryFn: ({ pageParam, signal }: { pageParam: number; signal?: AbortSignal }) =>
 			fetchArtists(
 				user,

@@ -1,4 +1,4 @@
-import MultipleArtists from '../../components/Context/components/multiple-artists'
+import MultipleArtists from '../../components/Context/multiple-artists'
 import { MultipleArtistsProps } from '../Player/types'
 
 export default function MultipleArtistsSheet(props: MultipleArtistsProps): React.JSX.Element {

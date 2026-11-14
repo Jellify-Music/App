@@ -81,7 +81,8 @@ contributors, and a full changelog link, all collected by
 [`collect-release-changes.js`](../../scripts/collect-release-changes.js).
 Issues only show up when a PR closes them with a keyword such as
 `Fixes #123`. [`announce-release.js`](../../scripts/announce-release.js)
-then posts it to Discord.
+then posts it to Discord, pinging the role whose ID is in the
+`DISCORD_RELEASE_ROLE_ID` repository variable.
 
 ### Ruby for publishing
 

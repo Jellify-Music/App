@@ -1,7 +1,7 @@
 import { fetch } from 'react-native-nitro-fetch'
 import type { Patron } from '../../../../types/patron'
 
-import { PATRON_API_ENDPOINT } from '../../../../configs/config'
+import { PATRON_API_ENDPOINT } from '../../../../configs/patrons.config'
 
 export default async function fetchPatrons(signal?: AbortSignal): Promise<Patron[]> {
 	const response = await fetch(PATRON_API_ENDPOINT, { signal })

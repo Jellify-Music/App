@@ -31,7 +31,6 @@ export default function fetchTracks(
 ) {
 	return new Promise<BaseItemDto[]>((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
 
 		// SortName includes track numbers (e.g. "0001 - 0001 - Title"),
@@ -53,7 +52,7 @@ export default function fetchTracks(
 			.getItems(
 				{
 					includeItemTypes: [BaseItemKind.Audio],
-					parentId: library.musicLibraryId,
+					parentId: library?.musicLibraryId,
 					userId: user.id,
 					recursive: true,
 					filters: filters.length > 0 ? filters : undefined,

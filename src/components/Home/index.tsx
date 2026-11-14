@@ -1,9 +1,10 @@
 import { ScrollView, RefreshControl } from 'react-native'
 import { YStack, getToken, useTheme } from 'tamagui'
-import RecentArtists from './helpers/recent-artists'
-import RecentlyPlayed from './helpers/recently-played'
-import FrequentArtists from './helpers/frequent-artists'
-import FrequentlyPlayedTracks from './helpers/frequent-tracks'
+import RecentArtists from './components/recent-artists'
+import RecentlyPlayed from './components/recently-played'
+import FrequentArtists from './components/frequent-artists'
+import FrequentlyPlayedTracks from './components/frequent-tracks'
+import RecentPlaylists from './components/recent-playlists'
 import { usePreventRemove } from '@react-navigation/native'
 import useHomeQueries from '../../api/mutations/home'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
@@ -50,10 +51,12 @@ export function Home(): React.JSX.Element {
 
 function HomeContent(): React.JSX.Element {
 	return (
-		<YStack alignContent='flex-start' gap='3'>
+		<YStack alignContent='flex-start' gap='1'>
 			<RecentArtists />
 
 			<RecentlyPlayed />
+
+			<RecentPlaylists />
 
 			<FrequentArtists />
 
