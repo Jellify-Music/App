@@ -2,19 +2,36 @@ appId: com.cosmonautical.jellify
 ---
 
 # Continue from previous test
-- extendedWaitUntil:
-    visible:
-      text: "Royalty Free Music"
-    timeout: 30000
+#
+# Onboarding skips library selection when the server has a single music library,
+# so wait for either the home screen or the library list (whose filter hint only
+# shows with more than one music library)
+- repeat:
+    while:
+      notVisible:
+        id: "home-tab-button"
+    times: 30
+    commands:
+      - runFlow:
+          when:
+            visible:
+              id: "library_filter_hint"
+          commands:
+            # Take screenshot of library selection
+            - takeScreenshot: screenshots/setup/initial_select_library_state_screen
 
-# Take screenshot of login screen
-- takeScreenshot: screenshots/setup/initial_select_library_state_screen
+            # Select music library and continue
+            - tapOn:
+                text: "Royalty Free Music"
+            - tapOn:
+                id: "let_s_go_button"
 
-# Select music library and continue
-- tapOn:
-    text: "Royalty Free Music"
-- tapOn:
-    id: "let_s_go_button"
+      # Pause between checks while the libraries load
+      - extendedWaitUntil:
+          visible:
+            id: "home-tab-button"
+          timeout: 1000
+          optional: true
 
 # Wait for home screen by checking for home tab button
 - extendedWaitUntil:

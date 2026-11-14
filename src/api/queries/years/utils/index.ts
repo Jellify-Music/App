@@ -30,7 +30,7 @@ export async function fetchLibraryYears(
 	if (isUndefined(api)) throw new Error('Client instance not set')
 	if (isUndefined(userId)) throw new Error('User id required')
 
-	const libraryIds = await fetchMusicLibraryIds(api, library)
+	const libraryIds = await fetchMusicLibraryIds(library)
 
 	const years = await Promise.all(
 		libraryIds.map((parentId) =>
