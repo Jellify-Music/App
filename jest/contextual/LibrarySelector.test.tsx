@@ -78,9 +78,7 @@ describe('LibrarySelector', () => {
 
 		await renderLibrarySelector()
 
-		expect(
-			screen.getByText('Tap the selected library again to show music from all libraries'),
-		).toBeTruthy()
+		expect(screen.getByText('Tap the selected library again for all libraries')).toBeTruthy()
 	})
 
 	it('leaves out the filter hint with one music library', async () => {
