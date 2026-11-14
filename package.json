@@ -36,6 +36,7 @@
     "postinstall": "bun run generate-config && patch-package"
   },
   "dependencies": {
+    "@jellify-music/audiomuse-ai-jellyfin-sdk": "0.1.1",
     "@jellify-music/react-native-reanimated-slider": "0.7.0",
     "@jellyfin/sdk": "1.0.2",
     "@legendapp/list": "3.7.2",
