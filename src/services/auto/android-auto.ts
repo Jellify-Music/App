@@ -205,6 +205,7 @@ async function loadChildren(parentId: string): Promise<MediaItem[] | null> {
 								parentId: musicLibraryId,
 								userId: user.id,
 								includeItemTypes: [BaseItemKind.MusicArtist],
+								recursive: true,
 								sortBy: [ItemSortBy.SortName],
 								sortOrder: [SortOrder.Ascending],
 								enableImages: true,

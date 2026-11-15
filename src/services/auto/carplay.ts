@@ -316,6 +316,7 @@ async function load(templateId: string): Promise<CarPlayListSection[]> {
 							await getItems({
 								parentId: musicLibraryId,
 								includeItemTypes: [BaseItemKind.MusicArtist],
+								recursive: true,
 								sortBy: [ItemSortBy.SortName],
 								sortOrder: [SortOrder.Ascending],
 								enableImages: true,

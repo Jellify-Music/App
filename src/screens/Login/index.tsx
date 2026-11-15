@@ -1,37 +1,30 @@
-import { isUndefined } from 'lodash'
 import ServerAuthenticationScreen from './server-authentication'
 import ServerAddressScreen from './server-address'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import ServerLibraryScreen from './server-library'
-import { getServer, getUser } from '../../stores/auth/utils'
 import LoginStackParamList from './types'
 import QuickConnectScreen from './quick-connect'
 
 const LoginStack = createNativeStackNavigator<LoginStackParamList>({
-	initialRouteName: isUndefined(getServer())
-		? 'ServerAddress'
-		: isUndefined(getUser())
-			? 'ServerAuthentication'
-			: 'LibrarySelection',
+	initialRouteName: 'ServerAddress',
 	screenOptions: {
-		headerShown: false,
 		gestureEnabled: false,
 	},
 	screens: {
 		ServerAddress: {
 			screen: ServerAddressScreen,
 			options: {
-				animationTypeForReplace: 'pop',
+				headerShown: false,
 			},
 		},
 		ServerAuthentication: {
 			screen: ServerAuthenticationScreen,
+			options: {
+				title: '',
+				headerBackButtonDisplayMode: 'minimal',
+			},
 		},
 		QuickConnect: {
 			screen: QuickConnectScreen,
-		},
-		LibrarySelection: {
-			screen: ServerLibraryScreen,
 		},
 	},
 })
