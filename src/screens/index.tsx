@@ -122,12 +122,14 @@ export default function Root(): React.JSX.Element {
 		routes: [{ name: getApi() ? 'Tabs' : 'Login' }],
 	}))
 
+	const onReady = () => navigationIntegration.registerNavigationContainer(navigationRef)
+
 	return (
 		<RootNavigation
 			ref={navigationRef}
 			initialState={initialState}
 			theme={getJellifyNavTheme(colorPreset, resolvedMode)}
-			onReady={() => navigationIntegration.registerNavigationContainer(navigationRef)}
+			onReady={onReady}
 		/>
 	)
 }
