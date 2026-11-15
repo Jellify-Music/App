@@ -34,7 +34,7 @@ jest.mock('../../src/api/queries/public-server-info', () => ({
 function renderServerAuthentication() {
 	return render(
 		<SafeAreaProvider>
-			<TamaguiProvider config={config} defaultTheme='purple_dark'>
+			<TamaguiProvider config={config} defaultTheme='haze_dark'>
 				<ServerAuthentication />
 			</TamaguiProvider>
 		</SafeAreaProvider>,

@@ -11,6 +11,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { applyHapticFeedback } from '../../utils/haptics'
+import { handleError } from '../../utils/errors'
+import { LoggingContext } from '../../utils/logging'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -57,7 +59,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 
 			await TrackPlayer.play()
 		} catch (error) {
-			console.error('Failed to shuffle and play:', error)
+			handleError(error, LoggingContext.Queue, 'Failed to shuffle library')
 		}
 	}
 

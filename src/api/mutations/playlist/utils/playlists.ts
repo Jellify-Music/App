@@ -1,3 +1,4 @@
+import { ApiNotAvailableError } from '../../../../types/errors'
 import { getApi, getUser } from '../../../../stores/auth/utils'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
@@ -97,31 +98,26 @@ export async function addManyToPlaylist(
  * Removes a track from a Jellyfin playlist.
  *
  * @param api The Jellyfin {@link Api} client
- * @param track The {@link BaseItemDto} to remove
+ * @param tracks The array of {@link BaseItemDto} to remove
  * @param playlist The {@link BaseItemDto} playlist to remove the track from
  * @returns
  */
-export async function removeFromPlaylist(
-	api: Api | undefined,
-	track: BaseItemDto,
-	playlist: BaseItemDto,
-) {
-	return new Promise<void>((resolve, reject) => {
-		if (isUndefined(api)) return reject(new Error('No API client available'))
+export async function removeFromPlaylist(tracks: BaseItemDto[], playlist: BaseItemDto) {
+	const api = getApi()
+	if (isUndefined(api)) return Promise.reject(new ApiNotAvailableError())
 
-		getPlaylistApi(api)
-			.removeItemFromPlaylist({
-				playlistId: playlist.Id!,
-				entryIds: [track.Id!],
-			})
-			.then(() => {
-				resolve()
-			})
-			.catch((error) => {
-				reject(error)
-				console.error(error)
-			})
-	})
+	return await getPlaylistApi(api)
+		.removeItemFromPlaylist({
+			playlistId: playlist.Id!,
+			entryIds: tracks.map((t) => t.Id!).filter(Boolean),
+		})
+		.then(() => {
+			return Promise.resolve()
+		})
+		.catch((error) => {
+			console.error(error)
+			return Promise.reject(error)
+		})
 }
 
 /**

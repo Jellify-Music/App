@@ -28,13 +28,18 @@ runs:
 
     # On a Pods miss, the pod downloads still come from this cache, which is
     # safe to restore from an older Podfile.lock.
+    #
+    # actions/cache saves paths outside the workspace relative to it, and the
+    # self-hosted runners' HOME and workspace sit at different depths than
+    # GitHub-hosted ones', so one runner type can't restore the other's
+    # entries. runner.environment keeps them apart.
     - name: 📦 Cache CocoaPods downloads
       uses: actions/cache@v6
       with:
         path: ~/Library/Caches/CocoaPods
-        key: ${{ runner.os }}-${{ runner.arch }}-cocoapods-${{ hashFiles('ios/Podfile.lock') }}
+        key: ${{ runner.os }}-${{ runner.arch }}-${{ runner.environment }}-cocoapods-${{ hashFiles('ios/Podfile.lock') }}
         restore-keys: |
-          ${{ runner.os }}-${{ runner.arch }}-cocoapods-
+          ${{ runner.os }}-${{ runner.arch }}-${{ runner.environment }}-cocoapods-
 
     # CocoaPods needs a UTF-8 locale. GitHub-hosted runners set one; the
     # self-hosted runners don't, and pod install then fails with

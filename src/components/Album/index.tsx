@@ -99,10 +99,6 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	return (
 		<SectionList
 			contentInsetAdjustmentBehavior='automatic'
-			contentContainerStyle={{
-				paddingTop: 8,
-				paddingHorizontal: 8,
-			}}
 			sections={sections}
 			keyExtractor={ItemKeyExtractor}
 			maxToRenderPerBatch={50}
@@ -130,7 +126,12 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 			ListEmptyComponent={() => (
 				<YStack flex={1} alignContent='center' margin='4'>
 					{isPending ? null : (
-						<SizableText textAlign='center' color='borderColor'>
+						<SizableText
+							fontSize='3'
+							fontWeight='6'
+							textAlign='center'
+							color='borderColor'
+						>
 							No album tracks
 						</SizableText>
 					)}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import Input from '../Global/helpers/input'
+import Input from '../Global/utils/input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H3, H5, SizableText, Spinner, YStack } from 'tamagui'
@@ -79,7 +79,7 @@ export default function Search(): React.JSX.Element {
 		<List
 			contentInsetAdjustmentBehavior='automatic'
 			ListHeaderComponent={
-				<YStack flex={1}>
+				<YStack flex={1} paddingHorizontal='2'>
 					<Input
 						placeholder={placeholder}
 						onChangeText={handleSearchStringUpdate}

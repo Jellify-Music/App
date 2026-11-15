@@ -1,5 +1,5 @@
 import { Circle, Spinner, View } from 'tamagui'
-import IconButton from '../../../components/Global/helpers/icon-button'
+import IconButton from '../../Global/utils/icon-button'
 import React from 'react'
 import Icon from '../../Global/components/icon'
 import { togglePlayback } from '../../../player/controls/playback'

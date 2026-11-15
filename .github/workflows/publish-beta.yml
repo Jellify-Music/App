@@ -297,6 +297,7 @@ jobs:
           artifacts: ./final-artifacts/*
           github_token: ${{ secrets.SIGNING_REPO_PAT }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          discord_role_id: ${{ vars.DISCORD_RELEASE_ROLE_ID }}
 
       - name: Cut stable Branch 
         run: |

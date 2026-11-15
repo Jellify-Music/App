@@ -3,10 +3,13 @@ import { DownloadedTrack, DownloadManager } from 'react-native-nitro-player'
 import { queryClient } from '../../api/client'
 import ALL_DOWNLOADS_KEY from './keys'
 import { downloadItems } from './functions'
+import { handleError } from '../../utils/errors'
+import { LoggingContext } from '../../utils/logging'
 
 const useDownloadTracks = () =>
 	useMutation({
 		mutationFn: downloadItems,
+		onError: (error) => handleError(error, LoggingContext.Downloads, 'Failed to download'),
 	})
 
 export const useDeleteDownloads = () => {
@@ -25,6 +28,8 @@ export const useDeleteDownloads = () => {
 				},
 			)
 		},
+		onError: (error) =>
+			handleError(error, LoggingContext.Downloads, 'Failed to remove downloads'),
 	})
 
 	return {

@@ -1,6 +1,6 @@
 import React from 'react'
 import { YStack, XStack, Button, SizableText } from 'tamagui'
-import { CheckboxWithLabel } from '../Global/helpers/checkbox-with-label'
+import { CheckboxWithLabel } from '../Global/utils/checkbox-with-label'
 import useLibraryStore from '../../stores/library'
 import { FiltersProps } from './types'
 import Icon from '../Global/components/icon'

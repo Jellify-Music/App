@@ -14,7 +14,7 @@ jest.mock('../../src/stores/settings/app', () => ({
 
 const renderFooter = (size: CardSizeToken, type: BaseItemKind) =>
 	render(
-		<TamaguiProvider config={config} defaultTheme='purple_dark'>
+		<TamaguiProvider config={config} defaultTheme='haze_dark'>
 			<Card width={size} height={size}>
 				<ItemCardFooter size={size} type={type} />
 			</Card>

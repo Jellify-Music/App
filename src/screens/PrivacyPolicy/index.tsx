@@ -2,13 +2,13 @@ import { Paragraph, YStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { PrivacyPolicyProps } from '../types'
 import { Linking } from 'react-native'
-import { LOGGING_PROVIDER_PRIVACY_POLICY_URL } from '../../configs/config'
+import { PRIVACY_POLICY_URL } from '../../configs/privacy.config'
 
 export default function PrivacyPolicyScreen(props: PrivacyPolicyProps): React.JSX.Element {
 	const { top, bottom } = useSafeAreaInsets()
 
 	const onGlitchTipPress = () => {
-		Linking.openURL(LOGGING_PROVIDER_PRIVACY_POLICY_URL)
+		Linking.openURL(PRIVACY_POLICY_URL)
 	}
 
 	return (
@@ -32,7 +32,7 @@ export default function PrivacyPolicyScreen(props: PrivacyPolicyProps): React.JS
 			</Paragraph>
 
 			<Paragraph textAlign='center' fontSize='3'>
-				You can read more about how GlitchTip handles your data in their{' '}
+				You can read more about how this data is handled in our{' '}
 				<Paragraph
 					textAlign='center'
 					fontSize='3'

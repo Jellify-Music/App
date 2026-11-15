@@ -51,9 +51,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   
   func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
     if (connectingSceneSession.role == UISceneSession.Role.carTemplateApplication) {
-      let scene =  UISceneConfiguration(name: "CarPlay", sessionRole: connectingSceneSession.role)
-      scene.delegateClass = CarSceneDelegate.self
-      return scene
+      // Info.plist names react-native-nitro-player's NitroPlayerCarPlaySceneDelegate for this configuration
+      return UISceneConfiguration(name: "CarPlay", sessionRole: connectingSceneSession.role)
     } else {
       let scene =  UISceneConfiguration(name: "Phone", sessionRole: connectingSceneSession.role)
       scene.delegateClass = PhoneSceneDelegate.self

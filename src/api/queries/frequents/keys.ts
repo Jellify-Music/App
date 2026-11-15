@@ -1,5 +1,6 @@
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { JellifyUser } from '@/src/types/JellifyUser'
+import { MusicLibraryQueryKey } from '../libraries/keys'
 
 enum FrequentsQueryKeys {
 	FrequentlyPlayedTracks = 'FREQUENTLY_PLAYED_TRACKS_200',
@@ -10,7 +11,7 @@ const FrequentsQueryKey = (
 	key: FrequentsQueryKeys,
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
-) => [key, user?.id, library?.musicLibraryId]
+) => [key, user?.id, MusicLibraryQueryKey(library?.musicLibraryId)]
 
 export const FrequentlyPlayedTracksQueryKey = (
 	user: JellifyUser | undefined,

@@ -72,7 +72,7 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     text: 'Color Scheme'
 - assertVisible:
-    text: 'Purple'
+    text: 'Haze'
 - assertVisible:
     text: 'Ocean'
 - assertVisible:
@@ -88,8 +88,8 @@ appId: com.cosmonautical.jellify
     text: 'Ocean'
 - takeScreenshot: screenshots/settings/appearance_ocean_selected
 - tapOn:
-    text: 'Purple'
-- takeScreenshot: screenshots/settings/appearance_purple_restored
+    text: 'Haze'
+- takeScreenshot: screenshots/settings/appearance_haze_restored
 
 # Scroll down to verify Hide Runtimes switch is reachable
 - scroll
@@ -441,7 +441,7 @@ appId: com.cosmonautical.jellify
     timeout: 10000
 - waitForAnimationToEnd
 - assertVisible:
-    text: 'Purple'
+    text: 'Haze'
 - takeScreenshot: screenshots/settings/persistence_check
 - runFlow: ../../subflows/platform/back.yaml
 - waitForAnimationToEnd

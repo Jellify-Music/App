@@ -2,15 +2,15 @@ import { fonts } from '@tamagui/config/v5'
 import { createFont } from 'tamagui'
 
 const figtreeFace = {
-	100: { normal: 'Figtree-Light', italic: 'Figtree Light Italic' },
-	200: { normal: 'Figtree-Light', italic: 'Figtree Light Italic' },
-	300: { normal: 'Figtree-Regular', italic: 'Figtree Italic' },
-	400: { normal: 'Figtree-Medium', italic: 'Figtree Medium Italic' },
-	500: { normal: 'Figtree-SemiBold', italic: 'Figtree SemiBold Italic' },
-	600: { normal: 'Figtree-Bold', italic: 'Figtree Bold Italic' },
-	700: { normal: 'Figtree-ExtraBold', italic: 'Figtree ExtraBold Italic' },
-	800: { normal: 'Figtree-Black', italic: 'Figtree Black Italic' },
-	900: { normal: 'Figtree-Black', italic: 'Figtree Black Italic' },
+	100: { normal: 'Figtree-Light', italic: 'Figtree-LightItalic' },
+	200: { normal: 'Figtree-Light', italic: 'Figtree-LightItalic' },
+	300: { normal: 'Figtree-Regular', italic: 'Figtree-Italic' },
+	400: { normal: 'Figtree-Medium', italic: 'Figtree-MediumItalic' },
+	500: { normal: 'Figtree-SemiBold', italic: 'Figtree-SemiBoldItalic' },
+	600: { normal: 'Figtree-Bold', italic: 'Figtree-BoldItalic' },
+	700: { normal: 'Figtree-ExtraBold', italic: 'Figtree-ExtraBoldItalic' },
+	800: { normal: 'Figtree-Black', italic: 'Figtree-BlackItalic' },
+	900: { normal: 'Figtree-Black', italic: 'Figtree-BlackItalic' },
 }
 
 export const bodyFont = createFont({

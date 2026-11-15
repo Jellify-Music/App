@@ -1,4 +1,4 @@
-import { SwitchWithLabel } from '../../../../components/Global/helpers/switch-with-label'
+import { SwitchWithLabel } from '../../../Global/utils/switch-with-label'
 import { useSendMetricsSetting } from '../../../../stores/settings/app'
 import { XStack, YStack, SizableText } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'

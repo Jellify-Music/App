@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native'
 import { render } from '@testing-library/react-native'
 import { TamaguiProvider } from 'tamagui'
 import config from '../../src/configs/tamagui.config'
-import Input from '../../src/components/Global/helpers/input'
+import Input from '../../src/components/Global/utils/input'
 
 describe('Input', () => {
 	// Android's TextInput crashes on launch when fontSize reaches it as a
@@ -11,7 +11,7 @@ describe('Input', () => {
 	// our numeric-only font sizes don't define, so the helper sets its own.
 	it('resolves its default font size to a number', async () => {
 		const screen = await render(
-			<TamaguiProvider config={config} defaultTheme='purple_dark'>
+			<TamaguiProvider config={config} defaultTheme='haze_dark'>
 				<Input testID='input' />
 			</TamaguiProvider>,
 		)

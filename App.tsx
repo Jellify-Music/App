@@ -50,7 +50,7 @@ function Container(): React.JSX.Element {
 	return (
 		<GestureHandlerRootView style={styles.gestureHandlerRootView}>
 			<KeyboardProvider>
-				<TamaguiProvider config={jellifyConfig} defaultTheme={'purple_dark'}>
+				<TamaguiProvider config={jellifyConfig} defaultTheme={'haze_dark'}>
 					<Jellify />
 				</TamaguiProvider>
 			</KeyboardProvider>

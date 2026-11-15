@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native'
 import { fireEvent, render } from '@testing-library/react-native'
 import { TamaguiProvider } from 'tamagui'
 import config from '../../src/configs/tamagui.config'
-import Button from '../../src/components/Global/helpers/button'
+import Button from '../../src/components/Global/utils/button'
 
 describe('Button', () => {
 	it.each([
@@ -16,7 +16,7 @@ describe('Button', () => {
 		async (size, diameter) => {
 			const onPress = jest.fn()
 			const screen = await render(
-				<TamaguiProvider config={config} defaultTheme='purple_dark'>
+				<TamaguiProvider config={config} defaultTheme='haze_dark'>
 					<Button circular size={size} onPress={onPress} accessibilityLabel='Submit' />
 				</TamaguiProvider>,
 			)
@@ -42,7 +42,7 @@ describe('Button', () => {
 
 	it('preserves the default rounded corners for non-circular buttons', async () => {
 		const screen = await render(
-			<TamaguiProvider config={config} defaultTheme='purple_dark'>
+			<TamaguiProvider config={config} defaultTheme='haze_dark'>
 				<Button>Submit</Button>
 			</TamaguiProvider>,
 		)

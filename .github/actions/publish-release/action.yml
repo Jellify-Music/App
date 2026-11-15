@@ -31,6 +31,10 @@ inputs:
   discord_webhook_url:
     description: 'Discord webhook to announce the release on'
     required: true
+  discord_role_id:
+    description: 'Discord role to ping with the announcement'
+    required: false
+    default: ''
 outputs:
   release_url:
     description: 'The URL of the GitHub release'
@@ -60,6 +64,7 @@ runs:
       shell: bash
       env:
         DISCORD_WEBHOOK_URL: ${{ inputs.discord_webhook_url }}
+        DISCORD_RELEASE_ROLE_ID: ${{ inputs.discord_role_id }}
         RELEASE_KIND: ${{ inputs.kind }}
         RELEASE_TITLE: ${{ inputs.title }}
         RELEASE_URL: ${{ steps.release.outputs.html_url }}

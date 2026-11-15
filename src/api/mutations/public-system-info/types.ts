@@ -7,7 +7,6 @@ export type PublicSystemInfoMutation = {
 
 export type ConnectToServerParams = {
 	onSuccess?: (result: SetJellyfinServerParams) => void
-	onError?: (error: Error) => void
 }
 
 export type ConnectToServerResult = {

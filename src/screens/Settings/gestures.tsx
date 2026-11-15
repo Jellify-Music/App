@@ -3,7 +3,7 @@ import { YStack, XStack, SizableText, ScrollView, Separator } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import ActionChip from '../../components/Settings/components/sections/action-chip'
-import { useSwipeSettingsStore } from '../../stores/settings/swipe'
+import { useSwipeSettingsStore } from '../../stores/settings/gestures'
 
 export default function GesturesScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()

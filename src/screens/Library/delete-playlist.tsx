@@ -1,5 +1,5 @@
 import { Spinner, XStack, YStack, SizableText } from 'tamagui'
-import Button from '../../components/Global/helpers/button'
+import Button from '../../components/Global/utils/button'
 import Icon from '../../components/Global/components/icon'
 import LibraryStackParamList, { LibraryDeletePlaylistProps } from '../Library/types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'

@@ -16,7 +16,7 @@ import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/el
 import { applyHapticFeedback } from '../../utils/haptics'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 import { loginStyles } from './styles'
-import Button from '../Global/helpers/button'
+import Button from '../Global/utils/button'
 
 // Handles polling, code display, error, and authentication
 function QuickConnectDisplay({

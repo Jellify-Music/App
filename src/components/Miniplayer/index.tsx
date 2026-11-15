@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTheme, XStack, YStack, SizableText } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
-import { Ticker } from '../../components/Global/helpers/Animated/text'
+import { Ticker } from '../Global/utils/Animated/text'
 import { PlayPauseIcon } from '../Player/components/buttons'
 
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler'

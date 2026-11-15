@@ -1,19 +1,6 @@
-import { getApi, getUser } from '../../../stores/auth/utils'
 import { useQuery } from '@tanstack/react-query'
 import { LibrariesQuery, PlaylistLibraryQuery } from './queries'
 
-export const useLibraries = () => {
-	const api = getApi()
+export const useLibraries = () => useQuery(LibrariesQuery())
 
-	const user = getUser()
-
-	return useQuery(LibrariesQuery(api, user))
-}
-
-export const usePlaylistLibrary = () => {
-	const api = getApi()
-
-	const user = getUser()
-
-	return useQuery(PlaylistLibraryQuery(api, user))
-}
+export const usePlaylistLibrary = () => useQuery(PlaylistLibraryQuery())

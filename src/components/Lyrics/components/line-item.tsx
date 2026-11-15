@@ -5,7 +5,7 @@ import Animated, {
 	interpolateColor,
 	Extrapolation,
 } from 'react-native-reanimated'
-import { AnimatedSizableText } from '../../Global/helpers/Animated/text'
+import { AnimatedSizableText } from '../../Global/utils/Animated/text'
 import { useTheme } from 'tamagui'
 import { ParsedLyricLine } from '../../../types/Lyrics'
 import { GestureDetector } from 'react-native-gesture-handler'

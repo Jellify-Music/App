@@ -80,12 +80,11 @@ export async function fetchItems(
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client not initialized')
 		if (isUndefined(user)) return reject('User not initialized')
-		if (isUndefined(library)) return reject('Library not initialized')
 
 		getLibraryApi(api)
 			.getItems(
 				{
-					parentId: parentId ?? library.musicLibraryId,
+					parentId: parentId ?? library?.musicLibraryId,
 					userId: user.id,
 					includeItemTypes: types,
 					sortBy: sortBy,

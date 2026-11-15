@@ -1,16 +1,18 @@
 import React from 'react'
 import type { EventHandler } from '../../types/Events'
+import type { Appearance, ColorPreset } from '../../types/theme'
 import { YStack, XStack, SizableText, ScrollView } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
-import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
-import { ColorPreset, ThemeSetting, useAppSettingsStore } from '../../stores/settings/app'
-import { PRESET_PALETTES } from '../../configs/tamagui.config'
+import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
+import { useAppSettingsStore } from '../../stores/settings/app'
+import { PRESET_PALETTES } from '../../configs/styling/themes'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
+import AppIconSettings from '../../components/Settings/components/settings/AppIcon'
 
 type ThemeOptionConfig = {
-	value: ThemeSetting
+	value: Appearance
 	label: string
 	icon: MaterialDesignIconsIconName
 }
@@ -27,8 +29,8 @@ const THEME_OPTIONS: ThemeOptionConfig[] = [
 	{ value: 'oled', label: 'OLED Black', icon: 'invert-colors' },
 ]
 
-const COLOR_PRESETS: ColorPresetConfig[] = [
-	{ value: 'purple', label: 'Purple' },
+const COLOR_PRESET_LABELS: ColorPresetConfig[] = [
+	{ value: 'haze', label: 'Haze' },
 	{ value: 'ocean', label: 'Ocean' },
 	{ value: 'forest', label: 'Forest' },
 	{ value: 'sunset', label: 'Sunset' },
@@ -143,7 +145,7 @@ export default function AppearanceScreen(): React.JSX.Element {
 							Color Scheme
 						</SizableText>
 						<XStack flexWrap='wrap' gap='2'>
-							{COLOR_PRESETS.map((preset) => (
+							{COLOR_PRESET_LABELS.map((preset) => (
 								<ColorPresetCard
 									key={preset.value}
 									preset={preset}
@@ -153,6 +155,8 @@ export default function AppearanceScreen(): React.JSX.Element {
 							))}
 						</XStack>
 					</YStack>
+
+					<AppIconSettings />
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>

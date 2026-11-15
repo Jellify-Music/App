@@ -86,7 +86,6 @@ export enum QueryKeys {
 	StorageInUse = 'StorageInUse',
 	Patrons = 'Patrons',
 	SpecialThanks = 'SpecialThanks',
-	RecentlyAddedAlbums = 'RecentlyAddedAlbums',
 	PublicPlaylists = 'PublicPlaylists',
 
 	/**

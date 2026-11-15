@@ -8,6 +8,7 @@ import fetchSimilarArtists, { fetchSimilarItems } from './utils/similar'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import { QueryAges } from '../../../constants/durations'
 import { DiscoverAlbumsQuery, DiscoverArtistsQuery } from './queries'
+import { MusicLibraryQueryKey } from '../libraries/keys'
 
 export const useSearchSuggestions = () => {
 	const [library] = useJellifyLibrary()
@@ -15,9 +16,12 @@ export const useSearchSuggestions = () => {
 	const user = getUser()
 
 	return useQuery({
-		queryKey: [SuggestionQueryKeys.SearchSuggestions, library?.musicLibraryId],
+		queryKey: [
+			SuggestionQueryKeys.SearchSuggestions,
+			MusicLibraryQueryKey(library?.musicLibraryId),
+		],
 		queryFn: () => fetchSearchSuggestions(user, library?.musicLibraryId),
-		enabled: !isUndefined(library),
+		enabled: !isUndefined(user),
 	})
 }
 

@@ -6,10 +6,10 @@ import { Card, RadioGroup, SizableText, Spinner, XStack, YStack, Image } from 't
 
 import { useStorageContext, CleanupSuggestion } from '../../providers/Storage'
 import Icon from '../../components/Global/components/icon'
-import Button from '../../components/Global/helpers/button'
+import Button from '../../components/Global/utils/button'
 import SettingsSection from '../../components/Settings/components/settings-section'
-import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
-import { RadioGroupItemWithLabel } from '../../components/Global/helpers/radio-group-item-with-label'
+import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
+import { RadioGroupItemWithLabel } from '../../components/Global/utils/radio-group-item-with-label'
 import { formatBytes } from '../../utils/formatting/bytes'
 import { useDeletionToast } from '../../utils/toasts/deletion-toast'
 import { useAutoDownload, useDownloadQuality } from '../../stores/settings/usage'

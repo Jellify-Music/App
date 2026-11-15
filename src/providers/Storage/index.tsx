@@ -1,10 +1,5 @@
 import React, { PropsWithChildren, createContext, use, useState } from 'react'
-import {
-	DownloadedTrack,
-	DownloadManager,
-	useDownloadProgress,
-	useDownloadStorage,
-} from 'react-native-nitro-player'
+import { DownloadedTrack, DownloadManager, useDownloadStorage } from 'react-native-nitro-player'
 import useDownloads from '../../hooks/downloads'
 
 export type StorageSummary = {
@@ -51,13 +46,10 @@ const sumDownloadBytes = (download: DownloadedTrack | undefined) => {
 export function StorageProvider({ children }: PropsWithChildren): React.JSX.Element {
 	const { data: downloads, refetch: refetchDownloads } = useDownloads()
 	const { storageInfo: storageInfo, refresh: refetchStorageInfo } = useDownloadStorage()
-	const activeDownloads = useDownloadProgress()
 
 	const [selection, setSelection] = useState<StorageSelectionState>({})
 	const [isDeleting, setIsDeleting] = useState(false)
 	const [isManuallyRefreshing, setIsManuallyRefreshing] = useState(false)
-
-	const activeDownloadsCount = Object.keys(activeDownloads ?? {}).length
 
 	const summary: StorageSummary | undefined = (() => {
 		if (!downloads || !storageInfo) return undefined

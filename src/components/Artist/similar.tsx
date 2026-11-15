@@ -8,48 +8,56 @@ import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Freeze } from 'react-freeze'
 import List from '../Global/components/Lists/utils'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function SimilarArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 	const { artist, similarArtists, fetchingSimilarArtists, fetchingAlbums, albums } =
 		useArtistContext()
 
+	const renderItem = ({ item: artist }: LegendListRenderItemProps<BaseItemDto>) => (
+		<ItemRow
+			item={artist}
+			onPress={() => {
+				navigation.push('Artist', {
+					artist,
+				})
+			}}
+		/>
+	)
+
 	return (
 		<Freeze freeze={fetchingAlbums && !albums}>
-			<YStack flex={1} margin={'2'}>
+			<YStack flex={1}>
 				<SizableText
+					margin={'2'}
 					size={'3'}
 					fontWeight='6'
 				>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</SizableText>
 
 				<List
-					data={similarArtists}
-					renderItem={({ item: artist }) => (
-						<ItemRow
-							item={artist}
-							onPress={() => {
-								navigation.push('Artist', {
-									artist,
-								})
-							}}
-						/>
-					)}
+					data={similarArtists?.slice(0, 5)}
+					renderItem={renderItem}
 					ListEmptyComponent={
-						fetchingSimilarArtists ? (
-							<ActivityIndicator />
-						) : (
-							<SizableText
-								fontSize='3'
-								color={'neutral'}
-								justify={'center'}
-								textAlign='center'
-							>
-								No similar artists
-							</SizableText>
-						)
+						<ListEmptyComponent fetchingSimilarArtists={fetchingSimilarArtists} />
 					}
 				/>
 			</YStack>
 		</Freeze>
+	)
+}
+
+interface ListEmptyComponentProps {
+	fetchingSimilarArtists: boolean
+}
+
+function ListEmptyComponent({ fetchingSimilarArtists }: ListEmptyComponentProps) {
+	return fetchingSimilarArtists ? (
+		<ActivityIndicator />
+	) : (
+		<SizableText fontSize='3' color={'neutral'} justify={'center'} textAlign='center'>
+			No similar artists
+		</SizableText>
 	)
 }

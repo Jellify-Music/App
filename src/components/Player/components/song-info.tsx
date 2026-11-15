@@ -1,4 +1,4 @@
-import { Ticker } from '../../../components/Global/helpers/Animated/text'
+import { Ticker } from '../../Global/utils/Animated/text'
 import { SizableText, XStack, YStack } from 'tamagui'
 import React from 'react'
 import FavoriteButton from '../../Global/components/favorite-button'

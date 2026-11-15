@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import Index from '../../components/Discover/component'
+import Index from '../../components/Discover'
 import DiscoverAlbums from './albums'
 import PublicPlaylists from './playlists'
 import SuggestedArtists from './artists'
