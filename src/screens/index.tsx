@@ -110,11 +110,10 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		AddPlaylistUsers: {
 			screen: addPlaylistUsers,
 			options: ({ route }) => ({
-				title: 'Add Playlist Users',
+				title: 'Share Playlist',
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: canUseFormSheet ? [1.0] : undefined,
 				sheetGrabberVisible: true,
-				header: () => addPlaylistUsersHeader(route.params.playlist),
 			}),
 		},
 	},
@@ -169,16 +168,17 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 
 function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
 	return (
-		<YStack gap={'$2'} marginTop={'$4'} alignItems='center'>
+		<YStack gap={'$2'} marginTop={'$4'} alignItems='center' flex={1}>
 			<SizableText fontSize='3' fontWeight='6'>
-				Add Users to Playlist
+				Share Playlist
 			</SizableText>
-			<XStack gap={'$2'}>
+			<XStack gap='2' flex={1} justifyContent='flex-start'>
 				<ItemImage
 					item={playlist}
-					width={'$12'}
-					height={'$12'}
-					imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+					width={'6'}
+					height={'6'}
+					imageOptions={{ maxWidth: 150, maxHeight: 150 }}
+					elevate
 				/>
 
 				<YStack gap={'$2'}>

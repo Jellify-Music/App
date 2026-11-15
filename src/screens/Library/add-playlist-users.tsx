@@ -1,18 +1,15 @@
-import { Paragraph, View, XStack } from 'tamagui'
 import { useState } from 'react'
-import Input from '../../components/Global/helpers/input'
-import {
-	useAddPlaylistUser,
-	usePlaylistUsers,
-	useRemovePlaylistUser,
-} from '../../../src/api/queries/playlist'
+import { LinearTransition } from 'react-native-reanimated'
+import { partition } from 'lodash'
+import type { UserDto } from '@jellyfin/sdk/lib/generated-client'
+import { Input, SizableText, View } from 'tamagui'
+import UserShareRow from '../../components/SharePlaylist/components/user-row'
+import { usePlaylistUsers } from '../../../src/api/queries/playlist'
 import { useUsers } from '../../../src/api/queries/users'
-import { SectionList } from 'react-native'
-import Icon from '../../../src/components/Global/components/icon'
 import { AddPlaylistUsersProps } from '../types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import getUserImageUrl from '../../api/queries/image/utils/avatar'
-import Image from '../../components/Global/utils/image'
+import { AnimatedList } from '../../components/Global/components/Lists/utils'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 //screen in react native
 export default function addPlaylistUsers({ route }: AddPlaylistUsersProps): React.JSX.Element {
@@ -26,52 +23,46 @@ export default function addPlaylistUsers({ route }: AddPlaylistUsersProps): Reac
 	const { data: users, isPending: useUsersIsPending, refetch: refetchUseUsers } = useUsers()
 	const { bottom } = useSafeAreaInsets()
 
-	//filter users based on search query
-	const filterUsersBySearch = (userList: typeof users) => {
-		if (!searchQuery.trim()) return userList ?? []
-		return (
-			userList?.filter((user) =>
-				user.Name?.toLowerCase().includes(searchQuery.toLowerCase()),
-			) ?? []
-		)
-	}
-
-	//invoke mutations on icon press
-	//add
-	const addUser = useAddPlaylistUser()
-	//remove
-	const removeUser = useRemovePlaylistUser()
-
-	//get string array of all playlist user IDs
-	const playlistUserIds = playlistUsers?.map((playlistUser) => playlistUser.UserId) ?? []
-
-	//if user exists in playlist already, do not display
-	//take all users, filter any users that also appear in playlistUserIds
-	const otherUsers = users?.filter((user) => !playlistUserIds?.includes(user.Id)) ?? []
-
-	//any user not included in listed users will get filtered out
-	const usersInPlaylist = users?.filter((user) => playlistUserIds?.includes(user.Id)) ?? []
+	//set of all playlist user IDs
+	const playlistUserIds = new Set(playlistUsers?.flatMap(({ UserId }) => UserId ?? []))
 
 	//apply search filter
-	const filteredOtherUsers = filterUsersBySearch(otherUsers)
-	const filteredInPlaylistUsers = filterUsersBySearch(usersInPlaylist)
+	const query = searchQuery.trim().toLowerCase()
+	const searchedUsers = query
+		? users?.filter((user) => user.Name?.toLowerCase().includes(query))
+		: users
 
-	//use formatting for sections component later on
-	const playlistUserData = [
-		{
-			title: 'Shared With',
-			data: filteredInPlaylistUsers,
-		},
-		{
-			title: 'Users on Server',
-			data: filteredOtherUsers,
-		},
-	]
+	//split users into those already in the playlist and everyone else
+	const [usersInPlaylist, otherUsers] = partition(
+		searchedUsers,
+		(user) => !!user.Id && playlistUserIds.has(user.Id),
+	)
+
+	const renderUserRow = ({ item: user }: LegendListRenderItemProps<UserDto>) => (
+		<UserShareRow user={user} playlistUserIds={playlistUserIds} playlist={playlist} />
+	)
 
 	//return component here
 	return (
 		//return view that occupies full screen
-		<View flex={1} paddingBottom={bottom}>
+		<View flex={1}>
+			{/* list of users and section list */}
+			<AnimatedList<UserDto>
+				nestedScrollEnabled
+				ListHeaderComponent={
+					<SizableText fontWeight='6' fontSize='3'>
+						{' '}
+						Users{' '}
+					</SizableText>
+				}
+				renderItem={renderUserRow}
+				contentContainerStyle={{
+					margin: 8,
+					paddingBottom: bottom,
+				}}
+				data={usersInPlaylist}
+				itemLayoutAnimation={LinearTransition.springify()}
+			/>
 			{/* search bar */}
 			<View padding={'$4'} paddingBottom={'$2'}>
 				<Input
@@ -83,54 +74,6 @@ export default function addPlaylistUsers({ route }: AddPlaylistUsersProps): Reac
 					rows={1}
 				/>
 			</View>
-
-			{/* conditional in react - only render if some variable meet criteria */}
-			{
-				//list of users and section list
-				<SectionList
-					nestedScrollEnabled
-					sections={playlistUserData}
-					renderSectionHeader={(info) => <Paragraph> {info.section.title} </Paragraph>}
-					renderItem={({ item: user }) => (
-						<XStack>
-							<Image
-								src={getUserImageUrl()}
-								style={{ width: 45, height: 45 }}
-								rounded
-							/>
-
-							<Paragraph fontWeight='bold' flex={1} padding={'$2'}>
-								{user.Name ?? 'Unknown User'}
-							</Paragraph>
-							{playlistUserIds.includes(user.Id) ? ( //send playlist id and user id (with bang! because it likely won't be undefined)
-								<Icon
-									onPress={() =>
-										removeUser.mutate({ playlist: playlist, user: user })
-									}
-									name='account-remove'
-									testID={`playlist-user-remove-${user.Name}`}
-									color='warning'
-								/>
-							) : (
-								//same stuff and canEdit as true bcs you know anyone you're sharing with
-								<Icon
-									onPress={() =>
-										addUser.mutate({
-											playlist: playlist,
-											user: user,
-											CanEdit: true,
-										})
-									}
-									name='account-plus'
-									testID={`playlist-user-add-${user.Name}`}
-									color='borderColor'
-								/>
-							)}
-						</XStack>
-					)}
-					keyExtractor={(item) => item.Id!}
-				/>
-			}
 		</View>
 	)
 }

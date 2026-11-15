@@ -1,5 +1,5 @@
 import { getApi } from '../../src/stores/auth/utils'
-import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getPlaylistApi } from '@jellyfin/sdk/lib/utils/api'
 import {
 	addPlaylistUser,
 	getPlaylistUsers,
@@ -31,12 +31,12 @@ describe('Playlist Users API Functions', () => {
 			}
 
 			;(getApi as jest.Mock).mockReturnValue(mockApi)
-			;(getPlaylistsApi as jest.Mock).mockReturnValue(mockPlaylistApi)
+			;(getPlaylistApi as jest.Mock).mockReturnValue(mockPlaylistApi)
 
 			const result = await getPlaylistUsers(mockPlaylistId)
 
 			expect(result).toEqual(mockUsers)
-			expect(getPlaylistsApi).toHaveBeenCalledWith(mockApi)
+			expect(getPlaylistApi).toHaveBeenCalledWith(mockApi)
 			expect(mockPlaylistApi.getPlaylistUsers).toHaveBeenCalledWith({
 				playlistId: mockPlaylistId,
 			})
@@ -56,7 +56,7 @@ describe('Playlist Users API Functions', () => {
 			}
 
 			;(getApi as jest.Mock).mockReturnValue(mockApi)
-			;(getPlaylistsApi as jest.Mock).mockReturnValue(mockPlaylistApi)
+			;(getPlaylistApi as jest.Mock).mockReturnValue(mockPlaylistApi)
 
 			await addPlaylistUser(mockPlaylistId, mockUserId, true)
 
@@ -79,7 +79,7 @@ describe('Playlist Users API Functions', () => {
 			}
 
 			;(getApi as jest.Mock).mockReturnValue(mockApi)
-			;(getPlaylistsApi as jest.Mock).mockReturnValue(mockPlaylistApi)
+			;(getPlaylistApi as jest.Mock).mockReturnValue(mockPlaylistApi)
 
 			await addPlaylistUser(mockPlaylistId, mockUserId, false)
 
@@ -104,7 +104,7 @@ describe('Playlist Users API Functions', () => {
 			}
 
 			;(getApi as jest.Mock).mockReturnValue(mockApi)
-			;(getPlaylistsApi as jest.Mock).mockReturnValue(mockPlaylistApi)
+			;(getPlaylistApi as jest.Mock).mockReturnValue(mockPlaylistApi)
 
 			await removePlaylistUser(mockPlaylistId, mockUserId)
 
