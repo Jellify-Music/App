@@ -1,16 +1,11 @@
 import { BaseItemDto, BaseItemKind, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import { YGroup } from 'tamagui'
 import { StackNavigation } from '../../screens/types'
-import { useQuery } from '@tanstack/react-query'
-import { QueryKeys } from '../../enums/query-keys'
-import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useEffect } from 'react'
-import { getApi } from '../../stores/auth/utils'
-import { useAlbum } from '../../api/queries/album'
+import { useAlbum, useAlbumDiscs } from '../../api/queries/album'
 import { usePlaylistTracks } from '../../api/queries/playlist'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { applyHapticFeedback } from '../../utils/haptics'
-import { QueryAges } from '../../constants/durations'
 import FavoriteContextMenuRow from './components/user-data'
 import AddToQueueMenuRows from './components/queue'
 import AddToPlaylistRow from './components/playlist/add-to-playlist-row'
@@ -37,8 +32,6 @@ export default function ItemContext({
 	downloadedMediaSourceInfo,
 	stackNavigation,
 }: ContextProps): React.JSX.Element {
-	const api = getApi()
-
 	const { bottom } = useSafeAreaInsets()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
@@ -52,12 +45,7 @@ export default function ItemContext({
 
 	const { data: tracks } = usePlaylistTracks(item, !isPlaylist)
 
-	const { data: discs } = useQuery({
-		queryKey: [QueryKeys.ItemTracks, item.Id],
-		queryFn: ({ signal }) => fetchAlbumDiscs(api, item, signal),
-		enabled: isAlbum,
-		gcTime: QueryAges.OneWeek,
-	})
+	const { data: discs } = useAlbumDiscs(item, isAlbum)
 
 	const hasTracks = isTrack || (isAlbum && discs) || (isPlaylist && tracks)
 

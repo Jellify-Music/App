@@ -8,7 +8,7 @@ import FavoriteIcon from './favorite-icon'
 import navigationRef from '../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import useItemContext from '../../../hooks/use-item-context'
+import warmItemContext from '../../../utils/fetching/item-context'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import React from 'react'
 import type { EventHandler } from '../../../types/Events'
@@ -69,10 +69,9 @@ function ItemRow({
 	const { mutate: removeFavorite } = useRemoveFavorite()
 	const [hideRunTimes] = useHideRunTimesSetting()
 
-	const warmContext = useItemContext()
 	const { data: isFavorite } = useIsFavorite(item)
 
-	const onPressIn = () => warmContext(item)
+	const onPressIn = () => warmItemContext(item)
 
 	/**
 	 * Handles the long press event for the item row.
