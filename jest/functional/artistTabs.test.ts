@@ -9,8 +9,8 @@ describe('artist tabs', () => {
 		screenOptions: { lazy: boolean; swipeEnabled: boolean; animationEnabled: boolean }
 	}
 
-	it('are the discography and the tracks, in that order', () => {
-		expect(Object.keys(config.screens)).toEqual(['Discography', 'Tracks'])
+	it('are the discography, the tracks and, when the server has info, the info, in that order', () => {
+		expect(Object.keys(config.screens)).toEqual(['Discography', 'Tracks', 'Info'])
 	})
 
 	// each list starts with the header and the tab bar, so they scroll away together
@@ -24,5 +24,12 @@ describe('artist tabs', () => {
 			swipeEnabled: false,
 			animationEnabled: false,
 		})
+	})
+
+	// the tab bar is made from the navigator's routes, so leaving the screen out hides the tab
+	it('only offer the info when the server has some', () => {
+		const info = config.screens.Info as { if: () => boolean }
+		expect(info.if).toEqual(expect.any(Function))
+		expect((config.screens.Tracks as { if?: unknown }).if).toBeUndefined()
 	})
 })
