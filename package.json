@@ -106,7 +106,7 @@
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.27",
     "@types/node": "26.6.6",
-    "@types/react": "19.2.17",
+    "@types/react": "19.3.0",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "9.39.4",
     "eslint-config-prettier": "10.1.8",
