@@ -100,18 +100,6 @@ export const useRecentlyAddedAlbums = () => {
 	return useInfiniteQuery(RecentlyAddedQuery(api, user, library))
 }
 
-export const useRefetchRecentlyAdded: () => () => void = () => {
-	const [library] = useJellifyLibrary()
-
-	return () =>
-		queryClient.invalidateQueries({
-			queryKey: [
-				QueryKeys.RecentlyAddedAlbums,
-				MusicLibraryQueryKey(library?.musicLibraryId),
-			],
-		})
-}
-
 export const useAlbumDiscs = (album: BaseItemDto, enabled: boolean = true) => {
 	const api = getApi()
 

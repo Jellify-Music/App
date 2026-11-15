@@ -22,7 +22,7 @@ import { fetchMusicLibraryIds } from '../../libraries/utils/music-libraries'
  * @param library The selected {@link JellifyLibrary}, or `undefined` for all music libraries
  * @param pageParam The page to fetch
  * @param signal Optional AbortSignal to cancel the request
- * @returns The genres on that page, sorted by name
+ * @returns The genres on that page. Pages merged from several libraries aren't sorted, see {@link sortGenres}
  */
 export async function fetchGenres(
 	api: Api | undefined,
@@ -59,8 +59,16 @@ export async function fetchGenres(
 
 	if (pages.length === 1) return pages[0]
 
-	return sortBy(
-		uniqBy(pages.flat(), ({ Id }) => Id),
-		({ SortName, Name }) => (SortName ?? Name ?? '').toLowerCase(),
-	)
+	return uniqBy(pages.flat(), ({ Id }) => Id)
+}
+
+/**
+ * Sorts genres by name. Pages merged from several music libraries are only sorted within
+ * themselves, so the loaded pages are sorted together once flattened.
+ *
+ * @param genres The genres to sort
+ * @returns The genres, sorted by name
+ */
+export function sortGenres(genres: BaseItemDto[]): BaseItemDto[] {
+	return sortBy(genres, ({ SortName, Name }) => (SortName ?? Name ?? '').toLowerCase())
 }
