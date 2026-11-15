@@ -10,6 +10,7 @@ import { slimifyDto } from './slimify-dto'
 import { getItemImageUrl } from '../../api/queries/image/utils'
 import { getTrackMediaSourceInfo } from './track-extra-payload'
 import { getItemName } from '../formatting/item-names'
+import buildAudioApiUrl from './item-to-audio-api-url'
 
 export function mapDtosToTracks(
 	items: BaseItemDto[],
@@ -52,6 +53,10 @@ export function mapDtoToTrack(
 		console.debug('Downloaded track path', `file://${downloadedTrack.localPath}`)
 	}
 
+	// Downloaded tracks get a remote URL so a Cast receiver can load them; the player still plays the local file.
+	// Streamed tracks stay empty and are resolved by onTracksNeedUpdate.
+	const url = downloadedTrack ? buildAudioApiUrl(item, undefined) : ''
+
 	if (downloadedTrack?.localArtworkPath) {
 		console.debug('Downloaded track artwork path', `file://${downloadedTrack.localArtworkPath}`)
 	}
@@ -59,7 +64,7 @@ export function mapDtoToTrack(
 	return {
 		...(headers ? { headers } : {}),
 		id: item.Id ?? '',
-		url: downloadedTrack?.localPath ? `file://${downloadedTrack.localPath}` : '',
+		url,
 		artwork: downloadedTrack?.localArtworkPath
 			? `file://${downloadedTrack.localArtworkPath}`
 			: getItemImageUrl(item, ImageType.Primary, {

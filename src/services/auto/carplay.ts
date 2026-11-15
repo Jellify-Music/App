@@ -28,6 +28,7 @@ import { fetchRecentlyAdded, fetchRecentlyPlayed } from '../../api/queries/recen
 import { fetchFrequentlyPlayed } from '../../api/queries/frequents/utils/frequents'
 import { refreshPlaylistTracks, refreshUserPlaylists } from '../../api/queries/playlist/cache'
 import { getItemImageUrl } from '../../api/queries/image/utils'
+import buildAudioApiUrl from '../../utils/mapping/item-to-audio-api-url'
 import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
@@ -136,7 +137,8 @@ async function downloadedTracks(): Promise<TrackItem[]> {
 		.sort((a, b) => b.downloadedAt - a.downloadedAt)
 		.map((download) => ({
 			...download.originalTrack,
-			url: `file://${download.localPath}`,
+			// Remote URL so a Cast receiver can load it; the player still plays the local file
+			url: buildAudioApiUrl({ Id: download.trackId }, undefined),
 			artwork: download.localArtworkPath
 				? `file://${download.localArtworkPath}`
 				: download.originalTrack.artwork,
