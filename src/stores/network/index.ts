@@ -1,10 +1,11 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
+import { NetworkStatusMessages } from '../../configs/messaging/network-status'
+import { NetworkStatuses } from '../../enums/network-status'
 
 type NetworkStore = {
-	networkStatus: networkStatusTypes | null
-	setNetworkStatus: (status: networkStatusTypes | null) => void
+	networkStatus: NetworkStatuses | null
+	setNetworkStatus: (status: NetworkStatuses | null) => void
 }
 
 export const useNetworkStore = create<NetworkStore>()(
@@ -20,11 +21,17 @@ export const useNetworkStore = create<NetworkStore>()(
 )
 
 export const useNetworkStatus = (): [
-	networkStatusTypes | null,
-	(status: networkStatusTypes | null) => void,
+	NetworkStatuses | null,
+	(status: NetworkStatuses | null) => void,
+	string,
 ] => {
 	const networkStatus = useNetworkStore((state) => state.networkStatus)
 	const setNetworkStatus = useNetworkStore((state) => state.setNetworkStatus)
 
-	return [networkStatus, setNetworkStatus]
+	const statusDisplayText =
+		networkStatus === NetworkStatuses.ONLINE
+			? NetworkStatusMessages.BACK_ONLINE
+			: NetworkStatusMessages.NO_INTERNET
+
+	return [networkStatus, setNetworkStatus, statusDisplayText]
 }

@@ -1,6 +1,6 @@
 import { isNull, isUndefined } from 'lodash'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
+import { NetworkStatuses } from '../../enums/network-status'
 import { DownloadedTrack, PlayerQueue } from 'react-native-nitro-player'
 import { AA_PLAYLIST_NAME_PREFIX } from '../../services/auto/android-auto'
 
@@ -14,14 +14,14 @@ export async function clearPlaylists() {
 }
 
 export function filterTracksOnNetworkStatus(
-	networkStatus: networkStatusTypes | undefined | null,
+	networkStatus: NetworkStatuses | undefined | null,
 	queuedItems: BaseItemDto[],
 	downloadedTracks: DownloadedTrack[],
 ) {
 	if (
 		isUndefined(networkStatus) ||
 		isNull(networkStatus) ||
-		networkStatus === networkStatusTypes.ONLINE
+		networkStatus === NetworkStatuses.ONLINE
 	)
 		return queuedItems
 	else

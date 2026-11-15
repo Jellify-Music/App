@@ -47,6 +47,31 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - NitroFetchWebsockets (1.4.0):
+    - hermes-engine
+    - NitroModules
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-callinvoker
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - NitroMmkv (4.3.2):
     - hermes-engine
     - MMKVCore (= 2.4.0)
@@ -152,6 +177,31 @@ PODS:
     - ReactNativeDependencies
     - Yoga
   - NitroSuperconfig (0.17.0):
+    - hermes-engine
+    - NitroModules
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-callinvoker
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
+  - NitroTextDecoder (0.1.2):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -2531,11 +2581,13 @@ DEPENDENCIES:
   - glog (from `build/rndeps-facades/glog`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - NitroFetch (from `../node_modules/react-native-nitro-fetch`)
+  - NitroFetchWebsockets (from `../node_modules/react-native-nitro-websockets`)
   - NitroMmkv (from `../node_modules/react-native-mmkv`)
   - NitroModules (from `../node_modules/react-native-nitro-modules`)
   - NitroOta (from `../node_modules/react-native-nitro-ota`)
   - NitroPlayer (from `../node_modules/react-native-nitro-player`)
   - NitroSuperconfig (from `../node_modules/react-native-superconfig`)
+  - NitroTextDecoder (from `../node_modules/react-native-nitro-text-decoder`)
   - Pulsar (from `../node_modules/react-native-pulsar`)
   - RCT-Folly (from `build/rndeps-facades/RCT-Folly`)
   - RCTDeprecation (from `build/rncore-facades/RCTDeprecation`)
@@ -2667,6 +2719,8 @@ EXTERNAL SOURCES:
     :tag: hermes-v260318099.0.5
   NitroFetch:
     :path: "../node_modules/react-native-nitro-fetch"
+  NitroFetchWebsockets:
+    :path: "../node_modules/react-native-nitro-websockets"
   NitroMmkv:
     :path: "../node_modules/react-native-mmkv"
   NitroModules:
@@ -2677,6 +2731,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-nitro-player"
   NitroSuperconfig:
     :path: "../node_modules/react-native-superconfig"
+  NitroTextDecoder:
+    :path: "../node_modules/react-native-nitro-text-decoder"
   Pulsar:
     :path: "../node_modules/react-native-pulsar"
   RCT-Folly:
@@ -2887,12 +2943,14 @@ SPEC CHECKSUMS:
   hermes-engine: 79484fc4e58f328d01b9339ef899ca633d3702ee
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
   NitroFetch: ddc5951481468126e88d19495b9ac4895cc44bda
+  NitroFetchWebsockets: 75c19dc706b861c1456bf819eb681d0ffeeca3b3
   NitroMmkv: 1cbda910413acda474751ac9b2522a6d466f74ad
   NitroModules: c32f969b7c536e0b6b401a9dfdb35bb4eba071ef
   NitroOta: 69d600c03b82cb15bab1b9e7a110de60071db2e8
   NitroOtaBundleManager: 69b9999f64febbf2470c62bd76c90993daa75929
   NitroPlayer: e36bfe02cf33d5b0f582c132ef01f4860bca6e9d
   NitroSuperconfig: c58fbdb4a975776d2e2a0be596763d5a7513153f
+  NitroTextDecoder: eff8546cd18856bc7615eba9f353a6daebce0c10
   Pulsar: f6701d83d2995ffc8af1618fd1470946c4913143
   PulsarHaptics: 62d13e9ef63535263f110a925e587d5d027dc683
   RCT-Folly: 82921e585c0400eda46fac1068297aa9dfb035e4

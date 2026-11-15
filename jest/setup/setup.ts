@@ -28,12 +28,10 @@ jest.mock('react-native-superconfig', () => ({
 
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
-// Mock the network status types to avoid dependency issues
+// Mock the network watcher to avoid opening a native websocket
 jest.mock('../../src/components/Network/internetConnectionWatcher', () => ({
-	networkStatusTypes: {
-		ONLINE: 'ONLINE',
-		OFFLINE: 'OFFLINE',
-	},
+	__esModule: true,
+	default: () => null,
 }))
 
 jest.mock('react-native/Libraries/Components/RefreshControl/RefreshControl', () => ({

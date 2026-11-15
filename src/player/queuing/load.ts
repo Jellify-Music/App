@@ -1,4 +1,4 @@
-import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
+import { NetworkStatuses } from '../../enums/network-status'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
 import { useNetworkStore } from '../../stores/network'
 import { setPlaybackPosition } from '../../stores/player/playback'
@@ -19,7 +19,7 @@ export default async function loadQueue({
 }: QueueMutation): Promise<LoadQueueResult> {
 	await TrackPlayer.pause()
 
-	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
+	const networkStatus = useNetworkStore.getState().networkStatus ?? NetworkStatuses.ONLINE
 
 	// Get the item at the start index
 	const startingTrack = tracklist[index]
@@ -27,7 +27,7 @@ export default async function loadQueue({
 	const downloadedTracks = await ensureDownloadedTracks()
 
 	const availableAudioItems = filterTracksOnNetworkStatus(
-		networkStatus as networkStatusTypes,
+		networkStatus as NetworkStatuses,
 		tracklist,
 		downloadedTracks ?? [],
 	)
