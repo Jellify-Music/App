@@ -117,10 +117,10 @@
     "husky": "9.1.7",
     "jest": "30.5.2",
     "lint-staged": "17.6.0",
-    "openai": "7.55.0",
+    "openai": "7.57.0",
     "patch-package": "8.0.1",
-    "prettier": "3.9.10",
-    "react-dom": "19.2.3",
+    "prettier": "3.10.1",
+    "react-dom": "19.3.0",
     "react-native-cli-bump-version": "1.5.1",
     "typescript": "6.0.3"
   },
