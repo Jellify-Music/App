@@ -1,8 +1,8 @@
 import { SizableText, Spinner, ToggleGroup, XStack, YGroup, YStack } from 'tamagui'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import type { EventHandler } from '../../types/Events'
 import Button from '../Global/utils/button'
-import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../Global/components/icon'
 import { useJellifyLibrary } from '../../stores/auth'
 import { useLibraries } from '../../api/queries/libraries'
@@ -11,11 +11,11 @@ import OneLibraryMessage from './components/one-library'
 import Heading from './components/heading'
 import NoLibrariesMessage from './components/no-libraries'
 import LoadErrorMessage from './components/loading-error'
-import { ALL_MUSIC_LIBRARIES } from '../../api/queries/libraries/keys'
 
 interface LibrarySelectorProps {
 	/**
-	 * Called with the selected music library, or `undefined` when all music libraries are selected
+	 * Called with the selected music library, or `undefined` when no library is selected,
+	 * in which case all music libraries are used
 	 */
 	onLibrarySelected: (selectedLibrary: BaseItemDto | undefined) => void
 	onCancel: EventHandler
@@ -41,16 +41,15 @@ export default function LibrarySelector({
 }: LibrarySelectorProps): React.JSX.Element {
 	const [library] = useJellifyLibrary()
 
-	const { data: libraries, isError, isPending, isSuccess } = useLibraries()
+	const { data: libraries = [], isError, isPending } = useLibraries()
 
-	const [musicLibraries, setMusicLibraries] = useState<BaseItemDto[]>([])
-
-	const [selectedLibraryId, setSelectedLibraryId] = useState<string>(
-		library?.musicLibraryId ?? ALL_MUSIC_LIBRARIES,
+	// The selected library filters the user's music. Without one, Jellify uses every music library
+	const [selectedLibraryId, setSelectedLibraryId] = useState<string | undefined>(
+		library?.musicLibraryId,
 	)
 
 	const handleLibrarySelection = () => {
-		if (selectedLibraryId === ALL_MUSIC_LIBRARIES) return onLibrarySelected(undefined)
+		if (!selectedLibraryId) return onLibrarySelected(undefined)
 
 		const selectedLibrary = libraries?.find((lib) => lib.Id === selectedLibraryId)
 
@@ -59,21 +58,9 @@ export default function LibrarySelector({
 		}
 	}
 
-	const hasMultipleLibraries = musicLibraries.length > 1
+	const hasMultipleLibraries = libraries.length > 1
 
-	useEffect(() => {
-		if (!isPending && isSuccess && libraries) {
-			const filteredMusicLibraries = libraries.filter(
-				(library) => library.CollectionType === CollectionType.Music,
-			)
-			setMusicLibraries(filteredMusicLibraries)
-		}
-	}, [isPending, isSuccess, libraries])
-
-	const libraryToggleItems = [
-		{ Id: ALL_MUSIC_LIBRARIES, Name: 'All Libraries' },
-		...musicLibraries,
-	].map((library) => {
+	const libraryToggleItems = libraries.map((library) => {
 		const isSelected: boolean = selectedLibraryId === library.Id!
 
 		return (
@@ -102,26 +89,42 @@ export default function LibrarySelector({
 
 	return (
 		<YStack flex={1} margin='4' testID='library_selection_screen' justifyContent='flex-end'>
-			<YStack flex={1} justifyContent='center'>
-				<Heading title={title} />
-			</YStack>
+			<Heading title={title} />
 
 			{!hasMultipleLibraries && !isOnboarding && <OneLibraryMessage />}
 
+			{hasMultipleLibraries && (
+				<SizableText
+					fontSize='3'
+					color='borderColor'
+					textAlign='center'
+					marginBottom='4'
+					testID='library_filter_hint'
+				>
+					{!selectedLibraryId
+						? 'Showing music from all libraries'
+						: 'Tap the selected library again for all libraries'}
+				</SizableText>
+			)}
+
 			<YStack flexShrink={1}>
 				{isPending ? (
-					<Spinner size='large' opacity='1 enter:1 exit:0' />
+					<Spinner
+						size='large'
+						opacity='1 enter:1 exit:0'
+						testID='library_selection_loading'
+					/>
 				) : isError ? (
 					<LoadErrorMessage />
-				) : musicLibraries.length === 0 ? (
+				) : libraries.length === 0 ? (
 					<NoLibrariesMessage />
 				) : (
 					<ToggleGroup
 						borderRadius='2'
 						marginVertical='4'
 						type='single'
-						disableDeactivation={true}
-						value={selectedLibraryId}
+						disableDeactivation={false}
+						value={selectedLibraryId ?? ''}
 						onValueChange={setSelectedLibraryId}
 						disabled={!hasMultipleLibraries && !isOnboarding}
 					>
@@ -146,7 +149,7 @@ export default function LibrarySelector({
 					<Button
 						variant='outlined'
 						borderColor={'primary'}
-						disabled={musicLibraries.length === 0}
+						disabled={libraries.length === 0}
 						icon={<Icon name={primaryButtonIcon} size='7' color='primary' />}
 						onPress={handleLibrarySelection}
 						testID='let_s_go_button'

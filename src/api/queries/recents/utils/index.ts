@@ -40,7 +40,7 @@ export async function fetchRecentlyAdded(
 	if (isUndefined(api)) throw new Error('Client instance not set')
 
 	try {
-		const libraryIds = await fetchMusicLibraryIds(api, library)
+		const libraryIds = await fetchMusicLibraryIds(library)
 
 		const latest = await Promise.all(
 			libraryIds.map((parentId) =>

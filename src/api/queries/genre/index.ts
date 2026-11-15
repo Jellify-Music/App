@@ -1,6 +1,6 @@
 import { useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { fetchGenres } from './utils'
+import { fetchGenres, sortGenres } from './utils'
 import { GenresQueryKey } from './keys'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyLibrary } from '../../../stores/auth'
@@ -20,6 +20,6 @@ export const useGenres = (): UseInfiniteQueryResult<BaseItemDto[], Error> => {
 			// Pages merged from several music libraries can hold more than one page's worth
 			return lastPage.length >= ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
-		select: (data) => uniqBy(data.pages.flat(), ({ Id }) => Id),
+		select: (data) => sortGenres(uniqBy(data.pages.flat(), ({ Id }) => Id)),
 	})
 }

@@ -8,7 +8,7 @@ Jellify uses [Maestro](https://maestro.mobile.dev) for end-to-end UI testing on 
 maestro/
 ├── flow-full.yaml       # Full test suite (all flows in order)
 ├── flows/               # One subdirectory per top-level screen / feature area
-│   ├── setup/           # App launch, login, server & library selection
+│   ├── setup/           # App launch, login, server selection
 │   ├── home/            # Home tab
 │   ├── quick-actions/   # Track row swipe actions & favouriting
 │   ├── library/         # Library tab
@@ -33,7 +33,7 @@ For example, `flows/home/flow.yaml` navigates to the home screen and then delega
 
 Runs the complete test suite in sequence:
 
-1. **Setup** — clears app state, launches the app, handles permission dialogs, logs in, selects a server and library
+1. **Setup** — clears app state, launches the app, handles permission dialogs, logs in, selects a server
 2. **Home** — exercises the home screen (recently played, etc.)
 3. **Quick Actions** — validates track-row swipe gestures and favouriting via swipe actions
 4. **Library** — exercises library browsing and tab navigation

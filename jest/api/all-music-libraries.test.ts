@@ -5,7 +5,7 @@ import { getGenreApi } from '@jellyfin/sdk/lib/utils/api/genre-api'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
 import { queryClient } from '../../src/api/client'
 import { fetchAlbums } from '../../src/api/queries/album/utils/album'
-import { fetchGenres } from '../../src/api/queries/genre/utils'
+import { fetchGenres, sortGenres } from '../../src/api/queries/genre/utils'
 import { ALL_MUSIC_LIBRARIES, MusicLibraryQueryKey } from '../../src/api/queries/libraries/keys'
 import { fetchRecentlyAdded } from '../../src/api/queries/recents/utils'
 import { fetchSearchResults } from '../../src/api/queries/search/utils'
@@ -147,7 +147,21 @@ describe('querying without a selected music library', () => {
 			'music-a',
 			'music-b',
 		])
-		expect(genres.map(({ Id }) => Id)).toEqual(['ambient', 'jazz', 'rock'])
+		expect(sortGenres(genres).map(({ Id }) => Id)).toEqual(['ambient', 'jazz', 'rock'])
+	})
+
+	test('sorts genres from several pages together', () => {
+		const pages = [
+			[{ Name: 'Metal' }, { Name: 'Rock' }],
+			[{ Name: 'ambient' }, { Name: 'Zydeco', SortName: 'zydeco' }],
+		]
+
+		expect(sortGenres(pages.flat()).map(({ Name }) => Name)).toEqual([
+			'ambient',
+			'Metal',
+			'Rock',
+			'Zydeco',
+		])
 	})
 
 	test('fetches the genres of the selected library alone', async () => {
