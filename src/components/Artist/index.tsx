@@ -11,7 +11,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import ItemRow from '../Global/components/item-row'
 import ArtistHeader from './header'
 import SimilarArtists from './similar'
-import { Spinner, useTheme, YStack, SizableText, View } from 'tamagui'
+import { Spinner, useTheme, YStack, SizableText } from 'tamagui'
 import {
 	filterForAlbums,
 	filterForEPs,
@@ -66,11 +66,7 @@ export default function Artist(): React.JSX.Element {
 
 	const renderItem = ({
 		item,
-	}: SectionListRenderItemInfo<BaseItemDto, SectionBase<BaseItemDto>>) => (
-		<View marginHorizontal='2'>
-			<ItemRow item={item} />
-		</View>
-	)
+	}: SectionListRenderItemInfo<BaseItemDto, SectionBase<BaseItemDto>>) => <ItemRow item={item} />
 
 	const ListEmptyComponent = (
 		<YStack justifyContent='center' alignContent='center'>

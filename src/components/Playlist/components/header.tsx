@@ -18,7 +18,7 @@ export default function PlaylistTracklistHeader(): React.JSX.Element {
 	const { playlist, playlistTracks, editing, newName, setNewName } = usePlaylistContext()
 
 	return (
-		<YStack paddingTop='1' marginBottom='2' gap='2'>
+		<YStack paddingTop='1' margin='2' gap='2'>
 			<XStack justifyContent='center' alignContent='center' padding='2'>
 				<ItemImage item={playlist} width={'15'} height={'15'} elevate />
 			</XStack>

@@ -7,7 +7,7 @@ import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
-import { getApi, getUser } from '../stores/auth/utils'
+import { getApi } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import {

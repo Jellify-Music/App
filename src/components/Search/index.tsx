@@ -79,7 +79,7 @@ export default function Search(): React.JSX.Element {
 		<List
 			contentInsetAdjustmentBehavior='automatic'
 			ListHeaderComponent={
-				<YStack flex={1}>
+				<YStack flex={1} paddingHorizontal='2'>
 					<Input
 						placeholder={placeholder}
 						onChangeText={handleSearchStringUpdate}
