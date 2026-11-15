@@ -9,6 +9,9 @@ export const stackScreenOptions: NativeStackNavigationOptions = {
 	headerTitleStyle: {
 		fontFamily: 'Figtree-Bold',
 	},
+	headerBackTitleStyle: {
+		fontFamily: 'Figtree-Bold',
+	},
 }
 
 export default navigationRef
