@@ -1,6 +1,6 @@
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import { isEmpty, isUndefined } from 'lodash'
-import { H3, H5, Separator, Spinner, XStack, YStack } from 'tamagui'
+import { H3, H5, Separator, Spinner, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import useAuthenticateUserByName from '../../api/mutations/authentication'
 import { useState } from 'react'
@@ -8,13 +8,15 @@ import LoginStackParamList from '../../screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import Input from '../Global/utils/input'
-import { GestureResponderEvent, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import Button from '../Global/utils/button'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
+import { RootStackParamList } from '../../screens/types'
 
 export default function ServerAuthentication(): React.JSX.Element {
+	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
 	const [username, setUsername] = useState<string | undefined>(undefined)
@@ -23,19 +25,13 @@ export default function ServerAuthentication(): React.JSX.Element {
 	const { data: serverInfo } = usePublicServerInfo()
 
 	const { mutate: authenticateUserByName, isPending } = useAuthenticateUserByName({
-		onSuccess: () => navigation.navigate('LibrarySelection'),
+		onSuccess: () => rootNavigation.navigate('Tabs'),
 	})
 
 	const onSubmitEditing = () => {
 		if (!isUndefined(username) && !isEmpty(username) && !isPending) {
 			authenticateUserByName({ username, password })
 		}
-	}
-
-	const onSignInPress = (event: GestureResponderEvent) => {
-		navigation.navigate('ServerAddress', undefined, {
-			pop: true,
-		})
 	}
 
 	return (
@@ -45,18 +41,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 			marginHorizontal='4'
 			testID='server_authentication_screen'
 		>
-			<XStack alignItems='flex-start' flexShrink={1}>
-				<Button
-					icon={<Icon name='chevron-left' size='7' />}
-					onPress={onSignInPress}
-					fontWeight='6'
-					{...ICON_PRESS_STYLES}
-				>
-					{'Switch Server'}
-				</Button>
-			</XStack>
-
-			<YStack gap='2' flexGrow={1} justifyContent='center'>
+			<YStack gap='2' flex={1} justifyContent='flex-start'>
 				<Animated.View
 					entering={FadeIn.easing(Easing.ease)}
 					exiting={FadeOut.easing(Easing.ease)}
@@ -68,7 +53,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 				</Animated.View>
 			</YStack>
 
-			<YStack gap='4'>
+			<YStack gap='4' flex={1} justifyContent='flex-end'>
 				<Input
 					prependElement={<Icon name='human-greeting-variant' color={'primary'} />}
 					placeholder='Username'

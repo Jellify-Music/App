@@ -17,8 +17,7 @@ appId: com.cosmonautical.jellify
     env:
       button_id: sign_in_button
 
-# Wait for sign in to finish. Library selection comes next, unless the
-# server has a single music library, in which case onboarding skips it
+# Wait for sign in to finish
 - extendedWaitUntil:
     notVisible:
       id: "server_authentication_screen"
