@@ -42,7 +42,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 	}
 
 	return (
-		<YStack alignContent='center' flex={1} marginBottom='2'>
+		<YStack alignContent='center' flex={1} margin='2'>
 			<XStack justifyContent='center'>
 				<ItemImage
 					item={album}

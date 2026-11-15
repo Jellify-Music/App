@@ -7,12 +7,16 @@ import SettingsStack from '../Settings'
 import DiscoverStack from '../Discover'
 import LibraryStack from '../Library'
 import HomeStack from '../Home'
+import TabParamList from './types'
 
-const Tabs = createBottomTabNavigator({
+const Tabs = createBottomTabNavigator<TabParamList>({
 	initialRouteName: 'HomeTab',
 	screenOptions: {
 		animation: 'shift',
 		lazy: true,
+		tabBarLabelStyle: {
+			fontFamily: 'Figtree-Bold',
+		},
 	},
 	detachInactiveScreens: true,
 	tabBar: (props) => <TabBar {...props} />,

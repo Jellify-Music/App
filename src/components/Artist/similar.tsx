@@ -29,8 +29,9 @@ export default function SimilarArtists(): React.JSX.Element {
 
 	return (
 		<Freeze freeze={fetchingAlbums && !albums}>
-			<YStack flex={1} margin={'2'}>
+			<YStack flex={1}>
 				<SizableText
+					margin={'2'}
 					size={'3'}
 					fontWeight='6'
 				>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</SizableText>

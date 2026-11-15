@@ -169,11 +169,6 @@ export default function Playlist(): React.JSX.Element {
 				component={LegendList}
 				animationConfig={'spring'}
 				contentInsetAdjustmentBehavior='automatic'
-				containerStyle={{
-					flex: 1,
-					paddingTop: 8,
-					paddingHorizontal: 8,
-				}}
 				ListHeaderComponent={<PlaylistTracklistHeader />}
 				data={playlistTracks}
 				lockToMainAxis

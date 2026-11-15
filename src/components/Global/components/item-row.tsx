@@ -3,7 +3,6 @@ import { XStack, YStack, getToken, SizableText } from 'tamagui'
 import Icon from './icon'
 import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../utils/time-codes'
-import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
 import navigationRef from '../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -18,10 +17,10 @@ import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
 	withSpring,
-	withTiming,
 } from 'react-native-reanimated'
 import { useSwipeableRowContext } from './SwipeableRow/context'
 import SwipeableRow from './SwipeableRow'
+import HideableArtwork from './SwipeableRow/hideable-artwork'
 import { useSwipeSettingsStore } from '../../../stores/settings/gestures'
 import { buildSwipeConfig } from '../utils/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
@@ -175,7 +174,7 @@ function ItemRow({
 				width={'100%'}
 				transition={'quick'}
 				opacity={pressOpacity}
-				paddingVertical='2'
+				padding='2'
 				backgroundColor='background'
 				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
 				onPressIn={onPressIn}
@@ -215,7 +214,7 @@ function ItemRow({
 				width={'100%'}
 				transition={'quick'}
 				opacity={pressOpacity}
-				paddingVertical='2'
+				padding='2'
 				backgroundColor='background'
 				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
 				onPressIn={onPressIn}
@@ -320,37 +319,6 @@ function ItemRowDetails({
 				</SizableText>
 			)}
 		</YStack>
-	)
-}
-
-// Artwork wrapper that fades out when the quick-action menu is open
-function HideableArtwork({
-	item,
-	circular,
-	onLayout,
-}: {
-	item: BaseItemDto
-	circular?: boolean
-	onLayout?: (event: LayoutChangeEvent) => void
-}): React.JSX.Element {
-	const { tx } = useSwipeableRowContext()
-	// Hide artwork as soon as swiping starts (any non-zero tx)
-	const style = useAnimatedStyle(() => ({
-		opacity: withTiming(tx.value === 0 ? 1 : 0),
-	}))
-	return (
-		<Animated.View style={style} onLayout={onLayout}>
-			<XStack marginRight='2' marginVertical={'auto'} alignItems='center'>
-				<ItemImage
-					item={item}
-					height={'4'}
-					width={'4'}
-					elevate
-					circular={item.Type === BaseItemKind.MusicArtist || circular}
-					imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
-				/>
-			</XStack>
-		</Animated.View>
 	)
 }
 
