@@ -83,7 +83,7 @@ const HomeStack = createNativeStackNavigator({
 | `Settings/` | Settings tab stack |
 | `Player/` | Player sheet (`PlayerRoot`) |
 | `Album/` | Album detail screen |
-| `Artist/` | Artist detail screen |
+| `Artist/` | Artist detail screen; its tabs are a static top-tab navigator (`tabs.ts`) embedded with `getComponent()` |
 | `Playlist/` | Playlist detail screen |
 | `Tracks/` | Generic track list screen |
 | `Context/` | Context menu sheet |
