@@ -1,7 +1,6 @@
 import usePatrons from '../../api/queries/patrons'
 import useSpecialThanks from '../../api/queries/special-thanks'
-import { APP_GITHUB_URL } from '../../configs/ota.config'
-import { PRIVACY_POLICY_URL } from '../../configs/privacy.config'
+import { PRIVACY_POLICY_URL, SOURCE_CODE_URL } from '../../configs/privacy.config'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { useInfoCaption } from '../../hooks/use-caption'
 import { downloadUpdate } from '../../services/ota'
@@ -70,7 +69,7 @@ export default function About(): React.JSX.Element {
 							alignItems='center'
 							gap='1'
 							{...ICON_PRESS_STYLES}
-							onPress={() => Linking.openURL(APP_GITHUB_URL)}
+							onPress={() => Linking.openURL(SOURCE_CODE_URL)}
 							testID='jellify-source-link'
 						>
 							<Icon name='code-tags' size='7' color='borderColor' />
