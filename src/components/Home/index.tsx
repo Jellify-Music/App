@@ -51,7 +51,7 @@ export function Home(): React.JSX.Element {
 
 function HomeContent(): React.JSX.Element {
 	return (
-		<YStack alignContent='flex-start' gap='1'>
+		<YStack gap='2'>
 			<RecentArtists />
 
 			<RecentlyPlayed />
