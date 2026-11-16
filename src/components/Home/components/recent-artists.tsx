@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import React from 'react'
 import { H4, XStack } from 'tamagui'
 import { RootStackParamList } from '../../../screens/types'
@@ -14,6 +15,8 @@ import AnimatedRow from '../../Global/utils/Animated/row'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function RecentArtists(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const recentArtistsInfiniteQuery = useRecentArtists()
 
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -52,7 +55,7 @@ export default function RecentArtists(): React.JSX.Element {
 				opacity='1 press:0.6'
 				marginHorizontal='2'
 			>
-				<H4 userSelect='none'>Recent Artists</H4>
+				<H4 userSelect='none'>{t('home.recentArtists')}</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

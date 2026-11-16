@@ -1,0 +1,9 @@
+{
+	"home": {
+		"onRepeat": "On Repeat",
+		"recentArtists": "Recent Artists",
+		"yourPlaylists": "Your Playlists",
+		"playItAgain": "Play it again",
+		"mostPlayed": "Most Played"
+	}
+}
