@@ -1,9 +1,4 @@
-import {
-	NotificationButtonEvent,
-	NotificationButtons,
-	TrackItem,
-	TrackPlayer,
-} from 'react-native-nitro-player'
+import { NotificationButtonEvent, NotificationButtons, TrackItem } from 'react-native-nitro-player'
 import { queryClient } from '../../../api/client'
 import { QueryAges } from '../../../constants/durations'
 import { setFavorite } from '../../../api/mutations/favorite'
@@ -13,8 +8,7 @@ import { getUser } from '../../../stores/auth/utils'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
-
-const FAVORITE_BUTTON_ID = 'favorite'
+import { FAVORITE_BUTTON_ID, setFavoriteButtonState } from './favorite-button-state'
 
 /**
  * A favorite toggle in the system media controls: Control Center and the
@@ -33,14 +27,6 @@ export const notificationButtons: NotificationButtons = {
 		lockScreen: [{ id: FAVORITE_BUTTON_ID, title: 'Favorite', command: 'like' }],
 		carPlay: [{ id: FAVORITE_BUTTON_ID, icon: 'heart', activeIcon: 'heart.fill' }],
 	},
-}
-
-export function setFavoriteButtonState(trackId: string, isFavorite: boolean) {
-	TrackPlayer.setNotificationButtonState({
-		buttonId: FAVORITE_BUTTON_ID,
-		trackIds: [trackId],
-		isActive: isFavorite,
-	})
 }
 
 /**
