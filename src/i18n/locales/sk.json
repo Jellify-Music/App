@@ -322,34 +322,38 @@
 		"account": "Účet",
 		"home": "Domov",
 		"discover": "Objaviť",
-		"settings": ""
+		"settings": "Nastavenia"
 	},
 	"genres": {
-		"title": "",
-		"selectAll": "",
-		"none": ""
+		"title": "Vybrať žánre",
+		"selectAll": "Vybrať všetko",
+		"none": "Nenašli sa žiadne žánre"
 	},
 	"years": {
-		"loadError": "",
-		"min": "",
-		"max": "",
-		"selectMin": "",
-		"selectMax": ""
+		"loadError": "Nepodarilo sa načítať roky",
+		"min": "Minimálny rok",
+		"max": "Maximálny rok",
+		"selectMin": "Vyberte minimálny rok",
+		"selectMax": "Vyberte maximálny rok"
 	},
 	"privacy": {
-		"intro": "",
-		"purpose": "",
-		"optional": "",
-		"readMore": ""
+		"intro": "Jellify je vybavené nástrojom GlitchTip na sledovanie a hlásenie chýb.",
+		"purpose": "Vďaka tomu môže Jellify automaticky zaznamenávať a hlásiť problémy.",
+		"optional": "Táto funkcia je úplne voliteľná, štandardne je vypnutá a jej zapnutie či vypnutie je možné kedykoľvek.",
+		"readMore": "Viac informácií o tom, ako sa s týmito údajmi nakladá, nájdete v našich <link>zásadách ochrany osobných údajov</link>."
 	},
 	"storage": {
-		"unknownSaveDate": "",
-		"deletedDownloads": "",
-		"reviewSelection": "",
-		"readyToRemove": "",
-		"savedAt": "",
-		"deleteDownloads": "",
-		"noneSelected": "",
+		"unknownSaveDate": "Neznámy dátum uloženia",
+		"deletedDownloads_one": "{{count}} stiahnutie bolo odstránené",
+		"deletedDownloads_few": "{{count}} stiahnutia boli odstránené",
+		"deletedDownloads_other": "{{count}} stiahnutí bolo odstránených",
+		"reviewSelection": "Skontrolovať výber",
+		"readyToRemove_one": "{{count}} skladba je pripravená na odstránenie",
+		"readyToRemove_few": "{{count}} skladby sú pripravená na odstránenie",
+		"readyToRemove_other": "{{count}} skladieb je pripravených na odstránenie",
+		"savedAt": "Uložené {{date}}",
+		"deleteDownloads": "Vymazať stiahnuté",
+		"noneSelected": "Nie sú vybrané žiadne skladby",
 		"noneSelectedHint": "",
 		"removedDownloads": "",
 		"removedTrack": "",
