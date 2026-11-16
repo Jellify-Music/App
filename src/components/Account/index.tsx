@@ -157,7 +157,7 @@ export default function Account(): React.JSX.Element {
 
 							{isAudioMuseEnabled && (
 								<ServerInfoChip
-									label='Detected'
+									label={t('account.detected')}
 									value={'AudioMuse AI'}
 									icon='music-box'
 									color={'success'}

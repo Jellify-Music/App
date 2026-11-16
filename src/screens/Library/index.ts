@@ -85,7 +85,7 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		GeneratePlaylist: {
 			screen: GeneratePlaylistScreen,
 			options: {
-				title: 'Generate Playlist',
+				title: i18n.t('library.generatePlaylist'),
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,

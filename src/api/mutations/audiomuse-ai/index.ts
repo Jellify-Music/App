@@ -10,6 +10,7 @@ import { refreshCarPlayLibrary } from '../../../services/auto/carplay'
 import { applyHapticFeedback } from '../../../utils/haptics'
 import { handleError } from '../../../utils/errors'
 import { LoggingContext } from '../../../utils/logging'
+import i18n from '../../../i18n'
 
 /**
  * Hook to have AudioMuse AI pick tracks for a playlist from a natural-language request
@@ -21,7 +22,7 @@ export const useGeneratePlaylistWithAudioMuseAI = () =>
 		mutationFn: generatePlaylistWithAudioMuseAI,
 		onSuccess: () => applyHapticFeedback('success'),
 		onError: (error) => {
-			handleError(error, LoggingContext.Playlist, 'Failed to generate playlist')
+			handleError(error, LoggingContext.Playlist, 'generatePlaylist')
 		},
 	})
 
@@ -45,15 +46,15 @@ export const useSaveAudioMuseAIPlaylist = () => {
 			applyHapticFeedback('success')
 
 			Toast.show({
-				text1: 'Playlist created',
-				text2: `Created playlist ${name}`,
+				text1: i18n.t('playlist.created'),
+				text2: i18n.t('playlist.createdMessage', { name }),
 				type: 'success',
 			})
 
 			libraryStackNavigation.goBack()
 		},
 		onError: (error) => {
-			handleError(error, LoggingContext.Playlist, 'Failed to save generated playlist')
+			handleError(error, LoggingContext.Playlist, 'saveGeneratedPlaylist')
 		},
 	})
 }

@@ -3,6 +3,7 @@ import { Label, Spinner, XStack, SizableText, YStack } from 'tamagui'
 import { isEmpty } from 'lodash'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useTranslation } from 'react-i18next'
 import Input from '../Global/utils/input'
 import Button from '../Global/utils/button'
 import Icon from '../Global/components/icon'
@@ -13,6 +14,8 @@ import {
 } from '../../api/mutations/audiomuse-ai'
 
 export default function GeneratePlaylist(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const [prompt, setPrompt] = useState<string>('')
@@ -46,11 +49,11 @@ export default function GeneratePlaylist(): React.JSX.Element {
 		<YStack margin='4' gap='4'>
 			<YStack gap='2'>
 				<Label size='2' htmlFor='prompt' fontWeight='6' justifyContent='flex-end'>
-					What do you want to listen to?
+					{t('generatePlaylist.prompt')}
 				</Label>
 				<Input
 					id='prompt'
-					placeholder='Songs for a rainy afternoon'
+					placeholder={t('generatePlaylist.promptPlaceholder')}
 					value={prompt}
 					onChangeText={setPrompt}
 					returnKeyType='go'
@@ -62,17 +65,17 @@ export default function GeneratePlaylist(): React.JSX.Element {
 				(tracks && tracks.length > 0 ? (
 					<YStack gap='2'>
 						<SizableText fontSize='2' fontWeight='6' color='borderColor'>
-							{`${tracks.length} tracks generated`}
+							{t('generatePlaylist.tracksGenerated', { count: tracks.length })}
 						</SizableText>
 
 						<Label size='2' htmlFor='name' fontWeight='6' justifyContent='flex-end'>
-							Name
+							{t('playlist.name')}
 						</Label>
 						<Input id='name' value={name} onChangeText={setName} />
 					</YStack>
 				) : (
 					<SizableText fontSize='2' color='borderColor'>
-						No tracks matched that request. Try describing it differently.
+						{t('generatePlaylist.noTracks')}
 					</SizableText>
 				))}
 
@@ -86,7 +89,7 @@ export default function GeneratePlaylist(): React.JSX.Element {
 					icon={<Icon name='chevron-left' size='6' color={'borderColor'} />}
 				>
 					<SizableText fontSize='2' fontWeight='6' color={'borderColor'}>
-						Cancel
+						{t('common.cancel')}
 					</SizableText>
 				</Button>
 
@@ -110,7 +113,7 @@ export default function GeneratePlaylist(): React.JSX.Element {
 						<Spinner color='primary' />
 					) : (
 						<SizableText fontSize='2' fontWeight='6' color={'primary'}>
-							{hasGenerated ? 'Retry' : 'Generate'}
+							{hasGenerated ? t('common.retry') : t('generatePlaylist.generate')}
 						</SizableText>
 					)}
 				</Button>
@@ -136,7 +139,7 @@ export default function GeneratePlaylist(): React.JSX.Element {
 							<Spinner color='primary' />
 						) : (
 							<SizableText fontSize='2' fontWeight='6' color={'primary'}>
-								Save
+								{t('common.save')}
 							</SizableText>
 						)}
 					</Button>

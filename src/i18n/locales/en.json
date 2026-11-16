@@ -35,7 +35,8 @@
 		"version": "Version",
 		"connection": "Connection",
 		"secure": "Secure (HTTPS)",
-		"insecure": "Insecure (HTTP)"
+		"insecure": "Insecure (HTTP)",
+		"detected": "Detected"
 	},
 	"common": {
 		"change": "Change",
@@ -133,6 +134,7 @@
 	},
 	"library": {
 		"createPlaylist": "Create Playlist",
+		"generatePlaylist": "Generate Playlist",
 		"sort": "Sort",
 		"filter": "Filter"
 	},
@@ -188,6 +190,14 @@
 		"deleteConfirm": "Delete playlist {{name}}?",
 		"created": "Playlist created",
 		"createdMessage": "Created playlist {{name}}"
+	},
+	"generatePlaylist": {
+		"prompt": "What do you want to listen to?",
+		"promptPlaceholder": "Songs for a rainy afternoon",
+		"tracksGenerated_one": "{{count}} track generated",
+		"tracksGenerated_other": "{{count}} tracks generated",
+		"noTracks": "No tracks matched that request. Try describing it differently.",
+		"generate": "Generate"
 	},
 	"queue": {
 		"nowPlaying": "Now Playing",
@@ -448,7 +458,9 @@
 		"playLater": "Failed to play later",
 		"fetchRandomTracks": "Failed to fetch random tracks",
 		"shuffleQueue": "Failed to shuffle queue",
-		"unshuffleQueue": "Failed to unshuffle queue"
+		"unshuffleQueue": "Failed to unshuffle queue",
+		"generatePlaylist": "Failed to generate playlist",
+		"saveGeneratedPlaylist": "Failed to save generated playlist"
 	},
 	"about": {
 		"otaVersion": "OTA Version: {{version}}",

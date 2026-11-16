@@ -259,7 +259,7 @@ export default function SwipeableRow({
 										borderRadius={0}
 										opacity='1 press:0.8'
 										role='button'
-										aria-label={`Left quick action ${action.icon}`}
+										aria-label={action.label}
 										onPress={() => {
 											action.onPress()
 											close()
@@ -342,7 +342,7 @@ export default function SwipeableRow({
 										borderRadius={0}
 										opacity='1 press:0.8'
 										role='button'
-										aria-label={`Right quick action ${action.icon}`}
+										aria-label={action.label}
 										onPress={() => {
 											action.onPress()
 											close()
