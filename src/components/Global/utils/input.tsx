@@ -8,6 +8,7 @@ import {
 	YStack,
 } from 'tamagui'
 import Icon from '../components/icon'
+import { useTranslation } from 'react-i18next'
 
 type RNTextInputAutofillSubset = Partial<
 	Pick<
@@ -37,6 +38,8 @@ type InputProps = Exclude<TamaguiInputProps, 'size'> &
  * Tracked by https://github.com/Jellify-Music/App/issues/652
  */
 export default function Input(props: InputProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const {
 		prependElement,
 		appendElement,
@@ -109,8 +112,8 @@ export default function Input(props: InputProps): React.JSX.Element {
 				{showAndroidClearButton && (
 					<YStack
 						accessibilityRole='button'
-						accessibilityLabel='Clear text'
-						accessibilityHint='Clears the contents of the text field'
+						accessibilityLabel={t('input.clear')}
+						accessibilityHint={t('input.clearHint')}
 						onPress={() => onChangeText?.('')}
 						testID={clearButtonTestID}
 						alignItems='center'

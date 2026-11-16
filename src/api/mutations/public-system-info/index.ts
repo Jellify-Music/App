@@ -9,16 +9,16 @@ import type {
 } from './types'
 import LoggingContext from '../../../utils/logging/enums'
 import { handleError } from '../../../utils/errors'
+import i18n from '../../../i18n'
 
 const useConnectToServer = ({ onSuccess }: ConnectToServerParams) =>
 	useMutation<ConnectToServerResult, Error, PublicSystemInfoMutation>({
 		mutationFn: ({ serverAddress }) => connectToServer(serverAddress),
 		onSuccess: ({ publicSystemInfoResponse, resolvedUrl }, { serverAddress }) => {
-			if (!publicSystemInfoResponse.Version)
-				throw new Error(`Jellyfin instance did not respond`)
+			if (!publicSystemInfoResponse.Version) throw new Error(i18n.t('login.noResponse'))
 
 			if (!publicSystemInfoResponse.StartupWizardCompleted)
-				throw new Error(`Server has not been set up yet`)
+				throw new Error(i18n.t('login.notSetUp'))
 
 			const server: SetServerParams = {
 				url: resolvedUrl,
@@ -36,7 +36,8 @@ const useConnectToServer = ({ onSuccess }: ConnectToServerParams) =>
 			handleError(
 				error,
 				LoggingContext.PublicSystemInfo,
-				`Unable to connect to ${serverAddress}`,
+				'connect',
+				{ server: serverAddress },
 				'Unable to connect to server',
 			)
 		},

@@ -18,8 +18,11 @@ import {
 	filterForSingles,
 	filterForUnknown,
 } from '../../configs/categorizing/albums.config'
+import { useTranslation } from 'react-i18next'
 
 export default function Artist(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { featuredOn, albums, fetchingAlbums, refresh } = useArtistContext()
 
 	const theme = useTheme()
@@ -27,23 +30,23 @@ export default function Artist(): React.JSX.Element {
 	const sections: SectionListData<BaseItemDto>[] = albums
 		? [
 				{
-					title: 'Albums',
+					title: t('artist.sections.albums'),
 					data: albums.filter(filterForAlbums) ?? [],
 				},
 				{
-					title: 'EPs',
+					title: t('artist.sections.eps'),
 					data: albums.filter(filterForEPs) ?? [],
 				},
 				{
-					title: 'Singles',
+					title: t('artist.sections.singles'),
 					data: albums.filter(filterForSingles) ?? [],
 				},
 				{
-					title: 'Other',
+					title: t('artist.sections.other'),
 					data: albums.filter(filterForUnknown) ?? [],
 				},
 				{
-					title: 'Featured On',
+					title: t('artist.sections.featuredOn'),
 					data: featuredOn ?? [],
 				},
 			]
@@ -74,7 +77,7 @@ export default function Artist(): React.JSX.Element {
 				<Spinner color='primary' flex={1} />
 			) : (
 				<SizableText fontSize='3' color={'neutral'}>
-					No albums
+					{t('artist.noAlbums')}
 				</SizableText>
 			)}
 		</YStack>

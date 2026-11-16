@@ -11,8 +11,11 @@ import { useDiscoverArtists } from '../../../api/queries/suggestions'
 import AnimatedRow from '../../Global/utils/Animated/row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { useTranslation } from 'react-i18next'
 
 export default function SuggestedArtists(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const suggestedArtistsInfiniteQuery = useDiscoverArtists()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
@@ -50,7 +53,7 @@ export default function SuggestedArtists(): React.JSX.Element {
 				transition='quick'
 				opacity='1 press:0.6'
 			>
-				<H4 userSelect='none'>Artists for You</H4>
+				<H4 userSelect='none'>{t('discover.artistsForYou')}</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList data={suggestedArtistsInfiniteQuery.data} renderItem={renderItem} />

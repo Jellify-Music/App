@@ -25,7 +25,7 @@ export default function FrequentArtists(): React.JSX.Element {
 	const renderItem = ({ item: artist }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
 			item={artist}
-			caption={artist.Name ?? 'Unknown Artist'}
+			caption={artist.Name ?? t('placeholders.unknownArtist')}
 			subCaption={pickFirstGenre(artist.Genres)}
 			onPress={() => {
 				navigation.navigate('Artist', {

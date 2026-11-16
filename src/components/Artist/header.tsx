@@ -17,8 +17,11 @@ import { loadNewQueue } from '../../player/queuing'
 import { ImageUrlOptions } from '../../api/queries/image/utils'
 import { handleError } from '../../utils/errors'
 import { LoggingContext } from '../../utils/logging'
+import { useTranslation } from 'react-i18next'
 
 export default function ArtistHeader(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const api = getApi()
 
 	const { artist, albums } = useArtistContext()
@@ -47,7 +50,9 @@ export default function ArtistHeader(): React.JSX.Element {
 				startPlayback: true,
 			})
 		} catch (error) {
-			handleError(error, LoggingContext.Queue, `Failed to play ${artist.Name ?? 'artist'}`)
+			handleError(error, LoggingContext.Queue, 'playArtist', {
+				name: artist.Name ?? t('placeholders.unknownArtist'),
+			})
 		}
 	}
 
@@ -104,7 +109,7 @@ export default function ArtistHeader(): React.JSX.Element {
 					}
 				>
 					<Paragraph fontWeight='6' fontSize='3'>
-						{`View Tracks`}
+						{t('artist.viewTracks')}
 					</Paragraph>
 
 					<Icon name='chevron-right' size='7' />

@@ -13,8 +13,11 @@ import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { handleError } from '../../utils/errors'
 import { LoggingContext } from '../../utils/logging'
+import { useTranslation } from 'react-i18next'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
+	const { t } = useTranslation()
+
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const insets = useSafeAreaInsets()
@@ -59,7 +62,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 
 			await TrackPlayer.play()
 		} catch (error) {
-			handleError(error, LoggingContext.Queue, 'Failed to shuffle library')
+			handleError(error, LoggingContext.Queue, 'shuffleLibrary')
 		}
 	}
 
@@ -88,7 +91,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 							<Icon name={'plus-circle-outline'} color={'primary'} />
 
 							<SizableText fontSize='2' fontWeight='6' color='primary'>
-								Create Playlist
+								{t('library.createPlaylist')}
 							</SizableText>
 						</XStack>
 					)}
@@ -103,7 +106,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 							<Icon name={'shuffle'} color={'borderColor'} />
 
 							<SizableText fontSize='2' fontWeight='6' color='borderColor'>
-								All
+								{t('common.all')}
 							</SizableText>
 						</XStack>
 					)}
@@ -124,7 +127,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 								<Icon name={'sort'} color={'borderColor'} />
 
 								<SizableText fontSize='2' fontWeight='6' color='borderColor'>
-									Sort
+									{t('library.sort')}
 								</SizableText>
 							</XStack>
 
@@ -149,7 +152,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 									fontWeight='6'
 									color={`${hasActiveFilters ? 'primary' : 'borderColor'}`}
 								>
-									Filter
+									{t('library.filter')}
 								</SizableText>
 							</XStack>
 						</>
@@ -190,7 +193,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 								<Icon name={'filter-remove'} color={'borderColor'} />
 
 								<SizableText fontSize='2' fontWeight='6' color='borderColor'>
-									Clear
+									{t('common.clear')}
 								</SizableText>
 							</XStack>
 						)}

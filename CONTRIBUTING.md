@@ -167,6 +167,8 @@ const { t } = useTranslation()
 - Only add or change keys in `en.json`. The other locale files are managed by Weblate, so don't edit them by hand
 - Keys are type-checked, so `t('home.typo')` fails `tsc`
 - Use i18next's `_one` / `_other` suffixes for plurals (e.g. `trackCount_one`, `trackCount_other`)
+- Outside of components, use `i18n.t()` from `src/i18n`
+- `handleError` takes a key under `errors` for its toast title, and reports the English text to Sentry
 
 ## Testing
 

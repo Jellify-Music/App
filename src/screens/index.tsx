@@ -26,6 +26,7 @@ import PlayerStack from './Player'
 import LoginStack from './Login'
 import PrivacyPolicyScreen from './PrivacyPolicy'
 import { Ticker } from '../components/Global/utils/Animated/text'
+import i18n from '../i18n'
 
 /**
  * The root navigation stack for Jellify. Contains all top level screens, such as the login screen
@@ -69,7 +70,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		AddToPlaylist: {
 			screen: AddToPlaylistSheet,
 			options: {
-				headerTitle: 'Add to Playlist',
+				headerTitle: i18n.t('context.addToPlaylist'),
 				presentation: addToPlaylistSheetPresentation,
 				sheetAllowedDetents:
 					addToPlaylistSheetPresentation === 'formSheet' ? [1.0] : undefined,
@@ -88,7 +89,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		DeletePlaylist: {
 			screen: DeletePlaylist,
 			options: {
-				title: 'Delete Playlist',
+				title: i18n.t('context.deletePlaylist'),
 				presentation: bottomSheetPresentation,
 				headerShown: false,
 				sheetGrabberVisible: true,

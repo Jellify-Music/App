@@ -10,8 +10,11 @@ import navigationRef from '../navigation'
 import resetQueue from '../../player/queuing/reset'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSignOut } from '../../stores/auth'
+import { useTranslation } from 'react-i18next'
 
 export default function SignOutModal(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { data: server } = usePublicServerInfo()
 
 	const settingsStackNavigation =
@@ -60,7 +63,7 @@ export default function SignOutModal(): React.JSX.Element {
 						flex={1}
 						onPress={settingsStackNavigation.goBack}
 					>
-						Cancel
+						{t('common.cancel')}
 					</Button>
 					<Button
 						testID='sign-out-button'
@@ -70,7 +73,7 @@ export default function SignOutModal(): React.JSX.Element {
 						color={'danger'}
 						onPress={onSignOut}
 					>
-						Sign out
+						{t('settings.signOut')}
 					</Button>
 				</XStack>
 			</YStack>

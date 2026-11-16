@@ -30,7 +30,7 @@ export default function RecentArtists(): React.JSX.Element {
 	const renderItem = ({ item: recentArtist }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
 			item={recentArtist}
-			caption={recentArtist.Name ?? 'Unknown Artist'}
+			caption={recentArtist.Name ?? t('placeholders.unknownArtist')}
 			subCaption={pickFirstGenre(recentArtist.Genres)}
 			onPress={() => {
 				navigation.navigate('Artist', {

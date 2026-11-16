@@ -4,6 +4,462 @@
 		"recentArtists": "Recent Artists",
 		"yourPlaylists": "Your Playlists",
 		"playItAgain": "Play it again",
-		"mostPlayed": "Most Played"
+		"mostPlayed": "Most Played",
+		"recentlyPlayed": "Recently Played"
+	},
+	"placeholders": {
+		"unknownUser": "Unknown User",
+		"unknownLibrary": "Unknown Library",
+		"unknownServer": "Unknown Server",
+		"unknownAddress": "Unknown Address",
+		"unknownAlbum": "Unknown Album",
+		"untitledAlbum": "Untitled Album",
+		"unknownYear": "Unknown Year",
+		"unknownArtist": "Unknown Artist",
+		"untitledTrack": "Untitled Track",
+		"untitled": "Untitled",
+		"unknownPlaylist": "Unknown Playlist",
+		"unnamedLibrary": "Unnamed Library",
+		"untitledPlaylist": "Untitled Playlist",
+		"unknownTrack": "Unknown Track",
+		"unknownGenre": "Unknown Genre",
+		"unknownMusicVideo": "Unknown Music Video",
+		"unknownItem": "Unknown Item"
+	},
+	"account": {
+		"jellyfinUser": "Jellyfin User",
+		"musicLibrary": "Music Library",
+		"allLibraries": "All Libraries",
+		"currentLibrary": "Current library",
+		"server": "Server",
+		"version": "Version",
+		"connection": "Connection",
+		"secure": "Secure (HTTPS)",
+		"insecure": "Insecure (HTTP)"
+	},
+	"common": {
+		"change": "Change",
+		"unknown": "Unknown",
+		"play": "Play",
+		"shuffle": "Shuffle",
+		"retry": "Retry",
+		"noItems": "No items",
+		"mix": "Mix",
+		"seeMore": "See More",
+		"trackCount_one": "{{count}} Track",
+		"trackCount_other": "{{count}} Tracks",
+		"all": "All",
+		"clear": "Clear",
+		"cancel": "Cancel",
+		"save": "Save",
+		"delete": "Delete",
+		"apply": "Apply",
+		"any": "Any",
+		"goBack": "Go back",
+		"error": "Error",
+		"close": "Close",
+		"refresh": "Refresh",
+		"ok": "OK"
+	},
+	"album": {
+		"featuring": "Featuring",
+		"similarAlbums": "Similar Albums",
+		"noSimilarAlbums": "No similar albums found",
+		"noTracks": "No album tracks"
+	},
+	"artist": {
+		"sections": {
+			"albums": "Albums",
+			"eps": "EPs",
+			"singles": "Singles",
+			"other": "Other",
+			"featuredOn": "Featured On"
+		},
+		"noAlbums": "No albums",
+		"similarTo": "Similar to {{name}}",
+		"noSimilarArtists": "No similar artists",
+		"viewTracks": "View Tracks"
+	},
+	"cast": {
+		"noDevices": "Use the Cast button to pick a device"
+	},
+	"context": {
+		"goTo": "Go to {{name}}",
+		"removeDownload": "Remove Download",
+		"downloadQueued": "Download Queued",
+		"download": "Download",
+		"goToMix": "Go to {{name}} Mix",
+		"addToPlaylist": "Add to Playlist",
+		"deletePlaylist": "Delete Playlist",
+		"removeFromPlaylist": "Remove from Playlist",
+		"playNext": "Play Next",
+		"playLater": "Play Later",
+		"openAudioSpecs": "Open Audio Specs",
+		"addToFavorites": "Add to favorites",
+		"removeFromFavorites": "Remove from favorites"
+	},
+	"discover": {
+		"recentlyAdded": "Recently Added",
+		"moreFromTheVault": "More from the Vault",
+		"artistsForYou": "Artists for You",
+		"playlistsOn": "Playlists on {{server}}",
+		"albumsOn": "Albums on {{server}}"
+	},
+	"errorBoundary": {
+		"title": "Oops! That was a wrong note.",
+		"message": "Jellify stopped unexpectedly. Let's tune things up and try again!"
+	},
+	"filters": {
+		"favorites": "Favorites",
+		"downloaded": "Downloaded",
+		"unplayed": "Unplayed",
+		"yearRange": "Year range",
+		"yearRangeWithValue": "Year range {{range}}"
+	},
+	"swipe": {
+		"hint": "Swipe for actions",
+		"playLater": "Play later",
+		"toggleFavorite": "Toggle favorite",
+		"playNext": "Play next",
+		"addToPlaylist": "Add to playlist"
+	},
+	"input": {
+		"clear": "Clear text",
+		"clearHint": "Clears the contents of the text field"
+	},
+	"instantMix": {
+		"noTracks": "No mix tracks",
+		"title": "{{name}} Mix"
+	},
+	"library": {
+		"createPlaylist": "Create Playlist",
+		"sort": "Sort",
+		"filter": "Filter"
+	},
+	"librarySelector": {
+		"title": "Select Music Library",
+		"showingAll": "Showing music from all libraries",
+		"tapForAll": "Tap the selected library again for all libraries",
+		"loadError": "Unable to load libraries",
+		"noLibraries": "No music libraries found",
+		"noLibrariesHint": "Please create a music library in Jellyfin to continue",
+		"oneLibrary": "Only one music library is available"
+	},
+	"login": {
+		"copiedToClipboard": "Copied to clipboard",
+		"signInManually": "Sign in Manually",
+		"quickConnect": "Quick Connect",
+		"quickConnectHint": "Enter the code in another session",
+		"serverAddress": "Jellyfin Server Address",
+		"welcome": "Welcome!",
+		"welcomeSubtitle": "Let's get connected to Jellyfin",
+		"connect": "Connect",
+		"signInTo": "Sign in to {{server}}",
+		"unknownVersion": "Unknown Jellyfin version",
+		"username": "Username",
+		"password": "Password",
+		"signIn": "Sign in",
+		"useQuickConnect": "Use Quick Connect",
+		"noResponse": "Jellyfin instance did not respond",
+		"notSetUp": "Server has not been set up yet",
+		"unableToConnect": "Unable to connect to Jellyfin"
+	},
+	"lyrics": {
+		"none": "No lyrics available"
+	},
+	"player": {
+		"nothingPlaying": "Nothing Playing",
+		"close": "Close player",
+		"playingFrom": "Playing from"
+	},
+	"network": {
+		"backOnline": "And we're back!",
+		"offline": "You are offline"
+	},
+	"audioSpecs": {
+		"downloadedFile": "Downloaded File",
+		"transcodedStream": "Transcoded Stream",
+		"directStream": "Direct Stream"
+	},
+	"playlist": {
+		"namePlaceholder": "Playlist Name",
+		"none": "No playlists",
+		"name": "Name",
+		"deleteConfirm": "Delete playlist {{name}}?",
+		"created": "Playlist created",
+		"createdMessage": "Created playlist {{name}}"
+	},
+	"queue": {
+		"nowPlaying": "Now Playing",
+		"playingNext": "Playing next",
+		"playingLater": "Playing later"
+	},
+	"search": {
+		"inputLabel": "Search your library",
+		"inputHint": "Type to search artists, albums, playlists, and songs",
+		"artistResults": "Artist results",
+		"results": "Results",
+		"noResults": "No Results",
+		"suggestedArtists": "Suggested artists",
+		"suggestions": "Suggestions"
+	},
+	"settings": {
+		"appIcon": {
+			"updated": "Updated app icon to {{name}}",
+			"title": "App Icon",
+			"description": "Your new icon will appear after leaving the app"
+		},
+		"lookahead": {
+			"title": "Track Lookahead",
+			"description": "Number of upcoming tracks to prefetch"
+		},
+		"analytics": {
+			"title": "Send Analytics",
+			"learnMore": "Learn more"
+		},
+		"sections": {
+			"appearance": "Appearance",
+			"gestures": "Gestures",
+			"playback": "Playback",
+			"storage": "Storage",
+			"privacyDeveloper": "Privacy & Developer",
+			"about": "About"
+		},
+		"signOut": "Sign Out",
+		"appearance": {
+			"themes": {
+				"system": "Match Device",
+				"light": "Light",
+				"dark": "Dark",
+				"oled": "OLED Black"
+			},
+			"colorPresets": {
+				"haze": "Haze",
+				"ocean": "Ocean",
+				"forest": "Forest",
+				"sunset": "Sunset",
+				"peanut": "Peanut"
+			},
+			"theme": "Theme",
+			"colorScheme": "Color Scheme",
+			"hideRuntimes": "Hide Runtimes",
+			"hideRuntimesDescription": "Hide track duration lengths",
+			"hideCardIndicators": "Hide Card Indicators",
+			"hideCardIndicatorsDescription": "Hide indicators on card corners"
+		},
+		"gestures": {
+			"description": "Single selection triggers on reveal; multiple selections show a menu.",
+			"swipeLeft": "Swipe Left",
+			"swipeRight": "Swipe Right",
+			"favorite": "Favorite"
+		},
+		"playback": {
+			"streamingQuality": "Streaming Quality",
+			"streamingQualityDescription": "Changes apply to new tracks",
+			"normalization": "Audio Normalization",
+			"normalizationDescription": "Normalize volume between tracks",
+			"qualityBadge": "Quality Badge",
+			"qualityBadgeDescription": "Display audio quality in player"
+		},
+		"quality": {
+			"original": "Original Quality",
+			"high": "High (320kbps)",
+			"medium": "Medium (256kbps)",
+			"low": "Low (192kbps)"
+		},
+		"developer": {
+			"invalidPrId": "Please enter a valid PR ID (a positive integer)",
+			"title": "Developer",
+			"options": "Developer Options",
+			"optionsDescription": "Enable advanced developer features",
+			"prIdDescription": "Enter PR ID to test pull request builds",
+			"prIdPlaceholder": "Enter PR ID",
+			"currentPrId": "Current PR ID:"
+		},
+		"privacy": {
+			"title": "Privacy",
+			"reduceHaptics": "Reduce Haptics",
+			"reduceHapticsDescription": "Reduce haptic feedback intensity"
+		},
+		"library": {
+			"changed": "Library changed",
+			"nowUsing": "Now using {{name}}",
+			"nowUsingAll": "Now using all music libraries",
+			"apply": "Apply Changes"
+		}
+	},
+	"sort": {
+		"by": {
+			"track": "Track",
+			"album": "Album",
+			"artist": "Artist",
+			"dateAdded": "Date Added",
+			"playCount": "Play Count",
+			"releaseDate": "Release Date",
+			"runtime": "Runtime"
+		},
+		"order": {
+			"oldest": "Oldest",
+			"newest": "Newest",
+			"lowest": "Lowest",
+			"highest": "Highest",
+			"ascending": "Ascending",
+			"descending": "Descending"
+		},
+		"sortBy": "Sort By",
+		"sortOrder": "Sort Order"
+	},
+	"navigation": {
+		"tracks": "Tracks",
+		"library": "Library",
+		"filters": "Filters",
+		"player": "Player",
+		"audioDevices": "Audio Devices",
+		"search": "Search",
+		"selectLibrary": "Select Library",
+		"storageManagement": "Storage Management",
+		"account": "Account",
+		"home": "Home",
+		"discover": "Discover",
+		"settings": "Settings"
+	},
+	"genres": {
+		"title": "Select Genres",
+		"selectAll": "Select all",
+		"none": "No genres found"
+	},
+	"years": {
+		"loadError": "Could not load years",
+		"min": "Min year",
+		"max": "Max year",
+		"selectMin": "Select min year",
+		"selectMax": "Select max year"
+	},
+	"privacy": {
+		"intro": "Jellify is equipped with GlitchTip for error tracking and reporting.",
+		"purpose": "This enables Jellify to collect and report issues automatically.",
+		"optional": "This is entirely optional, off by default, and can be toggled at any time.",
+		"readMore": "You can read more about how this data is handled in our <link>privacy policy</link>."
+	},
+	"storage": {
+		"unknownSaveDate": "Unknown save date",
+		"deletedDownloads_one": "Deleted {{count}} download",
+		"deletedDownloads_other": "Deleted {{count}} downloads",
+		"reviewSelection": "Review selection",
+		"readyToRemove_one": "{{count}} track ready to remove",
+		"readyToRemove_other": "{{count}} tracks ready to remove",
+		"savedAt": "Saved {{date}}",
+		"deleteDownloads": "Delete downloads",
+		"noneSelected": "No tracks selected",
+		"noneSelectedHint": "Select some downloads to clean up storage.",
+		"removedDownloads_one": "Removed {{count}} download",
+		"removedDownloads_other": "Removed {{count}} downloads",
+		"removedTrack": "Removed {{name}}",
+		"track": "track",
+		"clearAllTitle": "Clear all downloads?",
+		"clearAllMessage": "This will remove all downloaded music from your device. This action cannot be undone.",
+		"clearAll": "Clear All",
+		"clearSelectedTitle": "Clear selected downloads?",
+		"clearSelectedMessage_one": "Are you sure you want to clear {{count}} download?",
+		"clearSelectedMessage_other": "Are you sure you want to clear {{count}} downloads?",
+		"selectedCount": "{{count}} selected",
+		"overview": "Storage overview",
+		"refreshOverview": "Refresh storage overview",
+		"usage": "Used by offline music · {{free}} free on device",
+		"downloadCount_one": "{{count}} download",
+		"downloadCount_other": "{{count}} downloads",
+		"calculating": "Calculating storage usage…",
+		"clearDownload": "Clear download",
+		"empty": "No offline music yet",
+		"emptyHint": "Downloaded tracks will show up here so you can reclaim storage any time.",
+		"readyToCleanUp": "Ready to clean up?",
+		"selectionSummary_one": "{{count}} track · {{size}}",
+		"selectionSummary_other": "{{count}} tracks · {{size}}",
+		"clearSize": "Clear {{size}}",
+		"offlineLibrary": "Offline library",
+		"cachedCount_one": "{{count}} item cached",
+		"cachedCount_other": "{{count}} items cached",
+		"audioFiles": "Audio files",
+		"downloadSettings": "Download Settings",
+		"autoDownload": "Auto-Download Tracks",
+		"autoDownloadDescription": "Download tracks as they are played",
+		"downloadQuality": "Download Quality",
+		"downloadQualityDescription": "Quality used when downloading tracks",
+		"freed": "Freed {{size}}",
+		"suggestions": {
+			"staleTitle": "Unused in 30+ days",
+			"staleDescription": "Remove tracks you have not touched recently.",
+			"largeTitle": "Large files",
+			"largeDescription": "High bitrate albums occupying the most space."
+		}
+	},
+	"shuffle": {
+		"fetchFailed": "Unable to fetch random tracks",
+		"noDownloads": "No downloaded tracks available",
+		"noTracks": "No tracks to shuffle",
+		"nothing": "Nothing to shuffle",
+		"nothingPlaying": "No track currently playing"
+	},
+	"ota": {
+		"updated": "Jellify has been updated!",
+		"restart": "Restart to apply the changes",
+		"notAvailable": "Update not available",
+		"prUpdated": "Jellify has been updated with the PR",
+		"prNotAvailable": "This PR build is not available"
+	},
+	"car": {
+		"artists": "Artists",
+		"albums": "Albums",
+		"playlists": "Playlists",
+		"empty": "Nothing here yet",
+		"more": "More…",
+		"signIn": "Open Jellify on your phone to sign in",
+		"signInAgain": "Sign in again in Jellify on your phone",
+		"unreachable": "Couldn't reach your Jellyfin server",
+		"tapToRetry": "Tap to try again",
+		"recentlyAdded": "Recently added",
+		"quickPicks": "Quick picks",
+		"songs": "Songs",
+		"downloads": "Downloads",
+		"yourLibrary": "Your library",
+		"queue": "Queue",
+		"songCount_one": "{{count}} song",
+		"songCount_other": "{{count}} songs"
+	},
+	"errors": {
+		"setAppIcon": "Unable to set app icon",
+		"removeFromPlaylist": "Failed to remove from playlist",
+		"shuffleLibrary": "Failed to shuffle library",
+		"playArtist": "Failed to play {{name}}",
+		"download": "Failed to download",
+		"removeDownloads": "Failed to remove downloads",
+		"createPlaylist": "Failed to create playlist",
+		"deletePlaylist": "Failed to delete playlist",
+		"updatePlaylist": "Failed to update playlist",
+		"addToPlaylist": "Failed to add to {{name}}",
+		"removeFromNamedPlaylist": "Failed to remove from {{name}}",
+		"addFavorite": "Failed to add favorite",
+		"removeFavorite": "Failed to remove favorite",
+		"connect": "Unable to connect to {{server}}",
+		"initiateQuickConnect": "Unable to initiate Quick Connect",
+		"quickConnectSignIn": "Unable to sign in with Quick Connect",
+		"signIn": "Unable to sign in to {{server}}",
+		"playNext": "Failed to play next",
+		"playLater": "Failed to play later",
+		"fetchRandomTracks": "Failed to fetch random tracks",
+		"shuffleQueue": "Failed to shuffle queue",
+		"unshuffleQueue": "Failed to unshuffle queue"
+	},
+	"about": {
+		"otaVersion": "OTA Version: {{version}}",
+		"source": "Source",
+		"privacyPolicy": "Privacy Policy",
+		"update": "Update",
+		"caughtABug": "Caught a bug?",
+		"reportIssue": "Report Issue",
+		"joinDiscord": "Join Discord",
+		"wallOfFame": "Wall of Fame",
+		"sponsors": "Sponsors",
+		"specialThanks": "Special Thanks"
 	}
 }

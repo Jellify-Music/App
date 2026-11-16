@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { YStack, XStack, Button, Spinner, Paragraph, SizableText } from 'tamagui'
 import { Modal, ScrollView, Pressable } from 'react-native'
 import Icon from '../../components/Global/components/icon'
@@ -8,11 +8,14 @@ import LibraryStackParamList, { YearSelectionProps } from '../Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { applyHapticFeedback } from '../../utils/haptics'
+import { useTranslation } from 'react-i18next'
 
 const ANY = 'any'
 type Picking = 'min' | 'max' | null
 
 export default function YearSelectionScreen({ route }: YearSelectionProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const tab = route.params?.tab ?? 'Tracks'
@@ -23,18 +26,18 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 	const [picking, setPicking] = useState<Picking>(null)
 
 	// Min year options: if maxYear is set, only years <= maxYear
-	const minYearOptions = useMemo(() => {
+	const minYearOptions = (() => {
 		if (availableYears.length === 0) return []
 		const max = typeof maxYear === 'number' ? maxYear : Math.max(...availableYears)
 		return availableYears.filter((y) => y <= max)
-	}, [availableYears, maxYear])
+	})()
 
 	// Max year options: if minYear is set, only years >= minYear
-	const maxYearOptions = useMemo(() => {
+	const maxYearOptions = (() => {
 		if (availableYears.length === 0) return []
 		const min = typeof minYear === 'number' ? minYear : Math.min(...availableYears)
 		return availableYears.filter((y) => y >= min)
-	}, [availableYears, minYear])
+	})()
 
 	const handleOpenMin = () => {
 		applyHapticFeedback('info')
@@ -96,8 +99,8 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 			? `${minYear === ANY ? '…' : minYear} – ${maxYear === ANY ? '…' : maxYear}`
 			: null
 
-	const minLabel = minYear === ANY ? 'Any' : String(minYear)
-	const maxLabel = maxYear === ANY ? 'Any' : String(maxYear)
+	const minLabel = minYear === ANY ? t('common.any') : String(minYear)
+	const maxLabel = maxYear === ANY ? t('common.any') : String(maxYear)
 
 	if (isPending && availableYears.length === 0) {
 		return (
@@ -110,9 +113,9 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 	if (isError) {
 		return (
 			<YStack flex={1} alignItems='center' justifyContent='center' padding='4'>
-				<SizableText color='borderColor'>Could not load years</SizableText>
+				<SizableText color='borderColor'>{t('years.loadError')}</SizableText>
 				<Button marginTop='4' onPress={libraryStackNavigation.goBack}>
-					Go back
+					{t('common.goBack')}
 				</Button>
 			</YStack>
 		)
@@ -132,19 +135,19 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 				borderBottomColor='borderColor'
 			>
 				<Button variant='outlined' size='md' onPress={libraryStackNavigation.goBack}>
-					Cancel
+					{t('common.cancel')}
 				</Button>
 				<SizableText size='6' fontWeight='8'>
-					Year range
+					{t('filters.yearRange')}
 				</SizableText>
 				<Button variant='outlined' size='md' onPress={handleClear} disabled={!hasSelection}>
-					Clear
+					{t('common.clear')}
 				</Button>
 			</XStack>
 
 			<YStack flex={1} padding='4' gap='2'>
 				<SizableText size='5' fontWeight='6' marginBottom='2'>
-					Min year
+					{t('years.min')}
 				</SizableText>
 				<Pressable onPress={handleOpenMin}>
 					<XStack
@@ -162,7 +165,7 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 				</Pressable>
 
 				<SizableText size='5' fontWeight='6' marginBottom='2' marginTop='3'>
-					Max year
+					{t('years.max')}
 				</SizableText>
 				<Pressable onPress={handleOpenMax}>
 					<XStack
@@ -204,7 +207,7 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 							maxHeight='100%'
 						>
 							<SizableText size='5' fontWeight='6' marginBottom='3'>
-								{picking === 'min' ? 'Select min year' : 'Select max year'}
+								{picking === 'min' ? t('years.selectMin') : t('years.selectMax')}
 							</SizableText>
 							<ScrollView
 								style={{ maxHeight: 330 }}
@@ -224,7 +227,7 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 										<SizableText
 											fontWeight={currentValue === ANY ? 'bold' : undefined}
 										>
-											Any
+											{t('common.any')}
 										</SizableText>
 									</XStack>
 								</Pressable>
@@ -267,7 +270,7 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 					</SizableText>
 					<Button variant='outlined' borderColor='primary' size='md' onPress={handleSave}>
 						<Paragraph color='primary' fontWeight='6'>
-							Apply
+							{t('common.apply')}
 						</Paragraph>
 					</Button>
 				</XStack>

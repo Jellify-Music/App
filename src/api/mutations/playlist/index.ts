@@ -27,6 +27,7 @@ import { applyHapticFeedback } from '../../../utils/haptics'
 import { handleError } from '../../../utils/errors'
 import { LoggingContext } from '../../../utils/logging'
 import { AddToPlaylistMutation, RemoveFromPlaylistMutation, UseUpdatePlaylistParams } from './types'
+import i18n from '../../../i18n'
 
 /**
  * Hook to create a new playlist
@@ -52,15 +53,15 @@ export const useAddPlaylist = () => {
 			applyHapticFeedback('success')
 
 			Toast.show({
-				text1: 'Playlist created',
-				text2: `Created playlist ${name}`,
+				text1: i18n.t('playlist.created'),
+				text2: i18n.t('playlist.createdMessage', { name }),
 				type: 'success',
 			})
 
 			libraryStackNavigation.goBack()
 		},
 		onError: (error) => {
-			handleError(error, LoggingContext.Playlist, 'Failed to create playlist')
+			handleError(error, LoggingContext.Playlist, 'createPlaylist')
 		},
 	})
 }
@@ -87,7 +88,7 @@ export const useDeletePlaylist = () => {
 			navigationRef.goBack() // Pop Playlist screen or Context sheet if open
 		},
 		onError: (error) => {
-			handleError(error, LoggingContext.Playlist, 'Failed to delete playlist')
+			handleError(error, LoggingContext.Playlist, 'deletePlaylist')
 		},
 	})
 }
@@ -129,7 +130,7 @@ export const useUpdatePlaylist = ({ onSettled, onError }: UseUpdatePlaylistParam
 			applyHapticFeedback('success')
 		},
 		onError: (error) => {
-			handleError(error, LoggingContext.Playlist, 'Failed to update playlist')
+			handleError(error, LoggingContext.Playlist, 'updatePlaylist')
 			onError?.()
 		},
 		onSettled: onSettled,
@@ -160,11 +161,9 @@ export const useAddToPlaylist = (playlist: BaseItemDto) =>
 			appendPlaylistTracks(playlist, tracks)
 		},
 		onError: (error) => {
-			handleError(
-				error,
-				LoggingContext.Playlist,
-				`Failed to add to ${playlist.Name ?? 'playlist'}`,
-			)
+			handleError(error, LoggingContext.Playlist, 'addToPlaylist', {
+				name: playlist.Name ?? i18n.t('placeholders.untitledPlaylist'),
+			})
 		},
 	})
 
@@ -188,10 +187,8 @@ export const useRemoveFromPlaylist = (playlist: BaseItemDto) =>
 			removePlaylistTracks(playlist, tracks)
 		},
 		onError: (error) => {
-			handleError(
-				error,
-				LoggingContext.Playlist,
-				`Failed to remove from ${playlist.Name ?? 'playlist'}`,
-			)
+			handleError(error, LoggingContext.Playlist, 'removeFromNamedPlaylist', {
+				name: playlist.Name ?? i18n.t('placeholders.untitledPlaylist'),
+			})
 		},
 	})

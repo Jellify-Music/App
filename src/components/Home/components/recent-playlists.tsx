@@ -30,7 +30,7 @@ export default function RecentPlaylists(): React.JSX.Element {
 	const renderItem = ({ item: recentPlaylist }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
 			item={recentPlaylist}
-			caption={recentPlaylist.Name ?? 'Unknown Playlist'}
+			caption={recentPlaylist.Name ?? t('placeholders.unknownPlaylist')}
 			captionAlign='left'
 			subCaption={pickFirstGenre(recentPlaylist.Genres)}
 			onPress={() => {

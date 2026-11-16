@@ -22,6 +22,9 @@ i18n.use(initReactI18next).init({
 	resources,
 	lng: deviceLanguage,
 	fallbackLng: 'en',
+	// Resources are bundled, so initialize synchronously. Navigation options
+	// and services translate strings when their modules load
+	initAsync: false,
 	interpolation: {
 		// React already escapes rendered values
 		escapeValue: false,

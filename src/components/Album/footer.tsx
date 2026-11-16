@@ -14,6 +14,7 @@ import ItemRow from '../Global/components/item-row'
 import { formatArtistNames } from '../../utils/formatting/artist-names'
 import { Freeze } from 'react-freeze'
 import List from '../Global/components/Lists/utils'
+import { useTranslation } from 'react-i18next'
 
 export default function AlbumTrackListFooter({
 	album,
@@ -22,6 +23,8 @@ export default function AlbumTrackListFooter({
 	album: BaseItemDto
 	freeze: boolean
 }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation =
 		useNavigation<
 			NativeStackNavigationProp<
@@ -37,7 +40,7 @@ export default function AlbumTrackListFooter({
 				{album.ArtistItems && album.ArtistItems.length > 1 && (
 					<YStack>
 						<SizableText marginHorizontal='2' fontWeight='6'>
-							Featuring
+							{t('album.featuring')}
 						</SizableText>
 
 						<List
@@ -67,7 +70,7 @@ export default function AlbumTrackListFooter({
 						style={{ flex: 1 }}
 					>
 						<SizableText marginHorizontal='2' fontWeight='6'>
-							Similar Albums
+							{t('album.similarAlbums')}
 						</SizableText>
 						<HorizontalCardList
 							data={suggestions}
@@ -75,7 +78,7 @@ export default function AlbumTrackListFooter({
 								<ItemCard
 									size={'8'}
 									item={album}
-									caption={album.Name ?? 'Unknown Album'}
+									caption={album.Name ?? t('placeholders.unknownAlbum')}
 									subCaption={formatArtistNames(album.Artists ?? [])}
 									onPress={() => {
 										navigation.push('Album', {
@@ -94,7 +97,7 @@ export default function AlbumTrackListFooter({
 										<Spinner alignSelf='center' color='primary' />
 									) : (
 										<SizableText justifyContent='center' textAlign='center'>
-											No similar albums found
+											{t('album.noSimilarAlbums')}
 										</SizableText>
 									)}
 								</YStack>

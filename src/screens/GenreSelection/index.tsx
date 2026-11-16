@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { YStack, XStack, Button, Spinner, Paragraph, SizableText } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useGenres } from '../../api/queries/genre'
@@ -12,8 +12,11 @@ import { useNavigation } from '@react-navigation/native'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 import List from '../../components/Global/components/Lists/utils'
+import { useTranslation } from 'react-i18next'
 
 export default function GenreSelectionScreen(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const genresInfiniteQuery = useGenres()
@@ -28,7 +31,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 		useLibraryStore.getState().filters.tracks.genreIds ?? [],
 	)
 	// Group genres by first letter for A-Z navigation
-	const genresByLetter = useMemo(() => {
+	const genresByLetter = (() => {
 		if (!genres) return new Map<string, BaseItemDto[]>()
 		const grouped = new Map<string, BaseItemDto[]>()
 		genres.forEach((genre) => {
@@ -41,10 +44,10 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 			grouped.get(letter)!.push(genre)
 		})
 		return grouped
-	}, [genres])
+	})()
 
 	// Flatten grouped genres for display, maintaining letter sections
-	const flattenedGenres = useMemo(() => {
+	const flattenedGenres = (() => {
 		const result: (BaseItemDto | string)[] = []
 		const sortedLetters = Array.from(genresByLetter.keys()).sort((a, b) => {
 			if (a === '#') return -1 // "#" goes to the top
@@ -62,7 +65,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 			result.push(...letterGenres)
 		})
 		return result
-	}, [genresByLetter])
+	})()
 
 	const toggleGenre = (genreId: string) => {
 		applyHapticFeedback('info')
@@ -113,7 +116,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 			onPress={handleSelectAll}
 		>
 			<YStack flex={1}>
-				<SizableText fontWeight='6'>Select all</SizableText>
+				<SizableText fontWeight='6'>{t('genres.selectAll')}</SizableText>
 				{genres != null && (
 					<SizableText color='borderColor'>{`${allLoadedGenreIds.length} genres`}</SizableText>
 				)}
@@ -189,10 +192,10 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 				borderBottomColor='borderColor'
 			>
 				<Button variant='outlined' size='sm' onPress={libraryStackNavigation.goBack}>
-					Cancel
+					{t('common.cancel')}
 				</Button>
 				<SizableText fontWeight='6' size='6'>
-					Select Genres
+					{t('genres.title')}
 				</SizableText>
 				<Button
 					variant='outlined'
@@ -200,7 +203,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 					onPress={handleClear}
 					disabled={selectedGenreIds.length === 0}
 				>
-					Clear
+					{t('common.clear')}
 				</Button>
 			</XStack>
 
@@ -216,7 +219,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 				}}
 				ListEmptyComponent={
 					<YStack flex={1} justifyContent='center' alignItems='center' padding='4'>
-						<SizableText color='borderColor'>No genres found</SizableText>
+						<SizableText color='borderColor'>{t('genres.none')}</SizableText>
 					</YStack>
 				}
 			/>
@@ -236,7 +239,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 					>{`${selectedGenreIds.length} selected`}</SizableText>
 					<Button variant='outlined' borderColor='primary' size='sm' onPress={handleSave}>
 						<Paragraph fontWeight='6' color='primary'>
-							Apply
+							{t('common.apply')}
 						</Paragraph>
 					</Button>
 				</XStack>
