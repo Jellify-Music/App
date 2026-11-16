@@ -18,7 +18,7 @@ const FAVORITE_BUTTON_ID = 'favorite'
 
 /**
  * A favorite toggle in the system media controls: Control Center and the
- * Lock Screen on iOS, the media notification and Android Auto on Android
+ * Lock Screen and CarPlay on iOS, the media notification and Android Auto on Android
  */
 export const notificationButtons: NotificationButtons = {
 	android: [
@@ -31,6 +31,7 @@ export const notificationButtons: NotificationButtons = {
 	],
 	ios: {
 		lockScreen: [{ id: FAVORITE_BUTTON_ID, title: 'Favorite', command: 'like' }],
+		carPlay: [{ id: FAVORITE_BUTTON_ID, icon: 'heart', activeIcon: 'heart.fill' }],
 	},
 }
 
