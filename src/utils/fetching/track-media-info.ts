@@ -35,13 +35,9 @@ export default async function resolveTrackUrls(
 			return track
 		}
 
-		const transcodingUrl = playbackInfo.MediaSources?.[0]?.TranscodingUrl
-
 		return {
 			...track,
-			url: transcodingUrl
-				? buildTranscodedAudioApiUrl(playbackInfo)
-				: buildAudioApiUrl(getTrackDto(track)!, playbackInfo),
+			url: buildStreamUrl(track, playbackInfo),
 			duration: playbackInfo.MediaSources?.[0]?.RunTimeTicks
 				? convertRunTimeTicksToSeconds(playbackInfo.MediaSources[0].RunTimeTicks)
 				: track.duration,
@@ -57,3 +53,35 @@ export default async function resolveTrackUrls(
 
 	return updatedTracks
 }
+
+/**
+ * Fetches the URLs a Cast receiver plays, using the Cast device profile so formats it can't
+ * decode (ALAC) are transcoded.
+ *
+ * @returns The Cast URL for each track whose playback info was fetched, keyed by track id
+ */
+export async function resolveCastUrls(
+	trackItems: TrackItem[],
+	signal?: AbortSignal,
+): Promise<Record<string, string>> {
+	const castUrlEntries = await Promise.allSettled(
+		trackItems.map(async (track) => {
+			const playbackInfo = await queryForMediaInfo(track.id, 'cast', signal)
+			return [track.id, buildStreamUrl(track, playbackInfo)] as [string, string]
+		}),
+	)
+
+	return Object.fromEntries(
+		castUrlEntries
+			.filter(
+				(entry): entry is PromiseFulfilledResult<[string, string]> =>
+					entry.status === 'fulfilled',
+			)
+			.map((entry) => entry.value),
+	)
+}
+
+const buildStreamUrl = (track: TrackItem, playbackInfo: PlaybackInfoResponse) =>
+	playbackInfo.MediaSources?.[0]?.TranscodingUrl
+		? buildTranscodedAudioApiUrl(playbackInfo)
+		: buildAudioApiUrl(getTrackDto(track)!, playbackInfo)

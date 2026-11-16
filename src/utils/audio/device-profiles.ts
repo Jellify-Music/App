@@ -76,8 +76,36 @@ export function getDeviceProfile(
 	streamingQuality: StreamingQuality,
 	type: SourceType,
 ): DeviceProfile {
+	return buildDeviceProfile(
+		streamingQuality,
+		PLAYER_PROFILES,
+		capitalize(type),
+		getTranscodingProfiles(PLAYER_PROFILES, type),
+	)
+}
+
+/**
+ * Builds the {@link DeviceProfile} used while casting. The Cast receiver fetches and decodes
+ * the stream itself, so it gets its own codec support instead of the phone's.
+ *
+ * @param streamingQuality The {@link StreamingQuality} defined by the user in the settings
+ */
+export function getCastDeviceProfile(streamingQuality: StreamingQuality): DeviceProfile {
+	return buildDeviceProfile(
+		streamingQuality,
+		CAST_PLAYER_PROFILES,
+		'Cast',
+		CAST_PLAYER_PROFILES.TranscodingProfiles!,
+	)
+}
+
+function buildDeviceProfile(
+	streamingQuality: StreamingQuality,
+	profiles: DeviceProfile,
+	name: string,
+	transcodingProfiles: DeviceProfile['TranscodingProfiles'],
+): DeviceProfile {
 	const qualityParams = getQualityParams(streamingQuality)
-	const profiles = PLAYER_PROFILES
 
 	const directPlayProfiles =
 		qualityParams == null
@@ -90,7 +118,7 @@ export function getDeviceProfile(
 
 	return {
 		Id: uuid.v4(),
-		Name: `${capitalize(streamingQuality)} Quality Audio ${capitalize(type)}`,
+		Name: `${capitalize(streamingQuality)} Quality Audio ${name}`,
 		MaxStaticBitrate:
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		MaxStreamingBitrate:
@@ -99,7 +127,7 @@ export function getDeviceProfile(
 		MaxStaticMusicBitrate:
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
-		TranscodingProfiles: getTranscodingProfiles(profiles, type),
+		TranscodingProfiles: transcodingProfiles,
 		CodecProfiles: profiles.CodecProfiles,
 	} as DeviceProfile
 }
@@ -229,6 +257,34 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
 			Type: DlnaProfileType.Audio,
 		},
 	],
+}
+
+/**
+ * What a Google Cast receiver can decode. ALAC isn't supported, so it's transcoded to MP3,
+ * which every receiver plays.
+ *
+ * Progressive rather than HLS: the default receiver can't tell an audio-only HLS stream's
+ * segment format without being told.
+ */
+const CAST_PLAYER_PROFILES: DeviceProfile = {
+	DirectPlayProfiles: [
+		...UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles!,
+		{
+			Container: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			AudioCodec: 'aac',
+			Container: 'm4a',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			AudioCodec: 'aac',
+			Container: 'mp4',
+			Type: DlnaProfileType.Audio,
+		},
+	],
+	TranscodingProfiles: UNIVERSAL_PLAYER_PROFILES.TranscodingProfiles,
 }
 
 /**

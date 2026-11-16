@@ -1,5 +1,5 @@
 import { isUndefined } from 'lodash'
-import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
+import { TrackPlayer, PlayerQueue, Cast } from 'react-native-nitro-player'
 import { clearQueueStore, usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import {
@@ -8,6 +8,7 @@ import {
 	onPlaybackStateChange,
 	onSeek,
 	onTracksNeedUpdate,
+	onTracksNeedCastUrls,
 } from './event-handlers'
 import navigationRef from '../../../screens/navigation'
 import { captureError } from '../../../utils/logging'
@@ -15,10 +16,11 @@ import LoggingContext from '../../../utils/logging/enums'
 import {
 	useStreamingDeviceProfileStore,
 	useDownloadingDeviceProfileStore,
+	useCastDeviceProfileStore,
 } from '../../../stores/profile'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
-import { getDeviceProfile } from '../../../utils/audio/device-profiles'
+import { getCastDeviceProfile, getDeviceProfile } from '../../../utils/audio/device-profiles'
 import { updateTrackMediaInfo } from './track-media-info'
 
 /**
@@ -37,10 +39,14 @@ export function syncDeviceProfiles() {
 	useDownloadingDeviceProfileStore
 		.getState()
 		.setDeviceProfile(getDeviceProfile(downloadQuality, 'download'))
+
+	useCastDeviceProfileStore.getState().setDeviceProfile(getCastDeviceProfile(streamingQuality))
 }
 
 export function registerPlayerEventHandlers() {
 	TrackPlayer.onTracksNeedUpdate(onTracksNeedUpdate)
+
+	Cast.onTracksNeedCastUrls(onTracksNeedCastUrls)
 
 	TrackPlayer.onChangeTrack(onChangeTrack)
 

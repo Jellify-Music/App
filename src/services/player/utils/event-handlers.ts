@@ -2,6 +2,7 @@ import reportPlaybackProgress from '../../../api/mutations/playback/functions/pl
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
 import {
+	Cast,
 	PlayerQueue,
 	TrackPlayer,
 	Reason,
@@ -15,6 +16,7 @@ import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
+import { resolveCastUrls } from '../../../utils/fetching/track-media-info'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -55,6 +57,25 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
 	console.debug(`[Player Event] Updating media info for track lookahead ${tracksToUpdate.length}`)
 
 	await updateTrackMediaInfo(tracksToUpdate)
+}
+
+/**
+ * An event handler for the {@link Cast.onTracksNeedCastUrls} event.
+ * Called while casting for the current and upcoming tracks the receiver has no URL for.
+ *
+ * The receiver fetches and decodes the stream itself, so its URLs come from the Cast device
+ * profile rather than the one this device plays.
+ *
+ * @param tracks The {@link TrackItem}s that need Cast URLs
+ */
+export async function onTracksNeedCastUrls(tracks: TrackItem[]) {
+	if (tracks.length === 0) return
+
+	try {
+		await Cast.setCastUrls(await resolveCastUrls(tracks))
+	} catch (error) {
+		captureError(error, LoggingContext.NitroPlayer, 'Failed to resolve Cast URLs')
+	}
 }
 
 /**

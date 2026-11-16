@@ -2,6 +2,7 @@ import MediaInfoQueryKey from './keys'
 import { fetchMediaInfo } from './utils'
 import { getApi } from '../../../stores/auth/utils'
 import {
+	useCastDeviceProfileStore,
 	useDownloadingDeviceProfileStore,
 	useStreamingDeviceProfileStore,
 } from '../../../stores/profile'
@@ -11,16 +12,30 @@ import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/
 import { QueryExecuteOptions } from '@tanstack/react-query'
 import { QueryAges } from '../../../constants/durations'
 
+/**
+ * Where the stream plays: on this device, as a download, or on a Cast receiver
+ */
+export type MediaInfoSource = SourceType | 'cast'
+
+const deviceProfileFor = (source: MediaInfoSource) => {
+	switch (source) {
+		case 'download':
+			return useDownloadingDeviceProfileStore.getState().deviceProfile
+		case 'cast':
+			return useCastDeviceProfileStore.getState().deviceProfile
+		default:
+			return useStreamingDeviceProfileStore.getState().deviceProfile
+	}
+}
+
 export const MediaInfoQuery = (
 	itemId: string | null | undefined,
-	source: SourceType,
+	source: MediaInfoSource,
 	signal?: AbortSignal,
 ) => {
 	const api = getApi()
 
-	const streamingProfile = useStreamingDeviceProfileStore.getState().deviceProfile
-	const downloadingProfile = useDownloadingDeviceProfileStore.getState().deviceProfile
-	const profile = source === 'stream' ? streamingProfile : downloadingProfile
+	const profile = deviceProfileFor(source)
 
 	return {
 		queryKey: MediaInfoQueryKey({
@@ -42,7 +57,7 @@ export const MediaInfoQuery = (
 
 export default async function queryForMediaInfo(
 	itemId: string | null | undefined,
-	source: SourceType,
+	source: MediaInfoSource,
 	signal?: AbortSignal,
 ) {
 	return await queryClient.query<PlaybackInfoResponse>(MediaInfoQuery(itemId, source, signal))

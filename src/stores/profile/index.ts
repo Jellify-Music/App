@@ -2,7 +2,7 @@ import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { mmkvStateStorage } from '../../constants/storage'
-import { getDeviceProfile } from '../../utils/audio/device-profiles'
+import { getCastDeviceProfile, getDeviceProfile } from '../../utils/audio/device-profiles'
 import { StreamingQuality } from '../../enums/audio-quality'
 import { DeviceProfileStore } from './types'
 import { setStreamingDeviceProfile } from './utils/set'
@@ -54,3 +54,17 @@ export const useDownloadingDeviceProfileStore = create<DeviceProfileStore>()(
 export const useDownloadingDeviceProfile = () => {
 	return useDownloadingDeviceProfileStore((state) => state.deviceProfile)
 }
+
+/**
+ * The profile used to fetch stream URLs while casting. Rebuilt from the streaming quality on
+ * startup, so it isn't persisted.
+ */
+export const useCastDeviceProfileStore = create<DeviceProfileStore>()(
+	devtools(
+		(set) => ({
+			deviceProfile: getCastDeviceProfile(StreamingQuality.Original),
+			setDeviceProfile: (data: DeviceProfile) => set({ deviceProfile: data }),
+		}),
+		{ name: 'cast-device-profile-store' },
+	),
+)

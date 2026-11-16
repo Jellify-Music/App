@@ -1,5 +1,5 @@
-import { useStreamingDeviceProfileStore } from '../../../profile'
-import { getDeviceProfile } from '../../../../utils/audio/device-profiles'
+import { useCastDeviceProfileStore, useStreamingDeviceProfileStore } from '../../../profile'
+import { getCastDeviceProfile, getDeviceProfile } from '../../../../utils/audio/device-profiles'
 import type { PlayerSettingsStoreSet } from '../types'
 import { PlayerSettingsStore } from '../types'
 import { usePlayerQueueStore } from '../../../../stores/player/queue'
@@ -13,6 +13,9 @@ export const setStreamingQuality =
 		useStreamingDeviceProfileStore
 			.getState()
 			.setDeviceProfile(getDeviceProfile(streamingQuality, 'stream'))
+		useCastDeviceProfileStore
+			.getState()
+			.setDeviceProfile(getCastDeviceProfile(streamingQuality))
 	}
 
 /**

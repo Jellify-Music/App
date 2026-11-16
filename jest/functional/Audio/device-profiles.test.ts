@@ -268,3 +268,56 @@ describe('Transcoding protocol', () => {
 		}
 	})
 })
+
+describe('Cast', () => {
+	const castProfileFor = (os: string, quality: StreamingQuality): DeviceProfile => {
+		let profile: DeviceProfile | undefined
+		jest.isolateModules(() => {
+			const { Platform } = require('react-native')
+			Platform.OS = os
+			profile = require('../../../src/utils/audio/device-profiles').getCastDeviceProfile(
+				quality,
+			)
+		})
+		return profile!
+	}
+
+	const castDirectPlays = (
+		os: string,
+		quality: StreamingQuality,
+		container: string,
+		codec?: string,
+	): boolean =>
+		castProfileFor(os, quality).DirectPlayProfiles!.some(
+			(p) =>
+				p.Container!.split(',').includes(container) &&
+				(p.AudioCodec === undefined || p.AudioCodec === codec),
+		)
+
+	it('names the profile after the quality', () => {
+		expect(castProfileFor('ios', StreamingQuality.High).Name).toBe('High Quality Audio Cast')
+	})
+
+	it.each(['ios', 'android'])('transcodes ALAC, which receivers cannot decode, on %s', (os) => {
+		expect(castDirectPlays(os, StreamingQuality.Original, 'm4a', 'alac')).toBe(false)
+		expect(castDirectPlays(os, StreamingQuality.Original, 'm4b', 'alac')).toBe(false)
+	})
+
+	it.each(['ios', 'android'])('direct plays what receivers decode on %s', (os) => {
+		expect(castDirectPlays(os, StreamingQuality.Original, 'mp3')).toBe(true)
+		expect(castDirectPlays(os, StreamingQuality.Original, 'flac')).toBe(true)
+		expect(castDirectPlays(os, StreamingQuality.Original, 'm4a', 'aac')).toBe(true)
+	})
+
+	it.each(LOSSY_QUALITIES)('transcodes lossless formats at %s quality', (quality) => {
+		expect(castDirectPlays('ios', quality, 'flac')).toBe(false)
+		expect(castDirectPlays('ios', quality, 'wav')).toBe(false)
+		expect(castProfileFor('ios', quality).MusicStreamingTranscodingBitrate).toBeDefined()
+	})
+
+	it.each(['ios', 'android'])('transcodes to progressive MP3 on %s', (os) => {
+		expect(castProfileFor(os, StreamingQuality.Original).TranscodingProfiles).toEqual([
+			expect.objectContaining({ AudioCodec: 'mp3', Container: 'mp3', Protocol: 'http' }),
+		])
+	})
+})
