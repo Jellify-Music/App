@@ -5,6 +5,7 @@ import { getItemName } from '../../../../utils/formatting/item-names'
 import { useArtist } from '../../../../api/queries/artist'
 import { ArtistMenuRowsProps, ViewArtistMenuRowProps } from './types'
 import ContextMenuRow from '..'
+import { useTranslation } from 'react-i18next'
 
 export default function ArtistMenuRows({
 	artistIds,
@@ -23,6 +24,8 @@ function ViewArtistMenuRow({
 	artistId,
 	stackNavigation,
 }: ViewArtistMenuRowProps): React.JSX.Element | null {
+	const { t } = useTranslation()
+
 	const { data: artist } = useArtist(artistId)
 
 	const goToArtist = (artist: BaseItemDto) => {
@@ -33,7 +36,7 @@ function ViewArtistMenuRow({
 	return artist ? (
 		<ContextMenuRow
 			imageProp={{ imageType: ImageType.Primary, item: artist, circular: true }}
-			label={`Go to ${getItemName(artist)}`}
+			label={t('context.goTo', { name: getItemName(artist) })}
 			onPress={() => goToArtist(artist)}
 		/>
 	) : null

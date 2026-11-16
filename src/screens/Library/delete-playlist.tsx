@@ -6,8 +6,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useDeletePlaylist } from '../../api/mutations/playlist'
+import { useTranslation } from 'react-i18next'
 
 export default function DeletePlaylist({ route }: LibraryDeletePlaylistProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const deletePlaylist = useDeletePlaylist()
@@ -17,7 +20,9 @@ export default function DeletePlaylist({ route }: LibraryDeletePlaylistProps): R
 	return (
 		<YStack margin='4' gap='4' justifyContent='space-between' marginBottom={bottom}>
 			<SizableText fontWeight='6' textAlign='center'>
-				{`Delete playlist ${route.params.playlist.Name ?? 'Untitled Playlist'}?`}
+				{t('playlist.deleteConfirm', {
+					name: route.params.playlist.Name ?? t('placeholders.untitledPlaylist'),
+				})}
 			</SizableText>
 			<XStack justifyContent='space-evenly' gap='2'>
 				<Button
@@ -28,7 +33,7 @@ export default function DeletePlaylist({ route }: LibraryDeletePlaylistProps): R
 					icon={() => <Icon name='chevron-left' size='7' color={'borderColor'} />}
 				>
 					<SizableText fontWeight='6' color={'borderColor'}>
-						Cancel
+						{t('common.cancel')}
 					</SizableText>
 				</Button>
 				<Button
@@ -47,7 +52,7 @@ export default function DeletePlaylist({ route }: LibraryDeletePlaylistProps): R
 						<Spinner color='warning' />
 					) : (
 						<SizableText fontWeight='6' color={'warning'}>
-							Delete
+							{t('common.delete')}
 						</SizableText>
 					)}
 				</Button>

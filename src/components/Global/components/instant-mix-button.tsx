@@ -7,6 +7,7 @@ import Button from '../utils/button'
 import { CommonActions } from '@react-navigation/native'
 import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { SizableText } from 'tamagui'
+import { useTranslation } from 'react-i18next'
 
 export function InstantMixIconButton({
 	item,
@@ -35,6 +36,8 @@ export function InstantMixButton({
 	item: BaseItemDto
 	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	return (
 		<Button
 			borderRadius={'2'}
@@ -52,7 +55,7 @@ export function InstantMixButton({
 			{...BUTTON_PRESS_STYLES}
 		>
 			<SizableText fontSize={'2'} fontWeight='6' color='success'>
-				Mix
+				{t('common.mix')}
 			</SizableText>
 		</Button>
 	)

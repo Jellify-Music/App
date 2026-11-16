@@ -15,6 +15,7 @@ import {
 } from 'react'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { SortableReorderEvent } from 'react-native-drax'
+import { useTranslation } from 'react-i18next'
 
 interface PlaylistContext {
 	playlist: BaseItemDto
@@ -74,11 +75,15 @@ interface PlaylistProviderProps {
 }
 
 export const PlaylistProvider = ({ playlist, canEdit, children }: PlaylistProviderProps) => {
+	const { t } = useTranslation()
+
 	const playlistTrackIds = useRef<string[]>([])
 
 	const [editing, setEditing] = useState<boolean>(false)
 
-	const [newName, setNewName] = useState<string>(playlist.Name ?? 'Untitled Playlist')
+	const [newName, setNewName] = useState<string>(
+		playlist.Name ?? t('placeholders.untitledPlaylist'),
+	)
 
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[]>([])
 

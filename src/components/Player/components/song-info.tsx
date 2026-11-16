@@ -15,8 +15,11 @@ import { RootStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { PlayerParamList } from '@/src/screens/Player/types'
 import navigationRef from '../../../screens/navigation'
+import { useTranslation } from 'react-i18next'
 
 export default function SongInfo(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const currentTrack = useCurrentTrack()
 
 	const rootStackNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -29,7 +32,7 @@ export default function SongInfo(): React.JSX.Element {
 	)
 
 	// Memoize expensive computations
-	const trackTitle = currentTrack?.title ?? 'Untitled Track'
+	const trackTitle = currentTrack?.title ?? t('placeholders.untitledTrack')
 
 	const handleTrackPress = () => {
 		if (album) {
@@ -100,7 +103,7 @@ export default function SongInfo(): React.JSX.Element {
 								{...ICON_PRESS_STYLES}
 								onPress={handleArtistPress}
 							>
-								{currentTrack?.artist ?? 'Unknown Artist'}
+								{currentTrack?.artist ?? t('placeholders.unknownArtist')}
 							</SizableText>
 							{isExplicit(item) && (
 								<XStack alignSelf='center' paddingTop={5.3} paddingLeft='1'>

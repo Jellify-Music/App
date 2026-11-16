@@ -8,8 +8,11 @@ import { useAddPlaylist } from '../../api/mutations/playlist'
 import LibraryStackParamList from './types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 
 export default function AddPlaylist(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const [name, setName] = useState<string>('')
@@ -20,7 +23,7 @@ export default function AddPlaylist(): React.JSX.Element {
 		<YStack margin='4' flex={1} gap='4'>
 			<YStack gap='2'>
 				<Label size='2' htmlFor='name' fontWeight='6' justifyContent='flex-end'>
-					Name
+					{t('playlist.name')}
 				</Label>
 				<Input id='name' onChangeText={setName} />
 			</YStack>
@@ -34,7 +37,7 @@ export default function AddPlaylist(): React.JSX.Element {
 					icon={<Icon name='chevron-left' size='6' color={'borderColor'} />}
 				>
 					<SizableText fontSize='2' fontWeight='6' color={'borderColor'}>
-						Cancel
+						{t('common.cancel')}
 					</SizableText>
 				</Button>
 				<Button
@@ -53,7 +56,7 @@ export default function AddPlaylist(): React.JSX.Element {
 						<Spinner color='primary' />
 					) : (
 						<SizableText fontSize='2' fontWeight='6' color={'primary'}>
-							Save
+							{t('common.save')}
 						</SizableText>
 					)}
 				</Button>

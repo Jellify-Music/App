@@ -16,6 +16,7 @@ import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mut
 import { useAlbumDiscs } from '../../api/queries/album'
 import { ItemKeyExtractor } from '../../utils/parsing/key-extractor'
 import AlbumSectionHeader from './section-header'
+import { useTranslation } from 'react-i18next'
 
 /**
  * The screen for an Album's track list
@@ -26,6 +27,8 @@ import AlbumSectionHeader from './section-header'
  * @returns A React component
  */
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const theme = useTheme()
@@ -132,7 +135,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 							textAlign='center'
 							color='borderColor'
 						>
-							No album tracks
+							{t('album.noTracks')}
 						</SizableText>
 					)}
 				</YStack>

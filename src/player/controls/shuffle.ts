@@ -22,6 +22,7 @@ import LoggingContext from '../../utils/logging/enums'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { handleError } from '../../utils/errors'
+import i18n from '../../i18n'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
@@ -45,7 +46,7 @@ export async function handleLibraryShuffle() {
 
 		if (!api || !user || !deviceProfile) {
 			Toast.show({
-				text1: 'Unable to fetch random tracks',
+				text1: i18n.t('shuffle.fetchFailed'),
 				type: 'error',
 			})
 		} else {
@@ -65,7 +66,7 @@ export async function handleLibraryShuffle() {
 			if (isDownloaded) {
 				if (!downloadedTracks || downloadedTracks.length === 0) {
 					Toast.show({
-						text1: 'No downloaded tracks available',
+						text1: i18n.t('shuffle.noDownloads'),
 						type: 'info',
 					})
 					return { currentIndex: 0, queue: [] }
@@ -157,7 +158,7 @@ export async function handleLibraryShuffle() {
 				const finalQueue: TrackItem[] = randomTracks
 
 				if (finalQueue.length === 0) {
-					Toast.show({ text1: 'No tracks to shuffle', type: 'info' })
+					Toast.show({ text1: i18n.t('shuffle.noTracks'), type: 'info' })
 					return { currentIndex: 0, queue: [] }
 				}
 
@@ -181,7 +182,7 @@ export async function handleLibraryShuffle() {
 			}
 		}
 	} catch (error) {
-		handleError(error, LoggingContext.NitroFetch, 'Failed to fetch random tracks')
+		handleError(error, LoggingContext.NitroFetch, 'fetchRandomTracks')
 	}
 }
 
@@ -194,7 +195,7 @@ export async function handleShuffle(): Promise<ShuffleResult | undefined> {
 
 	if (!playQueue || playQueue.length <= 1) {
 		Toast.show({
-			text1: 'Nothing to shuffle',
+			text1: i18n.t('shuffle.nothing'),
 			type: 'info',
 		})
 		return { currentIndex: currentIndex ?? 0, queue: playQueue ?? [] }
@@ -202,7 +203,7 @@ export async function handleShuffle(): Promise<ShuffleResult | undefined> {
 
 	if (isUndefined(currentIndex) || !currentTrack) {
 		Toast.show({
-			text1: 'No track currently playing',
+			text1: i18n.t('shuffle.nothingPlaying'),
 			type: 'info',
 		})
 		return { currentIndex: currentIndex ?? 0, queue: playQueue }
@@ -224,7 +225,7 @@ export async function handleShuffle(): Promise<ShuffleResult | undefined> {
 
 		updatedQueue = tracks
 	} catch (error) {
-		handleError(error, LoggingContext.NitroFetch, 'Failed to shuffle queue')
+		handleError(error, LoggingContext.NitroFetch, 'shuffleQueue')
 		return undefined
 	}
 
@@ -285,7 +286,7 @@ export async function handleDeshuffle(): Promise<ShuffleResult | undefined> {
 			await PlayerQueue.addTracksToPlaylist(playlistId, nextUnshuffledItems)
 		}
 	} catch (error) {
-		handleError(error, LoggingContext.NitroFetch, 'Failed to unshuffle queue')
+		handleError(error, LoggingContext.NitroFetch, 'unshuffleQueue')
 		return undefined
 	}
 

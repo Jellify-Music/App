@@ -4,8 +4,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import ActionChip from '../../components/Settings/components/sections/action-chip'
 import { useSwipeSettingsStore } from '../../stores/settings/gestures'
+import { useTranslation } from 'react-i18next'
 
 export default function GesturesScreen(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { bottom } = useSafeAreaInsets()
 	const left = useSwipeSettingsStore((s) => s.left)
 	const right = useSwipeSettingsStore((s) => s.right)
@@ -27,41 +30,41 @@ export default function GesturesScreen(): React.JSX.Element {
 					margin='2'
 				>
 					<SizableText color='borderColor' fontSize='2'>
-						Single selection triggers on reveal; multiple selections show a menu.
+						{t('settings.gestures.description')}
 					</SizableText>
 
 					<Separator borderColor='borderColor' />
 
 					<YStack gap='3'>
 						<SizableText fontSize='3' fontWeight='6'>
-							Swipe Left
+							{t('settings.gestures.swipeLeft')}
 						</SizableText>
 						<XStack gap='2' flexWrap='wrap'>
 							<ActionChip
 								testID='swipe-left-chip-favorite'
 								active={left.includes('ToggleFavorite')}
-								label='Favorite'
+								label={t('settings.gestures.favorite')}
 								icon='heart'
 								onPress={() => toggleLeft('ToggleFavorite')}
 							/>
 							<ActionChip
 								testID='swipe-left-chip-add-to-playlist'
 								active={left.includes('AddToPlaylist')}
-								label='Add to Playlist'
+								label={t('context.addToPlaylist')}
 								icon='plus-circle-outline'
 								onPress={() => toggleLeft('AddToPlaylist')}
 							/>
 							<ActionChip
 								testID='swipe-left-chip-add-to-queue'
 								active={left.includes('AddToQueue')}
-								label='Play Later'
+								label={t('context.playLater')}
 								icon='playlist-play'
 								onPress={() => toggleLeft('AddToQueue')}
 							/>
 							<ActionChip
 								testID='swipe-left-chip-play-next'
 								active={left.includes('PlayNext')}
-								label='Play Next'
+								label={t('context.playNext')}
 								icon='playlist-music'
 								onPress={() => toggleLeft('PlayNext')}
 							/>
@@ -70,34 +73,34 @@ export default function GesturesScreen(): React.JSX.Element {
 
 					<YStack gap='3'>
 						<SizableText fontSize='3' fontWeight='6'>
-							Swipe Right
+							{t('settings.gestures.swipeRight')}
 						</SizableText>
 						<XStack gap='2' flexWrap='wrap'>
 							<ActionChip
 								testID='swipe-right-chip-favorite'
 								active={right.includes('ToggleFavorite')}
-								label='Favorite'
+								label={t('settings.gestures.favorite')}
 								icon='heart'
 								onPress={() => toggleRight('ToggleFavorite')}
 							/>
 							<ActionChip
 								testID='swipe-right-chip-add-to-playlist'
 								active={right.includes('AddToPlaylist')}
-								label='Add to Playlist'
+								label={t('context.addToPlaylist')}
 								icon='plus-circle-outline'
 								onPress={() => toggleRight('AddToPlaylist')}
 							/>
 							<ActionChip
 								testID='swipe-right-chip-add-to-queue'
 								active={right.includes('AddToQueue')}
-								label='Play Later'
+								label={t('context.playLater')}
 								icon='playlist-play'
 								onPress={() => toggleRight('AddToQueue')}
 							/>
 							<ActionChip
 								testID='swipe-right-chip-play-next'
 								active={right.includes('PlayNext')}
-								label='Play Next'
+								label={t('context.playNext')}
 								icon='playlist-music'
 								onPress={() => toggleRight('PlayNext')}
 							/>

@@ -97,7 +97,7 @@ export const useAddFavorite = () => {
 			invalidateRelevantQueries(item)
 		},
 		onError: (error) => {
-			handleError(error, LoggingContext.Favorites, 'Failed to add favorite')
+			handleError(error, LoggingContext.Favorites, 'addFavorite')
 		},
 	})
 }
@@ -126,7 +126,7 @@ export const useRemoveFavorite = () => {
 			invalidateRelevantQueries(item)
 		},
 		onError: (error) => {
-			handleError(error, LoggingContext.Favorites, 'Failed to remove favorite')
+			handleError(error, LoggingContext.Favorites, 'removeFavorite')
 		},
 	})
 }

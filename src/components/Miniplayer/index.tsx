@@ -16,8 +16,11 @@ import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { previous, skip } from '../../player/controls'
 import { PAN_GESTURE_THRESHOLD } from '../../configs/gesturing/miniplayer'
 import MiniPlayerProgress from './progress'
+import { useTranslation } from 'react-i18next'
 
 export default function Miniplayer(): React.JSX.Element | null {
+	const { t } = useTranslation()
+
 	const nowPlaying = useCurrentTrack()
 	const item = getTrackDto(nowPlaying)
 	const payload = getTypedExtraPayload(nowPlaying)
@@ -113,13 +116,13 @@ export default function Miniplayer(): React.JSX.Element | null {
 							>
 								<Ticker>
 									<SizableText fontWeight='6' fontSize='2'>
-										{nowPlaying.title ?? 'Nothing Playing'}
+										{nowPlaying.title ?? t('player.nothingPlaying')}
 									</SizableText>
 								</Ticker>
 
 								<Ticker>
 									<SizableText fontSize='2'>
-										{nowPlaying.artist ?? 'Unknown Artist'}
+										{nowPlaying.artist ?? t('placeholders.unknownArtist')}
 									</SizableText>
 								</Ticker>
 							</Animated.View>

@@ -13,8 +13,11 @@ import { useDeveloperOptionsEnabled, usePrId } from '../../stores/settings/devel
 import { downloadPRUpdate } from '../../services/ota/pull-request'
 import SendMetricsAndCrashDataSetting from '../../components/Settings/components/settings/send-metrics-and-crash-data'
 import { applyHapticFeedback } from '../../utils/haptics'
+import { useTranslation } from 'react-i18next'
 
 export default function PrivacyDeveloperScreen(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { bottom } = useSafeAreaInsets()
 
 	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
@@ -28,7 +31,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 		const trimmed = localPrId.trim()
 		const parsed = Number(trimmed)
 		if (!trimmed || !Number.isInteger(parsed) || parsed <= 0) {
-			Alert.alert('Error', 'Please enter a valid PR ID (a positive integer)')
+			Alert.alert(t('common.error'), t('settings.developer.invalidPrId'))
 			return
 		}
 		setPrId(trimmed)
@@ -47,7 +50,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 				testID='settings-screen-privacy-developer'
 			>
 				<SettingsSection
-					title='Privacy'
+					title={t('settings.privacy.title')}
 					icon='shield-account'
 					iconColor='success'
 					defaultExpanded
@@ -58,10 +61,10 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
 							<SizableText fontSize='3' fontWeight='6'>
-								Reduce Haptics
+								{t('settings.privacy.reduceHaptics')}
 							</SizableText>
 							<SizableText fontSize='2' color='borderColor'>
-								Reduce haptic feedback intensity
+								{t('settings.privacy.reduceHapticsDescription')}
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel
@@ -73,7 +76,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 				</SettingsSection>
 
 				<SettingsSection
-					title='Developer'
+					title={t('settings.developer.title')}
 					icon='code-braces'
 					iconColor='borderColor'
 					defaultExpanded
@@ -82,10 +85,10 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
 							<SizableText fontSize='3' fontWeight='6'>
-								Developer Options
+								{t('settings.developer.options')}
 							</SizableText>
 							<SizableText fontSize='2' color='borderColor'>
-								Enable advanced developer features
+								{t('settings.developer.optionsDescription')}
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel
@@ -99,11 +102,11 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 					{developerOptionsEnabled && (
 						<YStack gap='2' paddingTop='1'>
 							<SizableText fontSize='2' color='borderColor'>
-								Enter PR ID to test pull request builds
+								{t('settings.developer.prIdDescription')}
 							</SizableText>
 							<XStack gap='2' alignItems='center'>
 								<Input
-									placeholder='Enter PR ID'
+									placeholder={t('settings.developer.prIdPlaceholder')}
 									value={localPrId}
 									onChangeText={setLocalPrId}
 									keyboardType='numeric'
@@ -118,7 +121,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 							</XStack>
 							{prId && (
 								<SizableText color='success' fontSize='2'>
-									Current PR ID: {prId}
+									{t('settings.developer.currentPrId')} {prId}
 								</SizableText>
 							)}
 						</YStack>

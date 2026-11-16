@@ -17,6 +17,7 @@ import { applyHapticFeedback } from '../../utils/haptics'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 import { loginStyles } from './styles'
 import Button from '../Global/utils/button'
+import { useTranslation } from 'react-i18next'
 
 // Handles polling, code display, error, and authentication
 function QuickConnectDisplay({
@@ -28,6 +29,8 @@ function QuickConnectDisplay({
 	code: string
 	onExpired: () => void
 }) {
+	const { t } = useTranslation()
+
 	const [copyIconName, setCopyIconName] =
 		useState<MaterialDesignIconsIconName>('clipboard-outline')
 
@@ -45,7 +48,7 @@ function QuickConnectDisplay({
 		setCopyIconName('check')
 		Toast.show({
 			type: 'info',
-			text1: 'Coped to Clipboard',
+			text1: t('login.copiedToClipboard'),
 		})
 		setTimeout(() => setCopyIconName('clipboard-outline'), 1500)
 	}
@@ -97,6 +100,8 @@ function QuickConnectDisplay({
 
 // Initiates quick connect, manages secret/code state, and renders display
 export default function QuickConnectInitiator() {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
 	const {
@@ -128,7 +133,7 @@ export default function QuickConnectInitiator() {
 					}}
 					{...ICON_PRESS_STYLES}
 				>
-					{'Sign in Manually'}
+					{t('login.signInManually')}
 				</Button>
 			</XStack>
 
@@ -146,10 +151,10 @@ export default function QuickConnectInitiator() {
 					style={loginStyles.headerSection}
 				>
 					<H3 marginHorizontal='2' textAlign='center' testID='quick_connect_title'>
-						Quick Connect
+						{t('login.quickConnect')}
 					</H3>
 
-					<H5 textAlign={'center'}>Enter the code in another session</H5>
+					<H5 textAlign={'center'}>{t('login.quickConnectHint')}</H5>
 				</Animated.View>
 
 				<YStack flex={2} justifyContent='center' gap='4'>
@@ -162,7 +167,7 @@ export default function QuickConnectInitiator() {
 							onExpired={beginQuickConnect}
 						/>
 					) : (
-						<Button onPress={beginQuickConnect}>Retry</Button>
+						<Button onPress={beginQuickConnect}>{t('common.retry')}</Button>
 					)}
 				</YStack>
 			</YStack>
