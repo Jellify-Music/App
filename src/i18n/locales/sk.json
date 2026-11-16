@@ -2,14 +2,14 @@
 	"home": {
 		"onRepeat": "",
 		"recentArtists": "",
-		"yourPlaylists": "",
+		"yourPlaylists": "Vaše zoznamy skladieb",
 		"playItAgain": "",
-		"mostPlayed": "",
-		"recentlyPlayed": ""
+		"mostPlayed": "Najviac hrané",
+		"recentlyPlayed": "Nedávno prehrávané"
 	},
 	"placeholders": {
-		"unknownUser": "",
-		"unknownLibrary": "",
+		"unknownUser": "Neznámy používateľ",
+		"unknownLibrary": "Neznáma knižnica",
 		"unknownServer": "",
 		"unknownAddress": "",
 		"unknownAlbum": "",
