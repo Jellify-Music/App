@@ -67,7 +67,7 @@ export const useAddFavorite = () => {
 			onFavoriteChanged(item, data?.data)
 		},
 		onError: (error) => {
-			handleError(error, LoggingContext.Favorites, 'Failed to add favorite')
+			handleError(error, LoggingContext.Favorites, 'addFavorite')
 		},
 	})
 }
@@ -100,7 +100,7 @@ export const useRemoveFavorite = () => {
 			onFavoriteChanged(item, data?.data)
 		},
 		onError: (error) => {
-			handleError(error, LoggingContext.Favorites, 'Failed to remove favorite')
+			handleError(error, LoggingContext.Favorites, 'removeFavorite')
 		},
 	})
 }

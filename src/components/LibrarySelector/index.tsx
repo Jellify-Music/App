@@ -11,6 +11,7 @@ import OneLibraryMessage from './components/one-library'
 import Heading from './components/heading'
 import NoLibrariesMessage from './components/no-libraries'
 import LoadErrorMessage from './components/loading-error'
+import { useTranslation } from 'react-i18next'
 
 interface LibrarySelectorProps {
 	/**
@@ -35,10 +36,12 @@ export default function LibrarySelector({
 	primaryButtonIcon,
 	cancelButtonText,
 	cancelButtonIcon,
-	title = 'Select Music Library',
+	title,
 	showCancelButton = true,
 	isOnboarding = false,
 }: LibrarySelectorProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const [library] = useJellifyLibrary()
 
 	const { data: libraries = [], isError, isPending } = useLibraries()
@@ -81,7 +84,7 @@ export default function LibrarySelector({
 					color={`${isSelected ? 'background' : 'neutral'}`}
 					fontSize='3'
 				>
-					{library.Name ?? 'Unnamed Library'}
+					{library.Name ?? t('placeholders.unnamedLibrary')}
 				</SizableText>
 			</ToggleGroup.Item>
 		)
@@ -89,7 +92,7 @@ export default function LibrarySelector({
 
 	return (
 		<YStack flex={1} margin='4' testID='library_selection_screen' justifyContent='flex-end'>
-			<Heading title={title} />
+			<Heading title={title ?? t('librarySelector.title')} />
 
 			{!hasMultipleLibraries && !isOnboarding && <OneLibraryMessage />}
 
@@ -102,8 +105,8 @@ export default function LibrarySelector({
 					testID='library_filter_hint'
 				>
 					{!selectedLibraryId
-						? 'Showing music from all libraries'
-						: 'Tap the selected library again for all libraries'}
+						? t('librarySelector.showingAll')
+						: t('librarySelector.tapForAll')}
 				</SizableText>
 			)}
 

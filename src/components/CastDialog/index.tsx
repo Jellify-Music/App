@@ -6,6 +6,7 @@ import React from 'react'
 // import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
 import { Paragraph, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
+import { useTranslation } from 'react-i18next'
 
 export default function CastDialog(): React.JSX.Element {
 	// const devices = useDevices()
@@ -26,10 +27,12 @@ export default function CastDialog(): React.JSX.Element {
 }
 
 function CastDialogNoDevices() {
+	const { t } = useTranslation()
+
 	return (
 		<YStack justifyContent='center' alignContent='center'>
 			<Icon size='10' name='speaker-off' />
-			<Paragraph fontWeight='6'>Use the Cast button to pick a device</Paragraph>
+			<Paragraph fontWeight='6'>{t('cast.noDevices')}</Paragraph>
 		</YStack>
 	)
 }

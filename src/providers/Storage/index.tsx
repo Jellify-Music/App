@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, createContext, use, useState } from 'react'
 import { DownloadedTrack, DownloadManager, useDownloadStorage } from 'react-native-nitro-player'
 import useDownloads from '../../hooks/downloads'
+import i18n from '../../i18n'
 
 export type StorageSummary = {
 	totalSpace: number
@@ -86,8 +87,8 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 		if (staleDownloads.length)
 			list.push({
 				id: 'stale-downloads',
-				title: 'Unused in 30+ days',
-				description: 'Remove tracks you have not touched recently.',
+				title: i18n.t('storage.suggestions.staleTitle'),
+				description: i18n.t('storage.suggestions.staleDescription'),
 				itemIds: staleDownloads.map((download) => download.trackId),
 				freedBytes: staleDownloads.reduce(
 					(acc, download) => acc + sumDownloadBytes(download),
@@ -99,8 +100,8 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 		if (largeDownloads.length)
 			list.push({
 				id: 'large-downloads',
-				title: 'Large files',
-				description: 'High bitrate albums occupying the most space.',
+				title: i18n.t('storage.suggestions.largeTitle'),
+				description: i18n.t('storage.suggestions.largeDescription'),
 				itemIds: largeDownloads.map((download) => download.trackId),
 				freedBytes: largeDownloads.reduce(
 					(acc, download) => acc + sumDownloadBytes(download),

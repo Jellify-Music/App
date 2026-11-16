@@ -14,8 +14,11 @@ import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import Button from '../Global/utils/button'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
 import { RootStackParamList } from '../../screens/types'
+import { useTranslation } from 'react-i18next'
 
 export default function ServerAuthentication(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
@@ -47,16 +50,16 @@ export default function ServerAuthentication(): React.JSX.Element {
 					exiting={FadeOut.easing(Easing.ease)}
 				>
 					<H3 textAlign='center' testID='server_authentication_title'>
-						{`Sign in to ${serverInfo?.ServerName ?? 'Jellyfin'}`}
+						{t('login.signInTo', { server: serverInfo?.ServerName ?? 'Jellyfin' })}
 					</H3>
-					<H5 textAlign='center'>{serverInfo?.Version ?? 'Unknown Jellyfin version'}</H5>
+					<H5 textAlign='center'>{serverInfo?.Version ?? t('login.unknownVersion')}</H5>
 				</Animated.View>
 			</YStack>
 
 			<YStack gap='4' flex={1} justifyContent='flex-end'>
 				<Input
 					prependElement={<Icon name='human-greeting-variant' color={'primary'} />}
-					placeholder='Username'
+					placeholder={t('login.username')}
 					value={username}
 					style={styles.input}
 					testID='username_input'
@@ -76,7 +79,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 
 				<Input
 					prependElement={<Icon name='lock-outline' color={'primary'} />}
-					placeholder='Password'
+					placeholder={t('login.password')}
 					value={password}
 					onChangeText={setPassword}
 					autoCapitalize='none'
@@ -99,7 +102,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 					onPress={onSubmitEditing}
 					color='background'
 				>
-					{isPending ? <Spinner color='background' /> : 'Sign in'}
+					{isPending ? <Spinner color='background' /> : t('login.signIn')}
 				</Button>
 
 				<Separator borderColor='borderColor' flexShrink={1} />
@@ -110,7 +113,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 					icon={<Icon size={'6'} name='chevron-right' color='primary' />}
 					{...ICON_PRESS_STYLES}
 				>
-					Use Quick Connect
+					{t('login.useQuickConnect')}
 				</Button>
 			</YStack>
 		</YStack>

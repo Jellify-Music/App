@@ -18,8 +18,11 @@ import { SEARCH_PLACEHOLDERS } from '../../configs/messaging/search'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import useSearchResults from '../../api/queries/search'
 import List from '../Global/components/Lists/utils'
+import { useTranslation } from 'react-i18next'
 
 export default function Search(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
 
 	/**
@@ -85,14 +88,14 @@ export default function Search(): React.JSX.Element {
 						onChangeText={handleSearchStringUpdate}
 						value={inputValue}
 						testID='search-input'
-						accessibilityLabel='Search your library'
-						accessibilityHint='Type to search artists, albums, playlists, and songs'
+						accessibilityLabel={t('search.inputLabel')}
+						accessibilityHint={t('search.inputHint')}
 						clearButtonMode='always'
 					/>
 
 					{!isEmpty(artistResults) && (
-						<YStack accessibilityLabel='Artist results' flex={1}>
-							<H3>Results</H3>
+						<YStack accessibilityLabel={t('search.artistResults')} flex={1}>
+							<H3>{t('search.results')}</H3>
 
 							<HorizontalCardList
 								data={artistResults}
@@ -143,7 +146,7 @@ export default function Search(): React.JSX.Element {
 							gap='3'
 							paddingHorizontal='4'
 						>
-							<H5>No Results</H5>
+							<H5>{t('search.noResults')}</H5>
 							<SizableText fontSize='2' textAlign='center'>
 								{`No results found for "${searchString}". Try a different search term.`}
 							</SizableText>

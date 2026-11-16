@@ -4,6 +4,7 @@ import { useAreAllDownloaded } from '../../../../hooks/downloads'
 import DownloadMenuRowProps from './types'
 import type { ContextMenuRowImageProp } from '../types'
 import ContextMenuRow from '..'
+import { useTranslation } from 'react-i18next'
 
 const REMOVE_DOWNLOAD_IMAGE_PROP: ContextMenuRowImageProp = {
 	iconName: 'broom',
@@ -11,6 +12,8 @@ const REMOVE_DOWNLOAD_IMAGE_PROP: ContextMenuRowImageProp = {
 }
 
 export default function DownloadMenuRow({ items }: DownloadMenuRowProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { mutate: download } = useDownloadTracks()
 
 	const { overallProgress } = useDownloadProgress({
@@ -31,7 +34,7 @@ export default function DownloadMenuRow({ items }: DownloadMenuRowProps): React.
 			<ContextMenuRow
 				onPress={handleRemoveDownloads}
 				imageProp={REMOVE_DOWNLOAD_IMAGE_PROP}
-				label='Remove Download'
+				label={t('context.removeDownload')}
 			/>
 		)
 
@@ -40,7 +43,7 @@ export default function DownloadMenuRow({ items }: DownloadMenuRowProps): React.
 			<ContextMenuRow
 				disabled
 				imageProp={{ progress: overallProgress }}
-				label='Download Queued'
+				label={t('context.downloadQueued')}
 			/>
 		)
 
@@ -48,7 +51,7 @@ export default function DownloadMenuRow({ items }: DownloadMenuRowProps): React.
 		<ContextMenuRow
 			onPress={() => download(items)}
 			imageProp={{ iconName: items.length > 1 ? 'download-multiple' : 'download' }}
-			label='Download'
+			label={t('context.download')}
 		/>
 	)
 }
