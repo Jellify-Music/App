@@ -1,9 +1,9 @@
 import { queryClient } from '../../client'
-import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, BaseItemKind, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
 import { getUserDataApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
-import { getApi, getUser, getLibrary } from '../../../stores/auth/utils'
+import { getApi, getLibrary } from '../../../stores/auth/utils'
 import { TrackQueryKeys } from '../../queries/track/keys'
 import { MusicLibraryQueryKey } from '../../queries/libraries/keys'
 import { QueryKeys } from '../../../enums/query-keys'
@@ -11,6 +11,7 @@ import { LoggingContext } from '../../../utils/logging'
 import { setQueryUserDataForItem } from '../../queries/user-data/cache'
 import { applyHapticFeedback } from '../../../utils/haptics'
 import { handleError } from '../../../utils/errors'
+import { setFavoriteButtonState } from '../../../services/player/utils/favorite-button'
 
 export const FAVORITE_MUTATION_KEY = ['favorite']
 
@@ -71,6 +72,36 @@ function invalidateRelevantQueries(item: BaseItemDto): void {
 	}
 }
 
+/**
+ * Marks or unmarks an item as a favorite in Jellyfin, without the UI side effects of the hooks.
+ * Used by the system media controls, which toggle favorites outside of React.
+ */
+export async function setFavorite(item: BaseItemDto, isFavorite: boolean): Promise<void> {
+	const api = getApi()
+
+	if (isUndefined(api)) throw new Error('API instance not defined')
+	if (isUndefined(item.Id)) throw new Error('Item ID is undefined')
+
+	const { data } = isFavorite
+		? await getUserDataApi(api).markFavoriteItem({ itemId: item.Id })
+		: await getUserDataApi(api).unmarkFavoriteItem({ itemId: item.Id })
+
+	onFavoriteChanged(item, data)
+}
+
+/**
+ * Updates the cache and the media controls' favorite button after an item's favorite status changes
+ */
+function onFavoriteChanged(item: BaseItemDto, userData: UserItemDataDto | undefined): void {
+	setQueryUserDataForItem(item, userData)
+
+	// Optimized: Only invalidate the relevant query based on item type and filter state
+	invalidateRelevantQueries(item)
+
+	if (item.Type === BaseItemKind.Audio && item.Id && userData)
+		setFavoriteButtonState(item.Id, userData.IsFavorite ?? false)
+}
+
 export const useAddFavorite = () => {
 	return useMutation({
 		mutationKey: FAVORITE_MUTATION_KEY,
@@ -87,14 +118,9 @@ export const useAddFavorite = () => {
 		onSuccess: (data, { item, onToggle }) => {
 			applyHapticFeedback('success')
 
-			const user = getUser()
-
 			if (onToggle) onToggle()
 
-			if (user) setQueryUserDataForItem(item, data?.data)
-
-			// Optimized: Only invalidate the relevant query based on item type and filter state
-			invalidateRelevantQueries(item)
+			onFavoriteChanged(item, data?.data)
 		},
 		onError: (error) => {
 			handleError(error, LoggingContext.Favorites, 'Failed to add favorite')
@@ -120,10 +146,7 @@ export const useRemoveFavorite = () => {
 
 			if (onToggle) onToggle()
 
-			setQueryUserDataForItem(item, data?.data)
-
-			// Optimized: Only invalidate the relevant query based on item type and filter state
-			invalidateRelevantQueries(item)
+			onFavoriteChanged(item, data?.data)
 		},
 		onError: (error) => {
 			handleError(error, LoggingContext.Favorites, 'Failed to remove favorite')
