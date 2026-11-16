@@ -1,4 +1,3 @@
-import React from 'react'
 import { YStack, XStack, SizableText, ScrollView, Avatar, Card } from 'tamagui'
 import { useJellyfinServer } from '../../hooks/auth/server'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
@@ -13,6 +12,7 @@ import { useJellifyUser, useJellifyLibrary } from '../../stores/auth'
 import HTTPS from '../../constants/protocols'
 import getUserImageUrl from '../../api/queries/image/utils/avatar'
 import ServerInfoChip from './components/chip'
+import { useIsAudioMuseEnabled } from '../../api/queries/plugins'
 import { useTranslation } from 'react-i18next'
 
 export default function Account(): React.JSX.Element {
@@ -22,6 +22,7 @@ export default function Account(): React.JSX.Element {
 
 	const [server] = useJellyfinServer()
 	const { data: serverInfo } = usePublicServerInfo()
+	const isAudioMuseEnabled = useIsAudioMuseEnabled()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
@@ -153,6 +154,15 @@ export default function Account(): React.JSX.Element {
 								icon={isSecure ? 'shield-check' : 'shield-alert'}
 								color={isSecure ? 'success' : 'warning'}
 							/>
+
+							{isAudioMuseEnabled && (
+								<ServerInfoChip
+									label={t('account.detected')}
+									value={'AudioMuse AI'}
+									icon='music-box'
+									color={'success'}
+								/>
+							)}
 						</XStack>
 					</YStack>
 				</SettingsSection>

@@ -10,6 +10,7 @@ export type SwipeAction = {
 }
 
 export type QuickAction = {
+	label: string
 	icon: MaterialDesignIconsIconName
 	color: ThemeTokens // Tamagui token e.g. 'primary'
 	onPress: EventHandler

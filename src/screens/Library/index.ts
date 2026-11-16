@@ -10,6 +10,7 @@ import DeletePlaylist from './delete-playlist'
 import LibraryTabs from '../../components/Library/component'
 import { BaseStackScreens } from '../base-stack'
 import { stackScreenOptions } from '../navigation'
+import GeneratePlaylistScreen from './generate-playlist'
 import i18n from '../../i18n'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
@@ -79,6 +80,15 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 				headerShown: false,
 				sheetGrabberVisible: true,
 				sheetAllowedDetents: 'fitToContents',
+			},
+		},
+		GeneratePlaylist: {
+			screen: GeneratePlaylistScreen,
+			options: {
+				title: i18n.t('library.generatePlaylist'),
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
 			},
 		},
 	},

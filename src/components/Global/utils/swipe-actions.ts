@@ -55,6 +55,7 @@ function toQuickAction(type: SwipeActionType, handlers: SwipeHandlers): QuickAct
 	switch (type) {
 		case 'AddToQueue':
 			return {
+				label: i18n.t('swipe.playLater'),
 				// Distinct icon for Play Later quick action
 				icon: 'playlist-play',
 				color: 'success',
@@ -62,12 +63,14 @@ function toQuickAction(type: SwipeActionType, handlers: SwipeHandlers): QuickAct
 			}
 		case 'ToggleFavorite':
 			return {
+				label: i18n.t('swipe.toggleFavorite'),
 				icon: 'heart',
 				color: 'primary',
 				onPress: handlers.toggleFavorite,
 			}
 		case 'PlayNext':
 			return {
+				label: i18n.t('swipe.playNext'),
 				icon: 'playlist-music',
 				color: 'success',
 				onPress: handlers.playNext,
@@ -75,6 +78,7 @@ function toQuickAction(type: SwipeActionType, handlers: SwipeHandlers): QuickAct
 		case 'AddToPlaylist':
 		default:
 			return {
+				label: i18n.t('swipe.addToPlaylist'),
 				icon: 'playlist-plus',
 				color: 'color',
 				onPress: handlers.addToPlaylist,
