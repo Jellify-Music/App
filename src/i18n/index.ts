@@ -14,9 +14,14 @@ export const resources = {
 
 /**
  * Uses Hermes' Intl support to read the device language, so no native
- * module is needed and translation updates can ship over OTA
+ * module is needed and translation updates can ship over OTA.
+ *
+ * Hermes doesn't implement Intl.Locale, so the language subtag is
+ * parsed from the BCP 47 tag directly
+ *
+ * @see {@link https://github.com/facebook/hermes/blob/main/doc/IntlAPIs.md | Hermes Intl APIs}
  */
-const deviceLanguage = new Intl.Locale(Intl.DateTimeFormat().resolvedOptions().locale).language
+const deviceLanguage = Intl.DateTimeFormat().resolvedOptions().locale.split(/[-_]/)[0]
 
 i18n.use(initReactI18next).init({
 	resources,
