@@ -23,19 +23,19 @@
 		"untitledPlaylist": "Liste de lecture sans titre",
 		"unknownTrack": "Titre inconnu",
 		"unknownGenre": "Genre inconnu",
-		"unknownMusicVideo": "",
-		"unknownItem": ""
+		"unknownMusicVideo": "Vidéoclip inconnu",
+		"unknownItem": "Item inconnu"
 	},
 	"account": {
-		"jellyfinUser": "",
-		"musicLibrary": "",
-		"allLibraries": "",
-		"currentLibrary": "",
-		"server": "",
-		"version": "",
-		"connection": "",
-		"secure": "",
-		"insecure": ""
+		"jellyfinUser": "Utilisateur Jellyfin",
+		"musicLibrary": "Bibliothèque musicale",
+		"allLibraries": "Toutes les bibliothèques",
+		"currentLibrary": "Bibliothèque actuelle",
+		"server": "Serveur",
+		"version": "Version",
+		"connection": "Connexion",
+		"secure": "Sécurisée (HTTPS)",
+		"insecure": "Non-sécurisée (HTTP)"
 	},
 	"common": {
 		"change": "",
