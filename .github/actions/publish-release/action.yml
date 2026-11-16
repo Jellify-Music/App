@@ -58,6 +58,8 @@ runs:
         bodyFile: release-body.md
         commit: ${{ inputs.commit }}
         artifacts: ${{ inputs.artifacts }}
+        # Only store releases become "latest", so OTAs never take that badge
+        makeLatest: ${{ inputs.kind == 'full' }}
         token: ${{ inputs.github_token }}
 
     - name: 🗣️ Announce on Discord
