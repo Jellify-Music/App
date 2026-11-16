@@ -15,6 +15,7 @@ import { QueryAges } from '../../../constants/durations'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
 import { AlbumQuery, RecentlyAddedQuery } from './queries'
+import { MusicLibraryQueryKey } from '../libraries/keys'
 
 export const useAlbum = (album: BaseItemDto) => useQuery(AlbumQuery(album))
 
@@ -57,7 +58,7 @@ const useAlbums = () => {
 		queryKey: [
 			QueryKeys.InfiniteAlbums,
 			isFavorites,
-			library?.musicLibraryId,
+			MusicLibraryQueryKey(library?.musicLibraryId),
 			librarySortBy,
 			sortDescending,
 			yearMin,
@@ -99,19 +100,10 @@ export const useRecentlyAddedAlbums = () => {
 	return useInfiniteQuery(RecentlyAddedQuery(api, user, library))
 }
 
-export const useRefetchRecentlyAdded: () => () => void = () => {
-	const [library] = useJellifyLibrary()
-
-	return () =>
-		queryClient.invalidateQueries({
-			queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
-		})
-}
-
-export const useAlbumDiscs = (album: BaseItemDto) => {
+export const useAlbumDiscs = (album: BaseItemDto, enabled: boolean = true) => {
 	const api = getApi()
 
-	return useQuery(AlbumDiscsQuery(api, album))
+	return useQuery({ ...AlbumDiscsQuery(api, album), enabled })
 }
 
 export async function refreshAlbumDiscs(album: BaseItemDto) {

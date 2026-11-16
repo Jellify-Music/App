@@ -21,7 +21,7 @@ export function useLibraryYears(): {
 	} = useQuery({
 		queryKey: LibraryYearsQueryKey(library?.musicLibraryId, user?.id),
 		queryFn: ({ signal }) => fetchLibraryYears(api, library, user?.id, signal),
-		enabled: Boolean(api && library && user?.id),
+		enabled: Boolean(api && user?.id),
 		staleTime: QueryAges.OneHour * 6,
 	})
 

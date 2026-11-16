@@ -28,14 +28,13 @@ export function fetchAlbums(
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
 		if (!user) return reject('No user provided')
-		if (!library) return reject('Library has not been set')
 
 		const yearsParam = buildYearsParam(yearMin, yearMax)
 
 		getLibraryApi(api)
 			.getItems(
 				{
-					parentId: library.musicLibraryId,
+					parentId: library?.musicLibraryId,
 					includeItemTypes: [BaseItemKind.MusicAlbum],
 					userId: user.id,
 					sortBy: sortBy,

@@ -33,13 +33,12 @@ export function fetchFrequentlyPlayed(
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 
 		getLibraryApi(api!)
 			.getItems(
 				{
 					includeItemTypes: [BaseItemKind.Audio],
-					parentId: library!.musicLibraryId,
+					parentId: library?.musicLibraryId,
 					recursive: true,
 					limit: ApiLimits.Frequents,
 					startIndex: page * ApiLimits.Frequents,
@@ -80,7 +79,6 @@ export function fetchFrequentlyPlayedArtists(
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 
 		queryClient
 			.infiniteQuery({

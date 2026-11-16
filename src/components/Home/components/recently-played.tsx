@@ -50,7 +50,6 @@ export default function RecentlyPlayed(): React.JSX.Element {
 					navigation,
 				})
 			}}
-			marginHorizontal={'1'}
 			captionAlign='left'
 		/>
 	)

@@ -23,7 +23,6 @@ export async function fetchSearchResults(
 
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User has not been set')
-		if (isUndefined(libraryId)) return reject('Library has not been set')
 
 		getLibraryApi(api)
 			.getItems(
