@@ -15,6 +15,7 @@ import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
+import { syncFavoriteButton } from './favorite-button'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -92,6 +93,8 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	await applyAudioNormalizationIfEnabled(track)
 
 	reportPlaybackStarted(track)
+
+	syncFavoriteButton(track)
 }
 
 // Playback started outside the app (Android Auto, Assistant) runs a native playlist the queue store has never seen
