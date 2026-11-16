@@ -93,7 +93,9 @@ describe('SwipeableRow behavior (expectations)', () => {
 
 	it('quick actions on right: pressing an action calls handler and closes', async () => {
 		const act1 = jest.fn()
-		const actions: QuickAction[] = [{ icon: 'download', color: 'primary', onPress: act1 }]
+		const actions: QuickAction[] = [
+			{ label: 'Download', icon: 'download', color: 'primary', onPress: act1 },
+		]
 
 		const { getByTestId } = await render(<Row rightActions={actions} testID='row-b' />)
 
@@ -114,12 +116,24 @@ describe('SwipeableRow behavior (expectations)', () => {
 			<>
 				<Row
 					rightActions={[
-						{ icon: 'playlist-music', color: 'primary', onPress: jest.fn() },
+						{
+							label: 'Add to Playlist',
+							icon: 'playlist-music',
+							color: 'primary',
+							onPress: jest.fn(),
+						},
 					]}
 					testID='r1'
 				/>
 				<Row
-					rightActions={[{ icon: 'plus-circle', color: 'primary', onPress: jest.fn() }]}
+					rightActions={[
+						{
+							label: 'Add to Queue',
+							icon: 'plus-circle',
+							color: 'primary',
+							onPress: jest.fn(),
+						},
+					]}
 					testID='r2'
 				/>
 			</>,
@@ -137,7 +151,14 @@ describe('SwipeableRow behavior (expectations)', () => {
 	it('scroll begin elsewhere closes any open menu (via registry)', async () => {
 		const { rerender } = await render(
 			<Row
-				rightActions={[{ icon: 'playlist-music', color: 'primary', onPress: jest.fn() }]}
+				rightActions={[
+					{
+						label: 'Add to Playlist',
+						icon: 'playlist-music',
+						color: 'primary',
+						onPress: jest.fn(),
+					},
+				]}
 				testID='scroll-row'
 			/>,
 		)
