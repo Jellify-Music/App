@@ -10,6 +10,7 @@ import DeletePlaylist from './delete-playlist'
 import LibraryTabs from '../../components/Library/component'
 import { BaseStackScreens } from '../base-stack'
 import { stackScreenOptions } from '../navigation'
+import GeneratePlaylistScreen from './generate-playlist'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 	initialRouteName: 'LibraryScreen',
@@ -78,6 +79,15 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 				headerShown: false,
 				sheetGrabberVisible: true,
 				sheetAllowedDetents: 'fitToContents',
+			},
+		},
+		GeneratePlaylist: {
+			screen: GeneratePlaylistScreen,
+			options: {
+				title: 'Generate Playlist',
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
 			},
 		},
 	},
