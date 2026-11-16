@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H4, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
@@ -13,6 +14,8 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const tracksInfiniteQuery = useFrequentlyPlayedTracks()
 
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -55,7 +58,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 				opacity='1 press:0.6'
 				marginHorizontal='2'
 			>
-				<H4 userSelect='none'>On Repeat</H4>
+				<H4 userSelect='none'>{t('home.onRepeat')}</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

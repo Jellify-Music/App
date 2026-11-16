@@ -29,6 +29,7 @@ import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { Queue } from '../../../services/types/queue-item'
 import { formatArtistName } from '../../../utils/formatting/artist-names'
 import { addToQueue, loadNewQueue } from '../../../player/queuing'
+import { useTranslation } from 'react-i18next'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -60,6 +61,8 @@ function ItemRow({
 	sortingByReleasedDate,
 	testID,
 }: ItemRowProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const artworkAreaWidth = useSharedValue(0)
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -191,7 +194,7 @@ function ItemRow({
 						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
 					) : item.Type === BaseItemKind.Playlist ? (
 						<SizableText fontSize='2' color={'borderColor'}>
-							{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
+							{t('common.trackCount', { count: playlistTrackCount ?? 0 })}
 						</SizableText>
 					) : null}
 					<FavoriteIcon item={item} />
@@ -232,7 +235,7 @@ function ItemRow({
 					) : (
 						item.Type === BaseItemKind.Playlist && (
 							<SizableText fontSize='2' color={'borderColor'}>
-								{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
+								{t('common.trackCount', { count: playlistTrackCount ?? 0 })}
 							</SizableText>
 						)
 					)}
@@ -252,6 +255,8 @@ function ItemRowDetails({
 	item: BaseItemDto
 	sortingByReleasedDate?: boolean | undefined
 }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const route = useRoute<RouteProp<BaseStackParamList>>()
 
 	const shouldRenderArtistName =
@@ -297,7 +302,7 @@ function ItemRowDetails({
 						lineBreakStrategyIOS='standard'
 						numberOfLines={1}
 					>
-						{item.ProductionYear?.toString() ?? 'Unknown Year'}
+						{item.ProductionYear?.toString() ?? t('placeholders.unknownYear')}
 					</SizableText>
 
 					<SizableText fontSize='2' color={'borderColor'}>

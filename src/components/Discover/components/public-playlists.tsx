@@ -9,8 +9,11 @@ import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
 import AnimatedRow from '../../Global/utils/Animated/row'
+import { useTranslation } from 'react-i18next'
 
 export default function PublicPlaylists(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const result = usePublicPlaylists()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
@@ -31,7 +34,7 @@ export default function PublicPlaylists(): React.JSX.Element {
 				marginHorizontal='2'
 			>
 				<H4 userSelect='none' numberOfLines={1} lineBreakStrategyIOS='standard'>
-					Playlists on {server?.ServerName ?? 'Jellyfin'}
+					{t('discover.playlistsOn', { server: server?.ServerName ?? 'Jellyfin' })}
 				</H4>
 				<Icon name='arrow-right' />
 			</XStack>

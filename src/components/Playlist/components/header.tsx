@@ -13,8 +13,11 @@ import { SizableText } from 'tamagui'
 import { RunTimeTicks } from '../../Global/utils/time-codes'
 import { loadNewQueue } from '../../../player/queuing'
 import { usePlaylistContext } from '../../../providers/Playlist'
+import { useTranslation } from 'react-i18next'
 
 export default function PlaylistTracklistHeader(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { playlist, playlistTracks, editing, newName, setNewName } = usePlaylistContext()
 
 	return (
@@ -32,7 +35,7 @@ export default function PlaylistTracklistHeader(): React.JSX.Element {
 					<Input
 						value={newName}
 						onChangeText={setNewName}
-						placeholder='Playlist Name'
+						placeholder={t('playlist.namePlaceholder')}
 						textAlign='center'
 						fontSize={'8'}
 						fontWeight='6'
@@ -47,7 +50,7 @@ export default function PlaylistTracklistHeader(): React.JSX.Element {
 				>
 					<YStack alignItems='center' gap='2'>
 						<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>
-							{newName ?? 'Untitled Playlist'}
+							{newName ?? t('placeholders.untitledPlaylist')}
 						</H5>
 
 						<RunTimeTicks>{playlist.RunTimeTicks}</RunTimeTicks>
@@ -82,6 +85,8 @@ function PlaylistHeaderControls({
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const playPlaylist = async (shuffled: boolean = false) => {
@@ -106,7 +111,7 @@ function PlaylistHeaderControls({
 				icon={<Icon name='play' color='background' size='7' />}
 			>
 				<SizableText fontSize='2' fontWeight='6' color={'background'}>
-					Play
+					{t('common.play')}
 				</SizableText>
 			</Button>
 
@@ -118,7 +123,7 @@ function PlaylistHeaderControls({
 				icon={<Icon name='shuffle' color='primary' size='7' />}
 			>
 				<SizableText fontSize='2' fontWeight='6' color={'primary'}>
-					Shuffle
+					{t('common.shuffle')}
 				</SizableText>
 			</Button>
 

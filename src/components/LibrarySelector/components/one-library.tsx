@@ -1,10 +1,13 @@
 import { AnimatePresence, SizableText } from 'tamagui'
+import { useTranslation } from 'react-i18next'
 
 export default function OneLibraryMessage(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	return (
 		<AnimatePresence>
 			<SizableText fontSize='3' color='borderColor' textAlign='center' transition={'quick'}>
-				Only one music library is available
+				{t('librarySelector.oneLibrary')}
 			</SizableText>
 		</AnimatePresence>
 	)

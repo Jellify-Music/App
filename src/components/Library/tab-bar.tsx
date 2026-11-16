@@ -13,8 +13,11 @@ import { applyHapticFeedback } from '../../utils/haptics'
 import { handleError } from '../../utils/errors'
 import { LoggingContext } from '../../utils/logging'
 import { SizableText, useTheme, XStack, YStack } from 'tamagui'
+import { useTranslation } from 'react-i18next'
 
 export default function LibraryTabBar(props: MaterialTopTabBarProps) {
+	const { t } = useTranslation()
+
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const insets = useSafeAreaInsets()
@@ -61,7 +64,7 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 
 			await TrackPlayer.play()
 		} catch (error) {
-			handleError(error, LoggingContext.Queue, 'Failed to shuffle library')
+			handleError(error, LoggingContext.Queue, 'shuffleLibrary')
 		}
 	}
 
@@ -95,7 +98,7 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 							<Icon name={'shuffle'} color={'borderColor'} />
 
 							<SizableText fontSize='2' fontWeight='6' color='borderColor'>
-								All
+								{t('common.all')}
 							</SizableText>
 						</XStack>
 					)}
@@ -116,7 +119,7 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 								<Icon name={'sort'} color={'borderColor'} />
 
 								<SizableText fontSize='2' fontWeight='6' color='borderColor'>
-									Sort
+									{t('library.sort')}
 								</SizableText>
 							</XStack>
 
@@ -141,7 +144,7 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 									fontWeight='6'
 									color={`${hasActiveFilters ? 'primary' : 'borderColor'}`}
 								>
-									Filter
+									{t('library.filter')}
 								</SizableText>
 							</XStack>
 						</>
@@ -182,7 +185,7 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 								<Icon name={'filter-remove'} color={'borderColor'} />
 
 								<SizableText fontSize='2' fontWeight='6' color='borderColor'>
-									Clear
+									{t('common.clear')}
 								</SizableText>
 							</XStack>
 						)}

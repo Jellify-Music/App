@@ -9,8 +9,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
 import { useDiscoverAlbums } from '../../../api/queries/suggestions'
 import AnimatedRow from '../../Global/utils/Animated/row'
+import { useTranslation } from 'react-i18next'
 
 export default function SuggestedAlbums() {
+	const { t } = useTranslation()
+
 	const suggestedAlbumsInfiniteQuery = useDiscoverAlbums()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
@@ -31,7 +34,7 @@ export default function SuggestedAlbums() {
 				transition='quick'
 				opacity='1 press:0.6'
 			>
-				<H4 userSelect='none'>More from the Vault</H4>
+				<H4 userSelect='none'>{t('discover.moreFromTheVault')}</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList

@@ -3,6 +3,7 @@ import { StackActions } from '@react-navigation/native'
 import { AddToPlaylistRowProps } from './types'
 import type { ContextMenuRowImageProp } from '../types'
 import ContextMenuRow from '..'
+import { useTranslation } from 'react-i18next'
 
 const IMAGE_PROP: ContextMenuRowImageProp = {
 	iconName: 'plus-circle-outline',
@@ -12,6 +13,8 @@ export default function AddToPlaylistRow({
 	tracks,
 	source,
 }: AddToPlaylistRowProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const onPress = () => {
 		navigationRef.goBack()
 		navigationRef.dispatch(
@@ -22,5 +25,11 @@ export default function AddToPlaylistRow({
 		)
 	}
 
-	return <ContextMenuRow onPress={onPress} imageProp={IMAGE_PROP} label='Add to Playlist' />
+	return (
+		<ContextMenuRow
+			onPress={onPress}
+			imageProp={IMAGE_PROP}
+			label={t('context.addToPlaylist')}
+		/>
+	)
 }

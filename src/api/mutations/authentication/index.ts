@@ -37,7 +37,8 @@ const useAuthenticateUserByName = ({ onSuccess }: AuthenticateUserByNameMutation
 			handleError(
 				error,
 				LoggingContext.Authentication,
-				`Unable to sign in to ${serverInfo?.ServerName ?? 'Jellyfin'}`,
+				'signIn',
+				{ server: serverInfo?.ServerName ?? 'Jellyfin' },
 				'Unable to sign in to server',
 			)
 		},

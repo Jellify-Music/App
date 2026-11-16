@@ -11,6 +11,7 @@ import Animated, {
 import { runOnJS } from 'react-native-worklets'
 
 import { useNetworkStatus } from '../../stores/network'
+import { useTranslation } from 'react-i18next'
 
 // Reduce the frequency of Android ConnectivityManager.registerNetworkCallbacks
 // to avoid a TooManyRequestsException.
@@ -20,11 +21,6 @@ NetInfo.configure({
 	reachabilityRequestTimeout: 30 * 1000, // 30 s (default 15 s)
 })
 
-const internetConnectionWatcher = {
-	NO_INTERNET: 'You are offline',
-	BACK_ONLINE: "And we're back!",
-}
-
 export enum networkStatusTypes {
 	ONLINE = 'ONLINE',
 	DISCONNECTED = 'DISCONNECTED',
@@ -33,6 +29,8 @@ export enum networkStatusTypes {
 const isAndroid = Platform.OS === 'android'
 
 const InternetConnectionWatcher = () => {
+	const { t } = useTranslation()
+
 	const lastNetworkStatus = useRef<networkStatusTypes | null>(networkStatusTypes.ONLINE)
 	const [networkStatus, setNetworkStatus] = useNetworkStatus()
 
@@ -122,8 +120,8 @@ const InternetConnectionWatcher = () => {
 			>
 				<SizableText fontSize='2' fontWeight='6' textAlign='center' color='background'>
 					{networkStatus === networkStatusTypes.ONLINE
-						? internetConnectionWatcher.BACK_ONLINE
-						: internetConnectionWatcher.NO_INTERNET}
+						? t('network.backOnline')
+						: t('network.offline')}
 				</SizableText>
 			</YStack>
 		</Animated.View>

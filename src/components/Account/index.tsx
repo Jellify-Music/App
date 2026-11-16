@@ -13,8 +13,11 @@ import HTTPS from '../../constants/protocols'
 import getUserImageUrl from '../../api/queries/image/utils/avatar'
 import ServerInfoChip from './components/chip'
 import { useIsAudioMuseEnabled } from '../../api/queries/plugins'
+import { useTranslation } from 'react-i18next'
 
 export default function Account(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
 	const [server] = useJellyfinServer()
@@ -49,10 +52,10 @@ export default function Account(): React.JSX.Element {
 						</Avatar>
 						<YStack alignItems='center' gap='1'>
 							<SizableText fontSize='3' fontWeight='6' color='background'>
-								{user?.name ?? 'Unknown User'}
+								{user?.name ?? t('placeholders.unknownUser')}
 							</SizableText>
 							<SizableText fontSize='2' color='background'>
-								Jellyfin User
+								{t('account.jellyfinUser')}
 							</SizableText>
 						</YStack>
 					</YStack>
@@ -60,7 +63,7 @@ export default function Account(): React.JSX.Element {
 
 				{/* Library Section */}
 				<SettingsSection
-					title='Music Library'
+					title={t('account.musicLibrary')}
 					icon='book-music'
 					iconColor='primary'
 					defaultExpanded
@@ -86,11 +89,12 @@ export default function Account(): React.JSX.Element {
 							<YStack flex={1}>
 								<SizableText fontSize='2' fontWeight='6'>
 									{library
-										? (library.musicLibraryName ?? 'Unknown Library')
-										: 'All Libraries'}
+										? (library.musicLibraryName ??
+											t('placeholders.unknownLibrary'))
+										: t('account.allLibraries')}
 								</SizableText>
 								<SizableText fontSize='2' color='borderColor'>
-									Current library
+									{t('account.currentLibrary')}
 								</SizableText>
 							</YStack>
 						</XStack>
@@ -103,14 +107,14 @@ export default function Account(): React.JSX.Element {
 							onPress={() => navigation.navigate('LibrarySelection')}
 							icon={<Icon name='swap-horizontal' color='color' size='7' />}
 						>
-							<SizableText fontSize='2'>Change</SizableText>
+							<SizableText fontSize='2'>{t('common.change')}</SizableText>
 						</Button>
 					</XStack>
 				</SettingsSection>
 
 				{/* Server Section */}
 				<SettingsSection
-					title='Server'
+					title={t('account.server')}
 					icon={isSecure ? 'lock' : 'lock-open'}
 					iconColor={isSecure ? 'success' : 'warning'}
 					defaultExpanded
@@ -130,23 +134,23 @@ export default function Account(): React.JSX.Element {
 							</YStack>
 							<YStack flex={1}>
 								<SizableText fontSize='3' fontWeight='6'>
-									{serverInfo?.ServerName ?? 'Unknown Server'}
+									{serverInfo?.ServerName ?? t('placeholders.unknownServer')}
 								</SizableText>
 								<SizableText fontSize='2' color='borderColor'>
-									{server?.url ?? 'Unknown Address'}
+									{server?.url ?? t('placeholders.unknownAddress')}
 								</SizableText>
 							</YStack>
 						</XStack>
 
 						<XStack flexWrap='wrap' gap='2'>
 							<ServerInfoChip
-								label='Version'
-								value={serverInfo?.Version ?? 'Unknown'}
+								label={t('account.version')}
+								value={serverInfo?.Version ?? t('common.unknown')}
 								icon='information'
 							/>
 							<ServerInfoChip
-								label='Connection'
-								value={isSecure ? 'Secure (HTTPS)' : 'Insecure (HTTP)'}
+								label={t('account.connection')}
+								value={isSecure ? t('account.secure') : t('account.insecure')}
 								icon={isSecure ? 'shield-check' : 'shield-alert'}
 								color={isSecure ? 'success' : 'warning'}
 							/>

@@ -7,6 +7,7 @@ import DiscoverStackParamList, { DiscoverAlbumScreenType } from './types'
 import { BaseStackScreens } from '../base-stack'
 import { stackScreenOptions } from '../navigation'
 import { getPublicServerInfo } from '../../api/queries/public-server-info'
+import i18n from '../../i18n'
 
 const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 	initialRouteName: 'Discover',
@@ -25,13 +26,15 @@ const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 		PublicPlaylists: {
 			screen: PublicPlaylists,
 			options: () => ({
-				title: `Playlists on ${getPublicServerInfo()?.ServerName ?? 'Jellyfin'}`,
+				title: i18n.t('discover.playlistsOn', {
+					server: getPublicServerInfo()?.ServerName ?? 'Jellyfin',
+				}),
 			}),
 		},
 		SuggestedArtists: {
 			screen: SuggestedArtists,
 			options: {
-				title: 'Artists for You',
+				title: i18n.t('discover.artistsForYou'),
 			},
 		},
 	},
@@ -40,11 +43,13 @@ const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 function getAlbumScreenTitle(type: DiscoverAlbumScreenType) {
 	switch (type) {
 		case DiscoverAlbumScreenType.RecentlyAdded:
-			return 'Recently Added'
+			return i18n.t('discover.recentlyAdded')
 		case DiscoverAlbumScreenType.Suggested:
-			return 'More from the Vault'
+			return i18n.t('discover.moreFromTheVault')
 		default:
-			return `Albums on ${getPublicServerInfo()?.ServerName ?? 'Jellyfin'}`
+			return i18n.t('discover.albumsOn', {
+				server: getPublicServerInfo()?.ServerName ?? 'Jellyfin',
+			})
 	}
 }
 

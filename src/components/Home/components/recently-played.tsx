@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import React from 'react'
 import { H4, XStack } from 'tamagui'
 import ItemCard from '../../Global/components/Card'
@@ -14,6 +15,8 @@ import { loadNewQueue } from '../../../player/queuing'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function RecentlyPlayed(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -65,7 +68,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				opacity='1 press:0.6'
 				marginHorizontal='2'
 			>
-				<H4 userSelect='none'>Play it again</H4>
+				<H4 userSelect='none'>{t('home.playItAgain')}</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

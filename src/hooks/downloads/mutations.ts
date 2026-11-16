@@ -9,7 +9,7 @@ import { LoggingContext } from '../../utils/logging'
 const useDownloadTracks = () =>
 	useMutation({
 		mutationFn: downloadItems,
-		onError: (error) => handleError(error, LoggingContext.Downloads, 'Failed to download'),
+		onError: (error) => handleError(error, LoggingContext.Downloads, 'download'),
 	})
 
 export const useDeleteDownloads = () => {
@@ -28,8 +28,7 @@ export const useDeleteDownloads = () => {
 				},
 			)
 		},
-		onError: (error) =>
-			handleError(error, LoggingContext.Downloads, 'Failed to remove downloads'),
+		onError: (error) => handleError(error, LoggingContext.Downloads, 'removeDownloads'),
 	})
 
 	return {

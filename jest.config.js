@@ -27,6 +27,7 @@ module.exports = {
 		'./jest/setup/safe-area-context.ts',
 		'./src/configs/tamagui.config.ts',
 		'./jest/setup/native-modules.ts',
+		'./jest/setup/i18n.ts',
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],
 	transformIgnorePatterns: [
