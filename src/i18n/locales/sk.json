@@ -10,367 +10,383 @@
 	"placeholders": {
 		"unknownUser": "Neznámy používateľ",
 		"unknownLibrary": "Neznáma knižnica",
-		"unknownServer": "",
-		"unknownAddress": "",
-		"unknownAlbum": "",
-		"untitledAlbum": "",
-		"unknownYear": "",
-		"unknownArtist": "",
-		"untitledTrack": "",
-		"untitled": "",
-		"unknownPlaylist": "",
-		"unnamedLibrary": "",
-		"untitledPlaylist": "",
-		"unknownTrack": "",
-		"unknownGenre": "",
-		"unknownMusicVideo": "",
-		"unknownItem": ""
+		"unknownServer": "Neznámy server",
+		"unknownAddress": "Neznáma adresa",
+		"unknownAlbum": "Neznámy album",
+		"untitledAlbum": "Album bez názvu",
+		"unknownYear": "Neznámy rok",
+		"unknownArtist": "Neznámy interpret",
+		"untitledTrack": "Skladba bez názvu",
+		"untitled": "Bez názvu",
+		"unknownPlaylist": "Neznámy zoznam skladieb",
+		"unnamedLibrary": "Knižnica bez názvu",
+		"untitledPlaylist": "Zoznam skladieb bez názvu",
+		"unknownTrack": "Neznáma skladba",
+		"unknownGenre": "Neznámy žáner",
+		"unknownMusicVideo": "Neznámy hudobný videoklip",
+		"unknownItem": "Neznáma položka"
 	},
 	"account": {
-		"jellyfinUser": "",
-		"musicLibrary": "",
-		"allLibraries": "",
-		"currentLibrary": "",
-		"server": "",
-		"version": "",
-		"connection": "",
-		"secure": "",
-		"insecure": ""
+		"jellyfinUser": "Používateľ aplikácie Jellyfin",
+		"musicLibrary": "Hudobná knižnica",
+		"allLibraries": "Všetky knižnice",
+		"currentLibrary": "Aktuálna knižnica",
+		"server": "Server",
+		"version": "Verzia",
+		"connection": "Pripojenie",
+		"secure": "Zabezpečené (HTTPS)",
+		"insecure": "Nezabezpečené (HTTP)"
 	},
 	"common": {
-		"change": "",
-		"unknown": "",
-		"play": "",
-		"shuffle": "",
-		"retry": "",
-		"noItems": "",
-		"mix": "",
-		"seeMore": "",
-		"trackCount": "",
-		"all": "",
-		"clear": "",
-		"cancel": "",
-		"save": "",
-		"delete": "",
-		"apply": "",
-		"any": "",
-		"goBack": "",
-		"error": "",
-		"close": "",
-		"refresh": "",
-		"ok": ""
+		"change": "Zmeniť",
+		"unknown": "Neznáme",
+		"play": "Prehrať",
+		"shuffle": "Náhodne",
+		"retry": "Skúsiť znova",
+		"noItems": "Žiadne položky",
+		"mix": "Mix",
+		"seeMore": "Zobraziť viac",
+		"trackCount_one": "{{count}} skladba",
+		"trackCount_few": "{{count}} skladby",
+		"trackCount_other": "{{count}} skladieb",
+		"all": "Všetko",
+		"clear": "Vyčistiť",
+		"cancel": "Zrušiť",
+		"save": "Uložiť",
+		"delete": "Odstrániť",
+		"apply": "Použiť",
+		"any": "Akékoľvek",
+		"goBack": "Prejsť späť",
+		"error": "Chyba",
+		"close": "Zavrieť",
+		"refresh": "Obnoviť",
+		"ok": "OK"
 	},
 	"album": {
 		"featuring": "",
-		"similarAlbums": "",
-		"noSimilarAlbums": "",
-		"noTracks": ""
+		"similarAlbums": "Podobné albumy",
+		"noSimilarAlbums": "Nenašli sa žiadne podobné albumy",
+		"noTracks": "Žiadne skladby na albume"
 	},
 	"artist": {
 		"sections": {
-			"albums": "",
-			"eps": "",
-			"singles": "",
-			"other": "",
+			"albums": "Albumy",
+			"eps": "EP",
+			"singles": "Single",
+			"other": "Ostatné",
 			"featuredOn": ""
 		},
-		"noAlbums": "",
-		"similarTo": "",
-		"noSimilarArtists": "",
-		"viewTracks": ""
+		"noAlbums": "Žiadne albumy",
+		"similarTo": "Podobné ako {{name}}",
+		"noSimilarArtists": "Žiadni podobní interpreti",
+		"viewTracks": "Zobraziť skladby"
 	},
 	"cast": {
-		"noDevices": ""
+		"noDevices": "Použite tlačidlo Cast na výber zariadenia"
 	},
 	"context": {
-		"goTo": "",
+		"goTo": "Prejsť na {{name}}",
 		"removeDownload": "",
-		"downloadQueued": "",
-		"download": "",
-		"goToMix": "",
-		"addToPlaylist": "",
-		"deletePlaylist": "",
-		"removeFromPlaylist": "",
-		"playNext": "",
-		"playLater": "",
-		"openAudioSpecs": "",
-		"addToFavorites": "",
-		"removeFromFavorites": ""
+		"downloadQueued": "Stiahnuť skladby v poradí",
+		"download": "Stiahnuť",
+		"goToMix": "Prejsť na {{name}} mix",
+		"addToPlaylist": "Pridať do zoznamu skladieb",
+		"deletePlaylist": "Vymazať zoznam skladieb",
+		"removeFromPlaylist": "Odstrániť zo zoznamu skladieb",
+		"playNext": "Prehrať ako ďalšiu",
+		"playLater": "Prehrať neskôr",
+		"openAudioSpecs": "Otvoriť špecifikácie zvuku",
+		"addToFavorites": "Pridať do obľúbených",
+		"removeFromFavorites": "Odstrániť z obľúbených"
 	},
 	"discover": {
-		"recentlyAdded": "",
+		"recentlyAdded": "Nedávno pridané",
 		"moreFromTheVault": "",
-		"artistsForYou": "",
-		"playlistsOn": "",
-		"albumsOn": ""
+		"artistsForYou": "Interpreti pre vás",
+		"playlistsOn": "Zoznamy skladieb na {{server}}",
+		"albumsOn": "Albumy na {{server}}"
 	},
 	"errorBoundary": {
-		"title": "",
-		"message": ""
+		"title": "Ups! To bola nesprávna nôta.",
+		"message": "Aplikácia Jellify sa nečakane zastavila. Skúsme to vyladiť a pokúsiť sa o to znova!"
 	},
 	"filters": {
-		"favorites": "",
-		"downloaded": "",
-		"unplayed": "",
-		"yearRange": "",
-		"yearRangeWithValue": ""
+		"favorites": "Obľúbené",
+		"downloaded": "Stiahnuté",
+		"unplayed": "Neprehraté",
+		"yearRange": "Rozsah rokov",
+		"yearRangeWithValue": "Rozsah rokov {{range}}"
 	},
 	"swipe": {
-		"hint": "",
-		"playLater": "",
-		"toggleFavorite": "",
+		"hint": "Potiahnutím zobrazíte akcie",
+		"playLater": "Prehrať neskôr",
+		"toggleFavorite": "Prepnúť obľúbené",
 		"playNext": "",
-		"addToPlaylist": ""
+		"addToPlaylist": "Pridať do zoznamu skladieb"
 	},
 	"input": {
-		"clear": "",
-		"clearHint": ""
+		"clear": "Vyčistiť text",
+		"clearHint": "Vyčistí obsah textového poľa"
 	},
 	"instantMix": {
 		"noTracks": "",
 		"title": ""
 	},
 	"library": {
-		"createPlaylist": "",
-		"sort": "",
-		"filter": ""
+		"createPlaylist": "Vytvoriť zoznam skladieb",
+		"sort": "Zoradiť",
+		"filter": "Filter"
 	},
 	"librarySelector": {
-		"title": "",
-		"showingAll": "",
-		"tapForAll": "",
-		"loadError": "",
-		"noLibraries": "",
-		"noLibrariesHint": "",
-		"oneLibrary": ""
+		"title": "Vyberte hudobnú knižnicu",
+		"showingAll": "Zobrazuje sa hudba zo všetkých knižníc",
+		"tapForAll": "Ťuknutím na vybranú knižnicu znova zobrazíte všetky knižnice",
+		"loadError": "Nepodarilo sa načítať knižnice",
+		"noLibraries": "Nenašli sa žiadne hudobné knižnice",
+		"noLibrariesHint": "Ak chcete pokračovať, vytvorte si prosím hudobnú knižnicu v aplikácii Jellyfin",
+		"oneLibrary": "Len jedna hudobná knižnica je dostupná"
 	},
 	"login": {
-		"copiedToClipboard": "",
-		"signInManually": "",
-		"quickConnect": "",
-		"quickConnectHint": "",
-		"serverAddress": "",
-		"welcome": "",
-		"welcomeSubtitle": "",
-		"connect": "",
-		"signInTo": "",
-		"unknownVersion": "",
-		"username": "",
-		"password": "",
-		"signIn": "",
-		"useQuickConnect": "",
-		"noResponse": "",
-		"notSetUp": "",
-		"unableToConnect": ""
+		"copiedToClipboard": "Skopírované do schránky",
+		"signInManually": "Prihlásiť sa manuálne",
+		"quickConnect": "Rýchle pripojenie",
+		"quickConnectHint": "Zadajte kód v druhej relácii",
+		"serverAddress": "Adresa servera Jellyfin",
+		"welcome": "Vitajte!",
+		"welcomeSubtitle": "Pripojme sa k aplikácii Jellyfin",
+		"connect": "Pripojiť",
+		"signInTo": "Prihlásiť sa do {{server}}",
+		"unknownVersion": "Neznáma verzia Jellyfin",
+		"username": "Používateľské meno",
+		"password": "Heslo",
+		"signIn": "Prihlásiť sa",
+		"useQuickConnect": "Použiť rýchle pripojenie",
+		"noResponse": "Inštancia Jellyfin neodpovedala",
+		"notSetUp": "Server ešte nebol nastavený",
+		"unableToConnect": "Nepodarilo sa pripojiť k Jellyfin"
 	},
 	"lyrics": {
-		"none": ""
+		"none": "Text piesne nie je dostupný"
 	},
 	"player": {
-		"nothingPlaying": "",
-		"close": "",
-		"playingFrom": ""
+		"nothingPlaying": "Nič sa neprehráva",
+		"close": "Zavrieť prehrávač",
+		"playingFrom": "Prehráva sa z"
 	},
 	"network": {
-		"backOnline": "",
-		"offline": ""
+		"backOnline": "A sme späť!",
+		"offline": "Ste offline"
 	},
 	"audioSpecs": {
-		"downloadedFile": "",
-		"transcodedStream": "",
-		"directStream": ""
+		"downloadedFile": "Stiahnutý súbor",
+		"transcodedStream": "Prekódovaný stream",
+		"directStream": "Priamy stream"
 	},
 	"playlist": {
-		"namePlaceholder": "",
-		"none": "",
-		"name": "",
-		"deleteConfirm": "",
-		"created": "",
-		"createdMessage": ""
+		"namePlaceholder": "Názov zoznamu skladieb",
+		"none": "Žiadne zoznamy skladieb",
+		"name": "Názov",
+		"deleteConfirm": "Odstrániť zoznam skladieb {{name}}?",
+		"created": "Zoznam skladieb bol vytvorený",
+		"createdMessage": "Zoznam skladieb {{name}} bol vytvorený"
 	},
 	"queue": {
-		"nowPlaying": "",
+		"nowPlaying": "Práve sa prehráva",
 		"playingNext": "",
 		"playingLater": ""
 	},
 	"search": {
-		"inputLabel": "",
-		"inputHint": "",
-		"artistResults": "",
-		"results": "",
-		"noResults": "",
-		"suggestedArtists": "",
-		"suggestions": ""
+		"inputLabel": "Vyhľadať vo vašej knižnici",
+		"inputHint": "Napíšte text a vyhľadajte interpretov, albumy, zoznamy skladieb a skladby",
+		"artistResults": "Výsledky interpretov",
+		"results": "Výsledky",
+		"noResults": "Žiadne výsledky",
+		"suggestedArtists": "Navrhovaní interpreti",
+		"suggestions": "Návrhy"
 	},
 	"settings": {
 		"appIcon": {
-			"updated": "",
-			"title": "",
-			"description": ""
+			"updated": "Ikona aplikácie bola aktualizovaná na {{name}}",
+			"title": "Ikona aplikácie",
+			"description": "Nová ikona sa zobrazí po ukončení aplikácie"
 		},
 		"lookahead": {
 			"title": "",
-			"description": ""
+			"description": "Počet nasledujúcich skladieb, ktoré sa vopred načítajú"
 		},
 		"analytics": {
-			"title": "",
-			"learnMore": ""
+			"title": "Odosielať analytické údaje",
+			"learnMore": "Zistiť viac"
 		},
 		"sections": {
-			"appearance": "",
-			"gestures": "",
-			"playback": "",
-			"storage": "",
-			"privacyDeveloper": "",
-			"about": ""
+			"appearance": "Vzhľad",
+			"gestures": "Gestá",
+			"playback": "Prehrávanie",
+			"storage": "Úložisko",
+			"privacyDeveloper": "Súkromie a vývojár",
+			"about": "O aplikácii"
 		},
-		"signOut": "",
+		"signOut": "Odhlásiť sa",
 		"appearance": {
 			"themes": {
-				"system": "",
-				"light": "",
-				"dark": "",
-				"oled": ""
+				"system": "Podľa zariadenia",
+				"light": "Svetlá",
+				"dark": "Tmavá",
+				"oled": "OLED čierna"
 			},
 			"colorPresets": {
-				"haze": "",
-				"ocean": "",
-				"forest": "",
-				"sunset": "",
-				"peanut": ""
+				"haze": "Hmla",
+				"ocean": "Oceán",
+				"forest": "Les",
+				"sunset": "Západ slnka",
+				"peanut": "Arašid"
 			},
-			"theme": "",
-			"colorScheme": "",
-			"hideRuntimes": "",
-			"hideRuntimesDescription": "",
-			"hideCardIndicators": "",
-			"hideCardIndicatorsDescription": ""
+			"theme": "Téma",
+			"colorScheme": "Farebná schéma",
+			"hideRuntimes": "Skryť dĺžky",
+			"hideRuntimesDescription": "Skryť dĺžku trvania skladieb",
+			"hideCardIndicators": "Skryť indikátory na kartách",
+			"hideCardIndicatorsDescription": "Skryť indikátory v rohoch kariet"
 		},
 		"gestures": {
 			"description": "",
-			"swipeLeft": "",
-			"swipeRight": "",
-			"favorite": ""
+			"swipeLeft": "Potiahnuť doľava",
+			"swipeRight": "Potiahnuť doprava",
+			"favorite": "Obľúbiť"
 		},
 		"playback": {
-			"streamingQuality": "",
-			"streamingQualityDescription": "",
-			"normalization": "",
-			"normalizationDescription": "",
-			"qualityBadge": "",
-			"qualityBadgeDescription": ""
+			"streamingQuality": "Kvalita streamovania",
+			"streamingQualityDescription": "Zmeny sa prejavia pri nových skladbách",
+			"normalization": "Normalizácia zvuku",
+			"normalizationDescription": "Normalizovať hlasitosť medzi skladbami",
+			"qualityBadge": "Odznak kvality",
+			"qualityBadgeDescription": "Zobraziť kvalitu zvuku v prehrávači"
 		},
 		"quality": {
-			"original": "",
-			"high": "",
-			"medium": "",
-			"low": ""
+			"original": "Pôvodná kvalita",
+			"high": "Vysoká (320 kbps)",
+			"medium": "Stredná (256 kbps)",
+			"low": "Nízka (192 kbps)"
 		},
 		"developer": {
-			"invalidPrId": "",
-			"title": "",
-			"options": "",
-			"optionsDescription": "",
-			"prIdDescription": "",
-			"prIdPlaceholder": "",
-			"currentPrId": ""
+			"invalidPrId": "Zadajte prosím platné číslo PR (kladné celé číslo)",
+			"title": "Vývojár",
+			"options": "Možnosti pre vývojárov",
+			"optionsDescription": "Povoliť pokročilé funkcie pre vývojárov",
+			"prIdDescription": "Zadajte číslo PR na testovanie zostavení pull requestov",
+			"prIdPlaceholder": "Zadajte ID PR",
+			"currentPrId": "Aktuálne ID PR:"
 		},
 		"privacy": {
-			"title": "",
-			"reduceHaptics": "",
-			"reduceHapticsDescription": ""
+			"title": "Súkromie",
+			"reduceHaptics": "Znížiť haptickú odozvu",
+			"reduceHapticsDescription": "Znížiť intenzitu haptickej odozvy"
 		},
 		"library": {
-			"changed": "",
-			"nowUsing": "",
-			"nowUsingAll": "",
-			"apply": ""
+			"changed": "Knižnica bola zmenená",
+			"nowUsing": "Teraz sa používa {{name}}",
+			"nowUsingAll": "Teraz sa používajú všetky hudobné knižnice",
+			"apply": "Použiť zmeny"
 		}
 	},
 	"sort": {
 		"by": {
-			"track": "",
-			"album": "",
-			"artist": "",
-			"dateAdded": "",
-			"playCount": "",
-			"releaseDate": "",
-			"runtime": ""
+			"track": "Skladba",
+			"album": "Album",
+			"artist": "Interpret",
+			"dateAdded": "Dátum pridania",
+			"playCount": "Počet prehratí",
+			"releaseDate": "Dátum vydania",
+			"runtime": "Dĺžka"
 		},
 		"order": {
-			"oldest": "",
-			"newest": "",
-			"lowest": "",
-			"highest": "",
-			"ascending": "",
-			"descending": ""
+			"oldest": "Najstaršie",
+			"newest": "Najnovšie",
+			"lowest": "Najnižšie",
+			"highest": "Najvyššie",
+			"ascending": "Vzostupne",
+			"descending": "Zostupne"
 		},
-		"sortBy": "",
-		"sortOrder": ""
+		"sortBy": "Zoradiť podľa",
+		"sortOrder": "Poradie"
 	},
 	"navigation": {
-		"tracks": "",
-		"library": "",
-		"filters": "",
-		"player": "",
-		"audioDevices": "",
-		"search": "",
-		"selectLibrary": "",
-		"storageManagement": "",
-		"account": "",
-		"home": "",
-		"discover": "",
-		"settings": ""
+		"tracks": "Skladby",
+		"library": "Knižnica",
+		"filters": "Filtre",
+		"player": "Prehrávač",
+		"audioDevices": "Zvukové zariadenia",
+		"search": "Hľadať",
+		"selectLibrary": "Vybrať knižnicu",
+		"storageManagement": "Spravovanie úložiska",
+		"account": "Účet",
+		"home": "Domov",
+		"discover": "Objaviť",
+		"settings": "Nastavenia"
 	},
 	"genres": {
-		"title": "",
-		"selectAll": "",
-		"none": ""
+		"title": "Vybrať žánre",
+		"selectAll": "Vybrať všetko",
+		"none": "Nenašli sa žiadne žánre"
 	},
 	"years": {
-		"loadError": "",
-		"min": "",
-		"max": "",
-		"selectMin": "",
-		"selectMax": ""
+		"loadError": "Nepodarilo sa načítať roky",
+		"min": "Minimálny rok",
+		"max": "Maximálny rok",
+		"selectMin": "Vyberte minimálny rok",
+		"selectMax": "Vyberte maximálny rok"
 	},
 	"privacy": {
-		"intro": "",
-		"purpose": "",
-		"optional": "",
-		"readMore": ""
+		"intro": "Jellify je vybavené nástrojom GlitchTip na sledovanie a hlásenie chýb.",
+		"purpose": "Vďaka tomu môže Jellify automaticky zaznamenávať a hlásiť problémy.",
+		"optional": "Táto funkcia je úplne voliteľná, štandardne je vypnutá a jej zapnutie či vypnutie je možné kedykoľvek.",
+		"readMore": "Viac informácií o tom, ako sa s týmito údajmi nakladá, nájdete v našich <link>zásadách ochrany osobných údajov</link>."
 	},
 	"storage": {
-		"unknownSaveDate": "",
-		"deletedDownloads": "",
-		"reviewSelection": "",
-		"readyToRemove": "",
-		"savedAt": "",
-		"deleteDownloads": "",
-		"noneSelected": "",
+		"unknownSaveDate": "Neznámy dátum uloženia",
+		"deletedDownloads_one": "{{count}} stiahnutie bolo odstránené",
+		"deletedDownloads_few": "{{count}} stiahnutia boli odstránené",
+		"deletedDownloads_other": "{{count}} stiahnutí bolo odstránených",
+		"reviewSelection": "Skontrolovať výber",
+		"readyToRemove_one": "{{count}} skladba je pripravená na odstránenie",
+		"readyToRemove_few": "{{count}} skladby sú pripravená na odstránenie",
+		"readyToRemove_other": "{{count}} skladieb je pripravených na odstránenie",
+		"savedAt": "Uložené {{date}}",
+		"deleteDownloads": "Vymazať stiahnuté",
+		"noneSelected": "Nie sú vybrané žiadne skladby",
 		"noneSelectedHint": "",
-		"removedDownloads": "",
+		"removedDownloads_one": "",
+		"removedDownloads_few": "",
+		"removedDownloads_other": "",
 		"removedTrack": "",
 		"track": "",
 		"clearAllTitle": "",
 		"clearAllMessage": "",
 		"clearAll": "",
 		"clearSelectedTitle": "",
-		"clearSelectedMessage": "",
+		"clearSelectedMessage_one": "",
+		"clearSelectedMessage_few": "",
+		"clearSelectedMessage_other": "",
 		"selectedCount": "",
 		"overview": "",
 		"refreshOverview": "",
 		"usage": "",
-		"downloadCount": "",
+		"downloadCount_one": "",
+		"downloadCount_few": "",
+		"downloadCount_other": "",
 		"calculating": "",
 		"clearDownload": "",
 		"empty": "",
 		"emptyHint": "",
 		"readyToCleanUp": "",
-		"selectionSummary": "",
+		"selectionSummary_one": "",
+		"selectionSummary_few": "",
+		"selectionSummary_other": "",
 		"clearSize": "",
 		"offlineLibrary": "",
-		"cachedCount": "",
+		"cachedCount_one": "",
+		"cachedCount_few": "",
+		"cachedCount_other": "",
 		"audioFiles": "",
 		"downloadSettings": "",
 		"autoDownload": "",
@@ -415,7 +431,9 @@
 		"downloads": "",
 		"yourLibrary": "",
 		"queue": "",
-		"songCount": ""
+		"songCount_one": "",
+		"songCount_few": "",
+		"songCount_other": ""
 	},
 	"errors": {
 		"setAppIcon": "",
