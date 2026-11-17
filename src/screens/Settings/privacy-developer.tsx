@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
 import Button from '../../components/Global/utils/button'
-import Input from '../../components/Global/utils/input'
+import Input from '../../components/Global/utils/Input'
 import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
 import SettingsSection from '../../components/Settings/components/settings-section'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
