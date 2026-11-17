@@ -1,4 +1,4 @@
-import Input from '../../components/Global/utils/input'
+import Input from '../../components/Global/utils/Input'
 import React, { useState } from 'react'
 import { Label, Spinner, XStack, SizableText, YStack } from 'tamagui'
 import Button from '../../components/Global/utils/button'

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import Input from '../Global/utils/input'
+import React, { useEffect, useRef, useState } from 'react'
+import { useSearchInputGesture } from '../../hooks/gestures/search'
+import Input from '../Global/utils/Input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { H3, H5, SizableText, Spinner, YStack } from 'tamagui'
+import { H3, H5, SizableText, Spinner, TamaguiElement, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
@@ -35,6 +36,10 @@ export default function Search(): React.JSX.Element {
 	 * which is keyed off of this value for caching.
 	 */
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
+
+	const inputRef = useRef<TamaguiElement>(null)
+
+	useSearchInputGesture({ inputRef, navigation })
 
 	useEffect(() => {
 		const timeout = setTimeout(() => {
@@ -84,6 +89,7 @@ export default function Search(): React.JSX.Element {
 			ListHeaderComponent={
 				<YStack flex={1} paddingHorizontal='2'>
 					<Input
+						ref={inputRef}
 						placeholder={placeholder}
 						onChangeText={handleSearchStringUpdate}
 						value={inputValue}

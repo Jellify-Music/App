@@ -1,34 +1,9 @@
 import React from 'react'
-import { Platform, TextInputProps } from 'react-native'
-import {
-	SizableText,
-	Input as TamaguiInput,
-	InputProps as TamaguiInputProps,
-	XStack,
-	YStack,
-} from 'tamagui'
-import Icon from '../components/icon'
+import { Platform } from 'react-native'
+import { SizableText, Input as TamaguiInput, XStack, YStack } from 'tamagui'
+import Icon from '../../components/icon'
 import { useTranslation } from 'react-i18next'
-
-type RNTextInputAutofillSubset = Partial<
-	Pick<
-		TextInputProps,
-		| 'autoComplete'
-		| 'textContentType'
-		| 'importantForAutofill'
-		| 'returnKeyType'
-		| 'autoFocus'
-		| 'keyboardType'
-	>
->
-
-type InputProps = Exclude<TamaguiInputProps, 'size'> &
-	RNTextInputAutofillSubset & {
-		title?: string | undefined
-		testID?: string | undefined
-		prependElement?: React.JSX.Element | undefined
-		appendElement?: React.JSX.Element | undefined
-	}
+import { InputProps } from './types'
 
 /**
  * On Android, `clearButtonMode` is iOS-only and produces no UI. We render a
