@@ -4,6 +4,7 @@ import {
 	SizableText,
 	Input as TamaguiInput,
 	InputProps as TamaguiInputProps,
+	TamaguiElement,
 	XStack,
 	YStack,
 } from 'tamagui'
@@ -24,6 +25,7 @@ type RNTextInputAutofillSubset = Partial<
 
 type InputProps = Exclude<TamaguiInputProps, 'size'> &
 	RNTextInputAutofillSubset & {
+		ref?: React.Ref<TamaguiElement> | undefined
 		title?: string | undefined
 		testID?: string | undefined
 		prependElement?: React.JSX.Element | undefined
