@@ -159,7 +159,7 @@ export default function Account(): React.JSX.Element {
 								<ServerInfoChip
 									label={t('account.detected')}
 									value={'AudioMuse AI'}
-									icon='music-box'
+									icon='creation'
 									color={'success'}
 								/>
 							)}
