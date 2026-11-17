@@ -1,6 +1,7 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import en from './locales/en.json'
+import sk from './locales/sk.json'
 
 /**
  * Translation resources, keyed by language code.
@@ -10,6 +11,7 @@ import en from './locales/en.json'
  */
 export const resources = {
 	en: { translation: en },
+	sk: { translation: sk },
 } as const
 
 /**
