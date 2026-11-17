@@ -40,6 +40,7 @@ export default function Search(): React.JSX.Element {
 	const inputRef = useRef<TamaguiElement>(null)
 
 	useSearchInputGesture({ inputRef, navigation })
+
 	useEffect(() => {
 		const timeout = setTimeout(() => {
 			setSearchString(inputValue || undefined)

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { RefObject, useEffect } from 'react'
 import { TamaguiElement } from 'tamagui'
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs'
 import TabParamList from '../../screens/Tabs/types'
@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import SearchParamList from '../../screens/Search/types'
 
 interface UseSearchInputParams {
-	inputRef: React.RefObject<TamaguiElement | null>
+	inputRef: RefObject<TamaguiElement | null>
 	navigation: NativeStackNavigationProp<SearchParamList>
 }
 
@@ -24,5 +24,5 @@ export const useSearchInputGesture = ({ inputRef, navigation }: UseSearchInputPa
 		return tabNavigation?.addListener('tabPress', () => {
 			if (navigation.isFocused()) inputRef.current?.focus()
 		})
-	}, [navigation])
+	}, [inputRef, navigation])
 }
