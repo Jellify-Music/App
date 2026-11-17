@@ -1,16 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { TextInputInstance } from 'react-native'
+import { useSearchInputGesture } from '../../hooks/gestures/search'
 import Input from '../Global/utils/input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs'
 import { H3, H5, SizableText, Spinner, TamaguiElement, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import ItemCard from '../Global/components/Card'
 import SearchParamList from '../../screens/Search/types'
-import TabParamList from '../../screens/Tabs/types'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import navigationRef from '../../screens/navigation'
 import { StackActions, useNavigation } from '@react-navigation/native'
@@ -41,18 +39,7 @@ export default function Search(): React.JSX.Element {
 
 	const inputRef = useRef<TamaguiElement>(null)
 
-	/**
-	 * Pressing the Search tab while already on the search screen focuses the input
-	 * and opens the keyboard. The listener lives on the parent tab navigator since
-	 * tab events don't propagate to nested stack screens.
-	 */
-	useEffect(() => {
-		const tabNavigation = navigation.getParent<BottomTabNavigationProp<TabParamList>>()
-		return tabNavigation?.addListener('tabPress', () => {
-			if (navigation.isFocused()) (inputRef.current as TextInputInstance | null)?.focus()
-		})
-	}, [navigation])
-
+	useSearchInputGesture({ inputRef, navigation })
 	useEffect(() => {
 		const timeout = setTimeout(() => {
 			setSearchString(inputValue || undefined)
