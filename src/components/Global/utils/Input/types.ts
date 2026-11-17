@@ -1,6 +1,6 @@
 import { TextInputProps } from 'react-native'
-import { InputProps as TamaguiInputProps, TamaguiElement } from 'tamagui'
-import type { RefObject } from 'react'
+import { InputProps as TamaguiInputProps } from 'tamagui'
+import type { InputRefObject } from '../../../../hooks/gestures/search'
 
 type RNTextInputAutofillSubset = Partial<
 	Pick<
@@ -22,7 +22,7 @@ export type InputProps = Omit<TamaguiInputProps, 'size'> &
 		/**
 		 * A ref to the underlying Tamagui input element.
 		 */
-		ref?: RefObject<TamaguiElement | null>
+		ref?: InputRefObject
 
 		/**
 		 * The title displayed above the input field.
