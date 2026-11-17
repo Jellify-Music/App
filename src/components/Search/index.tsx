@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useSearchInputGesture } from '../../hooks/gestures/search'
-import Input from '../Global/utils/input'
+import Input from '../Global/utils/Input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H3, H5, SizableText, Spinner, TamaguiElement, YStack } from 'tamagui'
