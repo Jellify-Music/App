@@ -1,4 +1,5 @@
 import Tabs from './Tabs'
+import OtaScreen from './Ota'
 import { RootStackParamList } from './types'
 import { SizableText, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -98,6 +99,15 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		},
 		PrivacyPolicy: {
 			screen: PrivacyPolicyScreen,
+			options: {
+				headerShown: false,
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
+			},
+		},
+		Ota: {
+			screen: OtaScreen,
 			options: {
 				headerShown: false,
 				presentation: bottomSheetPresentation,

@@ -2,8 +2,9 @@ import { applyHapticFeedback } from '../../utils/haptics'
 import OTA_GITHUB_URL from '../../configs/ota.config'
 import { Platform, Alert } from 'react-native'
 
-import { githubOTA, OTAUpdateManager, reloadApp } from 'react-native-nitro-ota'
+import { githubOTA, OTAUpdateManager } from 'react-native-nitro-ota'
 import i18n from '../../i18n'
+import navigationRef from '../../screens/navigation'
 
 export const downloadPRUpdate = (prNumber: number) => {
 	const gitBranch = `PULL_REQUEST_${prNumber}_${Platform.OS}`
@@ -18,10 +19,7 @@ export const downloadPRUpdate = (prNumber: number) => {
 		.downloadUpdate()
 		.then(() => {
 			applyHapticFeedback('success')
-			Alert.alert(i18n.t('ota.prUpdated'), i18n.t('ota.restart'), [
-				{ text: i18n.t('common.ok'), onPress: reloadApp },
-				{ text: i18n.t('common.cancel'), style: 'cancel' },
-			])
+			navigationRef.navigate('Ota', { pullRequest: true })
 		})
 		.catch((error) => {
 			applyHapticFeedback('fatal')

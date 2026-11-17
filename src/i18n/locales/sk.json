@@ -410,7 +410,8 @@
 	},
 	"ota": {
 		"updated": "Aplikácia Jellify bola aktualizovaná!",
-		"restart": "Reštartujte ju, aby sa zmeny uplatnili",
+		"restart": "Reštartovať",
+		"restartInstructions": "Reštartujte ju, aby sa zmeny uplatnili",
 		"notAvailable": "Aktualizácia nie je dostupná",
 		"prUpdated": "Aplikácia Jellify bola aktualizovaná pomocou PR",
 		"prNotAvailable": "Toto zostavenie PR nie je k dispozícii"

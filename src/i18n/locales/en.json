@@ -412,7 +412,8 @@
 	},
 	"ota": {
 		"updated": "Jellify has been updated!",
-		"restart": "Restart to apply the changes",
+		"restart": "Restart",
+		"restartInstructions": "Restart to apply the changes",
 		"notAvailable": "Update not available",
 		"prUpdated": "Jellify has been updated with the PR",
 		"prNotAvailable": "This PR build is not available"

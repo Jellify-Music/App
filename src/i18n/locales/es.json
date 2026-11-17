@@ -411,6 +411,7 @@
 	"ota": {
 		"updated": "",
 		"restart": "",
+		"restartInstructions": "",
 		"notAvailable": "",
 		"prUpdated": "",
 		"prNotAvailable": ""
