@@ -1,7 +1,7 @@
 {
 	"home": {
-		"onRepeat": "",
-		"recentArtists": "",
+		"onRepeat": "Najprehrávanejšie",
+		"recentArtists": "Nedávno prehrávaní interpreti",
 		"yourPlaylists": "Vaše zoznamy skladieb",
 		"playItAgain": "Pustite si to znova",
 		"mostPlayed": "Najviac hrané",
@@ -35,7 +35,8 @@
 		"version": "Verzia",
 		"connection": "Pripojenie",
 		"secure": "Zabezpečené (HTTPS)",
-		"insecure": "Nezabezpečené (HTTP)"
+		"insecure": "Nezabezpečené (HTTP)",
+		"detected": "Zistené"
 	},
 	"common": {
 		"change": "Zmeniť",
