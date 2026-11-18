@@ -34,4 +34,4 @@ For screens that are reachable from multiple navigation stacks (e.g. an album de
 | `search/` | Search tab | `search-tab-button` |
 | `discover/` | Discover tab | `discover-tab-button` |
 | `settings/` | Settings tab | `settings-tab-button` |
-| `player/` | Full-screen player & queue | `miniplayer-test-id` (expand) |
+| `player/` | Full-screen player, queue & header-link navigation to the source album | `miniplayer-test-id` (expand) |
