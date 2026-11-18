@@ -111,13 +111,13 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		},
 		AddPlaylistUsers: {
 			screen: addPlaylistUsers,
-			options: ({ route }) => ({
+			options: {
 				title: 'Share Playlist',
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: canUseFormSheet ? [1.0] : undefined,
 				sheetGrabberVisible: true,
-			}),
-    },
+			},
+		},
 		Ota: {
 			screen: OtaScreen,
 			options: {
