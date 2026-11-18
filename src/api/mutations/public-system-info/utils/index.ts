@@ -1,6 +1,7 @@
 import { ServerAddressNotAvailableError } from '../../../../types/errors'
 import { JellyfinInfo } from '../../../info'
 import type { ConnectToServerResult } from '../types'
+import i18n from '../../../../i18n'
 
 /**
  * Attempts to connect to a Jellyfin server.
@@ -17,7 +18,7 @@ export async function connectToServer(serverAddress: string): Promise<ConnectToS
 	const candidates = await JellyfinInfo.discovery.getRecommendedServerCandidates(serverAddress)
 	const best = JellyfinInfo.discovery.findBestServer(candidates)
 
-	if (!best?.systemInfo?.Version) throw new Error('Unable to connect to Jellyfin')
+	if (!best?.systemInfo?.Version) throw new Error(i18n.t('login.unableToConnect'))
 
 	return {
 		publicSystemInfoResponse: best.systemInfo,

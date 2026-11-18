@@ -5,6 +5,7 @@ import { XStack, YStack, SizableText, Spinner, View } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import ItemImage from '../../Global/components/image'
 import { Ticker } from '../../Global/utils/Animated/text'
+import { useTranslation } from 'react-i18next'
 
 /**
  * Props for the AddToPlaylistRow component
@@ -25,6 +26,8 @@ export default function AddToPlaylistRow({
 	playlist,
 	tracks,
 }: AddToPlaylistRowProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	// The list is virtualized, so rows only mount (and fetch) when near the viewport
 	const { data: playlistTracks, isPending: fetchingPlaylistTracks } = usePlaylistTracks(playlist)
 
@@ -68,7 +71,7 @@ export default function AddToPlaylistRow({
 			<YStack alignItems='flex-start' flex={1}>
 				<Ticker>
 					<SizableText fontWeight='6' fontSize='3' numberOfLines={1}>
-						{playlist.Name ?? 'Untitled Playlist'}
+						{playlist.Name ?? t('placeholders.untitledPlaylist')}
 					</SizableText>
 				</Ticker>
 

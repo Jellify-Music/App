@@ -3,8 +3,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { PrivacyPolicyProps } from '../types'
 import { Linking } from 'react-native'
 import { PRIVACY_POLICY_URL } from '../../configs/privacy.config'
+import { Trans, useTranslation } from 'react-i18next'
 
 export default function PrivacyPolicyScreen(props: PrivacyPolicyProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { top, bottom } = useSafeAreaInsets()
 
 	const onGlitchTipPress = () => {
@@ -20,28 +23,31 @@ export default function PrivacyPolicyScreen(props: PrivacyPolicyProps): React.JS
 			gap='4'
 		>
 			<Paragraph textAlign='center' fontSize='3' fontWeight='6'>
-				Jellify is equipped with GlitchTip for error tracking and reporting.
+				{t('privacy.intro')}
 			</Paragraph>
 
 			<Paragraph textAlign='center' fontSize='3'>
-				This enables Jellify to collect and report issues automatically.
+				{t('privacy.purpose')}
 			</Paragraph>
 
 			<Paragraph textAlign='center' fontSize='3'>
-				This is entirely optional, off by default, and can be toggled at any time.
+				{t('privacy.optional')}
 			</Paragraph>
 
 			<Paragraph textAlign='center' fontSize='3'>
-				You can read more about how this data is handled in our{' '}
-				<Paragraph
-					textAlign='center'
-					fontSize='3'
-					color='primary'
-					onPress={onGlitchTipPress}
-				>
-					privacy policy
-				</Paragraph>
-				.
+				<Trans
+					i18nKey='privacy.readMore'
+					components={{
+						link: (
+							<Paragraph
+								textAlign='center'
+								fontSize='3'
+								color='primary'
+								onPress={onGlitchTipPress}
+							/>
+						),
+					}}
+				/>
 			</Paragraph>
 		</YStack>
 	)

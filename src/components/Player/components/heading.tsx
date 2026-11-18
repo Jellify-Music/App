@@ -4,16 +4,19 @@ import React from 'react'
 import { Ticker } from '../../Global/utils/Animated/text'
 import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../screens/navigation'
+import { useTranslation } from 'react-i18next'
 
 export default function PlayerHeading(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const theme = useTheme()
 
 	const queueRef = useQueueRef()
 
 	const playingFrom = !queueRef
-		? 'Untitled'
+		? t('placeholders.untitled')
 		: typeof queueRef === 'object'
-			? (queueRef.Name ?? 'Untitled')
+			? (queueRef.Name ?? t('placeholders.untitled'))
 			: queueRef
 
 	return (
@@ -29,7 +32,7 @@ export default function PlayerHeading(): React.JSX.Element {
 				size={22}
 				onPress={() => navigationRef.goBack()}
 				testID='player-close-button'
-				accessibilityLabel='Close player'
+				accessibilityLabel={t('player.close')}
 				style={{
 					marginVertical: 'auto',
 					width: 22,
@@ -38,7 +41,7 @@ export default function PlayerHeading(): React.JSX.Element {
 			/>
 
 			<YStack alignItems='center' flexGrow={1}>
-				<SizableText fontSize={'2'}>Playing from</SizableText>
+				<SizableText fontSize={'2'}>{t('player.playingFrom')}</SizableText>
 				<Ticker>
 					<SizableText fontWeight='6' numberOfLines={1} fontSize='2'>
 						{playingFrom}

@@ -9,8 +9,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { applyHapticFeedback } from '../../utils/haptics'
+import { useTranslation } from 'react-i18next'
 
 export default function Filters({ currentTab }: FiltersProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { bottom } = useSafeAreaInsets()
 
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -90,7 +93,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 					id='filter-favorites'
 					checked={isFavorites === true}
 					onCheckedChange={handleFavoritesToggle}
-					label='Favorites'
+					label={t('filters.favorites')}
 				/>
 			</XStack>
 
@@ -100,7 +103,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 						id='filter-downloaded'
 						checked={isDownloaded}
 						onCheckedChange={handleDownloadedToggle}
-						label='Downloaded'
+						label={t('filters.downloaded')}
 						disabled={hasGenresSelected}
 					/>
 				</XStack>
@@ -112,7 +115,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 						id='filter-unplayed'
 						checked={isUnplayed}
 						onCheckedChange={handleUnplayedToggle}
-						label='Unplayed'
+						label={t('filters.unplayed')}
 					/>
 				</XStack>
 			)}
@@ -169,7 +172,9 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 										: 'neutral'
 							}
 						>
-							{hasYearRange ? `Year range ${yearRangeLabel}` : 'Year range'}
+							{hasYearRange
+								? t('filters.yearRangeWithValue', { range: yearRangeLabel })
+								: t('filters.yearRange')}
 						</SizableText>
 						<Icon
 							name={hasYearRange ? 'filter-variant' : 'filter'}

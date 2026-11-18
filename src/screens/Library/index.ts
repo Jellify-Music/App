@@ -10,6 +10,8 @@ import DeletePlaylist from './delete-playlist'
 import LibraryTabs from '../../components/Library/component'
 import { BaseStackScreens } from '../base-stack'
 import { stackScreenOptions } from '../navigation'
+import GeneratePlaylistScreen from './generate-playlist'
+import i18n from '../../i18n'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 	initialRouteName: 'LibraryScreen',
@@ -18,7 +20,7 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		LibraryScreen: {
 			screen: LibraryTabs,
 			options: {
-				title: 'Library',
+				title: i18n.t('navigation.library'),
 
 				// I honestly don't think we need a header for this screen, given that there are
 				// tabs on the top of the screen for navigating the library, but if we want one,
@@ -30,7 +32,7 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		AddPlaylist: {
 			screen: AddPlaylist,
 			options: {
-				title: 'Create Playlist',
+				title: i18n.t('library.createPlaylist'),
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
@@ -39,7 +41,7 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		Filters: {
 			screen: FiltersSheet,
 			options: {
-				headerTitle: 'Filters',
+				headerTitle: i18n.t('navigation.filters'),
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
@@ -48,7 +50,7 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		SortOptions: {
 			screen: SortOptionsSheet,
 			options: {
-				headerTitle: 'Sort',
+				headerTitle: i18n.t('library.sort'),
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
@@ -57,7 +59,7 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		GenreSelection: {
 			screen: GenreSelectionScreen,
 			options: {
-				headerTitle: 'Select Genres',
+				headerTitle: i18n.t('genres.title'),
 				presentation: 'modal',
 				sheetGrabberVisible: true,
 			},
@@ -65,7 +67,7 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		YearSelection: {
 			screen: YearSelectionScreen,
 			options: {
-				headerTitle: 'Year range',
+				headerTitle: i18n.t('filters.yearRange'),
 				presentation: 'modal',
 				sheetGrabberVisible: true,
 			},
@@ -73,11 +75,20 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		DeletePlaylist: {
 			screen: DeletePlaylist,
 			options: {
-				title: 'Delete Playlist',
+				title: i18n.t('context.deletePlaylist'),
 				presentation: bottomSheetPresentation,
 				headerShown: false,
 				sheetGrabberVisible: true,
 				sheetAllowedDetents: 'fitToContents',
+			},
+		},
+		GeneratePlaylist: {
+			screen: GeneratePlaylistScreen,
+			options: {
+				title: i18n.t('library.generatePlaylist'),
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
 			},
 		},
 	},

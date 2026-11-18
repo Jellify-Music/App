@@ -15,8 +15,11 @@ import HTTPS from '../../../constants/protocols'
 import SettingsNavRow from './settings-nav-row'
 import getUserImageUrl from '../../../api/queries/image/utils/avatar'
 import { useJellyfinServer } from '../../../hooks/auth/server'
+import { useTranslation } from 'react-i18next'
 
 export default function VerticalSettings(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { top } = useSafeAreaInsets()
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
@@ -59,7 +62,7 @@ export default function VerticalSettings(): React.JSX.Element {
 						</Avatar>
 						<YStack flex={1}>
 							<SizableText fontSize='3' fontWeight='6' color='background'>
-								{user?.name ?? 'Unknown User'}
+								{user?.name ?? t('placeholders.unknownUser')}
 							</SizableText>
 							<XStack alignItems='center'>
 								<Icon
@@ -68,7 +71,7 @@ export default function VerticalSettings(): React.JSX.Element {
 									size='4'
 								/>
 								<SizableText size='2' color='background'>
-									{serverInfo?.ServerName ?? 'Unknown Server'}
+									{serverInfo?.ServerName ?? t('placeholders.unknownServer')}
 								</SizableText>
 							</XStack>
 						</YStack>
@@ -78,42 +81,42 @@ export default function VerticalSettings(): React.JSX.Element {
 
 				<SettingsNavRow
 					testID='settings-nav-appearance'
-					title='Appearance'
+					title={t('settings.sections.appearance')}
 					icon='palette'
 					route='Appearance'
 					iconColor='primary'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-gestures'
-					title='Gestures'
+					title={t('settings.sections.gestures')}
 					icon='gesture-swipe'
 					route='Gestures'
 					iconColor='success'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-playback'
-					title='Playback'
+					title={t('settings.sections.playback')}
 					icon='play-circle'
 					route='Playback'
 					iconColor='warning'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-storage'
-					title='Storage'
+					title={t('settings.sections.storage')}
 					icon='harddisk'
 					route='StorageManagement'
 					iconColor='primary'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-privacy-developer'
-					title='Privacy & Developer'
+					title={t('settings.sections.privacyDeveloper')}
 					icon='shield-account'
 					route='PrivacyDeveloper'
 					iconColor='success'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-about'
-					title='About'
+					title={t('settings.sections.about')}
 					icon='information'
 					route='About'
 					iconColor='primary'
@@ -129,7 +132,7 @@ export default function VerticalSettings(): React.JSX.Element {
 						icon={<Icon size='6' name='logout' color='background' />}
 					>
 						<SizableText size='3' color='background' fontWeight='6'>
-							Sign Out
+							{t('settings.signOut')}
 						</SizableText>
 					</Button>
 				</YStack>

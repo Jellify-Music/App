@@ -2,7 +2,9 @@ import { applyHapticFeedback } from '../../utils/haptics'
 import OTA_GITHUB_URL from '../../configs/ota.config'
 import { Platform, Alert } from 'react-native'
 
-import { githubOTA, OTAUpdateManager, reloadApp } from 'react-native-nitro-ota'
+import { githubOTA, OTAUpdateManager } from 'react-native-nitro-ota'
+import i18n from '../../i18n'
+import navigationRef from '../../screens/navigation'
 
 export const downloadPRUpdate = (prNumber: number) => {
 	const gitBranch = `PULL_REQUEST_${prNumber}_${Platform.OS}`
@@ -17,13 +19,10 @@ export const downloadPRUpdate = (prNumber: number) => {
 		.downloadUpdate()
 		.then(() => {
 			applyHapticFeedback('success')
-			Alert.alert('Jellify has been updated with the PR', 'Restart to apply the changes', [
-				{ text: 'OK', onPress: reloadApp },
-				{ text: 'Cancel', style: 'cancel' },
-			])
+			navigationRef.navigate('Ota', { pullRequest: true })
 		})
 		.catch((error) => {
 			applyHapticFeedback('fatal')
-			Alert.alert('PR is not available or to be found')
+			Alert.alert(i18n.t('ota.prNotAvailable'))
 		})
 }

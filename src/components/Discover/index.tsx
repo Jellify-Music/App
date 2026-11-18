@@ -44,7 +44,7 @@ export default function Index(): React.JSX.Element {
 
 function DiscoverContent() {
 	return (
-		<YStack alignContent='flex-start' gap='1'>
+		<YStack gap='2'>
 			<RecentlyAdded />
 
 			<PublicPlaylists />

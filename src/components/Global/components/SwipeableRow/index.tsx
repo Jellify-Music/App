@@ -20,6 +20,7 @@ import {
 import { SwipeableRowProvider } from './context'
 import { Pressable } from 'react-native'
 import { SwipeAction, QuickAction } from '../../../../hooks/gestures/types'
+import { useTranslation } from 'react-i18next'
 
 type SwipeableRowProps = {
 	children: React.ReactNode
@@ -48,6 +49,8 @@ export default function SwipeableRow({
 	rightActions,
 	disabled,
 }: SwipeableRowProps) {
+	const { t } = useTranslation()
+
 	const tx = useSharedValue(0)
 	const idRef = useRef<string | undefined>(undefined)
 	// React state for menu open (avoids pointerEvents bug from treating SharedValue object as truthy)
@@ -256,7 +259,7 @@ export default function SwipeableRow({
 										borderRadius={0}
 										opacity='1 press:0.8'
 										role='button'
-										aria-label={`Left quick action ${action.icon}`}
+										aria-label={action.label}
 										onPress={() => {
 											action.onPress()
 											close()
@@ -339,7 +342,7 @@ export default function SwipeableRow({
 										borderRadius={0}
 										opacity='1 press:0.8'
 										role='button'
-										aria-label={`Right quick action ${action.icon}`}
+										aria-label={action.label}
 										onPress={() => {
 											action.onPress()
 											close()
@@ -366,9 +369,7 @@ export default function SwipeableRow({
 						style={fgStyle}
 						// Disable touches only while a menu is open; allow presses when closed
 						pointerEvents={isMenuOpen ? 'none' : 'auto'}
-						accessibilityHint={
-							leftAction || rightAction ? 'Swipe for actions' : undefined
-						}
+						accessibilityHint={leftAction || rightAction ? t('swipe.hint') : undefined}
 					>
 						{children}
 					</Animated.View>

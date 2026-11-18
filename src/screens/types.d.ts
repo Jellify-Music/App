@@ -76,6 +76,8 @@ export type RootStackParamList = {
 		playlist: BaseItemDto
 	}
 	PrivacyPolicy: undefined
+
+	Ota: { pullRequest?: boolean } | undefined
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -100,3 +102,4 @@ export type GenresProps = {
 
 export type AddPlaylistUsersProps = NativeStackScreenProps<RootStackParamList, 'AddPlaylistUsers'>
 export type PrivacyPolicyProps = NativeStackScreenProps<RootStackParamList, 'PrivacyPolicy'>
+export type OtaProps = NativeStackScreenProps<RootStackParamList, 'Ota'>

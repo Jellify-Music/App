@@ -3,6 +3,7 @@ import React from 'react'
 import type { EventHandler } from '../../types/Events'
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
 import * as Sentry from '@sentry/react-native'
+import i18n from '../../i18n'
 
 type Props = {
 	reloader: number
@@ -60,12 +61,10 @@ export default class ErrorBoundary extends React.Component<Props, State> {
 			return (
 				<View style={styles.container}>
 					<Text style={styles.emoji}>🎵😵‍💫</Text>
-					<Text style={styles.title}>Oops! That was a wrong note.</Text>
-					<Text style={styles.subtitle}>
-						Jellify stopped unexpectedly. Lets tune things up and try again!
-					</Text>
+					<Text style={styles.title}>{i18n.t('errorBoundary.title')}</Text>
+					<Text style={styles.subtitle}>{i18n.t('errorBoundary.message')}</Text>
 					<TouchableOpacity style={styles.button} onPress={this.handleRetry}>
-						<Text style={styles.buttonText}>Retry</Text>
+						<Text style={styles.buttonText}>{i18n.t('common.retry')}</Text>
 					</TouchableOpacity>
 					{/* {__DEV__ && this.state.error && (
 						<Text style={styles.devError}>{this.state.error.toString()}</Text>
