@@ -1,0 +1,49 @@
+appId: com.cosmonautical.jellify
+---
+# Start an album queue so the header has a navigable source.
+- tapOn:
+    id: "library-tab-button"
+
+- tapOn:
+    id: "library-albums-tab-button"
+
+- tapOn:
+    id: "album-item-0"
+    index: 0
+
+- scrollUntilVisible:
+    element:
+      id: "album-track-0"
+    direction: DOWN
+
+- tapOn:
+    id: "album-track-0"
+
+- tapOn:
+    id: "miniplayer-test-id"
+
+- copyTextFrom:
+    id: "player-queue-link"
+
+- evalScript: ${output.queueTitle = maestro.copiedText}
+
+- tapOn:
+    id: "player-queue-link"
+
+- assertNotVisible:
+    id: "player-close-button"
+
+- assertVisible:
+    id: "album-track-0"
+
+- assertVisible:
+    text: ${'\\Q' + output.queueTitle + '\\E'}
+
+# Leave the Library stack at its root and restore Home for the next flow.
+- runFlow: ../../subflows/platform/back.yaml
+
+- assertVisible:
+    id: "library-albums-tab-button"
+
+- tapOn:
+    id: "home-tab-button"

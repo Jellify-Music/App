@@ -57,7 +57,7 @@ export default function PlayerHeading(): React.JSX.Element {
 
 			<YStack flex={1} alignItems='center' gap={'1'}>
 				<SizableText fontSize={'2'}>{t('player.playingFrom')}</SizableText>
-				<Ticker>
+				<Ticker testID='player-queue-link'>
 					<SizableText
 						fontWeight='6'
 						numberOfLines={1}

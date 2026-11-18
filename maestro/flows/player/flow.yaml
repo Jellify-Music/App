@@ -44,3 +44,5 @@ appId: com.cosmonautical.jellify
 
 # Navigate back to dismiss the full-screen player
 - runFlow: ../../subflows/platform/close-player.yaml
+
+- runFlow: header-link.yaml
