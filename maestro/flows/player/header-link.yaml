@@ -22,6 +22,9 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "miniplayer-test-id"
 
+- assertVisible:
+    id: "player-close-button"
+
 - copyTextFrom:
     id: "player-queue-link"
 
