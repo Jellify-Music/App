@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React from 'react'
@@ -14,6 +15,8 @@ import AnimatedRow from '../../Global/utils/Animated/row'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function FrequentArtists(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -22,7 +25,7 @@ export default function FrequentArtists(): React.JSX.Element {
 	const renderItem = ({ item: artist }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
 			item={artist}
-			caption={artist.Name ?? 'Unknown Artist'}
+			caption={artist.Name ?? t('placeholders.unknownArtist')}
 			subCaption={pickFirstGenre(artist.Genres)}
 			onPress={() => {
 				navigation.navigate('Artist', {
@@ -49,7 +52,7 @@ export default function FrequentArtists(): React.JSX.Element {
 				opacity='1 press:0.6'
 				marginHorizontal='2'
 			>
-				<H4 userSelect='none'>Most Played</H4>
+				<H4 userSelect='none'>{t('home.mostPlayed')}</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

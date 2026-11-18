@@ -8,8 +8,11 @@ import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screen
 import navigationRef from '../../../screens/navigation'
 import { useRecentlyAddedAlbums } from '../../../api/queries/album'
 import AnimatedRow from '../../Global/utils/Animated/row'
+import { useTranslation } from 'react-i18next'
 
 export default function RecentlyAdded(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const recentlyAddedAlbumsInfinityQuery = useRecentlyAddedAlbums()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
@@ -30,7 +33,7 @@ export default function RecentlyAdded(): React.JSX.Element {
 				opacity='1 press:0.6'
 				marginHorizontal='2'
 			>
-				<H4 userSelect='none'>Recently Added</H4>
+				<H4 userSelect='none'>{t('discover.recentlyAdded')}</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

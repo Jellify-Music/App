@@ -73,6 +73,8 @@ export type RootStackParamList = {
 	}
 
 	PrivacyPolicy: undefined
+
+	Ota: { pullRequest?: boolean } | undefined
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -83,3 +85,4 @@ export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'Add
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
 export type PrivacyPolicyProps = NativeStackScreenProps<RootStackParamList, 'PrivacyPolicy'>
+export type OtaProps = NativeStackScreenProps<RootStackParamList, 'Ota'>

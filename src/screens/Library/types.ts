@@ -7,6 +7,7 @@ import { FetchNextPageOptions, InfiniteData } from '@tanstack/react-query'
 type LibraryStackParamList = BaseStackParamList & {
 	LibraryScreen: NavigatorScreenParams<BaseStackParamList> | undefined
 	AddPlaylist: undefined
+	GeneratePlaylist: undefined
 	DeletePlaylist: {
 		playlist: BaseItemDto
 	}
@@ -29,6 +30,10 @@ export type LibraryArtistProps = NativeStackScreenProps<LibraryStackParamList, '
 export type LibraryAlbumProps = NativeStackScreenProps<LibraryStackParamList, 'Album'>
 
 export type LibraryAddPlaylistProps = NativeStackScreenProps<LibraryStackParamList, 'AddPlaylist'>
+export type LibraryGeneratePlaylistProps = NativeStackScreenProps<
+	LibraryStackParamList,
+	'GeneratePlaylist'
+>
 export type LibraryDeletePlaylistProps = NativeStackScreenProps<
 	LibraryStackParamList,
 	'DeletePlaylist'

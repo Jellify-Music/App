@@ -1,7 +1,6 @@
 import usePatrons from '../../api/queries/patrons'
 import useSpecialThanks from '../../api/queries/special-thanks'
-import { APP_GITHUB_URL } from '../../configs/ota.config'
-import { PRIVACY_POLICY_URL } from '../../configs/privacy.config'
+import { PRIVACY_POLICY_URL, SOURCE_CODE_URL } from '../../configs/privacy.config'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { useInfoCaption } from '../../hooks/use-caption'
 import { downloadUpdate } from '../../services/ota'
@@ -13,8 +12,11 @@ import { YStack, XStack, SizableText, Separator, Spacer, ScrollView, H4 } from '
 import SupporterList from './components/supporter-list'
 import Icon from '../Global/components/icon'
 import JellifyLogo from '../Branding/logo'
+import { useTranslation } from 'react-i18next'
 
 export default function About(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const patrons = usePatrons()
 	const specialThanks = useSpecialThanks()
 	const { data: caption } = useInfoCaption()
@@ -46,7 +48,7 @@ export default function About(): React.JSX.Element {
 								</SizableText>
 								{otaVersion && (
 									<SizableText fontSize='2' color='borderColor'>
-										OTA Version: {otaVersion}
+										{t('about.otaVersion', { version: otaVersion })}
 									</SizableText>
 								)}
 							</YStack>
@@ -70,12 +72,12 @@ export default function About(): React.JSX.Element {
 							alignItems='center'
 							gap='1'
 							{...ICON_PRESS_STYLES}
-							onPress={() => Linking.openURL(APP_GITHUB_URL)}
+							onPress={() => Linking.openURL(SOURCE_CODE_URL)}
 							testID='jellify-source-link'
 						>
 							<Icon name='code-tags' size='7' color='borderColor' />
 							<SizableText fontSize='2' fontWeight='4'>
-								Source
+								{t('about.source')}
 							</SizableText>
 						</XStack>
 
@@ -88,7 +90,7 @@ export default function About(): React.JSX.Element {
 						>
 							<Icon name='shield-account' size='7' color='borderColor' />
 							<SizableText fontSize='2' fontWeight='4'>
-								Privacy Policy
+								{t('about.privacyPolicy')}
 							</SizableText>
 						</XStack>
 
@@ -100,14 +102,14 @@ export default function About(): React.JSX.Element {
 						>
 							<Icon name='cellphone-arrow-down' size='7' color='success' />
 							<SizableText fontSize='2' fontWeight='4'>
-								Update
+								{t('about.update')}
 							</SizableText>
 						</XStack>
 					</XStack>
 
 					<YStack gap='2'>
 						<SizableText fontSize='2' fontWeight='6'>
-							Caught a bug?
+							{t('about.caughtABug')}
 						</SizableText>
 						<XStack gap='4' flexWrap='wrap'>
 							<XStack
@@ -121,7 +123,7 @@ export default function About(): React.JSX.Element {
 							>
 								<Icon name='github' size='7' color='warning' />
 								<SizableText fontSize='2' fontWeight='4'>
-									Report Issue
+									{t('about.reportIssue')}
 								</SizableText>
 							</XStack>
 							<XStack
@@ -133,7 +135,7 @@ export default function About(): React.JSX.Element {
 							>
 								<Icon name='chat' size='7' color='secondary' />
 								<SizableText fontSize='2' fontWeight='4'>
-									Join Discord
+									{t('about.joinDiscord')}
 								</SizableText>
 							</XStack>
 						</XStack>
@@ -151,7 +153,7 @@ export default function About(): React.JSX.Element {
 					testID='jellify-wall-of-fame'
 				>
 					<SizableText fontSize='3' fontWeight='6'>
-						Wall of Fame
+						{t('about.wallOfFame')}
 					</SizableText>
 					<XStack gap='4' flexWrap='wrap'>
 						<XStack
@@ -165,7 +167,7 @@ export default function About(): React.JSX.Element {
 						>
 							<Icon name='github' size='7' color='primary' />
 							<SizableText fontSize='2' fontWeight='4'>
-								Sponsors
+								{t('about.sponsors')}
 							</SizableText>
 						</XStack>
 						<XStack
@@ -209,7 +211,7 @@ export default function About(): React.JSX.Element {
 				>
 					<YStack gap='1'>
 						<SizableText fontSize='3' fontWeight='6'>
-							Special Thanks
+							{t('about.specialThanks')}
 						</SizableText>
 						<SupporterList patrons={specialThanks} />
 					</YStack>

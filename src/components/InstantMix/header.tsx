@@ -2,8 +2,11 @@ import { H5, useTheme, XStack, YStack } from 'tamagui'
 import { useInstantMixContext } from '../../providers/InstantMix'
 import ItemImage from '../Global/components/image'
 import { getItemName } from '../../utils/formatting/item-names'
+import { useTranslation } from 'react-i18next'
 
 export default function MixTrackListHeader() {
+	const { t } = useTranslation()
+
 	const { item } = useInstantMixContext()
 
 	const theme = useTheme()
@@ -25,7 +28,7 @@ export default function MixTrackListHeader() {
 			</XStack>
 
 			<H5 lineBreakStrategyIOS='standard' textAlign='center'>
-				{getItemName(item)} Mix
+				{t('instantMix.title', { name: getItemName(item) })}
 			</H5>
 		</YStack>
 	)

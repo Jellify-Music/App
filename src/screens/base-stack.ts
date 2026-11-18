@@ -5,6 +5,7 @@ import { PlaylistScreen } from './Playlist'
 import TracksScreen from './Tracks'
 import { BaseStackParamList } from './types'
 import InstantMixScreen from './InstantMix'
+import i18n from '../i18n'
 
 export const BaseStackScreens = {
 	Artist: {
@@ -16,7 +17,7 @@ export const BaseStackScreens = {
 			route: RouteProp<BaseStackParamList, 'Artist'>
 			theme: ReactNavigation.Theme
 		}) => ({
-			title: route.params.artist.Name ?? 'Unknown Artist',
+			title: route.params.artist.Name ?? i18n.t('placeholders.unknownArtist'),
 			headerTitleStyle: {
 				color: theme.colors.background,
 			},
@@ -31,7 +32,7 @@ export const BaseStackScreens = {
 			route: RouteProp<BaseStackParamList, 'Album'>
 			theme: ReactNavigation.Theme
 		}) => ({
-			title: route.params.album.Name ?? 'Untitled Album',
+			title: route.params.album.Name ?? i18n.t('placeholders.untitledAlbum'),
 			headerTitleStyle: {
 				color: theme.colors.background,
 			},
@@ -46,7 +47,7 @@ export const BaseStackScreens = {
 			route: RouteProp<BaseStackParamList, 'Playlist'>
 			theme: ReactNavigation.Theme
 		}) => ({
-			title: route.params.playlist.Name ?? 'Untitled Playlist',
+			title: route.params.playlist.Name ?? i18n.t('placeholders.untitledPlaylist'),
 			headerTitleStyle: {
 				color: theme.colors.background,
 			},
@@ -55,13 +56,18 @@ export const BaseStackScreens = {
 	InstantMix: {
 		screen: InstantMixScreen,
 		options: ({ route }: { route: RouteProp<BaseStackParamList, 'InstantMix'> }) => ({
-			headerTitle: `${route.params.item.Name ?? route.params.item.OriginalTitle ?? 'Untitled'} Mix`,
+			headerTitle: i18n.t('instantMix.title', {
+				name:
+					route.params.item.Name ??
+					route.params.item.OriginalTitle ??
+					i18n.t('placeholders.untitled'),
+			}),
 		}),
 	},
 	Tracks: {
 		screen: TracksScreen,
 		options: {
-			title: 'Tracks',
+			title: i18n.t('navigation.tracks'),
 		},
 	},
 }

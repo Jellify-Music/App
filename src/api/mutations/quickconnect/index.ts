@@ -22,7 +22,7 @@ export const useInitiateQuickConnect = () => {
 			return await getAuthenticationApi(api).initiateQuickConnect()
 		},
 		onError: async (error: Error) => {
-			handleError(error, LoggingContext.Authentication, 'Unable to initiate Quick Connect')
+			handleError(error, LoggingContext.Authentication, 'initiateQuickConnect')
 		},
 		onSuccess: async ({ data }, variables) => {
 			console.log(`Successfully initiated Quick Connect. Code is ${data.Code}`)
@@ -83,11 +83,7 @@ const useAuthenticateWithQuickConnect = () => {
 			navigation.navigate('Tabs')
 		},
 		onError: async (error: Error) => {
-			handleError(
-				error,
-				LoggingContext.Authentication,
-				'Unable to sign in with Quick Connect',
-			)
+			handleError(error, LoggingContext.Authentication, 'quickConnectSignIn')
 		},
 		retry: 0,
 		gcTime: 0,

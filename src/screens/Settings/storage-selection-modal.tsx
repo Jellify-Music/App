@@ -10,10 +10,12 @@ import { useStorageContext } from '../../providers/Storage'
 import { formatBytes } from '../../utils/formatting/bytes'
 import { useDeletionToast } from '../../utils/toasts/deletion-toast'
 import useDownloads from '../../hooks/downloads'
+import { useTranslation } from 'react-i18next'
+import i18n from '../../i18n'
 
 const formatSavedAt = (timestamp: number) => {
 	const parsedDate = new Date(timestamp)
-	if (Number.isNaN(parsedDate.getTime())) return 'Unknown save date'
+	if (Number.isNaN(parsedDate.getTime())) return i18n.t('storage.unknownSaveDate')
 	return parsedDate.toLocaleDateString(undefined, {
 		month: 'short',
 		day: 'numeric',
@@ -23,6 +25,8 @@ const formatSavedAt = (timestamp: number) => {
 export default function StorageSelectionModal({
 	navigation,
 }: NativeStackScreenProps<SettingsStackParamList, 'StorageSelectionReview'>): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { data: downloads } = useDownloads()
 
 	const { selection, deleteSelection, clearSelection, isDeleting } = useStorageContext()
@@ -38,7 +42,7 @@ export default function StorageSelectionModal({
 
 	const handleDelete = async () => {
 		const result = await deleteSelection()
-		showDeletionToast(`Deleted ${selectedDownloads.length} downloads`, 0)
+		showDeletionToast(t('storage.deletedDownloads', { count: selectedDownloads.length }), 0)
 		navigation.goBack()
 	}
 
@@ -62,10 +66,10 @@ export default function StorageSelectionModal({
 					icon={<Icon name='chevron-left' color='color' />}
 					onPress={handleClose}
 				>
-					Close
+					{t('common.close')}
 				</Button>
 				<SizableText size='2' fontWeight='6'>
-					Review selection
+					{t('storage.reviewSelection')}
 				</SizableText>
 				<Button
 					variant='outlined'
@@ -73,7 +77,7 @@ export default function StorageSelectionModal({
 					onPress={clearSelection}
 					disabled={!hasSelection}
 				>
-					Clear
+					{t('common.clear')}
 				</Button>
 			</XStack>
 
@@ -84,8 +88,7 @@ export default function StorageSelectionModal({
 							{formatBytes(selectedBytes)}
 						</SizableText>
 						<SizableText fontSize='2' color='borderColor'>
-							{selectedDownloads.length}{' '}
-							{selectedDownloads.length === 1 ? 'track' : 'tracks'} ready to remove
+							{t('storage.readyToRemove', { count: selectedDownloads.length })}
 						</SizableText>
 					</Card>
 
@@ -95,14 +98,17 @@ export default function StorageSelectionModal({
 								<YStack key={download.trackId as string}>
 									<YStack padding='3' gap='1'>
 										<SizableText fontSize='2' fontWeight='6'>
-											{download.originalTrack.title ?? 'Unknown track'}
+											{download.originalTrack.title ??
+												t('placeholders.unknownTrack')}
 										</SizableText>
 										<SizableText fontSize='2' color='borderColor'>
 											{download.originalTrack.album} ·{' '}
 											{formatBytes(download.fileSize)}
 										</SizableText>
 										<SizableText fontSize='2' color='borderColor'>
-											Saved {formatSavedAt(download.downloadedAt)}
+											{t('storage.savedAt', {
+												date: formatSavedAt(download.downloadedAt),
+											})}
 										</SizableText>
 									</YStack>
 									{index < selectedDownloads.length - 1 && <Separator />}
@@ -118,17 +124,17 @@ export default function StorageSelectionModal({
 						backgroundColor='danger'
 					>
 						<SizableText fontSize='2' fontWeight='6' color='background'>
-							Delete downloads
+							{t('storage.deleteDownloads')}
 						</SizableText>
 					</Button>
 				</YStack>
 			) : (
 				<Card borderWidth={1} borderColor='borderColor' borderRadius='6' padding='4'>
 					<SizableText fontSize='2' fontWeight='6'>
-						No tracks selected
+						{t('storage.noneSelected')}
 					</SizableText>
 					<SizableText fontSize='2' color='borderColor'>
-						Select some downloads to clean up storage.
+						{t('storage.noneSelectedHint')}
 					</SizableText>
 				</Card>
 			)}

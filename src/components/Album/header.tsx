@@ -12,6 +12,7 @@ import { useAlbumDiscs } from '../../api/queries/album'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { loadNewQueue } from '../../player/queuing'
+import { useTranslation } from 'react-i18next'
 
 /**
  * Renders a header for an Album's track list
@@ -21,6 +22,8 @@ import { loadNewQueue } from '../../player/queuing'
  * @returns A React component
  */
 export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { data: discs } = useAlbumDiscs(album)
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -58,7 +61,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 
 			<YStack marginTop='2' alignContent='center' justifyContent='center' gap='2'>
 				<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>
-					{album.Name ?? 'Untitled Album'}
+					{album.Name ?? t('placeholders.untitledAlbum')}
 				</H5>
 
 				{album.AlbumArtists && album.AlbumArtists.length > 0 && (
@@ -86,7 +89,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 								fontVariant={['tabular-nums']}
 								textAlign='right'
 							>
-								{album.ProductionYear?.toString() ?? 'Unknown Year'}
+								{album.ProductionYear?.toString() ?? t('placeholders.unknownYear')}
 							</SizableText>
 						) : null}
 					</YStack>
@@ -108,7 +111,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							onPress={() => playAlbum(false)}
 						>
 							<SizableText fontSize='2' fontWeight='6' color='background'>
-								Play
+								{t('common.play')}
 							</SizableText>
 						</Button>
 
@@ -121,7 +124,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							onPress={() => playAlbum(true)}
 						>
 							<SizableText fontSize='2' fontWeight='6' color='primary'>
-								Shuffle
+								{t('common.shuffle')}
 							</SizableText>
 						</Button>
 

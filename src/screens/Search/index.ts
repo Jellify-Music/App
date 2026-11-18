@@ -3,6 +3,7 @@ import Search from '../../components/Search'
 import SearchParamList from './types'
 import { BaseStackScreens } from '../base-stack'
 import { stackScreenOptions } from '../navigation'
+import i18n from '../../i18n'
 
 const SearchStack = createNativeStackNavigator<SearchParamList>({
 	initialRouteName: 'SearchScreen',
@@ -11,7 +12,7 @@ const SearchStack = createNativeStackNavigator<SearchParamList>({
 		SearchScreen: {
 			screen: Search,
 			options: {
-				title: 'Search',
+				title: i18n.t('navigation.search'),
 			},
 		},
 		...BaseStackScreens,

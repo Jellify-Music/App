@@ -10,8 +10,11 @@ import Toast from 'react-native-toast-message'
 import { applyHapticFeedback } from '../../../../../utils/haptics'
 import { handleError } from '../../../../../utils/errors'
 import { LoggingContext } from '../../../../../utils/logging'
+import { useTranslation } from 'react-i18next'
 
 export default function AppIconSettings(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const [selected, setSelected] = useState<AppIconValue>('Default')
 
 	useEffect(() => {
@@ -36,12 +39,14 @@ export default function AppIconSettings(): React.JSX.Element {
 				if (Platform.OS !== 'ios') {
 					Toast.show({
 						type: 'success',
-						text1: `Updated app icon to ${appIcon.value.toLocaleLowerCase()}`,
+						text1: t('settings.appIcon.updated', {
+							name: appIcon.value.toLocaleLowerCase(),
+						}),
 					})
 				}
 			})
 			.catch((error) => {
-				handleError(error, LoggingContext.UI, 'Unable to set app icon')
+				handleError(error, LoggingContext.UI, 'setAppIcon')
 				setSelected(previous)
 			})
 	}
@@ -50,11 +55,11 @@ export default function AppIconSettings(): React.JSX.Element {
 		<YStack gap='3'>
 			<YStack>
 				<SizableText fontSize='3' fontWeight='6'>
-					App Icon
+					{t('settings.appIcon.title')}
 				</SizableText>
 				{Platform.OS === 'android' && (
 					<SizableText fontSize='2' color='borderColor'>
-						Your new icon will appear after leaving the app
+						{t('settings.appIcon.description')}
 					</SizableText>
 				)}
 			</YStack>

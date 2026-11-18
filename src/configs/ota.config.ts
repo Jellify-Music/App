@@ -6,7 +6,6 @@ import { GITHUB_ORG_URL } from './config'
 
 export const OTA_UPDATE_ENABLED = Config.OTA_UPDATE_ENABLED === 'true'
 
-export const APP_GITHUB_URL = `${GITHUB_ORG_URL}/App`
 export const OTA_GITHUB_URL = `${GITHUB_ORG_URL}/App-Bundles`
 
 const version = DeviceInfo.getVersion()

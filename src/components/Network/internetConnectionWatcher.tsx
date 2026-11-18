@@ -108,7 +108,9 @@ const InternetConnectionWatcher = () => {
 				backgroundColor={`${networkStatus === NetworkStatuses.ONLINE ? 'success' : 'warning'}`}
 			>
 				<SizableText fontSize='2' fontWeight='6' textAlign='center' color='background'>
-					{statusDisplayText}
+					{networkStatus === networkStatusTypes.ONLINE
+						? t('network.backOnline')
+						: t('network.offline')}
 				</SizableText>
 			</YStack>
 		</Animated.View>
