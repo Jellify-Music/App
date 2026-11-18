@@ -86,31 +86,35 @@ function handleQueueRefNavigation(
 	queueRef: Queue | undefined,
 	rootNavigation: NativeStackNavigationProp<RootStackParamList>,
 ) {
-	if (!queueRef || typeof queueRef !== 'object') return
+	const action = getQueueRefNavigationAction(queueRef)
+
+	if (!action) return
 
 	rootNavigation.popTo('Tabs')
+	navigationRef.dispatch(action)
+}
 
-	switch (queueRef?.Type) {
+/**
+ * Builds the navigation action for a queue reference, if it refers to a navigable item.
+ *
+ * @param queueRef The referring item or title of the currently playing queue
+ *
+ * @returns The navigation action, or undefined if the queue reference isn't navigable
+ */
+function getQueueRefNavigationAction(queueRef: Queue | undefined) {
+	if (typeof queueRef !== 'object') return undefined
+
+	switch (queueRef.Type) {
 		case BaseItemKind.MusicAlbum:
-			return navigationRef.dispatch(
-				CommonActions.navigate('Album', {
-					album: queueRef,
-				}),
-			)
+			return CommonActions.navigate('Album', { album: queueRef })
 		case BaseItemKind.MusicArtist:
-			return navigationRef.dispatch(
-				CommonActions.navigate('Artist', {
-					artist: queueRef,
-				}),
-			)
+			return CommonActions.navigate('Artist', { artist: queueRef })
 		case BaseItemKind.Playlist:
-			return navigationRef.dispatch(
-				CommonActions.navigate('Playlist', {
-					playlist: queueRef,
-					canEdit: queueRef.CanDelete ?? false,
-				}),
-			)
+			return CommonActions.navigate('Playlist', {
+				playlist: queueRef,
+				canEdit: queueRef.CanDelete ?? false,
+			})
 		default:
-			return
+			return undefined
 	}
 }
