@@ -20,7 +20,7 @@ appId: com.cosmonautical.jellify
 
 - waitForAnimationToEnd
 
-- assertVisible: "Add Users to Playlist"
+- assertVisible: "Share Playlist"
 
 - takeScreenshot: screenshots/playlist/playlist_users_initial_state
 
