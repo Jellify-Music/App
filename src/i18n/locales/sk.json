@@ -1,7 +1,7 @@
 {
 	"home": {
-		"onRepeat": "",
-		"recentArtists": "",
+		"onRepeat": "Najprehrávanejšie",
+		"recentArtists": "Nedávno prehrávaní interpreti",
 		"yourPlaylists": "Vaše zoznamy skladieb",
 		"playItAgain": "Pustite si to znova",
 		"mostPlayed": "Najviac hrané",
@@ -35,7 +35,8 @@
 		"version": "Verzia",
 		"connection": "Pripojenie",
 		"secure": "Zabezpečené (HTTPS)",
-		"insecure": "Nezabezpečené (HTTP)"
+		"insecure": "Nezabezpečené (HTTP)",
+		"detected": "Zistené"
 	},
 	"common": {
 		"change": "Zmeniť",
@@ -135,7 +136,8 @@
 	"library": {
 		"createPlaylist": "Vytvoriť zoznam skladieb",
 		"sort": "Zoradiť",
-		"filter": "Filter"
+		"filter": "Filter",
+		"generatePlaylist": "Vygenerovať zoznam skladieb"
 	},
 	"librarySelector": {
 		"title": "Vyberte hudobnú knižnicu",
@@ -458,7 +460,9 @@
 		"playLater": "Nepodarilo sa prehrať neskôr",
 		"fetchRandomTracks": "Nepodarilo sa načítať náhodné skladby",
 		"shuffleQueue": "Nepodarilo sa náhodne prehrať skladby v poradí",
-		"unshuffleQueue": "Nepodarilo sa zrušiť náhodné prehratie skladieb v poradí"
+		"unshuffleQueue": "Nepodarilo sa zrušiť náhodné prehratie skladieb v poradí",
+		"generatePlaylist": "Vytvorenie zoznamu skladieb sa nepodarilo",
+		"saveGeneratedPlaylist": "Nepodarilo sa uložiť vygenerovaný zoznam skladieb"
 	},
 	"about": {
 		"otaVersion": "Verzia OTA: {{version}}",
@@ -471,5 +475,14 @@
 		"wallOfFame": "Sieň slávy",
 		"sponsors": "Sponzori",
 		"specialThanks": "Špeciálne poďakovanie"
+	},
+	"generatePlaylist": {
+		"prompt": "Čo by ste si chceli vypočuť?",
+		"promptPlaceholder": "Piesne na daždivé popoludnie",
+		"tracksGenerated_one": "{{count}} skladba bola vygenerovaná",
+		"tracksGenerated_few": "{{count}} skladby boli vygenerované",
+		"tracksGenerated_other": "{{count}} skladieb bolo vygenerovaných",
+		"noTracks": "Žiadna skladba nezodpovedá tejto požiadavke. Skúste ju opísať inak.",
+		"generate": "Vygenerovať"
 	}
 }
