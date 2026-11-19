@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { NetworkStatusMessages } from '../../configs/messaging/network-status'
 import { NetworkStatuses } from '../../enums/network-status'
+import { useTranslation } from 'react-i18next'
 
 type NetworkStore = {
 	networkStatus: NetworkStatuses | null
@@ -28,10 +28,10 @@ export const useNetworkStatus = (): [
 	const networkStatus = useNetworkStore((state) => state.networkStatus)
 	const setNetworkStatus = useNetworkStore((state) => state.setNetworkStatus)
 
+	const { t } = useTranslation()
+
 	const statusDisplayText =
-		networkStatus === NetworkStatuses.ONLINE
-			? NetworkStatusMessages.BACK_ONLINE
-			: NetworkStatusMessages.NO_INTERNET
+		networkStatus === NetworkStatuses.ONLINE ? t('network.backOnline') : t('network.offline')
 
 	return [networkStatus, setNetworkStatus, statusDisplayText]
 }
