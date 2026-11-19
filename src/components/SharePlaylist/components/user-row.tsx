@@ -5,6 +5,7 @@ import { BaseItemDto, UserDto } from '@jellyfin/sdk/lib/generated-client'
 import { useAddPlaylistUser, useRemovePlaylistUser } from '../../../api/queries/playlist'
 import Animated, { useReducedMotion, ZoomIn, ZoomOut } from 'react-native-reanimated'
 import AnimatedRow from '../../Global/utils/Animated/row'
+import { useTranslation } from 'react-i18next'
 
 interface UserShareRowProps {
 	user: UserDto
@@ -13,6 +14,8 @@ interface UserShareRowProps {
 }
 
 export default function UserShareRow({ user, playlistUserIds, playlist }: UserShareRowProps) {
+	const { t } = useTranslation()
+
 	const avatarUrl = getUserAvatarUrl(user)
 
 	const isInPlaylist = user.Id && playlistUserIds.has(user.Id)
@@ -41,7 +44,7 @@ export default function UserShareRow({ user, playlistUserIds, playlist }: UserSh
 				</Avatar>
 
 				<SizableText fontWeight='6' flex={1} padding={'$2'}>
-					{user.Name ?? 'Unknown User'}
+					{user.Name ?? t('placeholders.unknownUser')}
 				</SizableText>
 				{/* Keyed on share state so the new icon pops in when the user is added or removed */}
 				<Animated.View

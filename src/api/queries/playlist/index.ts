@@ -8,6 +8,7 @@ import { sortPlaylistsByName } from './utils/sort'
 import { applyHapticFeedback } from '../../../utils/haptics'
 import { queryClient } from '../../client'
 import { QueryAges } from '../../../constants/durations'
+import i18n from '../../../i18n'
 
 /**
  * Fetches the user's playlists from the cache or server, sorted by name
@@ -91,7 +92,7 @@ export const useAddPlaylistUser = () => {
 
 		onError: (error, variables) => {
 			console.log(error)
-			Toast.show({ type: 'error', text1: 'Unable to add user to playlist.' })
+			Toast.show({ type: 'error', text1: i18n.t('errors.addPlaylistUser') })
 		},
 	})
 }

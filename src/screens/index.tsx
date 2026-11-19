@@ -1,7 +1,7 @@
 import Tabs from './Tabs'
 import OtaScreen from './Ota'
 import { RootStackParamList } from './types'
-import { SizableText, XStack, YStack } from 'tamagui'
+import { SizableText, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
@@ -12,7 +12,6 @@ import { getUser } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import addPlaylistUsers from './Library/add-playlist-users'
-import ItemImage from '../components/Global/components/image'
 import {
 	addToPlaylistSheetPresentation,
 	bottomSheetPresentation,
@@ -112,7 +111,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		AddPlaylistUsers: {
 			screen: addPlaylistUsers,
 			options: {
-				title: 'Share Playlist',
+				title: i18n.t('playlist.share'),
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: canUseFormSheet ? [1.0] : undefined,
 				sheetGrabberVisible: true,
@@ -173,33 +172,6 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 					</SizableText>
 				</Ticker>
 			)}
-		</YStack>
-	)
-}
-
-function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
-	return (
-		<YStack gap={'$2'} marginTop={'$4'} alignItems='center' flex={1}>
-			<SizableText fontSize='3' fontWeight='6'>
-				Share Playlist
-			</SizableText>
-			<XStack gap='2' flex={1} justifyContent='flex-start'>
-				<ItemImage
-					item={playlist}
-					width={'6'}
-					height={'6'}
-					imageOptions={{ maxWidth: 150, maxHeight: 150 }}
-					elevate
-				/>
-
-				<YStack gap={'$2'}>
-					<Ticker>
-						<SizableText fontSize='3' fontWeight='6'>
-							{getItemName(playlist)}
-						</SizableText>
-					</Ticker>
-				</YStack>
-			</XStack>
 		</YStack>
 	)
 }

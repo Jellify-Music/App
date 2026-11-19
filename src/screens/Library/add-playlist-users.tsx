@@ -10,9 +10,11 @@ import { AddPlaylistUsersProps } from '../types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { AnimatedList } from '../../components/Global/components/Lists/utils'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { useTranslation } from 'react-i18next'
 
 //screen in react native
 export default function addPlaylistUsers({ route }: AddPlaylistUsersProps): React.JSX.Element {
+	const { t } = useTranslation()
 	const [searchQuery, setSearchQuery] = useState('')
 	const { playlist } = route.params
 	const {
@@ -51,8 +53,7 @@ export default function addPlaylistUsers({ route }: AddPlaylistUsersProps): Reac
 				nestedScrollEnabled
 				ListHeaderComponent={
 					<SizableText fontWeight='6' fontSize='3'>
-						{' '}
-						Users{' '}
+						{t('playlist.users')}
 					</SizableText>
 				}
 				renderItem={renderUserRow}
@@ -66,7 +67,7 @@ export default function addPlaylistUsers({ route }: AddPlaylistUsersProps): Reac
 			{/* search bar */}
 			<View padding={'$4'} paddingBottom={'$2'}>
 				<Input
-					placeholder='Search users by name...'
+					placeholder={t('playlist.searchUsers')}
 					testID='playlist-users-search-input'
 					value={searchQuery}
 					onChangeText={setSearchQuery}

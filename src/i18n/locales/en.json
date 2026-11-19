@@ -189,7 +189,10 @@
 		"name": "Name",
 		"deleteConfirm": "Delete playlist {{name}}?",
 		"created": "Playlist created",
-		"createdMessage": "Created playlist {{name}}"
+		"createdMessage": "Created playlist {{name}}",
+		"share": "Share Playlist",
+		"users": "Users",
+		"searchUsers": "Search users"
 	},
 	"generatePlaylist": {
 		"prompt": "What do you want to listen to?",
@@ -461,7 +464,8 @@
 		"shuffleQueue": "Failed to shuffle queue",
 		"unshuffleQueue": "Failed to unshuffle queue",
 		"generatePlaylist": "Failed to generate playlist",
-		"saveGeneratedPlaylist": "Failed to save generated playlist"
+		"saveGeneratedPlaylist": "Failed to save generated playlist",
+		"addPlaylistUser": "Unable to add user to playlist"
 	},
 	"about": {
 		"otaVersion": "OTA Version: {{version}}",
