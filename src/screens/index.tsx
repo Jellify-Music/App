@@ -1,8 +1,7 @@
 import Tabs from './Tabs'
+import { createNativeStackNavigator, createNativeStackScreen } from '@react-navigation/native-stack'
 import OtaScreen from './Ota'
-import { RootStackParamList } from './types'
 import { SizableText, YStack } from 'tamagui'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
@@ -22,9 +21,9 @@ import { navigationIntegration } from '../utils/logging/sentry'
 import { getJellifyNavTheme } from '../components/theme'
 import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
 import { useColorScheme } from 'react-native'
-import { useState } from 'react'
-import PlayerStack from './Player'
 import LoginStack from './Login'
+import PlayerStack from './Player'
+import { useState } from 'react'
 import PrivacyPolicyScreen from './PrivacyPolicy'
 import { Ticker } from '../components/Global/utils/Animated/text'
 import i18n from '../i18n'
@@ -34,22 +33,22 @@ import i18n from '../i18n'
  * and the main tab navigator, as well as any modals or sheets that can be opened from anywhere in
  * the app (e.g. the player, context menu, filters, etc).
  */
-const RootStack = createNativeStackNavigator<RootStackParamList>({
+export const RootStack = createNativeStackNavigator({
 	screens: {
-		Login: {
+		Login: createNativeStackScreen({
 			screen: LoginStack,
 			options: {
 				headerShown: false,
 			},
-		},
-		Tabs: {
+		}),
+		Tabs: createNativeStackScreen({
 			screen: Tabs,
 			options: {
 				headerShown: false,
 				gestureEnabled: false,
 			},
-		},
-		PlayerRoot: {
+		}),
+		PlayerRoot: createNativeStackScreen({
 			screen: PlayerStack,
 			options: {
 				// Android formSheet is unreliable on older SDKs; fallback to modal there
@@ -58,8 +57,8 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetAllowedDetents: playerSheetPresentation === 'formSheet' ? [1.0] : undefined,
 				headerShown: false,
 			},
-		},
-		Context: {
+		}),
+		Context: createNativeStackScreen({
 			screen: Context,
 			options: ({ route }) => ({
 				header: () => ContextSheetHeader(route.params.item),
@@ -67,8 +66,8 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
 			}),
-		},
-		AddToPlaylist: {
+		}),
+		AddToPlaylist: createNativeStackScreen({
 			screen: AddToPlaylistSheet,
 			options: {
 				headerTitle: i18n.t('context.addToPlaylist'),
@@ -77,8 +76,8 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 					addToPlaylistSheetPresentation === 'formSheet' ? [1.0] : undefined,
 				sheetGrabberVisible: true,
 			},
-		},
-		AudioSpecs: {
+		}),
+		AudioSpecs: createNativeStackScreen({
 			screen: AudioSpecsSheet,
 			options: ({ route }) => ({
 				header: () => ContextSheetHeader(route.params.item),
@@ -86,8 +85,8 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
 			}),
-		},
-		DeletePlaylist: {
+		}),
+		DeletePlaylist: createNativeStackScreen({
 			screen: DeletePlaylist,
 			options: {
 				title: i18n.t('context.deletePlaylist'),
@@ -96,8 +95,8 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetGrabberVisible: true,
 				sheetAllowedDetents: 'fitToContents',
 			},
-		},
-		PrivacyPolicy: {
+		}),
+		PrivacyPolicy: createNativeStackScreen({
 			screen: PrivacyPolicyScreen,
 			options: {
 				headerShown: false,
@@ -105,8 +104,8 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
 			},
-		},
-		Ota: {
+		}),
+		Ota: createNativeStackScreen({
 			screen: OtaScreen,
 			options: {
 				headerShown: false,
@@ -114,7 +113,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
 			},
-		},
+		}),
 	},
 })
 

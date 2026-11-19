@@ -1,5 +1,5 @@
 import { QueryKeys } from '../../../enums/query-keys'
-import { JellifyUser } from '@/src/types/JellifyUser'
+import { JellifyUser } from '../../../types/JellifyUser'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 /**

@@ -1,24 +1,22 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { stackScreenOptions } from '../navigation'
+import { createNativeStackNavigator, createNativeStackScreen } from '@react-navigation/native-stack'
 import { Home as HomeComponent } from '../../components/Home'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
 import RecentPlaylistsScreen from './playlists'
-import HomeStackParamList from './types'
-import { BaseStackScreens } from '../base-stack'
+import { BaseStack } from '../base-stack'
+import { stackScreenOptions } from '../navigation'
 import i18n from '../../i18n'
 
-const HomeStack = createNativeStackNavigator<HomeStackParamList>({
+const HomeStack = createNativeStackNavigator({
 	initialRouteName: 'HomeScreen',
 	screenOptions: stackScreenOptions,
 	screens: {
-		HomeScreen: {
+		HomeScreen: createNativeStackScreen({
 			screen: HomeComponent,
 			options: {
 				title: i18n.t('navigation.home'),
 			},
-		},
-		...BaseStackScreens,
+		}),
 		RecentArtists: {
 			screen: HomeArtistsScreen,
 			options: {
@@ -49,6 +47,7 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 				title: i18n.t('home.yourPlaylists'),
 			},
 		},
+		...BaseStack,
 	},
 })
 

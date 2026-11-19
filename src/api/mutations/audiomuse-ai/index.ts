@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Toast from 'react-native-toast-message'
-import LibraryStackParamList from '@/src/screens/Library/types'
+import { LibraryStackNavigator } from '../../../screens/Library/types'
 import { generatePlaylistWithAudioMuseAI, saveAudioMuseAIPlaylist } from './utils'
 import { refreshUserPlaylists } from '../../queries/playlist/cache'
 import { refreshAndroidAutoLibrary } from '../../../services/auto/android-auto'
@@ -32,7 +31,7 @@ export const useGeneratePlaylistWithAudioMuseAI = () =>
  * @returns A mutation object for saving the playlist
  */
 export const useSaveAudioMuseAIPlaylist = () => {
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<LibraryStackNavigator>()
 
 	return useMutation({
 		mutationFn: ({ name, itemIds }: { name: string; itemIds: string[] }) =>

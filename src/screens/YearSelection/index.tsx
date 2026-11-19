@@ -4,9 +4,9 @@ import { Modal, ScrollView, Pressable } from 'react-native'
 import Icon from '../../components/Global/components/icon'
 import useLibraryStore from '../../stores/library'
 import { useLibraryYears } from '../../api/queries/years'
-import LibraryStackParamList, { YearSelectionProps } from '../Library/types'
+import { YearSelectionProps } from '../Library/types'
+import { LibraryStackNavigator } from '../Library/types'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { useTranslation } from 'react-i18next'
 
@@ -16,7 +16,7 @@ type Picking = 'min' | 'max' | null
 export default function YearSelectionScreen({ route }: YearSelectionProps): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<LibraryStackNavigator>()
 
 	const tab = route.params?.tab ?? 'Tracks'
 	const { years: availableYears, isPending, isError } = useLibraryYears()

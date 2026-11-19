@@ -1,5 +1,5 @@
-import { JellifyLibrary } from '@/src/types/JellifyLibrary'
-import { JellifyUser } from '@/src/types/JellifyUser'
+import { JellifyLibrary } from '../../../types/JellifyLibrary'
+import { JellifyUser } from '../../../types/JellifyUser'
 import { MusicLibraryQueryKey } from '../libraries/keys'
 
 enum FrequentsQueryKeys {

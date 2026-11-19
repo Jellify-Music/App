@@ -4,9 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import { JellifyUser } from '../../../types/JellifyUser'
 import { isUndefined } from 'lodash'
 import { getAuthenticationApi } from '@jellyfin/sdk/lib/utils/api'
-import { useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../../../screens/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useNavigation, RootNavigator } from '@react-navigation/native'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyUser } from '../../../stores/auth'
 import { handleError } from '../../../utils/errors'
@@ -52,7 +50,7 @@ const useAuthenticateWithQuickConnect = () => {
 
 	const [, setUser] = useJellifyUser()
 
-	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const navigation = useNavigation<RootNavigator>()
 
 	return useMutation({
 		mutationFn: async (secret: string) => {

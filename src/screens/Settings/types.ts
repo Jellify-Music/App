@@ -1,19 +1,6 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { StaticParamList } from '@react-navigation/native'
+import type SettingsStack from '.'
 
-export type SettingsStackParamList = {
-	Settings: undefined
-	SignOut: undefined
-	LibrarySelection: undefined
-	StorageManagement: undefined
-	StorageSelectionReview: undefined
+export type SettingsStackNavigator = typeof SettingsStack
 
-	Account: undefined
-	Appearance: undefined
-	Gestures: undefined
-	Playback: undefined
-	PrivacyDeveloper: undefined
-	About: undefined
-}
-
-export type SettingsProps = NativeStackScreenProps<SettingsStackParamList, 'Settings'>
-export type SignOutModalProps = NativeStackScreenProps<SettingsStackParamList, 'SignOut'>
+export type SettingsStackParamList = StaticParamList<SettingsStackNavigator>

@@ -3,11 +3,10 @@ import { RefreshControl, SectionList } from 'react-native'
 import Track from '../Global/components/Track'
 import FavoriteButton from '../Global/components/favorite-button'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React, { useLayoutEffect } from 'react'
 import Icon from '../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
-import { BaseStackParamList } from '../../screens/types'
+import { BaseStackNavigator } from '../../screens/base-types'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
@@ -29,7 +28,7 @@ import { useTranslation } from 'react-i18next'
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const navigation = useNavigation<BaseStackNavigator>()
 
 	const theme = useTheme()
 
@@ -117,7 +116,6 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 				return (
 					<Track
 						testID={`album-track-${trackIndexInAlbum}`}
-						navigation={navigation}
 						track={track}
 						tracklist={albumTrackList}
 						index={trackIndexInAlbum}

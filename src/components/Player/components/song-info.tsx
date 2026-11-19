@@ -3,7 +3,7 @@ import { SizableText, XStack, YStack } from 'tamagui'
 import React from 'react'
 import FavoriteButton from '../../Global/components/favorite-button'
 import Icon from '../../Global/components/icon'
-import { StackActions, useNavigation } from '@react-navigation/native'
+import { StackActions, useNavigation, RootNavigator } from '@react-navigation/native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { isExplicit } from '../../../utils/audio/explicit'
@@ -11,9 +11,7 @@ import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { useAlbum } from '../../../api/queries/album'
-import { RootStackParamList } from '@/src/screens/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { PlayerParamList } from '@/src/screens/Player/types'
+import { PlayerStackNavigator } from '../../../screens/Player/types'
 import navigationRef from '../../../screens/navigation'
 import { useTranslation } from 'react-i18next'
 
@@ -22,8 +20,8 @@ export default function SongInfo(): React.JSX.Element {
 
 	const currentTrack = useCurrentTrack()
 
-	const rootStackNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-	const playerStackNavigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
+	const rootStackNavigation = useNavigation<RootNavigator>()
+	const playerStackNavigation = useNavigation<PlayerStackNavigator>()
 
 	const item = getTrackDto(currentTrack)
 

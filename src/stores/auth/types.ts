@@ -1,6 +1,6 @@
-import { JellyfinServer } from '@/src/types/JellyfinServer'
+import { JellyfinServer } from '../../types/JellyfinServer'
 import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models/public-system-info'
-import { JellifyUser } from '@/src/types/JellifyUser'
+import { JellifyUser } from '../../types/JellifyUser'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
 import { StateCreator } from 'zustand'
 

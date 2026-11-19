@@ -1,14 +1,12 @@
 import React from 'react'
 import { useTheme, XStack, YStack, SizableText } from 'tamagui'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, RootNavigator } from '@react-navigation/native'
 import { Ticker } from '../Global/utils/Animated/text'
 import { PlayPauseIcon } from '../Player/components/buttons'
 
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler'
 import Animated, { Easing, FadeIn, FadeOut, SlideInDown } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-import { RootStackParamList } from '../../screens/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
 import { useCurrentTrack } from '../../stores/player/queue'
 import getTrackDto, { getTypedExtraPayload } from '../../utils/mapping/track-extra-payload'
@@ -26,7 +24,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 	const payload = getTypedExtraPayload(nowPlaying)
 
 	const theme = useTheme()
-	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const navigation = useNavigation<RootNavigator>()
 
 	const handleSwipe = (direction: string) => {
 		if (direction === 'Swiped Left') {

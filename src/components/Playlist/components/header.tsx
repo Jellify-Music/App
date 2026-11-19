@@ -1,10 +1,9 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H5, Spacer, XStack, YStack } from 'tamagui'
 import { InstantMixButton } from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
-import LibraryStackParamList from '@/src/screens/Library/types'
+import { LibraryStackNavigator } from '../../../screens/Library/types'
 import ItemImage from '../../Global/components/image'
 import Input from '../../Global/utils/Input'
 import Animated, { Easing, FadeInDown, FadeOutDown } from 'react-native-reanimated'
@@ -87,7 +86,7 @@ function PlaylistHeaderControls({
 }): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const navigation = useNavigation<LibraryStackNavigator>()
 
 	const playPlaylist = async (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return

@@ -1,10 +1,9 @@
 import { H5, XStack, YStack } from 'tamagui'
-import { SettingsStackParamList } from './types'
+import { SettingsStackNavigator } from './types'
 import Button from '../../components/Global/utils/button'
 import Icon from '../../components/Global/components/icon'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
 import { CommonActions, useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { DownloadManager, TrackPlayer } from 'react-native-nitro-player'
 import navigationRef from '../navigation'
 import resetQueue from '../../player/queuing/reset'
@@ -17,8 +16,7 @@ export default function SignOutModal(): React.JSX.Element {
 
 	const { data: server } = usePublicServerInfo()
 
-	const settingsStackNavigation =
-		useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+	const settingsStackNavigation = useNavigation<SettingsStackNavigator>()
 
 	const signOut = useSignOut()
 

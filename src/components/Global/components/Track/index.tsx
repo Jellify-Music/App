@@ -8,15 +8,14 @@ import { Queue } from '../../../../services/types/queue-item'
 import { networkStatusTypes } from '../../../Network/internetConnectionWatcher'
 import { useNetworkStatus } from '../../../../stores/network'
 import navigationRef from '../../../../screens/navigation'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '../../../../screens/types'
 import SwipeableRow from '../SwipeableRow'
 import { useSwipeSettingsStore } from '../../../../stores/settings/gestures'
 import { buildSwipeConfig } from '../../utils/swipe-actions'
 import { useIsFavorite } from '../../../../api/queries/user-data'
 import { useCurrentTrackId } from '../../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
-import { StackActions } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
+import { BaseStackNavigator } from '../../../../screens/base-types'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
 import { useIsDownloaded } from '../../../../hooks/downloads'
@@ -25,7 +24,6 @@ import { useTranslation } from 'react-i18next'
 
 export interface TrackProps {
 	track: BaseItemDto
-	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	tracklist?: BaseItemDto[] | undefined
 	index: number
 	queue: Queue
@@ -43,7 +41,6 @@ export interface TrackProps {
 
 export default function Track({
 	track,
-	navigation,
 	tracklist,
 	index,
 	queue,
@@ -59,6 +56,8 @@ export default function Track({
 	sortingByPlayCount,
 }: TrackProps): React.JSX.Element {
 	const { t } = useTranslation()
+
+	const navigation = useNavigation<BaseStackNavigator>()
 
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 

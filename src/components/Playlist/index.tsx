@@ -1,8 +1,6 @@
 import { Spinner, XStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { StackActions, useNavigation } from '@react-navigation/native'
-import { BaseStackParamList } from '../../screens/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import navigationRef from '../../screens/navigation'
 import { useLayoutEffect } from 'react'
@@ -37,7 +35,7 @@ export default function Playlist(): React.JSX.Element {
 		isPending,
 	} = usePlaylistContext()
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const navigation = useNavigation()
 
 	const downloadTracks = useDownloadTracks()
 

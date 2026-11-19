@@ -1,4 +1,4 @@
-import { JellifyUser } from '@/src/types/JellifyUser'
+import { JellifyUser } from '../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 
 export enum LibraryQueryKeys {

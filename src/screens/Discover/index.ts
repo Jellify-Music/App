@@ -1,28 +1,28 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createNativeStackNavigator, createNativeStackScreen } from '@react-navigation/native-stack'
 import Index from '../../components/Discover'
 import DiscoverAlbums from './albums'
 import PublicPlaylists from './playlists'
 import SuggestedArtists from './artists'
-import DiscoverStackParamList, { DiscoverAlbumScreenType } from './types'
-import { BaseStackScreens } from '../base-stack'
+import { DiscoverAlbumScreenType } from './types'
+import { BaseStack } from '../base-stack'
 import { stackScreenOptions } from '../navigation'
 import { getPublicServerInfo } from '../../api/queries/public-server-info'
 import i18n from '../../i18n'
 
-const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
+const DiscoverStack = createNativeStackNavigator({
 	initialRouteName: 'Discover',
 	screenOptions: stackScreenOptions,
 	screens: {
 		Discover: {
 			screen: Index,
 		},
-		...BaseStackScreens,
-		Albums: {
+		...BaseStack,
+		Albums: createNativeStackScreen({
 			screen: DiscoverAlbums,
 			options: ({ route }) => ({
 				title: getAlbumScreenTitle(route.params.type),
 			}),
-		},
+		}),
 		PublicPlaylists: {
 			screen: PublicPlaylists,
 			options: () => ({

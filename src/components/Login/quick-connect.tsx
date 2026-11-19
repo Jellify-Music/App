@@ -5,8 +5,7 @@ import useAuthenticateWithQuickConnect, {
 import useGetQuickConnectState from '../../api/queries/quickconnect'
 import { Spinner, YStack, XStack, H3, Spacer, View, H5, H6 } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
-import LoginStackParamList from '@/src/screens/Login/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { LoginStackNavigator } from '../../screens/Login/types'
 import Icon from '../Global/components/icon'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import Toast from 'react-native-toast-message'
@@ -102,7 +101,7 @@ function QuickConnectDisplay({
 export default function QuickConnectInitiator() {
 	const { t } = useTranslation()
 
-	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
+	const navigation = useNavigation<LoginStackNavigator>()
 
 	const {
 		isPending: isInitiating,

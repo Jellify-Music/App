@@ -1,9 +1,6 @@
-import DiscoverStackParamList from '../../screens/Discover/types'
-import HomeStackParamList from '../../screens/Home/types'
-import LibraryStackParamList from '../../screens/Library/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { BaseStackNavigator } from '../../screens/base-types'
 import { YStack, Spinner, SizableText } from 'tamagui'
 import ItemCard from '../Global/components/Card'
 import { useSimilarItems } from '../../api/queries/suggestions'
@@ -25,12 +22,7 @@ export default function AlbumTrackListFooter({
 }): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const navigation =
-		useNavigation<
-			NativeStackNavigationProp<
-				HomeStackParamList | LibraryStackParamList | DiscoverStackParamList
-			>
-		>()
+	const navigation = useNavigation<BaseStackNavigator>()
 
 	const { data: suggestions, isPending: isLoadingSuggestions } = useSimilarItems(album)
 

@@ -1,13 +1,12 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
-import { PlayerParamList } from './types'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 import CastDialogScreen from '../CastDialog'
 import CastDialogHeaderRight from '../CastDialog/header'
 import PlayerScreen from '../../components/Player'
 import i18n from '../../i18n'
 
-const PlayerStack = createNativeStackNavigator<PlayerParamList>({
+const PlayerStack = createNativeStackNavigator({
 	initialRouteName: 'PlayerScreen',
 	screens: {
 		PlayerScreen: {

@@ -1,6 +1,5 @@
-import LibraryStackParamList from '@/src/screens/Library/types'
+import { LibraryStackNavigator } from '../../../screens/Library/types'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useMutation } from '@tanstack/react-query'
 import { refreshAndroidAutoLibrary } from '../../../services/auto/android-auto'
 import { refreshCarPlayLibrary } from '../../../services/auto/carplay'
@@ -35,7 +34,7 @@ import i18n from '../../../i18n'
  * @returns A mutation object for creating the playlist
  */
 export const useAddPlaylist = () => {
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<LibraryStackNavigator>()
 
 	return useMutation({
 		mutationFn: ({ name }: { name: string }) => createPlaylist(name),

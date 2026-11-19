@@ -1,5 +1,5 @@
 import React from 'react'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createBottomTabNavigator, createBottomTabScreen } from '@react-navigation/bottom-tabs'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import SearchStack from '../Search'
 import TabBar from './tab-bar'
@@ -7,10 +7,9 @@ import SettingsStack from '../Settings'
 import DiscoverStack from '../Discover'
 import LibraryStack from '../Library'
 import HomeStack from '../Home'
-import TabParamList from './types'
 import i18n from '../../i18n'
 
-const Tabs = createBottomTabNavigator<TabParamList>({
+const Tabs = createBottomTabNavigator({
 	initialRouteName: 'HomeTab',
 	screenOptions: {
 		animation: 'shift',
@@ -19,10 +18,9 @@ const Tabs = createBottomTabNavigator<TabParamList>({
 			fontFamily: 'Figtree-Bold',
 		},
 	},
-	detachInactiveScreens: true,
 	tabBar: (props) => <TabBar {...props} />,
 	screens: {
-		HomeTab: {
+		HomeTab: createBottomTabScreen({
 			screen: HomeStack,
 			options: {
 				title: i18n.t('navigation.home'),
@@ -36,8 +34,8 @@ const Tabs = createBottomTabNavigator<TabParamList>({
 				),
 				tabBarButtonTestID: 'home-tab-button',
 			},
-		},
-		LibraryTab: {
+		}),
+		LibraryTab: createBottomTabScreen({
 			screen: LibraryStack,
 			options: {
 				title: i18n.t('navigation.library'),
@@ -51,8 +49,8 @@ const Tabs = createBottomTabNavigator<TabParamList>({
 				),
 				tabBarButtonTestID: 'library-tab-button',
 			},
-		},
-		SearchTab: {
+		}),
+		SearchTab: createBottomTabScreen({
 			screen: SearchStack,
 			options: {
 				title: i18n.t('navigation.search'),
@@ -62,8 +60,8 @@ const Tabs = createBottomTabNavigator<TabParamList>({
 				),
 				tabBarButtonTestID: 'search-tab-button',
 			},
-		},
-		DiscoverTab: {
+		}),
+		DiscoverTab: createBottomTabScreen({
 			screen: DiscoverStack,
 			options: {
 				title: i18n.t('navigation.discover'),
@@ -73,8 +71,8 @@ const Tabs = createBottomTabNavigator<TabParamList>({
 				),
 				tabBarButtonTestID: 'discover-tab-button',
 			},
-		},
-		SettingsTab: {
+		}),
+		SettingsTab: createBottomTabScreen({
 			screen: SettingsStack,
 			options: {
 				title: i18n.t('navigation.settings'),
@@ -88,7 +86,7 @@ const Tabs = createBottomTabNavigator<TabParamList>({
 				),
 				tabBarButtonTestID: 'settings-tab-button',
 			},
-		},
+		}),
 	},
 })
 

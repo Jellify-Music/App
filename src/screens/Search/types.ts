@@ -1,7 +1,8 @@
-import { BaseStackParamList } from '../types'
+import { StaticParamList } from '@react-navigation/native'
+import type SearchStack from '.'
 
-type SearchParamList = BaseStackParamList & {
-	SearchScreen: undefined
-}
+export type SearchStackNavigator = typeof SearchStack
+
+type SearchParamList = StaticParamList<SearchStackNavigator>
 
 export default SearchParamList

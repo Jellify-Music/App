@@ -1,5 +1,5 @@
 import InstantMix from '../../components/InstantMix/component'
-import { InstantMixProps } from '../types'
+import { InstantMixProps } from '../base-types'
 import { InstantMixProvider } from '../../providers/InstantMix'
 
 export default function InstantMixScreen({ route }: InstantMixProps) {

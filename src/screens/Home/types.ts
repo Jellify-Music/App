@@ -1,20 +1,13 @@
-import { BaseStackParamList } from '../types'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { StaticParamList, StaticScreenProps } from '@react-navigation/native'
+import type HomeStack from '.'
 
-type HomeStackParamList = BaseStackParamList & {
-	HomeScreen: undefined
+export type RecentArtistsProps = StaticScreenProps<undefined>
+export type RecentTracksProps = StaticScreenProps<undefined>
+export type MostPlayedArtistsProps = StaticScreenProps<undefined>
+export type MostPlayedTracksProps = StaticScreenProps<undefined>
 
-	RecentArtists: undefined
-	MostPlayedArtists: undefined
-	RecentTracks: undefined
-	MostPlayedTracks: undefined
-	RecentPlaylists: undefined
-}
+export type HomeStackNavigator = typeof HomeStack
+
+type HomeStackParamList = StaticParamList<HomeStackNavigator>
 
 export default HomeStackParamList
-
-export type RecentArtistsProps = NativeStackScreenProps<HomeStackParamList, 'RecentArtists'>
-export type RecentTracksProps = NativeStackScreenProps<HomeStackParamList, 'RecentTracks'>
-export type MostPlayedArtistsProps = NativeStackScreenProps<HomeStackParamList, 'MostPlayedArtists'>
-export type MostPlayedTracksProps = NativeStackScreenProps<HomeStackParamList, 'MostPlayedTracks'>
-export type RecentPlaylistsProps = NativeStackScreenProps<HomeStackParamList, 'RecentPlaylists'>

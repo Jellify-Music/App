@@ -2,9 +2,8 @@ import { H4, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import ItemCard from '../../Global/components/Card'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
-import DiscoverStackParamList from '../../../screens/Discover/types'
+import { DiscoverStackNavigator } from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { useDiscoverArtists } from '../../../api/queries/suggestions'
@@ -18,7 +17,7 @@ export default function SuggestedArtists(): React.JSX.Element {
 
 	const suggestedArtistsInfiniteQuery = useDiscoverArtists()
 
-	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
+	const navigation = useNavigation<DiscoverStackNavigator>()
 
 	const suggestedArtistsExist =
 		suggestedArtistsInfiniteQuery.data && suggestedArtistsInfiniteQuery.data.length > 0

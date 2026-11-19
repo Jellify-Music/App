@@ -1,10 +1,9 @@
 import ServerAuthenticationScreen from './server-authentication'
 import ServerAddressScreen from './server-address'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import LoginStackParamList from './types'
 import QuickConnectScreen from './quick-connect'
 
-const LoginStack = createNativeStackNavigator<LoginStackParamList>({
+const LoginStack = createNativeStackNavigator({
 	initialRouteName: 'ServerAddress',
 	screenOptions: {
 		gestureEnabled: false,

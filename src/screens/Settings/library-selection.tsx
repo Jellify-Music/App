@@ -1,6 +1,5 @@
 import React from 'react'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { SettingsStackParamList } from './types'
+import { SettingsStackNavigator } from './types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../enums/query-keys'
 import { queryClient } from '../../api/client'
@@ -15,7 +14,7 @@ export default function LibrarySelectionScreen(): React.JSX.Element {
 
 	const [library, setLibrary] = useJellifyLibrary()
 
-	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+	const navigation = useNavigation<SettingsStackNavigator>()
 
 	const handleLibrarySelected = (selectedLibrary: BaseItemDto | undefined) => {
 		// Don't proceed if the same library is selected

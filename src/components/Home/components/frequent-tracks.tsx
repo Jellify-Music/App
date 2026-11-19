@@ -1,12 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H4, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import ItemCard from '../../Global/components/Card'
 import Icon from '../../Global/components/icon'
-import HomeStackParamList from '../../../screens/Home/types'
-import { useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../../../screens/types'
+import { HomeStackNavigator } from '../../../screens/Home/types'
+import { useNavigation, RootNavigator } from '@react-navigation/native'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
 import AnimatedRow from '../../Global/utils/Animated/row'
 import { loadNewQueue } from '../../../player/queuing'
@@ -18,9 +16,9 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 
 	const tracksInfiniteQuery = useFrequentlyPlayedTracks()
 
-	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
+	const navigation = useNavigation<HomeStackNavigator>()
 
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const rootNavigation = useNavigation<RootNavigator>()
 
 	const renderItem = ({ item: track, index }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard

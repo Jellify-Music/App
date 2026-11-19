@@ -4,9 +4,8 @@ import { CheckboxWithLabel } from '../Global/utils/checkbox-with-label'
 import useLibraryStore from '../../stores/library'
 import { FiltersProps } from './types'
 import Icon from '../Global/components/icon'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import LibraryStackParamList from '@/src/screens/Library/types'
+import { LibraryStackNavigator } from '../../screens/Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { useTranslation } from 'react-i18next'
@@ -16,7 +15,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 
 	const { bottom } = useSafeAreaInsets()
 
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<LibraryStackNavigator>()
 
 	const { filters, setTracksFilters, setAlbumsFilters, setArtistsFilters } = useLibraryStore()
 	if (!currentTab || currentTab === 'Playlists') {

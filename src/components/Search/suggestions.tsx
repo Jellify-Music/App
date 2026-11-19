@@ -2,10 +2,9 @@ import ItemRow from '../Global/components/item-row'
 import { SizableText, Spinner, YStack } from 'tamagui'
 import ItemCard from '../Global/components/Card'
 import HorizontalCardList from '../Global/components/horizontal-list'
-import SearchParamList from '../../screens/Search/types'
+import { SearchStackNavigator } from '../../screens/Search/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import Track from '../Global/components/Track'
 import { useSearchSuggestions } from '../../api/queries/suggestions'
@@ -22,7 +21,7 @@ interface SuggestionsHeaderProps {
 function SuggestionsHeader({ suggestions }: SuggestionsHeaderProps): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
+	const navigation = useNavigation<SearchStackNavigator>()
 
 	const suggestedArtists = suggestions?.filter((suggestion) => suggestion.Type === 'MusicArtist')
 
@@ -80,22 +79,13 @@ function EmptyState({ isFetching }: EmptyStateProps): React.JSX.Element {
 export default function Suggestions(): React.JSX.Element {
 	const { data: suggestions, isPending: fetchingSuggestions } = useSearchSuggestions()
 
-	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
-
 	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
 	}
 
 	const renderItem = ({ item }: { item: BaseItemDto }) =>
 		item.Type === 'Audio' ? (
-			<Track
-				showArtwork
-				queue={'Suggestions'}
-				track={item}
-				index={0}
-				tracklist={[item]}
-				navigation={navigation}
-			/>
+			<Track showArtwork queue={'Suggestions'} track={item} index={0} tracklist={[item]} />
 		) : (
 			<ItemRow item={item} />
 		)

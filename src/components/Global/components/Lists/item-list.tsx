@@ -10,9 +10,6 @@ import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 import ItemRow from '../item-row'
 import { Queue } from '../../../../services/types/queue-item'
 import Track from '../Track'
-import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '../../../../screens/types'
 import { EventHandler } from '../../../../types/Events'
 
 interface InfiniteItemListProps {
@@ -49,14 +46,11 @@ function BaseItemList({ query, queue, onEndReached }: BaseItemListProps): React.
 	const tracks = query.data?.filter(({ Type }) => Type === BaseItemKind.Audio) ?? []
 	const trackIds = new Map<string, number>(tracks.map((track, index) => [track.Id!, index]))
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-
 	const renderItem = ({ item, index }: LegendListRenderItemProps<BaseItemDto>) => {
 		const trackIndex = trackIds.get(item.Id!) ?? 0
 
 		return item.Type === BaseItemKind.Audio ? (
 			<Track
-				navigation={navigation}
 				showArtwork
 				index={0}
 				track={item}

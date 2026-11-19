@@ -1,10 +1,10 @@
 import React from 'react'
 import { XStack, SizableText, Card, ThemeTokens } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import Icon from '../../Global/components/icon'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
+import { SettingsStackNavigator } from '../../../screens/Settings/types'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 interface SettingsNavRowProps {
@@ -24,7 +24,7 @@ export default function SettingsNavRow({
 	description,
 	testID,
 }: SettingsNavRowProps): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+	const navigation = useNavigation<SettingsStackNavigator>()
 
 	return (
 		<Card

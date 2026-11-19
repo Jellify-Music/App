@@ -1,6 +1,6 @@
 import { CommonActions, RouteProp, StackActions, TabActions } from '@react-navigation/native'
 import navigationRef from '../../../screens/navigation'
-import { BaseStackParamList } from '@/src/screens/types'
+import { BaseStackParamList } from '../../../screens/base-types'
 
 export default function goToScreenFromContextSheet(
 	screenName: keyof BaseStackParamList,

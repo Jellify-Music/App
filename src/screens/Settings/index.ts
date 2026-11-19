@@ -4,7 +4,6 @@ import SignOutModal from './sign-out-modal'
 import LibrarySelectionScreen from './library-selection'
 import StorageManagementScreen from '../Storage'
 import StorageSelectionModal from './storage-selection-modal'
-import { SettingsStackParamList } from './types'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 import AccountScreen from '../Account'
 import AboutScreen from '../About'
@@ -15,7 +14,7 @@ import AppearanceScreen from './appearance'
 import { stackScreenOptions } from '../navigation'
 import i18n from '../../i18n'
 
-const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
+const SettingsStack = createNativeStackNavigator({
 	initialRouteName: 'Settings',
 	screenOptions: stackScreenOptions,
 	screens: {

@@ -1,61 +1,42 @@
-import { RouteProp } from '@react-navigation/native'
 import AlbumScreen from './Album'
 import ArtistScreen from './Artist'
 import { PlaylistScreen } from './Playlist'
 import TracksScreen from './Tracks'
-import { BaseStackParamList } from './types'
 import InstantMixScreen from './InstantMix'
+import { createNativeStackScreen } from '@react-navigation/native-stack'
 import i18n from '../i18n'
 
-export const BaseStackScreens = {
-	Artist: {
+export const BaseStack = {
+	Artist: createNativeStackScreen({
 		screen: ArtistScreen,
-		options: ({
-			route,
-			theme,
-		}: {
-			route: RouteProp<BaseStackParamList, 'Artist'>
-			theme: ReactNavigation.Theme
-		}) => ({
+		options: ({ route, theme }) => ({
 			title: route.params.artist.Name ?? i18n.t('placeholders.unknownArtist'),
 			headerTitleStyle: {
 				color: theme.colors.background,
 			},
 		}),
-	},
-	Album: {
+	}),
+	Album: createNativeStackScreen({
 		screen: AlbumScreen,
-		options: ({
-			route,
-			theme,
-		}: {
-			route: RouteProp<BaseStackParamList, 'Album'>
-			theme: ReactNavigation.Theme
-		}) => ({
+		options: ({ route, theme }) => ({
 			title: route.params.album.Name ?? i18n.t('placeholders.untitledAlbum'),
 			headerTitleStyle: {
 				color: theme.colors.background,
 			},
 		}),
-	},
-	Playlist: {
+	}),
+	Playlist: createNativeStackScreen({
 		screen: PlaylistScreen,
-		options: ({
-			route,
-			theme,
-		}: {
-			route: RouteProp<BaseStackParamList, 'Playlist'>
-			theme: ReactNavigation.Theme
-		}) => ({
+		options: ({ route, theme }) => ({
 			title: route.params.playlist.Name ?? i18n.t('placeholders.untitledPlaylist'),
 			headerTitleStyle: {
 				color: theme.colors.background,
 			},
 		}),
-	},
-	InstantMix: {
+	}),
+	InstantMix: createNativeStackScreen({
 		screen: InstantMixScreen,
-		options: ({ route }: { route: RouteProp<BaseStackParamList, 'InstantMix'> }) => ({
+		options: ({ route }) => ({
 			headerTitle: i18n.t('instantMix.title', {
 				name:
 					route.params.item.Name ??
@@ -63,11 +44,11 @@ export const BaseStackScreens = {
 					i18n.t('placeholders.untitled'),
 			}),
 		}),
-	},
-	Tracks: {
+	}),
+	Tracks: createNativeStackScreen({
 		screen: TracksScreen,
 		options: {
 			title: i18n.t('navigation.tracks'),
 		},
-	},
+	}),
 }

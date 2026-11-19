@@ -1,7 +1,6 @@
 import { SizableText, Spinner, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import LoginStackParamList from '../../screens/Login/types'
+import { LoginStackNavigator } from '../../screens/Login/types'
 import { useState } from 'react'
 import { isEmpty } from 'lodash'
 import useConnectToServer from '../../api/mutations/public-system-info'
@@ -13,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 export default function ServerAddress(): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
+	const navigation = useNavigation<LoginStackNavigator>()
 
 	const [serverAddress, setServerAddress] = useState<string | undefined>(undefined)
 

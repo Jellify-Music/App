@@ -1,25 +1,19 @@
-import { BaseStackParamList } from '../types'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { StaticParamList, StaticScreenProps } from '@react-navigation/native'
+import type DiscoverStack from '.'
 
 export enum DiscoverAlbumScreenType {
 	RecentlyAdded = 'RecentlyAdded',
 	Suggested = 'Suggested',
 }
 
-type DiscoverStackParamList = BaseStackParamList & {
-	Discover: undefined
-	Albums: {
-		type: DiscoverAlbumScreenType
-	}
-	PublicPlaylists: undefined
-	SuggestedArtists: undefined
-}
+export type DiscoverStackNavigator = typeof DiscoverStack
+
+type DiscoverStackParamList = StaticParamList<DiscoverStackNavigator>
 
 export default DiscoverStackParamList
 
-export type DiscoverAlbumsProps = NativeStackScreenProps<DiscoverStackParamList, 'Albums'>
-export type PublicPlaylistsProps = NativeStackScreenProps<DiscoverStackParamList, 'PublicPlaylists'>
-export type SuggestedArtistsProps = NativeStackScreenProps<
-	DiscoverStackParamList,
-	'SuggestedArtists'
->
+export type DiscoverAlbumsProps = StaticScreenProps<{
+	type: DiscoverAlbumScreenType
+}>
+export type PublicPlaylistsProps = StaticScreenProps<undefined>
+export type SuggestedArtistsProps = StaticScreenProps<undefined>

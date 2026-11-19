@@ -2,12 +2,11 @@ import React, { useState } from 'react'
 import { Label, Spinner, XStack, SizableText, YStack } from 'tamagui'
 import { isEmpty } from 'lodash'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import Input from '../Global/utils/Input'
 import Button from '../Global/utils/button'
 import Icon from '../Global/components/icon'
-import LibraryStackParamList from '../../screens/Library/types'
+import { LibraryStackNavigator } from '../../screens/Library/types'
 import {
 	useGeneratePlaylistWithAudioMuseAI,
 	useSaveAudioMuseAIPlaylist,
@@ -16,7 +15,7 @@ import {
 export default function GeneratePlaylist(): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<LibraryStackNavigator>()
 
 	const [prompt, setPrompt] = useState<string>('')
 	const [name, setName] = useState<string>('')

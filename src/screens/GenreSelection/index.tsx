@@ -6,8 +6,7 @@ import ItemImage from '../../components/Global/components/image'
 import Icon from '../../components/Global/components/icon'
 import useLibraryStore from '../../stores/library'
 import { getItemName } from '../../utils/formatting/item-names'
-import LibraryStackParamList from '../Library/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { LibraryStackNavigator } from '../Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
@@ -17,7 +16,7 @@ import { useTranslation } from 'react-i18next'
 export default function GenreSelectionScreen(): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<LibraryStackNavigator>()
 
 	const genresInfiniteQuery = useGenres()
 	const {

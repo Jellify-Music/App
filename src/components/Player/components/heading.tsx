@@ -1,5 +1,5 @@
 import { useTheme, XStack, YStack, SizableText, Spacer } from 'tamagui'
-import { useNavigation, CommonActions } from '@react-navigation/native'
+import { useNavigation, CommonActions, RootNavigator } from '@react-navigation/native'
 import { useQueueRef } from '../../../stores/player/queue'
 import React from 'react'
 import { Ticker } from '../../Global/utils/Animated/text'
@@ -15,7 +15,7 @@ import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 export default function PlayerHeading(): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const rootNavigation = useNavigation<RootNavigator>()
 
 	const theme = useTheme()
 
