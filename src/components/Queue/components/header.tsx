@@ -3,8 +3,11 @@ import { Platform, StyleSheet } from 'react-native'
 import { usePlayerContext } from '../../../providers/Player'
 import Icon from '../../Global/components/icon'
 import { ITEM_ROW_HEIGHT } from '../../../configs/styling/dimensions'
+import { useTranslation } from 'react-i18next'
 
 export default function QueueListHeader() {
+	const { t } = useTranslation()
+
 	const { setPage } = usePlayerContext()
 
 	const onPressUpIcon = () => setPage(0)
@@ -42,7 +45,7 @@ export default function QueueListHeader() {
 				/>
 
 				<Paragraph fontSize={'3'} fontWeight='6' textAlign='center'>
-					Now Playing
+					{t('queue.nowPlaying')}
 				</Paragraph>
 			</YStack>
 			<Spacer width={24} />

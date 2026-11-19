@@ -7,11 +7,14 @@ import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registe
 import { RefreshControl } from 'react-native'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 import List from '../Global/components/Lists/utils'
+import { useTranslation } from 'react-i18next'
 
 export interface PlaylistsProps {
 	query: UseQueryResult<BaseItemDto[], unknown>
 }
 export default function Playlists({ query }: PlaylistsProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const theme = useTheme()
 
 	const renderItem = ({ item: playlist, index }: LegendListRenderItemProps<BaseItemDto>) => (
@@ -37,7 +40,7 @@ export default function Playlists({ query }: PlaylistsProps): React.JSX.Element 
 			ListEmptyComponent={
 				<YStack flex={1} justify='center' alignItems='center'>
 					<Paragraph marginVertical='auto' color='borderColor'>
-						No playlists
+						{t('playlist.none')}
 					</Paragraph>
 				</YStack>
 			}

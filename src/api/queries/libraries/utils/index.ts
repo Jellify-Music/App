@@ -1,62 +1,58 @@
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getUserViewApi } from '@jellyfin/sdk/lib/utils/api'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
-import { Api } from '@jellyfin/sdk'
+import { ApiNotAvailableError, UserNotAvailableError } from '../../../../types/errors'
+import { captureError, LoggingContext } from '../../../../utils/logging'
 import { JellifyUser } from '../../../../types/JellifyUser'
+import { Api } from '@jellyfin/sdk'
 
 export async function fetchPlaylistLibrary(
-	api: Api,
-	user: JellifyUser,
+	api?: Api,
+	user?: JellifyUser,
 	signal?: AbortSignal,
 ): Promise<BaseItemDto | undefined> {
-	return new Promise((resolve, reject) => {
-		getLibraryApi(api)
-			.getItems(
-				{
-					userId: user.id,
-				},
-				{
-					signal,
-				},
-			)
-			.then((response) => {
-				if (response.data.Items)
-					return resolve(
-						response.data.Items.filter(
-							(library) => library.CollectionType == 'playlists',
-						)[0],
-					)
-				else return resolve(undefined)
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
+	if (!api) throw new ApiNotAvailableError()
+	if (!user) throw new UserNotAvailableError()
+
+	const response = await getLibraryApi(api)
+		.getItems({ userId: user.id }, { signal })
+		.catch((error) => {
+			// A cancelled request isn't a failure worth reporting
+			if (!signal?.aborted)
+				captureError(error, LoggingContext.LibraryFetch, 'Failed to fetch playlist library')
+			throw error
+		})
+
+	return response.data.Items?.find((library) => library.CollectionType == 'playlists')
 }
 
-export async function fetchUserViews(
-	api: Api,
-	user: JellifyUser,
+/**
+ * Fetches the music libraries the user can access
+ *
+ * @param api The Jellyfin {@link Api} instance
+ * @param user The signed in {@link JellifyUser}
+ * @param signal Cancels the request
+ * @returns The user's views that are music libraries
+ */
+export async function fetchMusicLibraries(
+	api?: Api,
+	user?: JellifyUser,
 	signal?: AbortSignal,
-): Promise<BaseItemDto[] | void> {
-	return new Promise((resolve, reject) => {
-		getUserViewApi(api)
-			.getUserViews(
-				{
-					userId: user.id,
-				},
-				{
-					signal,
-				},
-			)
-			.then((response) => {
-				if (response.data.Items) return resolve(response.data.Items)
-				else return resolve([])
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
+): Promise<BaseItemDto[]> {
+	if (!api) throw new ApiNotAvailableError()
+	if (!user) throw new UserNotAvailableError()
+
+	const response = await getUserViewApi(api)
+		.getUserViews({ userId: user.id }, { signal })
+		.catch((error) => {
+			// A cancelled request isn't a failure worth reporting
+			if (!signal?.aborted)
+				captureError(error, LoggingContext.LibraryFetch, 'Failed to fetch music libraries')
+			throw error
+		})
+
+	return (
+		response.data.Items?.filter((library) => library.CollectionType == CollectionType.Music) ??
+		[]
+	)
 }

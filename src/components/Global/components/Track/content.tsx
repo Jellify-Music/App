@@ -3,11 +3,11 @@ import type { EventHandler } from '../../../../types/Events'
 import { SizableText, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../icon'
-import ItemImage from '../image'
 import FavoriteIcon from '../favorite-icon'
 import DownloadIndicator from '../DownloadIndicator'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from '../SwipeableRow/context'
+import HideableArtwork from '../SwipeableRow/hideable-artwork'
 import { isExplicit } from '../../../../utils/audio/explicit'
 
 export interface TrackRowContentProps {
@@ -23,16 +23,6 @@ export interface TrackRowContentProps {
 	editing?: boolean
 	handleIconPress: EventHandler
 	testID?: string
-}
-
-function HideableArtwork({ children }: { children: React.ReactNode }) {
-	const { tx } = useSwipeableRowContext()
-	// Hide artwork as soon as swiping starts (any non-zero tx)
-	const style = useAnimatedStyle(() => ({
-		marginRight: 6,
-		opacity: withTiming(tx.value === 0 ? 1 : 0),
-	}))
-	return <Animated.View style={style}>{children}</Animated.View>
 }
 
 function SlidingTextArea({
@@ -98,23 +88,19 @@ export default function TrackRowContent({
 			alignContent='center'
 			alignItems='center'
 			flex={1}
-			gap='1'
-			paddingVertical='2'
+			gap='2'
+			padding='2'
 			transition={'quick'}
 			opacity='1 press:0.5'
 			backgroundColor='background'
 			testID={testID ?? undefined}
 		>
 			{showArtwork ? (
-				<HideableArtwork>
-					<ItemImage
-						item={track}
-						width={'4'}
-						height={'4'}
-						elevate
-						imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
-					/>
-				</HideableArtwork>
+				<HideableArtwork
+					item={track}
+					marginRight='0'
+					onLayout={(event) => setArtworkAreaWidth(event.nativeEvent.layout.width)}
+				/>
 			) : (
 				<SizableText
 					key={`${track.Id}-number`}

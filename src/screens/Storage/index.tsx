@@ -22,10 +22,13 @@ import { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useDownloadProgress } from 'react-native-nitro-player'
 import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
 import { DownloadQuality } from '../../enums/audio-quality'
+import { useTranslation } from 'react-i18next'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
 
 export default function StorageManagementScreen(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { summary, selection, toggleSelection, clearSelection, refresh } = useStorageContext()
 
 	const { data: downloads } = useDownloads()
@@ -68,7 +71,10 @@ export default function StorageManagementScreen(): React.JSX.Element {
 		setApplyingSuggestionId(suggestion.id)
 		try {
 			await deleteDownloads(suggestion.itemIds)
-			showDeletionToast(`Removed ${suggestion.itemIds.length} downloads`, 0)
+			showDeletionToast(
+				t('storage.removedDownloads', { count: suggestion.itemIds.length }),
+				0,
+			)
 		} finally {
 			setApplyingSuggestionId(null)
 		}
@@ -77,46 +83,48 @@ export default function StorageManagementScreen(): React.JSX.Element {
 	const handleDeleteSingle = async (download: DownloadedTrack) => {
 		await deleteDownloads([download.trackId])
 		showDeletionToast(
-			`Removed ${download.originalTrack.title ?? 'track'}`,
+			t('storage.removedTrack', { name: download.originalTrack.title ?? t('storage.track') }),
 			download.fileSize ?? 0,
 		)
 	}
 
 	const handleDeleteAll = () =>
-		Alert.alert(
-			'Clear all downloads?',
-			'This will remove all downloaded music from your device. This action cannot be undone.',
-			[
-				{ text: 'Cancel', style: 'cancel' },
-				{
-					text: 'Clear All',
-					style: 'destructive',
-					onPress: async () => {
-						if (!downloads) return
-						const allIds = downloads.map((d) => d.trackId)
-						const totalBytes = downloads.reduce(
-							(total, download) => total + getDownloadSize(download),
-							0,
-						)
-						await deleteDownloads(allIds)
-						showDeletionToast(`Removed ${allIds.length} downloads`, totalBytes)
-					},
+		Alert.alert(t('storage.clearAllTitle'), t('storage.clearAllMessage'), [
+			{ text: t('common.cancel'), style: 'cancel' },
+			{
+				text: t('storage.clearAll'),
+				style: 'destructive',
+				onPress: async () => {
+					if (!downloads) return
+					const allIds = downloads.map((d) => d.trackId)
+					const totalBytes = downloads.reduce(
+						(total, download) => total + getDownloadSize(download),
+						0,
+					)
+					await deleteDownloads(allIds)
+					showDeletionToast(
+						t('storage.removedDownloads', { count: allIds.length }),
+						totalBytes,
+					)
 				},
-			],
-		)
+			},
+		])
 
 	const handleDeleteSelection = () =>
 		Alert.alert(
-			'Clear selected downloads?',
-			`Are you sure you want to clear ${selectedIds.length} downloads?`,
+			t('storage.clearSelectedTitle'),
+			t('storage.clearSelectedMessage', { count: selectedIds.length }),
 			[
-				{ text: 'Cancel', style: 'cancel' },
+				{ text: t('common.cancel'), style: 'cancel' },
 				{
-					text: 'Clear',
+					text: t('common.clear'),
 					style: 'destructive',
 					onPress: async () => {
 						await deleteDownloads(selectedIds)
-						showDeletionToast(`Removed ${selectedIds.length} downloads`, selectedBytes)
+						showDeletionToast(
+							t('storage.removedDownloads', { count: selectedIds.length }),
+							selectedBytes,
+						)
 						clearSelection()
 					},
 				},
@@ -159,7 +167,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 									backgroundColor='background75'
 								>
 									<SizableText fontSize='2' fontWeight='6'>
-										{selectedIds.length} selected
+										{t('storage.selectedCount', { count: selectedIds.length })}
 									</SizableText>
 								</Card>
 							)}
@@ -216,6 +224,8 @@ const StorageSummaryCard = ({
 	activeDownloads: DownloadProgress[] | undefined
 	onDeleteAll: EventHandler
 }) => {
+	const { t } = useTranslation()
+
 	return (
 		<Card
 			backgroundColor='background75'
@@ -226,7 +236,7 @@ const StorageSummaryCard = ({
 		>
 			<XStack justifyContent='space-between' alignItems='center' marginBottom='3'>
 				<SizableText size='2' fontWeight='6'>
-					Storage overview
+					{t('storage.overview')}
 				</SizableText>
 				<XStack gap='2'>
 					<Icon
@@ -234,7 +244,7 @@ const StorageSummaryCard = ({
 						name='refresh'
 						color='color'
 						onPress={onRefresh}
-						aria-label='Refresh storage overview'
+						aria-label={t('storage.refreshOverview')}
 					/>
 					<Button
 						backgroundColor='warning'
@@ -244,7 +254,7 @@ const StorageSummaryCard = ({
 						icon={() => <Icon name='broom' color='background' size='7' />}
 					>
 						<SizableText fontSize='2' fontWeight='6' color='background'>
-							Clear All
+							{t('storage.clearAll')}
 						</SizableText>
 					</Button>
 				</XStack>
@@ -256,13 +266,13 @@ const StorageSummaryCard = ({
 							{formatBytes(summary.usedByDownloads)}
 						</SizableText>
 						<SizableText fontSize='2' color='borderColor'>
-							Used by offline music · {formatBytes(summary.freeSpace)} free on device
+							{t('storage.usage', { free: formatBytes(summary.freeSpace) })}
 						</SizableText>
 					</YStack>
 					<YStack gap='2'>
 						<ProgressBar progress={summary.usedPercentage} />
 						<SizableText fontSize='2' color='borderColor'>
-							{summary.downloadCount} downloads
+							{t('storage.downloadCount', { count: summary.downloadCount })}
 						</SizableText>
 					</YStack>
 					<StatGrid summary={summary} />
@@ -271,7 +281,7 @@ const StorageSummaryCard = ({
 				<YStack gap='2'>
 					<Spinner />
 					<SizableText fontSize='2' color='borderColor'>
-						Calculating storage usage…
+						{t('storage.calculating')}
 					</SizableText>
 				</YStack>
 			)}
@@ -300,73 +310,86 @@ const DownloadRow = ({
 	isSelected: boolean
 	onToggle: EventHandler
 	onDelete: EventHandler
-}) => (
-	<Pressable onPress={onToggle} accessibilityRole='button'>
-		<XStack padding='3' alignItems='center' gap='3' borderRadius='4'>
-			<Icon
-				name={isSelected ? 'check-circle-outline' : 'circle-outline'}
-				color={isSelected ? 'color' : 'borderColor'}
-			/>
+}) => {
+	const { t } = useTranslation()
 
-			{download.localArtworkPath ? (
-				<Image src={download.localArtworkPath} width={50} height={50} borderRadius='2' />
-			) : (
-				<YStack
-					width={50}
-					height={50}
-					borderRadius='2'
-					backgroundColor='background75'
-					alignItems='center'
-					justifyContent='center'
-				>
-					<Icon name='music-note' color='color' />
+	return (
+		<Pressable onPress={onToggle} accessibilityRole='button'>
+			<XStack padding='3' alignItems='center' gap='3' borderRadius='4'>
+				<Icon
+					name={isSelected ? 'check-circle-outline' : 'circle-outline'}
+					color={isSelected ? 'color' : 'borderColor'}
+				/>
+
+				{download.localArtworkPath ? (
+					<Image
+						src={download.localArtworkPath}
+						width={50}
+						height={50}
+						borderRadius='2'
+					/>
+				) : (
+					<YStack
+						width={50}
+						height={50}
+						borderRadius='2'
+						backgroundColor='background75'
+						alignItems='center'
+						justifyContent='center'
+					>
+						<Icon name='music-note' color='color' />
+					</YStack>
+				)}
+
+				<YStack flex={1} gap='1'>
+					<SizableText size='4' fontWeight='6'>
+						{download.originalTrack.title ?? t('placeholders.unknownTrack')}
+					</SizableText>
+					<SizableText fontSize='2' color='borderColor'>
+						{download.originalTrack.album ?? t('placeholders.unknownAlbum')} ·{' '}
+						{formatBytes(getDownloadSize(download))}
+					</SizableText>
 				</YStack>
-			)}
+				<Button
+					size='sm'
+					circular
+					backgroundColor='transparent'
+					hitSlop={10}
+					icon={() => <Icon name='broom' color='warning' />}
+					onPress={(event) => {
+						event.stopPropagation()
+						onDelete()
+					}}
+					aria-label={t('storage.clearDownload')}
+				/>
+			</XStack>
+		</Pressable>
+	)
+}
 
-			<YStack flex={1} gap='1'>
-				<SizableText size='4' fontWeight='6'>
-					{download.originalTrack.title ?? 'Unknown track'}
-				</SizableText>
-				<SizableText fontSize='2' color='borderColor'>
-					{download.originalTrack.album ?? 'Unknown album'} ·{' '}
-					{formatBytes(getDownloadSize(download))}
-				</SizableText>
-			</YStack>
+const EmptyState = ({ onRefresh }: { onRefresh: () => void }) => {
+	const { t } = useTranslation()
+
+	return (
+		<YStack padding='6' alignItems='center' gap='3'>
+			<SizableText size='6' fontWeight='6'>
+				{t('storage.empty')}
+			</SizableText>
+			<SizableText fontSize='2' color='borderColor' textAlign='center'>
+				{t('storage.emptyHint')}
+			</SizableText>
 			<Button
-				size='sm'
-				circular
-				backgroundColor='transparent'
-				hitSlop={10}
-				icon={() => <Icon name='broom' color='warning' />}
-				onPress={(event) => {
-					event.stopPropagation()
-					onDelete()
-				}}
-				aria-label='Clear download'
-			/>
-		</XStack>
-	</Pressable>
-)
-
-const EmptyState = ({ onRefresh }: { onRefresh: () => void }) => (
-	<YStack padding='6' alignItems='center' gap='3'>
-		<SizableText size='6' fontWeight='6'>
-			No offline music yet
-		</SizableText>
-		<SizableText fontSize='2' color='borderColor' textAlign='center'>
-			Downloaded tracks will show up here so you can reclaim storage any time.
-		</SizableText>
-		<Button
-			borderColor='borderColor'
-			borderWidth={1}
-			backgroundColor='background'
-			onPress={onRefresh}
-			icon={<Icon name='refresh' color='borderColor' />}
-		>
-			Refresh
-		</Button>
-	</YStack>
-)
+				borderColor='borderColor'
+				borderWidth={1}
+				backgroundColor='background'
+				onPress={onRefresh}
+				icon={<Icon name='refresh' color='borderColor' />}
+			>
+				{t('common.refresh')}
+			</Button>
+		</YStack>
+	)
+}
 
 const SelectionReviewBanner = ({
 	selectedCount,
@@ -378,69 +401,83 @@ const SelectionReviewBanner = ({
 	selectedBytes: number
 	onDelete: EventHandler
 	onClear: EventHandler
-}) => (
-	<Card
-		borderRadius='6'
-		borderWidth={1}
-		borderColor='borderColor'
-		backgroundColor='background75'
-		padding='3'
-	>
-		<YStack gap='3'>
-			<XStack justifyContent='space-between' alignItems='center'>
-				<YStack>
-					<SizableText size='2' fontWeight='6'>
-						Ready to clean up?
-					</SizableText>
-					<SizableText fontSize='2' color='borderColor'>
-						{selectedCount} {selectedCount === 1 ? 'track' : 'tracks'} ·{' '}
-						{formatBytes(selectedBytes)}
-					</SizableText>
-				</YStack>
-				<Button
-					borderColor='borderColor'
-					borderWidth={1}
-					backgroundColor='background'
-					onPress={onClear}
-				>
-					Clear
-				</Button>
-			</XStack>
-			<Button
-				size='sm'
-				borderColor='warning'
-				borderWidth={1}
-				icon={() => <Icon size='7' name='broom' color='warning' />}
-				onPress={onDelete}
-			>
-				<SizableText fontSize='2' fontWeight='6' color='warning'>
-					{`Clear ${formatBytes(selectedBytes)}`}
-				</SizableText>
-			</Button>
-		</YStack>
-	</Card>
-)
+}) => {
+	const { t } = useTranslation()
 
-const DownloadsSectionHeading = ({ count }: { count: number }) => (
-	<XStack alignItems='center' justifyContent='space-between'>
-		<SizableText size='2' fontWeight='2'>
-			Offline library
-		</SizableText>
-		<SizableText fontSize='2' color='borderColor'>
-			{count} {count === 1 ? 'item' : 'items'} cached
-		</SizableText>
-	</XStack>
-)
+	return (
+		<Card
+			borderRadius='6'
+			borderWidth={1}
+			borderColor='borderColor'
+			backgroundColor='background75'
+			padding='3'
+		>
+			<YStack gap='3'>
+				<XStack justifyContent='space-between' alignItems='center'>
+					<YStack>
+						<SizableText size='2' fontWeight='6'>
+							{t('storage.readyToCleanUp')}
+						</SizableText>
+						<SizableText fontSize='2' color='borderColor'>
+							{t('storage.selectionSummary', {
+								count: selectedCount,
+								size: formatBytes(selectedBytes),
+							})}
+						</SizableText>
+					</YStack>
+					<Button
+						borderColor='borderColor'
+						borderWidth={1}
+						backgroundColor='background'
+						onPress={onClear}
+					>
+						{t('common.clear')}
+					</Button>
+				</XStack>
+				<Button
+					size='sm'
+					borderColor='warning'
+					borderWidth={1}
+					icon={() => <Icon size='7' name='broom' color='warning' />}
+					onPress={onDelete}
+				>
+					<SizableText fontSize='2' fontWeight='6' color='warning'>
+						{t('storage.clearSize', { size: formatBytes(selectedBytes) })}
+					</SizableText>
+				</Button>
+			</YStack>
+		</Card>
+	)
+}
+
+const DownloadsSectionHeading = ({ count }: { count: number }) => {
+	const { t } = useTranslation()
+
+	return (
+		<XStack alignItems='center' justifyContent='space-between'>
+			<SizableText size='2' fontWeight='2'>
+				{t('storage.offlineLibrary')}
+			</SizableText>
+			<SizableText fontSize='2' color='borderColor'>
+				{t('storage.cachedCount', { count })}
+			</SizableText>
+		</XStack>
+	)
+}
 
 const StatGrid = ({
 	summary,
 }: {
 	summary: NonNullable<ReturnType<typeof useStorageContext>['summary']>
-}) => (
-	<XStack gap='3' flexWrap='wrap'>
-		<StatChip label='Audio files' value={formatBytes(summary.audioBytes)} />
-	</XStack>
-)
+}) => {
+	const { t } = useTranslation()
+
+	return (
+		<XStack gap='3' flexWrap='wrap'>
+			<StatChip label={t('storage.audioFiles')} value={formatBytes(summary.audioBytes)} />
+		</XStack>
+	)
+}
 
 const StatChip = ({ label, value }: { label: string; value: string }) => (
 	<YStack
@@ -472,38 +509,67 @@ const DownloadSettingsSection = ({
 	setAutoDownload: (value: boolean) => void
 	downloadQuality: DownloadQuality
 	setDownloadQuality: (value: DownloadQuality) => void
-}) => (
-	<SettingsSection title='Download Settings' icon='cog' iconColor='primary' defaultExpanded>
-		<XStack alignItems='center' justifyContent='space-between'>
-			<YStack flex={1}>
-				<SizableText fontSize='2' fontWeight={'6'}>
-					Auto-Download Tracks
-				</SizableText>
-				<SizableText fontSize='2' color='borderColor'>
-					Download tracks as they are played
-				</SizableText>
-			</YStack>
-			<SwitchWithLabel checked={autoDownload} onCheckedChange={setAutoDownload} size='2' />
-		</XStack>
+}) => {
+	const { t } = useTranslation()
 
-		<YStack>
-			<SizableText size='2' fontWeight={'6'}>
-				Download Quality
-			</SizableText>
-			<SizableText size='2' color='borderColor'>
-				Quality used when downloading tracks
-			</SizableText>
-			<RadioGroup
-				gap='3'
-				marginTop='2'
-				value={downloadQuality}
-				onValueChange={(value) => setDownloadQuality(value as DownloadQuality)}
-			>
-				<RadioGroupItemWithLabel size='3' value='original' label='Original Quality' />
-				<RadioGroupItemWithLabel size='3' value='high' label='High (320kbps)' />
-				<RadioGroupItemWithLabel size='3' value='medium' label='Medium (256kbps)' />
-				<RadioGroupItemWithLabel size='3' value='low' label='Low (192kbps)' />
-			</RadioGroup>
-		</YStack>
-	</SettingsSection>
-)
+	return (
+		<SettingsSection
+			title={t('storage.downloadSettings')}
+			icon='cog'
+			iconColor='primary'
+			defaultExpanded
+		>
+			<XStack alignItems='center' justifyContent='space-between'>
+				<YStack flex={1}>
+					<SizableText fontSize='2' fontWeight={'6'}>
+						{t('storage.autoDownload')}
+					</SizableText>
+					<SizableText fontSize='2' color='borderColor'>
+						{t('storage.autoDownloadDescription')}
+					</SizableText>
+				</YStack>
+				<SwitchWithLabel
+					checked={autoDownload}
+					onCheckedChange={setAutoDownload}
+					size='2'
+				/>
+			</XStack>
+
+			<YStack>
+				<SizableText size='2' fontWeight={'6'}>
+					{t('storage.downloadQuality')}
+				</SizableText>
+				<SizableText size='2' color='borderColor'>
+					{t('storage.downloadQualityDescription')}
+				</SizableText>
+				<RadioGroup
+					gap='3'
+					marginTop='2'
+					value={downloadQuality}
+					onValueChange={(value) => setDownloadQuality(value as DownloadQuality)}
+				>
+					<RadioGroupItemWithLabel
+						size='3'
+						value='original'
+						label={t('settings.quality.original')}
+					/>
+					<RadioGroupItemWithLabel
+						size='3'
+						value='high'
+						label={t('settings.quality.high')}
+					/>
+					<RadioGroupItemWithLabel
+						size='3'
+						value='medium'
+						label={t('settings.quality.medium')}
+					/>
+					<RadioGroupItemWithLabel
+						size='3'
+						value='low'
+						label={t('settings.quality.low')}
+					/>
+				</RadioGroup>
+			</YStack>
+		</SettingsSection>
+	)
+}

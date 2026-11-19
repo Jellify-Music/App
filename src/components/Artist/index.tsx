@@ -11,15 +11,18 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import ItemRow from '../Global/components/item-row'
 import ArtistHeader from './header'
 import SimilarArtists from './similar'
-import { Spinner, useTheme, YStack, SizableText, View } from 'tamagui'
+import { Spinner, useTheme, YStack, SizableText } from 'tamagui'
 import {
 	filterForAlbums,
 	filterForEPs,
 	filterForSingles,
 	filterForUnknown,
 } from '../../configs/categorizing/albums.config'
+import { useTranslation } from 'react-i18next'
 
 export default function Artist(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { featuredOn, albums, fetchingAlbums, refresh } = useArtistContext()
 
 	const theme = useTheme()
@@ -27,23 +30,23 @@ export default function Artist(): React.JSX.Element {
 	const sections: SectionListData<BaseItemDto>[] = albums
 		? [
 				{
-					title: 'Albums',
+					title: t('artist.sections.albums'),
 					data: albums.filter(filterForAlbums) ?? [],
 				},
 				{
-					title: 'EPs',
+					title: t('artist.sections.eps'),
 					data: albums.filter(filterForEPs) ?? [],
 				},
 				{
-					title: 'Singles',
+					title: t('artist.sections.singles'),
 					data: albums.filter(filterForSingles) ?? [],
 				},
 				{
-					title: 'Other',
+					title: t('artist.sections.other'),
 					data: albums.filter(filterForUnknown) ?? [],
 				},
 				{
-					title: 'Featured On',
+					title: t('artist.sections.featuredOn'),
 					data: featuredOn ?? [],
 				},
 			]
@@ -66,11 +69,7 @@ export default function Artist(): React.JSX.Element {
 
 	const renderItem = ({
 		item,
-	}: SectionListRenderItemInfo<BaseItemDto, SectionBase<BaseItemDto>>) => (
-		<View marginHorizontal='2'>
-			<ItemRow item={item} />
-		</View>
-	)
+	}: SectionListRenderItemInfo<BaseItemDto, SectionBase<BaseItemDto>>) => <ItemRow item={item} />
 
 	const ListEmptyComponent = (
 		<YStack justifyContent='center' alignContent='center'>
@@ -78,7 +77,7 @@ export default function Artist(): React.JSX.Element {
 				<Spinner color='primary' flex={1} />
 			) : (
 				<SizableText fontSize='3' color={'neutral'}>
-					No albums
+					{t('artist.noAlbums')}
 				</SizableText>
 			)}
 		</YStack>

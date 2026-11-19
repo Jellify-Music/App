@@ -1,4 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import i18n from '../../i18n'
 
 /**
  * Formats a track name by using the track's Name property,
@@ -9,5 +10,5 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
  * @returns the formatted track name
  */
 export default function formatTrackName(track: BaseItemDto): string {
-	return track.Name ?? track.OriginalTitle ?? `Untitled Track`
+	return track.Name ?? track.OriginalTitle ?? i18n.t('placeholders.untitledTrack')
 }

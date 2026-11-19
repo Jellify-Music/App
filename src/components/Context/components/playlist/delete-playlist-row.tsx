@@ -3,6 +3,7 @@ import { StackActions } from '@react-navigation/native'
 import { DeletePlaylistRowProps } from './types'
 import type { ContextMenuRowImageProp } from '../types'
 import ContextMenuRow from '..'
+import { useTranslation } from 'react-i18next'
 
 const IMAGE_PROP: ContextMenuRowImageProp = {
 	iconName: 'delete',
@@ -10,6 +11,8 @@ const IMAGE_PROP: ContextMenuRowImageProp = {
 }
 
 export default function DeletePlaylistRow({ playlist }: DeletePlaylistRowProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const onPress = () => {
 		navigationRef.dispatch(
 			StackActions.push('DeletePlaylist', {
@@ -19,5 +22,11 @@ export default function DeletePlaylistRow({ playlist }: DeletePlaylistRowProps):
 		)
 	}
 
-	return <ContextMenuRow onPress={onPress} imageProp={IMAGE_PROP} label='Delete Playlist' />
+	return (
+		<ContextMenuRow
+			onPress={onPress}
+			imageProp={IMAGE_PROP}
+			label={t('context.deletePlaylist')}
+		/>
+	)
 }

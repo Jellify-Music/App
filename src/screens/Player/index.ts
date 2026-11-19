@@ -5,6 +5,7 @@ import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 import CastDialogScreen from '../CastDialog'
 import CastDialogHeaderRight from '../CastDialog/header'
 import PlayerScreen from '../../components/Player'
+import i18n from '../../i18n'
 
 const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 	initialRouteName: 'PlayerScreen',
@@ -13,7 +14,7 @@ const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 			screen: PlayerScreen,
 			options: {
 				headerShown: false,
-				headerTitle: 'Player',
+				headerTitle: i18n.t('navigation.player'),
 			},
 		},
 		MultipleArtistsSheet: {
@@ -28,7 +29,7 @@ const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 		CastDialog: {
 			screen: CastDialogScreen,
 			options: {
-				headerTitle: 'Audio Devices',
+				headerTitle: i18n.t('navigation.audioDevices'),
 				headerRight: CastDialogHeaderRight,
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',

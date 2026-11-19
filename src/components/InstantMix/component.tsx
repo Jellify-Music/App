@@ -5,8 +5,11 @@ import useInstantMix from '../../api/queries/instant-mix'
 import { RefreshControl } from 'react-native'
 import List from '../Global/components/Lists/utils'
 import MixTrackListHeader from './header'
+import { useTranslation } from 'react-i18next'
 
 export default function InstantMix(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { data: mix, isFetching, refetch } = useInstantMix()
 
 	const theme = useTheme()
@@ -31,7 +34,9 @@ export default function InstantMix(): React.JSX.Element {
 			)}
 			ListHeaderComponent={<MixTrackListHeader />}
 			ListEmptyComponent={
-				!isFetching ? <SizableText color={'neutral'}>No mix tracks</SizableText> : undefined // Refresh Control will handle the spinner, which is actually called a "throbber" ;)
+				!isFetching ? (
+					<SizableText color={'neutral'}>{t('instantMix.noTracks')}</SizableText>
+				) : undefined // Refresh Control will handle the spinner, which is actually called a "throbber" ;)
 			}
 			refreshControl={
 				<RefreshControl

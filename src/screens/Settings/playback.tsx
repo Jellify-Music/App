@@ -6,8 +6,11 @@ import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label
 import { RadioGroupItemWithLabel } from '../../components/Global/utils/radio-group-item-with-label'
 import { usePlayerSettingsStore } from '../../stores/settings/player'
 import { StreamingQuality } from '../../enums/audio-quality'
+import { useTranslation } from 'react-i18next'
 
 export default function PlaybackScreen(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { primary, neutral } = useTheme()
 
 	const { bottom } = useSafeAreaInsets()
@@ -39,10 +42,10 @@ export default function PlaybackScreen(): React.JSX.Element {
 					<YStack gap='3'>
 						<YStack gap='1'>
 							<SizableText fontSize='3' fontWeight='6'>
-								Streaming Quality
+								{t('settings.playback.streamingQuality')}
 							</SizableText>
 							<SizableText fontSize='2' color='borderColor'>
-								Changes apply to new tracks
+								{t('settings.playback.streamingQualityDescription')}
 							</SizableText>
 						</YStack>
 						<RadioGroup
@@ -55,22 +58,22 @@ export default function PlaybackScreen(): React.JSX.Element {
 							<RadioGroupItemWithLabel
 								size='3'
 								value={StreamingQuality.Original}
-								label='Original Quality'
+								label={t('settings.quality.original')}
 							/>
 							<RadioGroupItemWithLabel
 								size='3'
 								value={StreamingQuality.High}
-								label='High (320kbps)'
+								label={t('settings.quality.high')}
 							/>
 							<RadioGroupItemWithLabel
 								size='3'
 								value={StreamingQuality.Medium}
-								label='Medium (256kbps)'
+								label={t('settings.quality.medium')}
 							/>
 							<RadioGroupItemWithLabel
 								size='3'
 								value={StreamingQuality.Low}
-								label='Low (192kbps)'
+								label={t('settings.quality.low')}
 							/>
 						</RadioGroup>
 					</YStack>
@@ -78,10 +81,10 @@ export default function PlaybackScreen(): React.JSX.Element {
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
 							<SizableText fontSize='3' fontWeight='6'>
-								Audio Normalization
+								{t('settings.playback.normalization')}
 							</SizableText>
 							<SizableText fontSize='2' color='borderColor'>
-								Normalize volume between tracks
+								{t('settings.playback.normalizationDescription')}
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel
@@ -94,10 +97,10 @@ export default function PlaybackScreen(): React.JSX.Element {
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
 							<SizableText fontSize='3' fontWeight='6'>
-								Quality Badge
+								{t('settings.playback.qualityBadge')}
 							</SizableText>
 							<SizableText fontSize='2' color='borderColor'>
-								Display audio quality in player
+								{t('settings.playback.qualityBadgeDescription')}
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel

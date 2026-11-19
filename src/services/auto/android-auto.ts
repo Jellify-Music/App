@@ -27,6 +27,7 @@ import { getItemImageUrl } from '../../api/queries/image/utils'
 import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
+import i18n from '../../i18n'
 
 /**
  * Playlists we materialize for Android Auto are tagged with this prefix so
@@ -43,10 +44,10 @@ const TRACK_FIELDS = [ItemFields.MediaSources, ItemFields.ParentId, ItemFields.P
 const FALLBACK_ICON = `android.resource://${getBundleId()}/drawable/ic_notification`
 
 const ROOT: MediaItem[] = [
-	folder('home', 'Home', { iconUrl: undefined, layoutType: 'grid' }),
-	folder('artists', 'Artists', { iconUrl: undefined, layoutType: 'list' }),
-	folder('albums', 'Albums', { iconUrl: undefined, layoutType: 'list' }),
-	folder('playlists', 'Playlists', { iconUrl: undefined, layoutType: 'grid' }),
+	folder('home', i18n.t('navigation.home'), { iconUrl: undefined, layoutType: 'grid' }),
+	folder('artists', i18n.t('car.artists'), { iconUrl: undefined, layoutType: 'list' }),
+	folder('albums', i18n.t('car.albums'), { iconUrl: undefined, layoutType: 'list' }),
+	folder('playlists', i18n.t('car.playlists'), { iconUrl: undefined, layoutType: 'grid' }),
 ]
 
 function folder(id: string, title: string, extra: Partial<MediaItem> = {}): MediaItem {
@@ -82,7 +83,7 @@ async function playableTracks(key: string, items: BaseItemDto[]): Promise<MediaI
 		items.filter((item) => item.Type === BaseItemKind.Audio),
 		await ensureDownloadedTracks(),
 	)
-	if (tracks.length === 0) return [message('Nothing here yet')]
+	if (tracks.length === 0) return [message(i18n.t('car.empty'))]
 
 	const name = `${AA_PLAYLIST_NAME_PREFIX}${key}`
 	const { currentPlaylistId } = await TrackPlayer.getState()
@@ -133,14 +134,17 @@ function byLetter(letter: string) {
 // "More" keeps long lists reachable without one oversized car result
 function withMore(base: string, offset: number, items: MediaItem[]): MediaItem[] {
 	if (items.length <= PAGE_SIZE) return items
-	return [...items.slice(0, PAGE_SIZE), folder(`${base}@${offset + PAGE_SIZE}`, 'More…')]
+	return [
+		...items.slice(0, PAGE_SIZE),
+		folder(`${base}@${offset + PAGE_SIZE}`, i18n.t('car.more')),
+	]
 }
 
 async function loadChildren(parentId: string): Promise<MediaItem[] | null> {
 	const api = getApi()
 	const user = getUser()
 	const library = getLibrary()
-	if (!api || !user) return [message('Open Jellify on your phone to sign in')]
+	if (!api || !user) return [message(i18n.t('car.signIn'))]
 
 	const [base, offsetText] = parentId.split('@')
 	const offset = Number(offsetText) || 0
@@ -178,16 +182,16 @@ async function loadChildren(parentId: string): Promise<MediaItem[] | null> {
 			)
 			const pick = (id: string, title: string, items: BaseItemDto[]) =>
 				folder(`picks:${id}`, title, {
-					groupTitle: 'Quick picks',
+					groupTitle: i18n.t('car.quickPicks'),
 					iconUrl: cover(items.find((item) => item.Type === BaseItemKind.Audio)),
 				})
 			return [
-				pick('recents', 'Play it again', picks[0]),
-				pick('frequents', 'On Repeat', picks[1]),
-				pick('favorites', 'Favorites', picks[2]),
+				pick('recents', i18n.t('home.playItAgain'), picks[0]),
+				pick('frequents', i18n.t('home.onRepeat'), picks[1]),
+				pick('favorites', i18n.t('filters.favorites'), picks[2]),
 				...recentlyAdded
 					.filter((item) => item.Type === BaseItemKind.MusicAlbum)
-					.map((album) => tile('album', album, 'Recently added')),
+					.map((album) => tile('album', album, i18n.t('car.recentlyAdded'))),
 			]
 		}
 		case 'artists':
@@ -205,6 +209,7 @@ async function loadChildren(parentId: string): Promise<MediaItem[] | null> {
 								parentId: musicLibraryId,
 								userId: user.id,
 								includeItemTypes: [BaseItemKind.MusicArtist],
+								recursive: true,
 								sortBy: [ItemSortBy.SortName],
 								sortOrder: [SortOrder.Ascending],
 								enableImages: true,
@@ -281,7 +286,7 @@ async function search(query: string): Promise<MediaItem[]> {
 	const api = getApi()
 	const user = getUser()
 	const library = getLibrary()
-	if (!api || !user) return [message('Open Jellify on your phone to sign in')]
+	if (!api || !user) return [message(i18n.t('car.signIn'))]
 
 	const [items, artists, playlists] = await Promise.all([
 		getItems({
@@ -307,15 +312,18 @@ async function search(query: string): Promise<MediaItem[]> {
 		}),
 	])
 	const songs = items.some((item) => item.Type === BaseItemKind.Audio)
-		? (await playableTracks('search', items)).map((song) => ({ ...song, groupTitle: 'Songs' }))
+		? (await playableTracks('search', items)).map((song) => ({
+				...song,
+				groupTitle: i18n.t('car.songs'),
+			}))
 		: []
 	return [
 		...songs,
-		...playlists.map((playlist) => tile('playlist', playlist, 'Playlists')),
-		...artists.map((artist) => tile('artist', artist, 'Artists')),
+		...playlists.map((playlist) => tile('playlist', playlist, i18n.t('car.playlists'))),
+		...artists.map((artist) => tile('artist', artist, i18n.t('car.artists'))),
 		...items
 			.filter((item) => item.Type === BaseItemKind.MusicAlbum)
-			.map((album) => tile('album', album, 'Albums')),
+			.map((album) => tile('album', album, i18n.t('car.albums'))),
 	]
 }
 
@@ -323,11 +331,10 @@ async function search(query: string): Promise<MediaItem[]> {
 const answering = (load: (argument: string) => Promise<MediaItem[] | null>) => (argument: string) =>
 	load(argument).catch((error) => {
 		console.warn('Android Auto: request failed', error)
-		if (error?.response?.status === 401)
-			return [message('Sign in again in Jellify on your phone')]
+		if (error?.response?.status === 401) return [message(i18n.t('car.signInAgain'))]
 		return [
-			folder(`retry:${argument}`, "Couldn't reach your Jellyfin server", {
-				subtitle: 'Tap to try again',
+			folder(`retry:${argument}`, i18n.t('car.unreachable'), {
+				subtitle: i18n.t('car.tapToRetry'),
 			}),
 		]
 	})

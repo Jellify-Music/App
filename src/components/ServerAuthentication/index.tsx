@@ -1,20 +1,25 @@
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import { isEmpty, isUndefined } from 'lodash'
-import { H3, H5, Separator, Spinner, XStack, YStack } from 'tamagui'
+import { H3, H5, Separator, Spinner, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import useAuthenticateUserByName from '../../api/mutations/authentication'
 import { useState } from 'react'
 import LoginStackParamList from '../../screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
-import Input from '../Global/utils/input'
-import { GestureResponderEvent, StyleSheet } from 'react-native'
+import Input from '../Global/utils/Input'
+import { StyleSheet } from 'react-native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import Button from '../Global/utils/button'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
+import { RootStackParamList } from '../../screens/types'
+import { useTranslation } from 'react-i18next'
 
 export default function ServerAuthentication(): React.JSX.Element {
+	const { t } = useTranslation()
+
+	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
 	const [username, setUsername] = useState<string | undefined>(undefined)
@@ -23,19 +28,13 @@ export default function ServerAuthentication(): React.JSX.Element {
 	const { data: serverInfo } = usePublicServerInfo()
 
 	const { mutate: authenticateUserByName, isPending } = useAuthenticateUserByName({
-		onSuccess: () => navigation.navigate('LibrarySelection'),
+		onSuccess: () => rootNavigation.navigate('Tabs'),
 	})
 
 	const onSubmitEditing = () => {
 		if (!isUndefined(username) && !isEmpty(username) && !isPending) {
 			authenticateUserByName({ username, password })
 		}
-	}
-
-	const onSignInPress = (event: GestureResponderEvent) => {
-		navigation.navigate('ServerAddress', undefined, {
-			pop: true,
-		})
 	}
 
 	return (
@@ -45,33 +44,22 @@ export default function ServerAuthentication(): React.JSX.Element {
 			marginHorizontal='4'
 			testID='server_authentication_screen'
 		>
-			<XStack alignItems='flex-start' flexShrink={1}>
-				<Button
-					icon={<Icon name='chevron-left' size='7' />}
-					onPress={onSignInPress}
-					fontWeight='6'
-					{...ICON_PRESS_STYLES}
-				>
-					{'Switch Server'}
-				</Button>
-			</XStack>
-
-			<YStack gap='2' flexGrow={1} justifyContent='center'>
+			<YStack gap='2' flex={1} justifyContent='flex-start'>
 				<Animated.View
 					entering={FadeIn.easing(Easing.ease)}
 					exiting={FadeOut.easing(Easing.ease)}
 				>
 					<H3 textAlign='center' testID='server_authentication_title'>
-						{`Sign in to ${serverInfo?.ServerName ?? 'Jellyfin'}`}
+						{t('login.signInTo', { server: serverInfo?.ServerName ?? 'Jellyfin' })}
 					</H3>
-					<H5 textAlign='center'>{serverInfo?.Version ?? 'Unknown Jellyfin version'}</H5>
+					<H5 textAlign='center'>{serverInfo?.Version ?? t('login.unknownVersion')}</H5>
 				</Animated.View>
 			</YStack>
 
-			<YStack gap='4'>
+			<YStack gap='4' flex={1} justifyContent='flex-end'>
 				<Input
 					prependElement={<Icon name='human-greeting-variant' color={'primary'} />}
-					placeholder='Username'
+					placeholder={t('login.username')}
 					value={username}
 					style={styles.input}
 					testID='username_input'
@@ -91,7 +79,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 
 				<Input
 					prependElement={<Icon name='lock-outline' color={'primary'} />}
-					placeholder='Password'
+					placeholder={t('login.password')}
 					value={password}
 					onChangeText={setPassword}
 					autoCapitalize='none'
@@ -114,7 +102,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 					onPress={onSubmitEditing}
 					color='background'
 				>
-					{isPending ? <Spinner color='background' /> : 'Sign in'}
+					{isPending ? <Spinner color='background' /> : t('login.signIn')}
 				</Button>
 
 				<Separator borderColor='borderColor' flexShrink={1} />
@@ -125,7 +113,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 					icon={<Icon size={'6'} name='chevron-right' color='primary' />}
 					{...ICON_PRESS_STYLES}
 				>
-					Use Quick Connect
+					{t('login.useQuickConnect')}
 				</Button>
 			</YStack>
 		</YStack>

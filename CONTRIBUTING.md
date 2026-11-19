@@ -6,6 +6,7 @@
 - [Running Locally](#️running-locally)
 - [Project Structure](#project-structure)
 - [Code Style](#code-style)
+- [Translations](#translations)
 - [Testing](#testing)
 - [Submitting a Pull Request](#submitting-a-pull-request)
 
@@ -152,6 +153,22 @@ Notable style rules enforced by ESLint:
 - No semicolons
 - `@typescript-eslint/no-explicit-any` is an **error** — avoid `any` types
 - `react/react-in-jsx-scope` is disabled (React 17+ JSX transform)
+
+## Translations
+
+User-facing strings live in `src/i18n/locales/en.json` and are rendered with `react-i18next`:
+
+```tsx
+const { t } = useTranslation()
+
+<H4>{t('home.onRepeat')}</H4>
+```
+
+- Only add or change keys in `en.json`. The other locale files are managed by Weblate, so don't edit them by hand
+- Keys are type-checked, so `t('home.typo')` fails `tsc`
+- Use i18next's `_one` / `_other` suffixes for plurals (e.g. `trackCount_one`, `trackCount_other`)
+- Outside of components, use `i18n.t()` from `src/i18n`
+- `handleError` takes a key under `errors` for its toast title, and reports the English text to Sentry
 
 ## Testing
 

@@ -5,7 +5,7 @@ import { JellifyUser } from '../../../types/JellifyUser'
 import { isUndefined } from 'lodash'
 import { getAuthenticationApi } from '@jellyfin/sdk/lib/utils/api'
 import { useNavigation } from '@react-navigation/native'
-import LoginStackParamList from '../../../screens/Login/types'
+import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyUser } from '../../../stores/auth'
@@ -22,7 +22,7 @@ export const useInitiateQuickConnect = () => {
 			return await getAuthenticationApi(api).initiateQuickConnect()
 		},
 		onError: async (error: Error) => {
-			handleError(error, LoggingContext.Authentication, 'Unable to initiate Quick Connect')
+			handleError(error, LoggingContext.Authentication, 'initiateQuickConnect')
 		},
 		onSuccess: async ({ data }, variables) => {
 			console.log(`Successfully initiated Quick Connect. Code is ${data.Code}`)
@@ -52,7 +52,7 @@ const useAuthenticateWithQuickConnect = () => {
 
 	const [, setUser] = useJellifyUser()
 
-	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
+	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	return useMutation({
 		mutationFn: async (secret: string) => {
@@ -80,14 +80,10 @@ const useAuthenticateWithQuickConnect = () => {
 			}
 
 			setUser(user)
-			navigation.navigate('LibrarySelection')
+			navigation.navigate('Tabs')
 		},
 		onError: async (error: Error) => {
-			handleError(
-				error,
-				LoggingContext.Authentication,
-				'Unable to sign in with Quick Connect',
-			)
+			handleError(error, LoggingContext.Authentication, 'quickConnectSignIn')
 		},
 		retry: 0,
 		gcTime: 0,

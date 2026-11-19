@@ -3,20 +3,9 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { LegendList, LegendListProps, LegendListRef } from '@legendapp/list/react-native'
 import { AnimatedLegendList, AnimatedLegendListProps } from '@legendapp/list/reanimated'
 import { Ref } from 'react'
-import { StyleProp, ViewStyle } from 'react-native'
 import { useReducedMotion } from 'react-native-reanimated'
 
 type ListType = (BaseItemDto | string | number) | BaseItemDto
-
-/**
- * Applies horizontal margins to vertical lists, keeping any style the caller passes
- */
-function getContentContainerStyle(
-	horizontal: boolean | null | undefined,
-	contentContainerStyle: StyleProp<ViewStyle>,
-): StyleProp<ViewStyle> {
-	return [!horizontal && { marginHorizontal: 8 }, contentContainerStyle]
-}
 
 type ListProps<T extends ListType> = Omit<LegendListProps<T>, 'keyExtractor' | 'recycleItems'> & {
 	ref?: Ref<LegendListRef>
@@ -26,26 +15,14 @@ type ListProps<T extends ListType> = Omit<LegendListProps<T>, 'keyExtractor' | '
  * A generic list component that wraps the {@link LegendList} component and provides
  * default key extraction from the {@link ItemKeyExtractor} and recycling behavior.
  *
- * This list component automatically applies flex and margin styles for vertical lists only, ensuring that
- * horizontal lists are not affected by these styles and behave as expected.
+ * This list component does not apply any spacing of its own, so rows, headers, and footers
+ * are responsible for their own horizontal padding.
  *
  * @param param0 The props for the list component
  * @returns The rendered list component
  */
-export default function List<T extends ListType>({
-	horizontal,
-	contentContainerStyle,
-	...props
-}: ListProps<T>) {
-	return (
-		<LegendList<T>
-			horizontal={horizontal}
-			{...props}
-			keyExtractor={ItemKeyExtractor}
-			recycleItems
-			contentContainerStyle={getContentContainerStyle(horizontal, contentContainerStyle)}
-		/>
-	)
+export default function List<T extends ListType>(props: ListProps<T>) {
+	return <LegendList<T> {...props} keyExtractor={ItemKeyExtractor} recycleItems />
 }
 
 export type AnimatedListProps<T extends ListType> = Omit<
@@ -67,9 +44,6 @@ export type AnimatedListProps<T extends ListType> = Omit<
  * @returns The rendered list component
  */
 export function AnimatedList<T extends ListType>({
-	data,
-	horizontal,
-	contentContainerStyle,
 	itemLayoutAnimation,
 	...props
 }: AnimatedListProps<T>) {
@@ -77,13 +51,10 @@ export function AnimatedList<T extends ListType>({
 
 	return (
 		<AnimatedLegendList<T>
-			data={data}
-			horizontal={horizontal}
+			{...props}
 			keyExtractor={ItemIdKeyExtractor}
 			recycleItems
-			contentContainerStyle={getContentContainerStyle(horizontal, contentContainerStyle)}
 			itemLayoutAnimation={reducedMotion ? undefined : itemLayoutAnimation}
-			{...props}
 		/>
 	)
 }

@@ -1,4 +1,5 @@
 import Tabs from './Tabs'
+import OtaScreen from './Ota'
 import { RootStackParamList } from './types'
 import { SizableText, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -7,7 +8,7 @@ import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
-import { getApi, getUser } from '../stores/auth/utils'
+import { getUser } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import {
@@ -26,6 +27,7 @@ import PlayerStack from './Player'
 import LoginStack from './Login'
 import PrivacyPolicyScreen from './PrivacyPolicy'
 import { Ticker } from '../components/Global/utils/Animated/text'
+import i18n from '../i18n'
 
 /**
  * The root navigation stack for Jellify. Contains all top level screens, such as the login screen
@@ -69,7 +71,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		AddToPlaylist: {
 			screen: AddToPlaylistSheet,
 			options: {
-				headerTitle: 'Add to Playlist',
+				headerTitle: i18n.t('context.addToPlaylist'),
 				presentation: addToPlaylistSheetPresentation,
 				sheetAllowedDetents:
 					addToPlaylistSheetPresentation === 'formSheet' ? [1.0] : undefined,
@@ -88,7 +90,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		DeletePlaylist: {
 			screen: DeletePlaylist,
 			options: {
-				title: 'Delete Playlist',
+				title: i18n.t('context.deletePlaylist'),
 				presentation: bottomSheetPresentation,
 				headerShown: false,
 				sheetGrabberVisible: true,
@@ -97,6 +99,15 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		},
 		PrivacyPolicy: {
 			screen: PrivacyPolicyScreen,
+			options: {
+				headerShown: false,
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
+			},
+		},
+		Ota: {
+			screen: OtaScreen,
 			options: {
 				headerShown: false,
 				presentation: bottomSheetPresentation,
@@ -119,15 +130,17 @@ export default function Root(): React.JSX.Element {
 	// Resolved on mount rather than at module load, since Android can recreate the activity
 	// (e.g. after switching app icons) while the JS runtime, and the user's session, live on
 	const [initialState] = useState<InitialState>(() => ({
-		routes: [{ name: getApi() ? 'Tabs' : 'Login' }],
+		routes: [{ name: getUser() ? 'Tabs' : 'Login' }],
 	}))
+
+	const onReady = () => navigationIntegration.registerNavigationContainer(navigationRef)
 
 	return (
 		<RootNavigation
 			ref={navigationRef}
 			initialState={initialState}
 			theme={getJellifyNavTheme(colorPreset, resolvedMode)}
-			onReady={() => navigationIntegration.registerNavigationContainer(navigationRef)}
+			onReady={onReady}
 		/>
 	)
 }

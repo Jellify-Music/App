@@ -6,19 +6,22 @@ import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import ItemImage from '../../Global/components/image'
-import Input from '../../Global/utils/input'
+import Input from '../../Global/utils/Input'
 import Animated, { Easing, FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import Button from '../../Global/utils/button'
 import { SizableText } from 'tamagui'
 import { RunTimeTicks } from '../../Global/utils/time-codes'
 import { loadNewQueue } from '../../../player/queuing'
 import { usePlaylistContext } from '../../../providers/Playlist'
+import { useTranslation } from 'react-i18next'
 
 export default function PlaylistTracklistHeader(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { playlist, playlistTracks, editing, newName, setNewName } = usePlaylistContext()
 
 	return (
-		<YStack paddingTop='1' marginBottom='2' gap='2'>
+		<YStack paddingTop='1' margin='2' gap='2'>
 			<XStack justifyContent='center' alignContent='center' padding='2'>
 				<ItemImage item={playlist} width={'15'} height={'15'} elevate />
 			</XStack>
@@ -32,7 +35,7 @@ export default function PlaylistTracklistHeader(): React.JSX.Element {
 					<Input
 						value={newName}
 						onChangeText={setNewName}
-						placeholder='Playlist Name'
+						placeholder={t('playlist.namePlaceholder')}
 						textAlign='center'
 						fontSize={'8'}
 						fontWeight='6'
@@ -47,7 +50,7 @@ export default function PlaylistTracklistHeader(): React.JSX.Element {
 				>
 					<YStack alignItems='center' gap='2'>
 						<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>
-							{newName ?? 'Untitled Playlist'}
+							{newName ?? t('placeholders.untitledPlaylist')}
 						</H5>
 
 						<RunTimeTicks>{playlist.RunTimeTicks}</RunTimeTicks>
@@ -82,6 +85,8 @@ function PlaylistHeaderControls({
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const playPlaylist = async (shuffled: boolean = false) => {
@@ -106,7 +111,7 @@ function PlaylistHeaderControls({
 				icon={<Icon name='play' color='background' size='7' />}
 			>
 				<SizableText fontSize='2' fontWeight='6' color={'background'}>
-					Play
+					{t('common.play')}
 				</SizableText>
 			</Button>
 
@@ -118,7 +123,7 @@ function PlaylistHeaderControls({
 				icon={<Icon name='shuffle' color='primary' size='7' />}
 			>
 				<SizableText fontSize='2' fontWeight='6' color={'primary'}>
-					Shuffle
+					{t('common.shuffle')}
 				</SizableText>
 			</Button>
 

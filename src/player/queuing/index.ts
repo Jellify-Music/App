@@ -10,6 +10,7 @@ import loadQueue from './load'
 import { isNull } from 'lodash'
 import { handleError } from '../../utils/errors'
 import { LoggingContext } from '../../utils/logging'
+import i18n from '../../i18n'
 
 export const loadNewQueue = async (variables: QueueMutation) => {
 	applyHapticFeedback('info')
@@ -44,16 +45,16 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 		applyHapticFeedback('success')
 		Toast.show({
 			text1:
-				variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Playing later',
+				variables.queuingType === QueuingType.PlayNext
+					? i18n.t('queue.playingNext')
+					: i18n.t('queue.playingLater'),
 			type: 'success',
 		})
 	} catch (error) {
 		handleError(
 			error,
 			LoggingContext.Queue,
-			variables.queuingType === QueuingType.PlayNext
-				? 'Failed to play next'
-				: 'Failed to play later',
+			variables.queuingType === QueuingType.PlayNext ? 'playNext' : 'playLater',
 		)
 	}
 }

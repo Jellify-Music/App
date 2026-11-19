@@ -14,10 +14,13 @@ import { useResetScroll } from '../../hooks/lyrics/scrolling'
 import { LegendListRef, LegendListRenderItemProps } from '@legendapp/list/react-native'
 import { AnimatedLegendList } from '@legendapp/list/reanimated'
 import { LyricKeyExtractor } from '../../utils/parsing/key-extractor'
+import { useTranslation } from 'react-i18next'
 
 const LyricList = AnimatedLegendList<ParsedLyricLine>
 
 export default function Lyrics(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { data: lyrics } = useRawLyrics()
 	const nowPlaying = useCurrentTrack()
 	const { position } = useProgress()
@@ -228,7 +231,7 @@ export default function Lyrics(): React.JSX.Element {
 				<YStack justifyContent='center' alignItems='center' flex={1}>
 					{showNoLyricsMessage && (
 						<SizableText fontSize={'3'} textAlign='center'>
-							No lyrics available
+							{t('lyrics.none')}
 						</SizableText>
 					)}
 				</YStack>

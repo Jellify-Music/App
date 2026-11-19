@@ -8,6 +8,7 @@ import { useEffect } from 'react'
 import { parseBitrateFromTranscodingUrl } from '../../utils/audio/transcoding'
 import { SourceType } from '../../types/JellifyTrack'
 import { capitalize } from 'lodash'
+import { useTranslation } from 'react-i18next'
 
 interface AudioSpecsProps {
 	item: BaseItemDto
@@ -44,6 +45,8 @@ function MediaSourceInfoView({
 	mediaInfo: MediaSourceInfo
 	type: SourceType
 }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { Bitrate, Container, TranscodingUrl, TranscodingContainer } = mediaInfo
 
 	const bitrate = TranscodingUrl ? parseBitrateFromTranscodingUrl(TranscodingUrl) : Bitrate
@@ -65,10 +68,10 @@ function MediaSourceInfoView({
 
 				<SizableText fontWeight='6'>
 					{type === 'download'
-						? 'Downloaded File'
+						? t('audioSpecs.downloadedFile')
 						: TranscodingUrl
-							? 'Transcoded Stream'
-							: 'Direct Stream'}
+							? t('audioSpecs.transcodedStream')
+							: t('audioSpecs.directStream')}
 				</SizableText>
 			</ListItem>
 			{bitrate && (

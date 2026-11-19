@@ -9,7 +9,7 @@ import { QueryAges } from '../../../constants/durations'
  *
  * @returns A hook that queries the server for installed plugins
  */
-export const useServerPlugins = () => {
+const useServerPlugins = () => {
 	const { data: serverInfo } = usePublicServerInfo()
 
 	return useQuery({
@@ -18,4 +18,10 @@ export const useServerPlugins = () => {
 		enabled: Boolean(serverInfo),
 		staleTime: QueryAges.OneDay,
 	})
+}
+
+export const useIsAudioMuseEnabled = () => {
+	const pluginsResponse = useServerPlugins()
+
+	return pluginsResponse?.data?.some((plugin) => plugin.Name === 'AudioMuse AI') ?? false
 }

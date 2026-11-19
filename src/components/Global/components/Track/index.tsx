@@ -21,6 +21,7 @@ import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
 import { useIsDownloaded } from '../../../../hooks/downloads'
 import { addToQueue, loadNewQueue } from '../../../../player/queuing'
+import { useTranslation } from 'react-i18next'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -63,6 +64,8 @@ export default function Track({
 	sortingByPlayCount,
 	isPlaying: isPlayingOverride,
 }: TrackProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
 	const [hideRunTimes] = useHideRunTimesSetting()
@@ -143,7 +146,7 @@ export default function Track({
 					: track.ArtistItems?.map((artist) => artist.Name).join(' • ')) ?? ''
 
 	// Memoize track name
-	const trackName = track.Name ?? 'Untitled Track'
+	const trackName = track.Name ?? t('placeholders.untitledTrack')
 
 	// Memoize index number
 	const indexNumber = track.IndexNumber?.toString() ?? ''

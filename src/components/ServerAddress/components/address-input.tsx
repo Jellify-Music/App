@@ -1,9 +1,10 @@
 import { YStack } from 'tamagui'
 import type { EventHandler } from '../../../types/Events'
 import SendMetricsAndCrashDataSetting from '../../Settings/components/settings/send-metrics-and-crash-data'
-import Input from '../../Global/utils/input'
+import Input from '../../Global/utils/Input'
 import { IS_MAESTRO_BUILD } from '../../../configs/config'
 import { DEFAULT_SERVER_ADDRESS } from '../../../configs/defaults.config'
+import { useTranslation } from 'react-i18next'
 
 interface AddressInputProps {
 	setServerAddress: (address: string) => void
@@ -11,6 +12,8 @@ interface AddressInputProps {
 }
 
 export default function AddressInput({ setServerAddress, connectWithAddress }: AddressInputProps) {
+	const { t } = useTranslation()
+
 	return (
 		<YStack gap='2'>
 			<Input
@@ -22,7 +25,7 @@ export default function AddressInput({ setServerAddress, connectWithAddress }: A
 				testID='server_address_input'
 				returnKeyType='done'
 				onSubmitEditing={connectWithAddress}
-				title='Jellyfin Server Address'
+				title={t('login.serverAddress')}
 				tabIndex={0}
 			/>
 
