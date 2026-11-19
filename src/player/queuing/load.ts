@@ -35,16 +35,16 @@ export default async function loadQueue({
 	// Convert to JellifyTracks first
 	let playlist = mapDtosToTracks(availableAudioItems, downloadedTracks)
 
+	// Look up the starting track by position, since the tracklist may contain the same track more than once
+	const mappedStartingTrack = playlist[availableAudioItems.indexOf(startingTrack)]
+
 	// Store the original unshuffled queue
 	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
 
 	// Handle if a shuffle was requested
 	if (shuffled && playlist.length > 1) {
-		const startingTrackId = startingTrack.Id
-		const mappedStartingTrack = playlist.find((track) => track.id === startingTrackId)
-
 		if (mappedStartingTrack) {
-			const remainingTracks = playlist.filter((track) => track.id !== startingTrackId)
+			const remainingTracks = playlist.filter((track) => track.id !== mappedStartingTrack.id)
 			const { shuffled: shuffledTracks } = shuffleJellifyTracks(remainingTracks)
 			playlist = [mappedStartingTrack, ...shuffledTracks]
 		} else {
@@ -53,7 +53,9 @@ export default async function loadQueue({
 		}
 	}
 
-	const rawStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
+	const rawStartIndex = mappedStartingTrack
+		? playlist.findIndex((item) => item.id === mappedStartingTrack.id)
+		: -1
 	const finalStartIndex = rawStartIndex >= 0 ? rawStartIndex : 0
 
 	await clearPlaylists()

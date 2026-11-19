@@ -10,6 +10,7 @@ import { slimifyDto } from './slimify-dto'
 import { getItemImageUrl } from '../../api/queries/image/utils'
 import { getTrackMediaSourceInfo } from './track-extra-payload'
 import { getItemName } from '../formatting/item-names'
+import uuid from 'react-native-uuid'
 
 export function mapDtosToTracks(
 	items: BaseItemDto[],
@@ -58,7 +59,8 @@ export function mapDtoToTrack(
 
 	return {
 		...(headers ? { headers } : {}),
-		id: item.Id ?? '',
+		// Unique per track so the same track can be queued more than once. Use getTrackDto for the Jellyfin ID
+		id: uuid.v4(),
 		url: downloadedTrack?.localPath ? `file://${downloadedTrack.localPath}` : '',
 		artwork: downloadedTrack?.localArtworkPath
 			? `file://${downloadedTrack.localArtworkPath}`

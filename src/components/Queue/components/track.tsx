@@ -23,6 +23,11 @@ export default function QueuedTrack({ item }: QueuedTrackProps): JSX.Element | u
 
 	const queueIndex = queue.findIndex((queueItem) => queueItem.id === item.id)
 
+	const isPlaying = usePlayerQueueStore(
+		(state) =>
+			state.currentIndex !== undefined && state.queue[state.currentIndex]?.id === item.id,
+	)
+
 	const onTrackPress = async (event: GestureEndEvent<TapHandlerData>) => {
 		'worklet'
 		return !event.canceled && queueIndex >= 0 && runOnJS(skip)(queueIndex)
@@ -57,6 +62,7 @@ export default function QueuedTrack({ item }: QueuedTrackProps): JSX.Element | u
 						testID={`queue-item-${queueIndex}`}
 						isNested
 						editing
+						isPlaying={isPlaying}
 					/>
 				</GestureDetector>
 

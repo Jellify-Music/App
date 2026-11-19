@@ -15,8 +15,6 @@ import { AddToQueueMutation } from '../interfaces'
 const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const { currentIndex, queue } = usePlayerQueueStore.getState()
 
-	const queuedIds = queue.map((track) => track.id)
-
 	const insertIndex = calculatePlayNextInsertIndex(currentIndex, queue)
 
 	const downloadedTracks = await ensureDownloadedTracks()
@@ -30,72 +28,15 @@ const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 		return
 	}
 
-	let updatedIndex = currentIndex
-	const tracksToReorder: TrackItem[] = []
-	const tracksToAdd: TrackItem[] = []
-
-	newTracks.forEach((track) => {
-		if (queuedIds.includes(track.id)) {
-			tracksToReorder.push(track)
-		} else {
-			tracksToAdd.push(track)
-		}
-	})
-
-	// Reorder existing tracks to the next position
-	if (tracksToReorder.length > 0) {
-		await reorderPlayNextTracksInQueue(
-			playlistId,
-			currentIndex,
-			insertIndex,
-			queue,
-			tracksToReorder,
-		)
-
-		// Update the current index if it's changed
-		updatedIndex = await TrackPlayer.getCurrentTrackIndex()
-	}
-
-	// Add new tracks to the queue
-	if (tracksToAdd.length > 0) {
-		await PlayerQueue.addTracksToPlaylist(playlistId, tracksToAdd, insertIndex)
-	}
+	await PlayerQueue.addTracksToPlaylist(playlistId, newTracks, insertIndex)
 
 	const updatedQueue = await TrackPlayer.getActualQueue()
 
 	usePlayerQueueStore.setState((state) => ({
 		...state,
-		currentIndex: updatedIndex,
 		queue: [...updatedQueue],
 		unShuffledQueue: [...state.unShuffledQueue, ...newTracks],
 	}))
-}
-
-async function reorderPlayNextTracksInQueue(
-	playlistId: string,
-	currentIndex: number | undefined,
-	insertIndex: number,
-	queue: TrackItem[],
-	tracksToReorder: TrackItem[],
-) {
-	const indexMap = new Map(queue.map((track, index) => [track.id, index]))
-
-	const tracksMovingPastCurrent = tracksToReorder.filter((track) => {
-		const currentPos = indexMap.get(track.id) ?? 0
-		return currentPos < (currentIndex ?? 0)
-	}).length
-
-	const reorderPromises = tracksToReorder.map((track, index) =>
-		PlayerQueue.reorderTrackInPlaylist(
-			playlistId,
-			track.id,
-			insertIndex + index - tracksMovingPastCurrent,
-		),
-	)
-
-	await Promise.all(reorderPromises)
-
-	return tracksMovingPastCurrent
 }
 
 /**
