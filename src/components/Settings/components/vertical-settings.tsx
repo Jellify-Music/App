@@ -2,12 +2,11 @@ import React from 'react'
 import { ScrollView, YStack, XStack, SizableText, Avatar, Card } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import Icon from '../../Global/components/icon'
 import Button from '../../Global/utils/button'
 import StatusBar from '../../Global/utils/status-bar'
-import { SettingsStackParamList } from '../../../screens/Settings/types'
+import { SettingsStackNavigator } from '../../../screens/Settings/types'
 import { useJellifyUser } from '../../../stores/auth'
 import { usePublicServerInfo } from '../../../api/queries/public-server-info'
 import HTTPS from '../../../constants/protocols'
@@ -21,7 +20,7 @@ export default function VerticalSettings(): React.JSX.Element {
 	const { t } = useTranslation()
 
 	const { top } = useSafeAreaInsets()
-	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+	const navigation = useNavigation<SettingsStackNavigator>()
 
 	const [server] = useJellyfinServer()
 	const { data: serverInfo } = usePublicServerInfo()

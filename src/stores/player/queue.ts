@@ -1,4 +1,4 @@
-import { Queue } from '@/src/services/types/queue-item'
+import { Queue } from '../../services/types/queue-item'
 import { createVersionedMmkvStorage } from '../../constants/versioned-storage'
 import { create } from 'zustand'
 import { devtools, persist, PersistStorage, StorageValue } from 'zustand/middleware'

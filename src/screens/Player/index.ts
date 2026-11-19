@@ -38,6 +38,4 @@ const PlayerStack = createNativeStackNavigator({
 	},
 })
 
-export type PlayerStackType = typeof PlayerStack
-
 export default PlayerStack

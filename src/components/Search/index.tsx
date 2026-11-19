@@ -2,13 +2,12 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useSearchInputGesture } from '../../hooks/gestures/search'
 import Input from '../Global/utils/Input'
 import ItemRow from '../Global/components/item-row'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H3, H5, SizableText, Spinner, TamaguiElement, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import ItemCard from '../Global/components/Card'
-import SearchParamList from '../../screens/Search/types'
+import { SearchStackNavigator } from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import navigationRef from '../../screens/navigation'
 import { StackActions, useNavigation } from '@react-navigation/native'
@@ -24,7 +23,7 @@ import { useTranslation } from 'react-i18next'
 export default function Search(): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
+	const navigation = useNavigation<SearchStackNavigator>()
 
 	/**
 	 * Raw text input value from the user, updates immediately as they type
@@ -71,14 +70,7 @@ export default function Search(): React.JSX.Element {
 
 	const renderItem = ({ item }: { item: BaseItemDto; index: number }) =>
 		item.Type === 'Audio' ? (
-			<Track
-				showArtwork
-				queue={'Suggestions'}
-				track={item}
-				index={0}
-				tracklist={[item]}
-				navigation={navigation}
-			/>
+			<Track showArtwork queue={'Suggestions'} track={item} index={0} tracklist={[item]} />
 		) : (
 			<ItemRow item={item} />
 		)

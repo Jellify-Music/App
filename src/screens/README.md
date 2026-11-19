@@ -47,7 +47,7 @@ If a screen or navigator requires bridging logic to render correctly (e.g. readi
 | `InstantMix` | `item: BaseItemDto` |
 | `Tracks` | `tracksInfiniteQuery: UseInfiniteQueryResult<…>` |
 
-These screens are not mounted in `RootStack`; instead they live inside each tab's own native stack so that the back button and header behave correctly within the tab. The corresponding param types are defined in `BaseStackParamList` in `types.d.ts`.
+These screens are not mounted in `RootStack`; instead they live inside each tab's own native stack so that the back button and header behave correctly within the tab. Their param lists are inferred from the screen components' `StaticScreenProps`, and `base-types.ts` exposes them as `BaseStackParamList`. To navigate from a component rendered on one of these screens, use `useNavigation<BaseStackNavigator>()`.
 
 **Currently consumed by:** `Home`, `Library`, `Discover`, and `Search` tab stacks.
 
@@ -63,7 +63,7 @@ const HomeStack = createNativeStackNavigator({
 })
 ```
 
-> If you add a new screen that should be reachable from multiple tabs, add it to `BaseStack` and `BaseStackParamList` rather than duplicating the config in each tab stack.
+> If you add a new screen that should be reachable from multiple tabs, add it to `BaseStack` (typing its props with `StaticScreenProps`) rather than duplicating the config in each tab stack.
 
 ---
 
@@ -74,7 +74,8 @@ const HomeStack = createNativeStackNavigator({
 | `index.tsx` | Root `RootStack` navigator; mounts the app via `createStaticNavigation` |
 | `base-stack.ts` | `BaseStack` — shared screen configs spread into each tab stack |
 | `navigation.ts` | `navigationRef` — a typed `NavigationContainerRef` for imperative navigation outside React |
-| `types.d.ts` | Shared param list types (`RootStackParamList`, `BaseStackParamList`) and screen prop types |
+| `types.ts` | Root stack types (`RootStackParamList`, the `RootNavigator` augmentation) and root screen prop types |
+| `base-types.ts` | `BaseStack` screen prop types, `BaseStackParamList`, `BaseStackNavigator` and `StackNavigation` |
 | `Tabs/` | Bottom tab navigator (`HomeTab`, `LibraryTab`, `SearchTab`, `DiscoverTab`, `SettingsTab`) |
 | `Home/` | Home tab stack (recents, artists, tracks); spreads `BaseStack` |
 | `Library/` | Library tab stack; includes `add-playlist` and `delete-playlist` sheet bridges; spreads `BaseStack` |

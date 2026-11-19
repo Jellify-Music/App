@@ -1,6 +1,5 @@
 import AddPlaylist from './add-playlist'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import LibraryStackParamList from './types'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 import FiltersSheet from '../Filters'
 import SortOptionsSheet from '../SortOptions'
@@ -13,7 +12,7 @@ import { stackScreenOptions } from '../navigation'
 import GeneratePlaylistScreen from './generate-playlist'
 import i18n from '../../i18n'
 
-const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
+const LibraryStack = createNativeStackNavigator({
 	initialRouteName: 'LibraryScreen',
 	screenOptions: stackScreenOptions,
 	screens: {

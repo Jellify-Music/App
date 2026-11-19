@@ -1,4 +1,4 @@
-import { JellifyLibrary } from '@/src/types/JellifyLibrary'
+import { JellifyLibrary } from '../../../types/JellifyLibrary'
 import { MusicLibraryQueryKey } from '../libraries/keys'
 
 export enum TrackQueryKeys {

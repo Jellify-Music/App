@@ -1,9 +1,8 @@
 import { usePlaylistContext } from '../../../providers/Playlist'
 import { loadNewQueue } from '../../../player/queuing'
-import { BaseStackParamList, RootStackParamList } from '@/src/screens/types'
+import { BaseStackNavigator } from '../../../screens/base-types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useNavigation, RootNavigator } from '@react-navigation/native'
 import { ListRenderItemInfo, StyleSheet } from 'react-native'
 import { DraxHandle } from 'react-native-drax'
 import Icon from '../../Global/components/icon'
@@ -13,8 +12,8 @@ import { XStack } from 'tamagui'
 export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo<BaseItemDto>) {
 	const { playlist, playlistTracks, onRemoveTrack, editing } = usePlaylistContext()
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const navigation = useNavigation<BaseStackNavigator>()
+	const rootNavigation = useNavigation<RootNavigator>()
 
 	const handlePress = async () => {
 		await loadNewQueue({
@@ -44,7 +43,6 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 			<Track
 				onPress={handlePress}
 				onLongPress={onLongPress}
-				navigation={navigation}
 				track={track}
 				tracklist={playlistTracks ?? []}
 				index={index}
@@ -66,7 +64,6 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 		<Track
 			onPress={handlePress}
 			onLongPress={onLongPress}
-			navigation={navigation}
 			track={track}
 			tracklist={playlistTracks ?? []}
 			index={index}

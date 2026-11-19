@@ -1,4 +1,4 @@
-import { SlimifiedBaseItemDto } from '@/src/types/JellifyTrack'
+import { SlimifiedBaseItemDto } from '../../types/JellifyTrack'
 import { getApi } from '../../stores/auth/utils'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client'
 import uuid from 'react-native-uuid'

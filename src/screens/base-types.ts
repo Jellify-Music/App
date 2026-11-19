@@ -1,9 +1,14 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { StaticScreenProps } from '@react-navigation/native'
+import {
+	NavigatorTypeBagFor,
+	StaticParamList,
+	StaticScreenProps,
+	TypedNavigator,
+} from '@react-navigation/native'
+import { NativeStackNavigationProp, NativeStackTypeBag } from '@react-navigation/native-stack'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { BaseStack } from './base-stack'
 import { LibrarySectionListData } from '../components/Global/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 export type ArtistProps = StaticScreenProps<{
 	artist: BaseItemDto
@@ -23,8 +28,21 @@ export type InstantMixProps = StaticScreenProps<{
 	item: BaseItemDto
 }>
 
-type BaseStackType = typeof BaseStack
+export type BaseStackParamList = StaticParamList<{ config: { screens: typeof BaseStack } }>
 
-declare module '@react-navigation/core' {
-	interface BaseStackNavigator extends NativeStackNavigationProp<BaseStackType> {}
-}
+/**
+ * A native stack containing the {@link BaseStack} screens, for use with `useNavigation`
+ * in components that can be rendered in any tab stack that spreads them
+ */
+export type BaseStackNavigator = TypedNavigator<
+	NavigatorTypeBagFor<NativeStackTypeBag, BaseStackParamList>
+>
+
+/**
+ * A navigation object that can reach the {@link BaseStack} screens, for passing
+ * between components (e.g. into the context sheet)
+ */
+export type StackNavigation = Pick<
+	NativeStackNavigationProp<BaseStackParamList>,
+	'navigate' | 'dispatch'
+>

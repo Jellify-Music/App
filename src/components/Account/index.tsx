@@ -2,12 +2,11 @@ import { YStack, XStack, SizableText, ScrollView, Avatar, Card } from 'tamagui'
 import { useJellyfinServer } from '../../hooks/auth/server'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import Icon from '../Global/components/icon'
 import Button from '../Global/utils/button'
 import SettingsSection from '../Settings/components/settings-section'
-import { SettingsStackParamList } from '../../screens/Settings/types'
+import { SettingsStackNavigator } from '../../screens/Settings/types'
 import { useJellifyUser, useJellifyLibrary } from '../../stores/auth'
 import HTTPS from '../../constants/protocols'
 import getUserImageUrl from '../../api/queries/image/utils/avatar'
@@ -18,7 +17,7 @@ import { useTranslation } from 'react-i18next'
 export default function Account(): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+	const navigation = useNavigation<SettingsStackNavigator>()
 
 	const [server] = useJellyfinServer()
 	const { data: serverInfo } = usePublicServerInfo()

@@ -2,12 +2,10 @@ import { useTranslation } from 'react-i18next'
 import React from 'react'
 import { H4, XStack } from 'tamagui'
 import ItemCard from '../../Global/components/Card'
-import { RootStackParamList } from '../../../screens/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
-import { useNavigation } from '@react-navigation/native'
-import HomeStackParamList from '../../../screens/Home/types'
+import { useNavigation, RootNavigator } from '@react-navigation/native'
+import { HomeStackNavigator } from '../../../screens/Home/types'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import AnimatedRow from '../../Global/utils/Animated/row'
@@ -17,8 +15,8 @@ import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 export default function RecentlyPlayed(): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const navigation = useNavigation<HomeStackNavigator>()
+	const rootNavigation = useNavigation<RootNavigator>()
 
 	const tracksInfiniteQuery = useRecentlyPlayedTracks()
 

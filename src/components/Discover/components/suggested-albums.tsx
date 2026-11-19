@@ -5,8 +5,8 @@ import HorizontalCardList from '../../Global/components/horizontal-list'
 import { H4, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
+import { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
+import { DiscoverStackNavigator } from '../../../screens/Discover/types'
 import { useDiscoverAlbums } from '../../../api/queries/suggestions'
 import AnimatedRow from '../../Global/utils/Animated/row'
 import { useTranslation } from 'react-i18next'
@@ -16,7 +16,7 @@ export default function SuggestedAlbums() {
 
 	const suggestedAlbumsInfiniteQuery = useDiscoverAlbums()
 
-	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
+	const navigation = useNavigation<DiscoverStackNavigator>()
 
 	const suggestedAlbumsExist =
 		suggestedAlbumsInfiniteQuery.data && suggestedAlbumsInfiniteQuery.data.length > 0

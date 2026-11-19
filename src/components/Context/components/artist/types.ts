@@ -1,5 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { StackNavigation } from '../../../../screens/types'
+import { StackNavigation } from '../../../../screens/base-types'
 
 export interface ArtistMenuRowsProps {
 	artistIds: BaseItemDto['Id'][]

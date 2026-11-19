@@ -1,7 +1,8 @@
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { GenericNavigation, StaticParamList, StaticScreenProps } from '@react-navigation/native'
+import { StaticParamList, StaticScreenProps } from '@react-navigation/native'
 import { RootStack } from '.'
+import { StackNavigation } from './base-types'
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
 
@@ -10,7 +11,7 @@ export type ContextProps = StaticScreenProps<{
 	playlist?: BaseItemDto
 	streamingMediaSourceInfo?: MediaSourceInfo
 	downloadedMediaSourceInfo?: MediaSourceInfo
-	navigation?: GenericNavigation<RootStackParamList>
+	navigation?: StackNavigation
 }>
 
 export type AddToPlaylistProps = StaticScreenProps<{

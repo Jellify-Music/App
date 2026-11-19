@@ -1,4 +1,3 @@
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { MaterialTopTabBar, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import { useIsAudioMuseEnabled } from '../../api/queries/plugins'
 import Icon from '../Global/components/icon'
@@ -7,7 +6,7 @@ import useLibraryStore from '../../stores/library'
 import { handleLibraryShuffle } from '../../player/controls/shuffle'
 import { TrackPlayer } from 'react-native-nitro-player'
 import { useNavigation } from '@react-navigation/native'
-import LibraryStackParamList from '@/src/screens/Library/types'
+import { LibraryStackNavigator } from '../../screens/Library/types'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { handleError } from '../../utils/errors'
@@ -18,7 +17,7 @@ import { useTranslation } from 'react-i18next'
 export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const { t } = useTranslation()
 
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<LibraryStackNavigator>()
 
 	const insets = useSafeAreaInsets()
 
@@ -196,7 +195,7 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 }
 
 function AddPlaylistButton() {
-	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const navigation = useNavigation<LibraryStackNavigator>()
 
 	const onPress = () => {
 		applyHapticFeedback('info')
@@ -219,7 +218,7 @@ function AddPlaylistButton() {
 }
 
 function GeneratePlaylistButton() {
-	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const navigation = useNavigation<LibraryStackNavigator>()
 
 	const onPress = () => {
 		applyHapticFeedback('info')

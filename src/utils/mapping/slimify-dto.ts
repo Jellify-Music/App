@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { TrackItem } from 'react-native-nitro-player'
 import getTrackDto from './track-extra-payload'
-import { SlimifiedBaseItemDto } from '@/src/types/JellifyTrack'
+import { SlimifiedBaseItemDto } from '../../types/JellifyTrack'
 
 export function slimifyDto(dto: BaseItemDto): SlimifiedBaseItemDto {
 	return {

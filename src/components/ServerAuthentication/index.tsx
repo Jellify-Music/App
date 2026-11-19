@@ -4,23 +4,21 @@ import { H3, H5, Separator, Spinner, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import useAuthenticateUserByName from '../../api/mutations/authentication'
 import { useState } from 'react'
-import LoginStackParamList from '../../screens/Login/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useNavigation } from '@react-navigation/native'
+import { LoginStackNavigator } from '../../screens/Login/types'
+import { useNavigation, RootNavigator } from '@react-navigation/native'
 import Input from '../Global/utils/Input'
 import { StyleSheet } from 'react-native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import Button from '../Global/utils/button'
 import { usePublicServerInfo } from '../../api/queries/public-server-info'
-import { RootStackParamList } from '../../screens/types'
 import { useTranslation } from 'react-i18next'
 
 export default function ServerAuthentication(): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
+	const rootNavigation = useNavigation<RootNavigator>()
+	const navigation = useNavigation<LoginStackNavigator>()
 
 	const [username, setUsername] = useState<string | undefined>(undefined)
 	const [password, setPassword] = useState<string>('')

@@ -1,11 +1,10 @@
 import { H4, XStack } from 'tamagui'
 import { usePublicServerInfo } from '../../../api/queries/public-server-info'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import ItemCard from '../../Global/components/Card'
 import { useNavigation } from '@react-navigation/native'
-import DiscoverStackParamList from '../../../screens/Discover/types'
+import { DiscoverStackNavigator } from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
 import AnimatedRow from '../../Global/utils/Animated/row'
@@ -16,7 +15,7 @@ export default function PublicPlaylists(): React.JSX.Element {
 
 	const result = usePublicPlaylists()
 
-	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
+	const navigation = useNavigation<DiscoverStackNavigator>()
 
 	const { data: server } = usePublicServerInfo()
 

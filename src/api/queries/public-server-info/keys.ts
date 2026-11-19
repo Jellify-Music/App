@@ -1,4 +1,4 @@
-import { JellyfinServer } from '@/src/types/JellyfinServer'
+import { JellyfinServer } from '../../../types/JellyfinServer'
 
 export enum PublicServerInfoKeys {
 	PUBLIC_SERVER_INFO = 'PUBLIC_SERVER_INFO',

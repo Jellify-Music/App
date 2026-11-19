@@ -6,7 +6,7 @@ import { PlaylistProvider } from '../../providers/Playlist'
 export function PlaylistScreen({ route }: PlaylistProps): React.JSX.Element {
 	return (
 		<PlaylistProvider playlist={route.params.playlist} canEdit={route.params.canEdit}>
-			<Playlist route={route} />
+			<Playlist />
 		</PlaylistProvider>
 	)
 }

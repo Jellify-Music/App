@@ -4,7 +4,7 @@ import { TrackItem } from 'react-native-nitro-player'
 import buildAudioApiUrl, { buildTranscodedAudioApiUrl } from '../mapping/item-to-audio-api-url'
 import getTrackDto from '../mapping/track-extra-payload'
 import { convertRunTimeTicksToSeconds } from '../mapping/ticks-to-seconds'
-import { SourceType } from '@/src/types/JellifyTrack'
+import { SourceType } from '../../types/JellifyTrack'
 
 export default async function resolveTrackUrls(
 	trackItems: TrackItem[],

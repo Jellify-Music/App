@@ -1,4 +1,4 @@
-import type JellifyStore from '@/src/stores/auth/types'
+import type JellifyStore from '../../stores/auth/types'
 import useJellifyStore from '../../stores/auth'
 import { useShallow } from 'zustand/react/shallow'
 

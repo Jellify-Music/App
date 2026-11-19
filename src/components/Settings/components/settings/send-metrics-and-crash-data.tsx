@@ -1,9 +1,7 @@
 import { SwitchWithLabel } from '../../../Global/utils/switch-with-label'
 import { useSendMetricsSetting } from '../../../../stores/settings/app'
 import { XStack, YStack, SizableText } from 'tamagui'
-import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { RootStackParamList } from '@/src/screens/types'
+import { useNavigation, RootNavigator } from '@react-navigation/native'
 import Icon from '../../../../components/Global/components/icon'
 import { useTranslation } from 'react-i18next'
 
@@ -12,7 +10,7 @@ export default function SendMetricsAndCrashDataSetting(): React.JSX.Element {
 
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 
-	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const navigation = useNavigation<RootNavigator>()
 
 	const onDisclaimerPress = () => {
 		navigation.navigate('PrivacyPolicy')

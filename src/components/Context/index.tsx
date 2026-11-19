@@ -1,6 +1,6 @@
 import { BaseItemDto, BaseItemKind, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import { YGroup } from 'tamagui'
-import { StackNavigation } from '../../screens/types'
+import { StackNavigation } from '../../screens/base-types'
 import { useEffect } from 'react'
 import { useAlbum, useAlbumDiscs } from '../../api/queries/album'
 import { usePlaylistTracks } from '../../api/queries/playlist'

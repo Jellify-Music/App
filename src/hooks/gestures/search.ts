@@ -23,7 +23,8 @@ interface UseSearchInputParams {
  */
 export const useSearchInputGesture = ({ inputRef, navigation }: UseSearchInputParams) => {
 	useEffect(() => {
-		const tabNavigation = navigation.getParent<BottomTabNavigationProp<TabParamList>>()
+		const tabNavigation = navigation.getParent() as
+			BottomTabNavigationProp<TabParamList> | undefined
 		return tabNavigation?.addListener('tabPress', () => tabPressHandler(inputRef, navigation))
 	}, [inputRef, navigation])
 }

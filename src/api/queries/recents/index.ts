@@ -1,13 +1,13 @@
 import { RecentlyPlayedArtistsQueryKey, RecentlyPlayedTracksQueryKey } from './keys'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-import type { BaseItemDtoInfiniteQueryOptions } from '@/src/api/types/infinite-query'
+import type { BaseItemDtoInfiniteQueryOptions } from '../../types/infinite-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
 import { isUndefined } from 'lodash'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { QueryAges } from '../../../constants/durations'
-import { JellifyLibrary } from '@/src/types/JellifyLibrary'
+import { JellifyLibrary } from '../../../types/JellifyLibrary'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 const RECENTS_QUERY_CONFIG: Pick<BaseItemDtoInfiniteQueryOptions, 'staleTime' | 'maxPages'> = {

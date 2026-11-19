@@ -1,13 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import React from 'react'
 import { H4, XStack } from 'tamagui'
-import { RootStackParamList } from '../../../screens/types'
 import ItemCard from '../../Global/components/Card'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
-import { useNavigation } from '@react-navigation/native'
-import HomeStackParamList from '../../../screens/Home/types'
+import { useNavigation, RootNavigator } from '@react-navigation/native'
+import { HomeStackNavigator } from '../../../screens/Home/types'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import AnimatedRow from '../../Global/utils/Animated/row'
@@ -19,9 +17,9 @@ export default function RecentPlaylists(): React.JSX.Element {
 
 	const recentPlaylistsQuery = useRecentlyUpdatedPlaylists()
 
-	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
+	const navigation = useNavigation<HomeStackNavigator>()
 
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const rootNavigation = useNavigation<RootNavigator>()
 
 	const handleHeaderPress = () => {
 		navigation.navigate('RecentPlaylists')

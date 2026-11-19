@@ -7,10 +7,9 @@ import SettingsStack from '../Settings'
 import DiscoverStack from '../Discover'
 import LibraryStack from '../Library'
 import HomeStack from '../Home'
-import TabParamList from './types'
 import i18n from '../../i18n'
 
-const Tabs = createBottomTabNavigator<TabParamList>({
+const Tabs = createBottomTabNavigator({
 	initialRouteName: 'HomeTab',
 	screenOptions: {
 		animation: 'shift',
@@ -19,7 +18,6 @@ const Tabs = createBottomTabNavigator<TabParamList>({
 			fontFamily: 'Figtree-Bold',
 		},
 	},
-	detachInactiveScreens: true,
 	tabBar: (props) => <TabBar {...props} />,
 	screens: {
 		HomeTab: createBottomTabScreen({

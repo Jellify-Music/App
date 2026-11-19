@@ -1,11 +1,11 @@
 import React from 'react'
 import { ScrollView } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { useNavigation } from '@react-navigation/native'
 import { Card, Separator, SizableText, Spinner, XStack, YStack } from 'tamagui'
 import Button from '../../components/Global/utils/button'
 import Icon from '../../components/Global/components/icon'
-import { SettingsStackParamList } from './types'
+import { SettingsStackNavigator } from './types'
 import { useStorageContext } from '../../providers/Storage'
 import { formatBytes } from '../../utils/formatting/bytes'
 import { useDeletionToast } from '../../utils/toasts/deletion-toast'
@@ -22,10 +22,10 @@ const formatSavedAt = (timestamp: number) => {
 	})
 }
 
-export default function StorageSelectionModal({
-	navigation,
-}: NativeStackScreenProps<SettingsStackParamList, 'StorageSelectionReview'>): React.JSX.Element {
+export default function StorageSelectionModal(): React.JSX.Element {
 	const { t } = useTranslation()
+
+	const navigation = useNavigation<SettingsStackNavigator>()
 
 	const { data: downloads } = useDownloads()
 

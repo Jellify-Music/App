@@ -5,8 +5,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../utils/time-codes'
 import FavoriteIcon from './favorite-icon'
 import navigationRef from '../../../screens/navigation'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '../../../screens/types'
+import { BaseStackNavigator, BaseStackParamList } from '../../../screens/base-types'
 import warmItemContext from '../../../utils/fetching/item-context'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import React from 'react'
@@ -65,7 +64,7 @@ function ItemRow({
 
 	const artworkAreaWidth = useSharedValue(0)
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const navigation = useNavigation<BaseStackNavigator>()
 
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()

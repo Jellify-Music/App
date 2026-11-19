@@ -1,7 +1,6 @@
-import { BaseStackParamList } from '../../screens/types'
+import { BaseStackNavigator } from '../../screens/base-types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { YStack, H5, XStack, Separator, SizableText } from 'tamagui'
 import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
@@ -26,7 +25,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 
 	const { data: discs } = useAlbumDiscs(album)
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const navigation = useNavigation<BaseStackNavigator>()
 
 	const playAlbum = (shuffled: boolean = false) => {
 		if (!discs || discs.length === 0) return

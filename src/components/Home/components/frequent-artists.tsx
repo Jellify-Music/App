@@ -1,13 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React from 'react'
 import ItemCard from '../../Global/components/Card'
 import { H4, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
-import { useNavigation } from '@react-navigation/native'
-import HomeStackParamList from '../../../screens/Home/types'
-import { RootStackParamList } from '../../../screens/types'
+import { useNavigation, RootNavigator } from '@react-navigation/native'
+import { HomeStackNavigator } from '../../../screens/Home/types'
 import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
@@ -17,8 +15,8 @@ import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 export default function FrequentArtists(): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const navigation = useNavigation<HomeStackNavigator>()
+	const rootNavigation = useNavigation<RootNavigator>()
 
 	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
 

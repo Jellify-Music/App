@@ -1,5 +1,4 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '../../screens/types'
+import { BaseStackNavigator } from '../../screens/base-types'
 import { useNavigation } from '@react-navigation/native'
 import { useArtistContext } from '../../providers/Artist'
 import { ActivityIndicator } from 'react-native'
@@ -15,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 export default function SimilarArtists(): React.JSX.Element {
 	const { t } = useTranslation()
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const navigation = useNavigation<BaseStackNavigator>()
 	const { artist, similarArtists, fetchingSimilarArtists, fetchingAlbums, albums } =
 		useArtistContext()
 

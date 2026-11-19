@@ -1,10 +1,10 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import ItemCard from '../../Global/components/Card'
 import { H4, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
-import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
+import { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
+import { DiscoverStackNavigator } from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { useRecentlyAddedAlbums } from '../../../api/queries/album'
 import AnimatedRow from '../../Global/utils/Animated/row'
@@ -15,7 +15,7 @@ export default function RecentlyAdded(): React.JSX.Element {
 
 	const recentlyAddedAlbumsInfinityQuery = useRecentlyAddedAlbums()
 
-	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
+	const navigation = useNavigation<DiscoverStackNavigator>()
 
 	const recentlyAddedExists =
 		recentlyAddedAlbumsInfinityQuery.data && recentlyAddedAlbumsInfinityQuery.data.length > 0
