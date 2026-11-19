@@ -2,6 +2,9 @@ import { NetworkStatuses } from '../../enums/network-status'
 import { useRef, useEffect } from 'react'
 import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
 import { getTokenValue } from 'tamagui'
+import { useNetworkStatus } from '../../stores/network'
+import useServerSocket from './use-server-socket'
+import { BACK_ONLINE_DISPLAY_MS } from '../../configs/networking/index.config'
 
 /**
  * A hook to keep track of the last known network status.
@@ -67,4 +70,40 @@ export const useNetworkStatusBannerStyle = (networkStatus: NetworkStatuses | nul
 	}, [networkStatus])
 
 	return animatedStyle
+}
+
+/**
+ * A hook that watches the connection to the Jellyfin server and updates the network status,
+ * briefly announcing when the connection comes back before clearing the status.
+ *
+ * @returns The current network status and its display text
+ */
+export const useServerConnectionStatus = (): [NetworkStatuses | null, string] => {
+	const [networkStatus, setNetworkStatus, statusDisplayText] = useNetworkStatus()
+
+	const lastNetworkStatus = useNetworkStatusRef(networkStatus)
+
+	const clearStatusTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+	useEffect(() => () => clearTimeout(clearStatusTimeout.current), [])
+
+	const clearNetworkStatus = () => {
+		if (lastNetworkStatus.current !== NetworkStatuses.DISCONNECTED) {
+			setNetworkStatus(null)
+		}
+	}
+
+	useServerSocket({
+		onConnect: () => {
+			// Only announce a reconnect, not the initial connection
+			if (lastNetworkStatus.current !== NetworkStatuses.DISCONNECTED) return
+
+			setNetworkStatus(NetworkStatuses.ONLINE)
+			clearTimeout(clearStatusTimeout.current)
+			clearStatusTimeout.current = setTimeout(clearNetworkStatus, BACK_ONLINE_DISPLAY_MS)
+		},
+		onDisconnect: () => setNetworkStatus(NetworkStatuses.DISCONNECTED),
+	})
+
+	return [networkStatus, statusDisplayText]
 }
