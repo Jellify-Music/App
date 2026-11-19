@@ -4,8 +4,8 @@ import LibraryStackParamList from '../../screens/Library/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { YStack, Spinner, Text } from 'tamagui'
-import ItemCard from '../Global/components/item-card'
+import { YStack, Spinner, SizableText } from 'tamagui'
+import ItemCard from '../Global/components/Card'
 import { useSimilarItems } from '../../api/queries/suggestions'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import navigationRef from '../../screens/navigation'
@@ -13,7 +13,8 @@ import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import ItemRow from '../Global/components/item-row'
 import { formatArtistNames } from '../../utils/formatting/artist-names'
 import { Freeze } from 'react-freeze'
-import List from '../Global/helpers/list'
+import List from '../Global/components/Lists/utils'
+import { useTranslation } from 'react-i18next'
 
 export default function AlbumTrackListFooter({
 	album,
@@ -22,6 +23,8 @@ export default function AlbumTrackListFooter({
 	album: BaseItemDto
 	freeze: boolean
 }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation =
 		useNavigation<
 			NativeStackNavigationProp<
@@ -33,12 +36,12 @@ export default function AlbumTrackListFooter({
 
 	return (
 		<Freeze freeze={freeze}>
-			<YStack gap={'$3'} marginVertical={'$2'} flex={1}>
+			<YStack gap='3' marginVertical='2' flex={1}>
 				{album.ArtistItems && album.ArtistItems.length > 1 && (
 					<YStack>
-						<Text marginHorizontal={'$2'} fontWeight='bold'>
-							Featuring
-						</Text>
+						<SizableText marginHorizontal='2' fontWeight='6'>
+							{t('album.featuring')}
+						</SizableText>
 
 						<List
 							data={album.ArtistItems}
@@ -66,17 +69,16 @@ export default function AlbumTrackListFooter({
 						exiting={FadeOut.easing(Easing.out(Easing.ease))}
 						style={{ flex: 1 }}
 					>
-						<Text marginHorizontal={'$2'} fontWeight='bold'>
-							Similar Albums
-						</Text>
+						<SizableText marginHorizontal='2' fontWeight='6'>
+							{t('album.similarAlbums')}
+						</SizableText>
 						<HorizontalCardList
 							data={suggestions}
 							renderItem={({ item: album }) => (
 								<ItemCard
-									size={'$8'}
+									size={'8'}
 									item={album}
-									squared
-									caption={album.Name ?? 'Unknown Album'}
+									caption={album.Name ?? t('placeholders.unknownAlbum')}
 									subCaption={formatArtistNames(album.Artists ?? [])}
 									onPress={() => {
 										navigation.push('Album', {
@@ -92,11 +94,11 @@ export default function AlbumTrackListFooter({
 							ListEmptyComponent={
 								<YStack alignContent='center'>
 									{isLoadingSuggestions ? (
-										<Spinner alignSelf='center' color={'$primary'} />
+										<Spinner alignSelf='center' color='primary' />
 									) : (
-										<Text justifyContent='center' textAlign='center'>
-											No similar albums found
-										</Text>
+										<SizableText justifyContent='center' textAlign='center'>
+											{t('album.noSimilarAlbums')}
+										</SizableText>
 									)}
 								</YStack>
 							}

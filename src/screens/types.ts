@@ -1,11 +1,6 @@
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import {
-	BaseStackNavigator,
-	GenericNavigation,
-	StaticParamList,
-	StaticScreenProps,
-} from '@react-navigation/native'
+import { GenericNavigation, StaticParamList, StaticScreenProps } from '@react-navigation/native'
 import { RootStack } from '.'
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -16,7 +11,6 @@ export type ContextProps = StaticScreenProps<{
 	streamingMediaSourceInfo?: MediaSourceInfo
 	downloadedMediaSourceInfo?: MediaSourceInfo
 	navigation?: GenericNavigation<RootStackParamList>
-	navigationCallback?: (screen: 'Album' | 'Artist', item: BaseItemDto) => void
 }>
 
 export type AddToPlaylistProps = StaticScreenProps<{
@@ -34,6 +28,10 @@ export type DeletePlaylistProps = StaticScreenProps<{
 	playlist: BaseItemDto
 	onDelete: () => void
 }>
+
+export type PrivacyPolicyProps = StaticScreenProps<undefined>
+
+export type OtaProps = StaticScreenProps<{ pullRequest?: boolean } | undefined>
 
 type RootStackType = typeof RootStack
 export type RootStackParamList = StaticParamList<RootStackType>

@@ -3,7 +3,7 @@ import Tracks from '../../components/Tracks/component'
 import { MostPlayedTracksProps, RecentTracksProps } from './types'
 import { useFrequentlyPlayedTracks } from '../../api/queries/frequents'
 import { HomeNavigator, useNavigation } from '@react-navigation/native'
-import ItemList from '../../components/Global/components/item-list'
+import InfiniteItemList from '../../components/Global/components/Lists/item-list'
 
 export default function HomeTracksScreen({
 	route,
@@ -18,5 +18,5 @@ export default function HomeTracksScreen({
 		return <Tracks tracksInfiniteQuery={frequentlyPlayedTracks} queue={'On Repeat'} />
 	}
 
-	return <ItemList query={recentlyPlayedTracks} queue={'Recently Played'} />
+	return <InfiniteItemList infiniteQuery={recentlyPlayedTracks} queue={'Recently Played'} />
 }

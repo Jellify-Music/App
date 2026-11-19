@@ -1,15 +1,10 @@
-import PlayerScreen from '../../components/Player'
-import Queue from '../../components/Queue'
-import {
-	createNativeStackNavigator,
-	NativeStackHeaderItemProps,
-} from '@react-navigation/native-stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
-import Lyrics from '../../components/Player/components/lyrics'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 import CastDialogScreen from '../CastDialog'
-import { Platform } from 'react-native'
 import CastDialogHeaderRight from '../CastDialog/header'
+import PlayerScreen from '../../components/Player'
+import i18n from '../../i18n'
 
 const PlayerStack = createNativeStackNavigator({
 	initialRouteName: 'PlayerScreen',
@@ -18,20 +13,7 @@ const PlayerStack = createNativeStackNavigator({
 			screen: PlayerScreen,
 			options: {
 				headerShown: false,
-				headerTitle: '',
-			},
-		},
-		QueueScreen: {
-			screen: Queue,
-			options: {
-				headerTitle: '',
-			},
-		},
-		LyricsScreen: {
-			screen: Lyrics,
-			options: {
-				headerTitle: '',
-				headerShown: false,
+				headerTitle: i18n.t('navigation.player'),
 			},
 		},
 		MultipleArtistsSheet: {
@@ -46,7 +28,7 @@ const PlayerStack = createNativeStackNavigator({
 		CastDialog: {
 			screen: CastDialogScreen,
 			options: {
-				headerTitle: 'Audio Devices',
+				headerTitle: i18n.t('navigation.audioDevices'),
 				headerRight: CastDialogHeaderRight,
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',

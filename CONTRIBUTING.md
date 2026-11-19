@@ -6,6 +6,7 @@
 - [Running Locally](#️running-locally)
 - [Project Structure](#project-structure)
 - [Code Style](#code-style)
+- [Translations](#translations)
 - [Testing](#testing)
 - [Submitting a Pull Request](#submitting-a-pull-request)
 
@@ -15,26 +16,32 @@
 2. Follow the instructions for [Running Locally](#️running-locally)
 3. Check out the [issues](https://github.com/Jellify-Music/App/issues) if you need inspiration
 4. Hack, hack, hack
-5. Submit a Pull Request to sync the main repository with your fork
+5. ???
+6. Submit a Pull Request to sync the main repository with your fork
 
 ## Running Locally
 
 ### Universal Dependencies
 
-- [Node.js v22](https://nodejs.org/en/download)
-- [Bun](https://bun.sh/) for managing dependencies
+- [Node.js](https://nodejs.org/en/download) v24 LTS (v22.13 or later also works) for running Metro and the React Native CLI
+- [Bun](https://bun.sh/) v1.4.2 for managing dependencies and running scripts
+  - The version is pinned by `packageManager` in `package.json`
 
 ### 🍎 iOS
 
 #### Dependencies
 
-- [Xcode](https://developer.apple.com/xcode/) for building
+- macOS
+- [Xcode](https://developer.apple.com/xcode/) 26 for building, plus an iOS Simulator runtime
+- [Ruby](https://www.ruby-lang.org/en/documentation/installation/) 4.0.7 for CocoaPods and Fastlane
+  - The version is pinned in `ios/.ruby-version`, so a version manager like [rbenv](https://github.com/rbenv/rbenv) (`rbenv install`) or [mise](https://mise.jdx.dev/) will pick it up automatically
+  - Bundler ships with Ruby, and CocoaPods and Fastlane are installed through it, so you don't need to install them globally
 
 #### Setup
 
 - Clone this repository
 - Run `bun init-ios` to initialize the project
-  - This will install `npm` packages, install `bundler` and required gems, and install required CocoaPods with [React Native's New Architecture](https://reactnative.dev/blog/2024/10/23/the-new-architecture-is-here#what-is-the-new-architecture)
+  - This will install `npm` packages, install `bundler` and required gems, and install required CocoaPods
 
 #### Running
 
@@ -56,7 +63,11 @@
 #### Dependencies
 
 - [Android Studio](https://developer.android.com/studio)
-- [Java Development Kit](https://www.oracle.com/th/java/technologies/downloads/)
+- [Java Development Kit 17](https://adoptium.net/temurin/releases/?version=17)
+  - React Native recommends JDK 17; newer JDKs may fail to build
+- Android SDK Platform 36, Build-Tools 36.0.0 and NDK 27.1.12297006, installed through Android Studio's SDK Manager
+  - Set `ANDROID_HOME` to your SDK location (see [References](#references))
+- [Ruby](https://www.ruby-lang.org/en/documentation/installation/) 4.0.7, only if you're building with Fastlane
 
 #### Setup
 
@@ -106,6 +117,27 @@ maestro/
   subflows/     # Reusable flows shared across multiple stacks
 ```
 
+## React Compiler
+
+This project uses the [React Compiler](https://react.dev/learn/react-compiler). Since the compiler automatically handles memoization, manual optimization hooks are unnecessary and should be avoided:
+
+- **Do not use `useMemo` or `useCallback`** — the compiler handles this automatically.
+
+### Reanimated Shared Values
+
+When working with Reanimated [`useSharedValue`](https://docs.swmansion.com/react-native-reanimated/docs/core/useSharedValue#react-compiler-support), always use the `get()` and `set()` accessors rather than reading or writing the `.value` property directly:
+
+```ts
+// ✅ Correct
+const width = useSharedValue(100)
+width.set(200)
+console.log(width.get())
+
+// ❌ Incorrect — not compatible with the React Compiler
+width.value = 200
+console.log(width.value)
+```
+
 ## Code Style
 
 The project uses ESLint, Prettier, and TypeScript for code quality. Before submitting a PR, please ensure your changes pass all checks:
@@ -121,6 +153,22 @@ Notable style rules enforced by ESLint:
 - No semicolons
 - `@typescript-eslint/no-explicit-any` is an **error** — avoid `any` types
 - `react/react-in-jsx-scope` is disabled (React 17+ JSX transform)
+
+## Translations
+
+User-facing strings live in `src/i18n/locales/en.json` and are rendered with `react-i18next`:
+
+```tsx
+const { t } = useTranslation()
+
+<H4>{t('home.onRepeat')}</H4>
+```
+
+- Only add or change keys in `en.json`. The other locale files are managed by Weblate, so don't edit them by hand
+- Keys are type-checked, so `t('home.typo')` fails `tsc`
+- Use i18next's `_one` / `_other` suffixes for plurals (e.g. `trackCount_one`, `trackCount_other`)
+- Outside of components, use `i18n.t()` from `src/i18n`
+- `handleError` takes a key under `errors` for its toast title, and reports the English text to Sentry
 
 ## Testing
 

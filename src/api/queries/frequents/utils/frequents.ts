@@ -6,49 +6,53 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
 import { isEmpty, isNull, isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
-import { ApiLimits } from '../../../../configs/query.config'
+import { ApiLimits } from '../../../../configs/querying/index.config'
 import { JellifyUser } from '@/src/types/JellifyUser'
-import { queryClient } from '../../../../constants/query-client'
-import { QueryKey } from '@tanstack/react-query'
+import { queryClient } from '../../../client'
 import { FrequentlyPlayedTracksQuery } from '../queries'
 import { ArtistQueryKey } from '../../artist/keys'
-import { setQueryUserDataForItems } from '../../user-data'
+import { setQueryUserDataForItem } from '../../user-data/cache'
 
 /**
  * Fetches the 100 most frequently played items from the user's library
  * @param api The Jellyfin {@link Api} instance
  * @param library The Jellyfin {@link JellifyLibrary} instance
  * @param page The page number to fetch
+ * @param signal Optional AbortSignal to cancel the request
  * @returns The most frequently played items from the user's library
  */
 export function fetchFrequentlyPlayed(
 	api: Api | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 
-		getItemsApi(api!)
-			.getItems({
-				includeItemTypes: [BaseItemKind.Audio],
-				parentId: library!.musicLibraryId,
-				recursive: true,
-				limit: ApiLimits.Frequents,
-				startIndex: page * ApiLimits.Frequents,
-				sortBy: [ItemSortBy.PlayCount],
-				sortOrder: [SortOrder.Descending],
-				fields: [ItemFields.ParentId, ItemFields.Tags],
-				enableUserData: true,
-			})
+		getLibraryApi(api!)
+			.getItems(
+				{
+					includeItemTypes: [BaseItemKind.Audio],
+					parentId: library?.musicLibraryId,
+					recursive: true,
+					limit: ApiLimits.Frequents,
+					startIndex: page * ApiLimits.Frequents,
+					sortBy: [ItemSortBy.PlayCount],
+					sortOrder: [SortOrder.Descending],
+					fields: [ItemFields.ParentId, ItemFields.Tags],
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {
@@ -63,6 +67,7 @@ export function fetchFrequentlyPlayed(
  * @param api The Jellyfin {@link Api} instance
  * @param library The Jellyfin {@link JellifyLibrary} instance
  * @param page The page number to fetch
+ * @param signal Optional AbortSignal to cancel the request
  * @returns The most frequently played artists from the user's library
  */
 export function fetchFrequentlyPlayedArtists(
@@ -70,15 +75,18 @@ export function fetchFrequentlyPlayedArtists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 
 		queryClient
-			.ensureInfiniteQueryData<BaseItemDto[], Error, BaseItemDto[], QueryKey, number>(
-				FrequentlyPlayedTracksQuery(user, library, api),
-			)
+			.infiniteQuery({
+				...FrequentlyPlayedTracksQuery(user, library, api),
+				staleTime: 'static',
+				// Keep the pages, since artists are derived from one page at a time
+				select: (data) => data,
+			})
 			.then(async (frequentlyPlayed) => {
 				const artistWithPlayCount = frequentlyPlayed.pages[page]
 					.filter(
@@ -116,7 +124,7 @@ export function fetchFrequentlyPlayedArtists(
 
 				// Fetch full artist details to get ImageTags
 				if (uniqueArtistIds.length > 0) {
-					const { data } = await getItemsApi(api!).getItems({
+					const { data } = await getLibraryApi(api!).getItems({
 						ids: uniqueArtistIds,
 						includeItemTypes: [BaseItemKind.MusicArtist],
 						fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
@@ -127,9 +135,8 @@ export function fetchFrequentlyPlayedArtists(
 					})
 
 					if (data.Items) {
-						setQueryUserDataForItems(data.Items)
-
 						data.Items.forEach((artist) => {
+							setQueryUserDataForItem(artist)
 							queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
 						})
 

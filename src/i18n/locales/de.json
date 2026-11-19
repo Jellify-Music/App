@@ -1,0 +1,466 @@
+{
+	"home": {
+		"onRepeat": "Auf Dauerschleife",
+		"recentArtists": "Kürzlich gehörte Künstler",
+		"yourPlaylists": "Deine Playlists",
+		"playItAgain": "Erneut anhören",
+		"mostPlayed": "Meistgespielt",
+		"recentlyPlayed": "Zuletzt gehört"
+	},
+	"placeholders": {
+		"unknownUser": "Unbekannter Benutzer",
+		"unknownLibrary": "Unbekannte Bibliothek",
+		"unknownServer": "Unbekannter Server",
+		"unknownAddress": "Unbekannte Serveradresse",
+		"unknownAlbum": "Unbekanntes Album",
+		"untitledAlbum": "Unbenanntes Album",
+		"unknownYear": "Unbekanntes Jahr",
+		"unknownArtist": "Unbekannter Künstler",
+		"untitledTrack": "Unbenannter Titel",
+		"untitled": "Unbenannt",
+		"unknownPlaylist": "Unbekannte Playlist",
+		"unnamedLibrary": "Unbenannte Bibliothek",
+		"untitledPlaylist": "Unbenannte Playlist",
+		"unknownTrack": "Unbekannter Titel",
+		"unknownGenre": "Unbekanntes Genre",
+		"unknownMusicVideo": "Unbekanntes Musikvideo",
+		"unknownItem": "Unbekanntes Element"
+	},
+	"account": {
+		"jellyfinUser": "Jellyfin Benutzer",
+		"musicLibrary": "Musikbibliothek",
+		"allLibraries": "Alle Bibliotheken",
+		"currentLibrary": "Aktuelle Bibliothek",
+		"server": "Server",
+		"version": "Version",
+		"connection": "Verbindung",
+		"secure": "gesichert (HTTPS)",
+		"insecure": "ungesichert (HTTP)"
+	},
+	"common": {
+		"change": "Anpassen",
+		"unknown": "Unbekannt",
+		"play": "Abspielen",
+		"shuffle": "Shuffle",
+		"retry": "Erneut versuchen",
+		"noItems": "Keine Einträge",
+		"mix": "Mix",
+		"seeMore": "Mehr ansehen",
+		"trackCount_one": "{{count}} Track",
+		"trackCount_other": "{{count}} Tracks",
+		"all": "Alles",
+		"clear": "Löschen",
+		"cancel": "Abbrechen",
+		"save": "Speichern",
+		"delete": "Löschen",
+		"apply": "Anwenden",
+		"any": "",
+		"goBack": "Zurück",
+		"error": "Fehler",
+		"close": "Schließen",
+		"refresh": "Aktualisieren",
+		"ok": "OK"
+	},
+	"album": {
+		"featuring": "",
+		"similarAlbums": "",
+		"noSimilarAlbums": "",
+		"noTracks": ""
+	},
+	"artist": {
+		"sections": {
+			"albums": "",
+			"eps": "",
+			"singles": "",
+			"other": "",
+			"featuredOn": ""
+		},
+		"noAlbums": "",
+		"similarTo": "",
+		"noSimilarArtists": "",
+		"viewTracks": ""
+	},
+	"cast": {
+		"noDevices": ""
+	},
+	"context": {
+		"goTo": "",
+		"removeDownload": "",
+		"downloadQueued": "",
+		"download": "",
+		"goToMix": "",
+		"addToPlaylist": "",
+		"deletePlaylist": "",
+		"removeFromPlaylist": "",
+		"playNext": "",
+		"playLater": "",
+		"openAudioSpecs": "",
+		"addToFavorites": "",
+		"removeFromFavorites": ""
+	},
+	"discover": {
+		"recentlyAdded": "",
+		"moreFromTheVault": "",
+		"artistsForYou": "",
+		"playlistsOn": "",
+		"albumsOn": ""
+	},
+	"errorBoundary": {
+		"title": "",
+		"message": ""
+	},
+	"filters": {
+		"favorites": "",
+		"downloaded": "",
+		"unplayed": "",
+		"yearRange": "",
+		"yearRangeWithValue": ""
+	},
+	"swipe": {
+		"hint": "",
+		"playLater": "",
+		"toggleFavorite": "",
+		"playNext": "",
+		"addToPlaylist": ""
+	},
+	"input": {
+		"clear": "",
+		"clearHint": ""
+	},
+	"instantMix": {
+		"noTracks": "",
+		"title": ""
+	},
+	"library": {
+		"createPlaylist": "",
+		"sort": "",
+		"filter": ""
+	},
+	"librarySelector": {
+		"title": "",
+		"showingAll": "",
+		"tapForAll": "",
+		"loadError": "",
+		"noLibraries": "",
+		"noLibrariesHint": "",
+		"oneLibrary": ""
+	},
+	"login": {
+		"copiedToClipboard": "",
+		"signInManually": "",
+		"quickConnect": "",
+		"quickConnectHint": "",
+		"serverAddress": "",
+		"welcome": "",
+		"welcomeSubtitle": "",
+		"connect": "",
+		"signInTo": "",
+		"unknownVersion": "",
+		"username": "",
+		"password": "",
+		"signIn": "",
+		"useQuickConnect": "",
+		"noResponse": "",
+		"notSetUp": "",
+		"unableToConnect": ""
+	},
+	"lyrics": {
+		"none": ""
+	},
+	"player": {
+		"nothingPlaying": "",
+		"close": "",
+		"playingFrom": ""
+	},
+	"network": {
+		"backOnline": "",
+		"offline": ""
+	},
+	"audioSpecs": {
+		"downloadedFile": "",
+		"transcodedStream": "",
+		"directStream": ""
+	},
+	"playlist": {
+		"namePlaceholder": "",
+		"none": "",
+		"name": "",
+		"deleteConfirm": "",
+		"created": "",
+		"createdMessage": ""
+	},
+	"queue": {
+		"nowPlaying": "",
+		"playingNext": "",
+		"playingLater": ""
+	},
+	"search": {
+		"inputLabel": "",
+		"inputHint": "",
+		"artistResults": "",
+		"results": "",
+		"noResults": "",
+		"suggestedArtists": "",
+		"suggestions": ""
+	},
+	"settings": {
+		"appIcon": {
+			"updated": "",
+			"title": "",
+			"description": ""
+		},
+		"lookahead": {
+			"title": "",
+			"description": ""
+		},
+		"analytics": {
+			"title": "",
+			"learnMore": ""
+		},
+		"sections": {
+			"appearance": "",
+			"gestures": "",
+			"playback": "",
+			"storage": "",
+			"privacyDeveloper": "",
+			"about": ""
+		},
+		"signOut": "",
+		"appearance": {
+			"themes": {
+				"system": "",
+				"light": "",
+				"dark": "",
+				"oled": ""
+			},
+			"colorPresets": {
+				"haze": "",
+				"ocean": "",
+				"forest": "",
+				"sunset": "",
+				"peanut": ""
+			},
+			"theme": "",
+			"colorScheme": "",
+			"hideRuntimes": "",
+			"hideRuntimesDescription": "",
+			"hideCardIndicators": "",
+			"hideCardIndicatorsDescription": ""
+		},
+		"gestures": {
+			"description": "",
+			"swipeLeft": "",
+			"swipeRight": "",
+			"favorite": ""
+		},
+		"playback": {
+			"streamingQuality": "",
+			"streamingQualityDescription": "",
+			"normalization": "",
+			"normalizationDescription": "",
+			"qualityBadge": "",
+			"qualityBadgeDescription": ""
+		},
+		"quality": {
+			"original": "",
+			"high": "",
+			"medium": "",
+			"low": ""
+		},
+		"developer": {
+			"invalidPrId": "",
+			"title": "",
+			"options": "",
+			"optionsDescription": "",
+			"prIdDescription": "",
+			"prIdPlaceholder": "",
+			"currentPrId": ""
+		},
+		"privacy": {
+			"title": "",
+			"reduceHaptics": "",
+			"reduceHapticsDescription": ""
+		},
+		"library": {
+			"changed": "",
+			"nowUsing": "",
+			"nowUsingAll": "",
+			"apply": ""
+		}
+	},
+	"sort": {
+		"by": {
+			"track": "",
+			"album": "",
+			"artist": "",
+			"dateAdded": "",
+			"playCount": "",
+			"releaseDate": "",
+			"runtime": ""
+		},
+		"order": {
+			"oldest": "",
+			"newest": "",
+			"lowest": "",
+			"highest": "",
+			"ascending": "",
+			"descending": ""
+		},
+		"sortBy": "",
+		"sortOrder": ""
+	},
+	"navigation": {
+		"tracks": "",
+		"library": "",
+		"filters": "",
+		"player": "",
+		"audioDevices": "",
+		"search": "",
+		"selectLibrary": "",
+		"storageManagement": "",
+		"account": "",
+		"home": "",
+		"discover": "",
+		"settings": ""
+	},
+	"genres": {
+		"title": "",
+		"selectAll": "",
+		"none": ""
+	},
+	"years": {
+		"loadError": "",
+		"min": "",
+		"max": "",
+		"selectMin": "",
+		"selectMax": ""
+	},
+	"privacy": {
+		"intro": "",
+		"purpose": "",
+		"optional": "",
+		"readMore": ""
+	},
+	"storage": {
+		"unknownSaveDate": "",
+		"deletedDownloads_one": "",
+		"deletedDownloads_other": "",
+		"reviewSelection": "",
+		"readyToRemove_one": "",
+		"readyToRemove_other": "",
+		"savedAt": "",
+		"deleteDownloads": "",
+		"noneSelected": "",
+		"noneSelectedHint": "",
+		"removedDownloads_one": "",
+		"removedDownloads_other": "",
+		"removedTrack": "",
+		"track": "",
+		"clearAllTitle": "",
+		"clearAllMessage": "",
+		"clearAll": "",
+		"clearSelectedTitle": "",
+		"clearSelectedMessage_one": "",
+		"clearSelectedMessage_other": "",
+		"selectedCount": "",
+		"overview": "",
+		"refreshOverview": "",
+		"usage": "",
+		"downloadCount_one": "",
+		"downloadCount_other": "",
+		"calculating": "",
+		"clearDownload": "",
+		"empty": "",
+		"emptyHint": "",
+		"readyToCleanUp": "",
+		"selectionSummary_one": "",
+		"selectionSummary_other": "",
+		"clearSize": "",
+		"offlineLibrary": "",
+		"cachedCount_one": "",
+		"cachedCount_other": "",
+		"audioFiles": "",
+		"downloadSettings": "",
+		"autoDownload": "",
+		"autoDownloadDescription": "",
+		"downloadQuality": "",
+		"downloadQualityDescription": "",
+		"freed": "",
+		"suggestions": {
+			"staleTitle": "",
+			"staleDescription": "",
+			"largeTitle": "",
+			"largeDescription": ""
+		}
+	},
+	"shuffle": {
+		"fetchFailed": "",
+		"noDownloads": "",
+		"noTracks": "",
+		"nothing": "",
+		"nothingPlaying": ""
+	},
+	"ota": {
+		"updated": "",
+		"restart": "",
+		"restartInstructions": "",
+		"notAvailable": "",
+		"prUpdated": "",
+		"prNotAvailable": ""
+	},
+	"car": {
+		"artists": "",
+		"albums": "",
+		"playlists": "",
+		"empty": "",
+		"more": "",
+		"signIn": "",
+		"signInAgain": "",
+		"unreachable": "",
+		"tapToRetry": "",
+		"recentlyAdded": "",
+		"quickPicks": "",
+		"songs": "",
+		"downloads": "",
+		"yourLibrary": "",
+		"queue": "",
+		"songCount_one": "",
+		"songCount_other": ""
+	},
+	"errors": {
+		"setAppIcon": "",
+		"removeFromPlaylist": "",
+		"shuffleLibrary": "",
+		"playArtist": "",
+		"download": "",
+		"removeDownloads": "",
+		"createPlaylist": "",
+		"deletePlaylist": "",
+		"updatePlaylist": "",
+		"addToPlaylist": "",
+		"removeFromNamedPlaylist": "",
+		"addFavorite": "",
+		"removeFavorite": "",
+		"connect": "",
+		"initiateQuickConnect": "",
+		"quickConnectSignIn": "",
+		"signIn": "",
+		"playNext": "",
+		"playLater": "",
+		"fetchRandomTracks": "",
+		"shuffleQueue": "",
+		"unshuffleQueue": ""
+	},
+	"about": {
+		"otaVersion": "",
+		"source": "",
+		"privacyPolicy": "",
+		"update": "",
+		"caughtABug": "",
+		"reportIssue": "",
+		"joinDiscord": "",
+		"wallOfFame": "",
+		"sponsors": "",
+		"specialThanks": ""
+	}
+}

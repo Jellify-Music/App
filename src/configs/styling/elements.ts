@@ -1,13 +1,11 @@
-import { ViewStyle } from 'tamagui'
-
-export const BUTTON_PRESS_STYLES: Pick<ViewStyle, 'pressStyle' | 'hoverStyle' | 'transition'> = {
+// v3 removed the separate `pressStyle`/`hoverStyle` props - interaction states are now
+// expressed as modifier clauses on the same style property (see Tamagui v3 "flat style props").
+export const BUTTON_PRESS_STYLES = {
 	transition: 'quick',
-	pressStyle: { scale: 0.875 },
-	hoverStyle: { scale: 0.925 },
-}
+	scale: '1 hover:0.925 press: 0.875',
+} as const
 
-export const ICON_PRESS_STYLES: Pick<ViewStyle, 'pressStyle' | 'hoverStyle' | 'transition'> = {
+export const ICON_PRESS_STYLES = {
 	transition: 'quick',
-	pressStyle: { opacity: 0.6 },
-	hoverStyle: { opacity: 0.8 },
-}
+	opacity: '1 hover: 0.8, press: 0.6',
+} as const

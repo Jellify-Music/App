@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#0D0E19</color>
+    <!-- Shared by every app icon. White in light mode to match the iOS automatic fill, see values-night for dark mode -->
+    <color name="ic_launcher_background">#FFFFFF</color>
 </resources>

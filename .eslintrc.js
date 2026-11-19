@@ -14,9 +14,10 @@ module.exports = {
 	},
 	rules: {
 		'react/react-in-jsx-scope': 'off',
-		'@typescript-eslint/no-unused-vars': 'off',
-		'@typescript-eslint/no-require-imports': 'off',
 		'@typescript-eslint/no-empty-object-type': 'off',
+		'@typescript-eslint/no-deprecated': 'error',
+		'@typescript-eslint/no-require-imports': 'off',
+		'@typescript-eslint/no-unused-vars': 'error',
 		'react/prop-types': 'off',
 		'@typescript-eslint/no-explicit-any': 'error', // Disallow usage of any
 		'no-mixed-spaces-and-tabs': 'off', // refer https://github.com/prettier/prettier/issues/4199

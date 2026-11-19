@@ -1,22 +1,21 @@
-import { Api } from '@jellyfin/sdk'
-import { LibrariesQueryKey, LibraryQueryKeys, PlaylistLibraryQueryKey } from './keys'
-import { fetchPlaylistLibrary, fetchUserViews } from './utils'
-import { JellifyUser } from '../../../types/JellifyUser'
+import { LibrariesQueryKey, PlaylistLibraryQueryKey } from './keys'
+import { fetchPlaylistLibrary, fetchMusicLibraries } from './utils'
 import { UndefinedInitialDataOptions } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
+import { getApi, getUser } from '../../../stores/auth/utils'
 
-export const LibrariesQuery = (api: Api | undefined, user: JellifyUser | undefined) =>
+export const LibrariesQuery = () =>
 	({
-		queryKey: LibrariesQueryKey(api, user),
-		queryFn: () => fetchUserViews(api!, user!),
+		queryKey: LibrariesQueryKey(getApi(), getUser()),
+		queryFn: ({ signal }) => fetchMusicLibraries(getApi(), getUser(), signal),
 		staleTime: 0, // Refetch on mount
-		enabled: Boolean(api && user),
+		enabled: Boolean(getApi() && getUser()),
 	}) as UndefinedInitialDataOptions<BaseItemDto[], Error, BaseItemDto[]>
 
-export const PlaylistLibraryQuery = (api: Api | undefined, user: JellifyUser | undefined) =>
+export const PlaylistLibraryQuery = () =>
 	({
-		queryKey: PlaylistLibraryQueryKey(api, user),
-		queryFn: () => fetchPlaylistLibrary(api!, user!),
+		queryKey: PlaylistLibraryQueryKey(getApi(), getUser()),
+		queryFn: ({ signal }) => fetchPlaylistLibrary(getApi(), getUser(), signal),
 		staleTime: Infinity,
-		enabled: Boolean(api && user),
+		enabled: Boolean(getApi() && getUser()),
 	}) as UndefinedInitialDataOptions<BaseItemDto | undefined, Error, BaseItemDto | undefined>

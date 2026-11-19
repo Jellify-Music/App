@@ -4,17 +4,20 @@ import { YStack, XStack, SizableText, ScrollView } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
-import Button from '../../components/Global/helpers/button'
-import Input from '../../components/Global/helpers/input'
-import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
+import Button from '../../components/Global/utils/button'
+import Input from '../../components/Global/utils/Input'
+import { SwitchWithLabel } from '../../components/Global/utils/switch-with-label'
 import SettingsSection from '../../components/Settings/components/settings-section'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { useDeveloperOptionsEnabled, usePrId } from '../../stores/settings/developer'
 import { downloadPRUpdate } from '../../services/ota/pull-request'
 import SendMetricsAndCrashDataSetting from '../../components/Settings/components/settings/send-metrics-and-crash-data'
 import { applyHapticFeedback } from '../../utils/haptics'
+import { useTranslation } from 'react-i18next'
 
 export default function PrivacyDeveloperScreen(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { bottom } = useSafeAreaInsets()
 
 	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
@@ -28,7 +31,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 		const trimmed = localPrId.trim()
 		const parsed = Number(trimmed)
 		if (!trimmed || !Number.isInteger(parsed) || parsed <= 0) {
-			Alert.alert('Error', 'Please enter a valid PR ID (a positive integer)')
+			Alert.alert(t('common.error'), t('settings.developer.invalidPrId'))
 			return
 		}
 		setPrId(trimmed)
@@ -36,15 +39,20 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	}
 
 	return (
-		<YStack flex={1} backgroundColor='$background' testID='settings-screen-privacy-developer'>
-			<ScrollView
-				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
-				showsVerticalScrollIndicator={false}
+		<ScrollView
+			contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
+			showsVerticalScrollIndicator={false}
+		>
+			<YStack
+				flex={1}
+				backgroundColor='background'
+				margin='2'
+				testID='settings-screen-privacy-developer'
 			>
 				<SettingsSection
-					title='Privacy'
+					title={t('settings.privacy.title')}
 					icon='shield-account'
-					iconColor='$success'
+					iconColor='success'
 					defaultExpanded
 					collapsible={false}
 				>
@@ -52,75 +60,74 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight={'$6'}>
-								Reduce Haptics
+							<SizableText fontSize='3' fontWeight='6'>
+								{t('settings.privacy.reduceHaptics')}
 							</SizableText>
-							<SizableText size='$2' color='$borderColor'>
-								Reduce haptic feedback intensity
+							<SizableText fontSize='2' color='borderColor'>
+								{t('settings.privacy.reduceHapticsDescription')}
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel
 							checked={reducedHaptics}
 							onCheckedChange={setReducedHaptics}
-							size='$2'
+							size='2'
 						/>
 					</XStack>
 				</SettingsSection>
 
 				<SettingsSection
-					title='Developer'
+					title={t('settings.developer.title')}
 					icon='code-braces'
-					iconColor='$borderColor'
+					iconColor='borderColor'
 					defaultExpanded
 					collapsible={false}
 				>
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight='$6'>
-								Developer Options
+							<SizableText fontSize='3' fontWeight='6'>
+								{t('settings.developer.options')}
 							</SizableText>
-							<SizableText size='$2' color='$borderColor'>
-								Enable advanced developer features
+							<SizableText fontSize='2' color='borderColor'>
+								{t('settings.developer.optionsDescription')}
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel
 							testID='developer-options-switch'
 							checked={developerOptionsEnabled}
 							onCheckedChange={setDeveloperOptionsEnabled}
-							size='$2'
+							size='2'
 						/>
 					</XStack>
 
 					{developerOptionsEnabled && (
-						<YStack gap='$2' paddingTop='$1'>
-							<SizableText size='$2' color='$borderColor'>
-								Enter PR ID to test pull request builds
+						<YStack gap='2' paddingTop='1'>
+							<SizableText fontSize='2' color='borderColor'>
+								{t('settings.developer.prIdDescription')}
 							</SizableText>
-							<XStack gap='$2' alignItems='center'>
+							<XStack gap='2' alignItems='center'>
 								<Input
-									placeholder='Enter PR ID'
+									placeholder={t('settings.developer.prIdPlaceholder')}
 									value={localPrId}
 									onChangeText={setLocalPrId}
 									keyboardType='numeric'
-									size='$3'
+									flex={1}
 								/>
 								<Button
-									size='$3'
-									backgroundColor='$primary'
-									onPress={handleSubmitPr}
 									circular
-									icon={<Icon name='check' color='$background' small />}
+									backgroundColor='primary'
+									onPress={handleSubmitPr}
+									icon={<Icon name='check' color='background' size='7' />}
 								/>
 							</XStack>
 							{prId && (
-								<SizableText color='$success' size='$2'>
-									Current PR ID: {prId}
+								<SizableText color='success' fontSize='2'>
+									{t('settings.developer.currentPrId')} {prId}
 								</SizableText>
 							)}
 						</YStack>
 					)}
 				</SettingsSection>
-			</ScrollView>
-		</YStack>
+			</YStack>
+		</ScrollView>
 	)
 }

@@ -1,0 +1,1 @@
+export const SCROLL_RESET_DELAY = 2000

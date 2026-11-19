@@ -3,7 +3,7 @@ import { fetchLibraryYears } from './utils'
 import { LibraryYearsQueryKey } from './keys'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'
-import { ONE_HOUR } from '../../../constants/query-client'
+import { QueryAges } from '../../../constants/durations'
 
 export function useLibraryYears(): {
 	years: number[]
@@ -20,9 +20,9 @@ export function useLibraryYears(): {
 		isError,
 	} = useQuery({
 		queryKey: LibraryYearsQueryKey(library?.musicLibraryId, user?.id),
-		queryFn: () => fetchLibraryYears(api, library, user?.id),
-		enabled: Boolean(api && library && user?.id),
-		staleTime: ONE_HOUR * 6,
+		queryFn: ({ signal }) => fetchLibraryYears(api, library, user?.id, signal),
+		enabled: Boolean(api && user?.id),
+		staleTime: QueryAges.OneHour * 6,
 	})
 
 	return { years, isPending, isError }

@@ -1,5 +1,4 @@
-import { YStack, XStack, Spinner, useTheme } from 'tamagui'
-import { Text } from '../Global/helpers/text'
+import { YStack, XStack, Spinner, useTheme, SizableText } from 'tamagui'
 import { RefreshControl, SectionList } from 'react-native'
 import Track from '../Global/components/Track'
 import FavoriteButton from '../Global/components/favorite-button'
@@ -12,10 +11,12 @@ import { BaseStackParamList } from '../../screens/types'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useAlbumDiscs } from '../../api/queries/album'
+import { ItemKeyExtractor } from '../../utils/parsing/key-extractor'
+import AlbumSectionHeader from './section-header'
+import { useTranslation } from 'react-i18next'
 
 /**
  * The screen for an Album's track list
@@ -26,6 +27,8 @@ import { useAlbumDiscs } from '../../api/queries/album'
  * @returns A React component
  */
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const theme = useTheme()
@@ -54,37 +57,33 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	const handleDownload = () => downloadTracks.mutate(albumTrackList ?? [])
 
+	const onRefresh = async () => {
+		await refetch()
+	}
+
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
-				<XStack gap={'$2'} justifyContent='center' alignContent='center'>
+				<XStack gap='2' justifyContent='center' alignContent='center'>
 					{albumTrackList &&
 						(isDownloaded ? (
-							<Animated.View
-								entering={FadeIn.easing(Easing.in(Easing.ease))}
-								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								layout={LinearTransition.springify()}
-							>
-								<Icon
-									color='$warning'
-									name='broom'
-									onPress={handleDeleteDownload}
-								/>
-							</Animated.View>
+							<Icon
+								color='warning'
+								name='broom'
+								onPress={handleDeleteDownload}
+								transition={'quick'}
+								opacity='1 enter:0 exit:0'
+							/>
 						) : downloadTracks.isPending ? (
-							<Spinner justifyContent='center' color={'$neutral'} />
+							<Spinner justifyContent='center' color='neutral' />
 						) : (
-							<Animated.View
-								entering={FadeIn.easing(Easing.in(Easing.ease))}
-								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								layout={LinearTransition.springify()}
-							>
-								<Icon
-									color='$success'
-									name='download-circle-outline'
-									onPress={handleDownload}
-								/>
-							</Animated.View>
+							<Icon
+								color='success'
+								name='download-circle-outline'
+								onPress={handleDownload}
+								transition={'quick'}
+								opacity='1 enter:0 exit:0'
+							/>
 						))}
 					<FavoriteButton item={album} />
 				</XStack>
@@ -103,24 +102,14 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	return (
 		<SectionList
 			contentInsetAdjustmentBehavior='automatic'
-			contentContainerStyle={{ flexGrow: 1 }}
 			sections={sections}
-			keyExtractor={(item, index) => item.Id! + index}
+			keyExtractor={ItemKeyExtractor}
 			maxToRenderPerBatch={50}
-			renderSectionHeader={({ section }) => {
-				return !isPending && hasMultipleSections ? (
-					<XStack
-						width='100%'
-						justifyContent={hasMultipleSections ? 'space-between' : 'flex-end'}
-						alignItems='center'
-						backgroundColor={'$background'}
-						paddingHorizontal={'$2'}
-					>
-						<Text padding={'$2'} bold>{`Disc ${section.title}`}</Text>
-					</XStack>
-				) : null
-			}}
-			ListHeaderComponent={() => <AlbumTrackListHeader album={album} />}
+			renderSectionHeader={({ section }) =>
+				!isPending &&
+				hasMultipleSections && <AlbumSectionHeader discNumber={section.title} />
+			}
+			ListHeaderComponent={<AlbumTrackListHeader album={album} />}
 			renderItem={({ item: track, index }) => {
 				const trackIndexInAlbum =
 					albumTrackList?.findIndex(({ Id }) => Id === track.Id) ?? index
@@ -136,17 +125,26 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 					/>
 				)
 			}}
-			ListFooterComponent={() => <AlbumTrackListFooter album={album} freeze={isPending} />}
+			ListFooterComponent={<AlbumTrackListFooter album={album} freeze={isPending} />}
 			ListEmptyComponent={() => (
-				<YStack flex={1} alignContent='center' margin={'$4'}>
-					{isPending ? null : <Text color={'$borderColor'}>No album tracks</Text>}
+				<YStack flex={1} alignContent='center' margin='4'>
+					{isPending ? null : (
+						<SizableText
+							fontSize='3'
+							fontWeight='6'
+							textAlign='center'
+							color='borderColor'
+						>
+							{t('album.noTracks')}
+						</SizableText>
+					)}
 				</YStack>
 			)}
 			onScrollBeginDrag={closeAllSwipeableRows}
 			refreshControl={
 				<RefreshControl
 					refreshing={isPending}
-					onRefresh={refetch}
+					onRefresh={onRefresh}
 					tintColor={theme.primary.val}
 				/>
 			}

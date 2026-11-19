@@ -2,16 +2,17 @@ import { BaseStackParamList } from '../../screens/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { YStack, H5, XStack, Separator, Paragraph } from 'tamagui'
+import { YStack, H5, XStack, Separator, SizableText } from 'tamagui'
 import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
-import { RunTimeTicks } from '../Global/helpers/time-codes'
-import Button from '../Global/helpers/button'
+import { RunTimeTicks } from '../Global/utils/time-codes'
+import Button from '../Global/utils/button'
 import { InstantMixButton } from '../Global/components/instant-mix-button'
 import { useAlbumDiscs } from '../../api/queries/album'
 import { formatArtistName } from '../../utils/formatting/artist-names'
-import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
-import { loadNewQueue } from '../../hooks/player/functions/queue'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
+import { loadNewQueue } from '../../player/queuing'
+import { useTranslation } from 'react-i18next'
 
 /**
  * Renders a header for an Album's track list
@@ -21,7 +22,9 @@ import { loadNewQueue } from '../../hooks/player/functions/queue'
  * @returns A React component
  */
 export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
-	const { data: discs, isPending } = useAlbumDiscs(album)
+	const { t } = useTranslation()
+
+	const { data: discs } = useAlbumDiscs(album)
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
@@ -42,52 +45,56 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 	}
 
 	return (
-		<YStack alignContent='center' flex={1} marginTop={'$4'}>
+		<YStack alignContent='center' flex={1} margin='2'>
 			<XStack justifyContent='center'>
 				<ItemImage
 					item={album}
-					width={'$15'}
-					height={'$15'}
+					width={'15'}
+					height={'15'}
 					imageOptions={{
 						maxHeight: 750,
 						maxWidth: 750,
 					}}
+					elevate
 				/>
 			</XStack>
 
-			<YStack marginTop={'$2'} alignContent='center' justifyContent='center' gap={'$2'}>
+			<YStack marginTop='2' alignContent='center' justifyContent='center' gap='2'>
 				<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>
-					{album.Name ?? 'Untitled Album'}
+					{album.Name ?? t('placeholders.untitledAlbum')}
 				</H5>
 
 				{album.AlbumArtists && album.AlbumArtists.length > 0 && (
-					<Paragraph
-						fontWeight={'$6'}
-						color={'$primary'}
+					<SizableText
+						fontWeight='6'
+						color='primary'
+						textAlign='center'
+						fontSize='3'
+						{...ICON_PRESS_STYLES}
 						onPress={() =>
 							navigation.navigate('Artist', {
 								artist: album.AlbumArtists![0],
 							})
 						}
-						textAlign='center'
-						fontSize={'$6'}
-						paddingBottom={'$2'}
-						{...ICON_PRESS_STYLES}
 					>
 						{formatArtistName(album.AlbumArtists[0].Name)}
-					</Paragraph>
+					</SizableText>
 				)}
 
-				<XStack justify='center' gap={'$3'} marginBottom={'$2'}>
+				<XStack justify='center' gap='3' marginBottom='2'>
 					<YStack flex={1} justifyContent='center'>
 						{album.ProductionYear ? (
-							<Paragraph fontVariant={['tabular-nums']} textAlign='right'>
-								{album.ProductionYear?.toString() ?? 'Unknown Year'}
-							</Paragraph>
+							<SizableText
+								fontSize='2'
+								fontVariant={['tabular-nums']}
+								textAlign='right'
+							>
+								{album.ProductionYear?.toString() ?? t('placeholders.unknownYear')}
+							</SizableText>
 						) : null}
 					</YStack>
 
-					<Separator vertical borderColor={'$borderColor'} />
+					<Separator vertical borderColor='borderColor' />
 
 					<RunTimeTicks props={{ flex: 1, textAlign: 'left' }}>
 						{album.RunTimeTicks}
@@ -95,38 +102,30 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 				</XStack>
 
 				{discs && (
-					<XStack
-						alignContent='center'
-						gap={'$2'}
-						marginHorizontal={'$2'}
-						paddingHorizontal={'$2'}
-					>
+					<XStack alignContent='center' gap='2' marginHorizontal='2'>
 						<Button
 							flex={1}
-							icon={() => <Icon small name='play' color='$background' />}
-							borderRadius={'$4'}
-							backgroundColor={'$primary'}
-							paddingRight={'$5'}
+							icon={<Icon size='7' name='play' color='background' />}
+							borderRadius={'2'}
+							backgroundColor={'primary'}
 							onPress={() => playAlbum(false)}
-							{...BUTTON_PRESS_STYLES}
 						>
-							<Paragraph fontWeight={'$6'} color={'$background'}>
-								Play
-							</Paragraph>
+							<SizableText fontSize='2' fontWeight='6' color='background'>
+								{t('common.play')}
+							</SizableText>
 						</Button>
 
 						<Button
-							icon={() => <Icon small name='shuffle' color='$primary' />}
-							borderWidth={'$1'}
-							borderRadius={'$4'}
-							borderColor={'$primary'}
+							icon={<Icon size='7' name='shuffle' color='primary' />}
+							borderWidth={'1'}
+							borderRadius={'2'}
+							borderColor={'primary'}
 							flex={1}
 							onPress={() => playAlbum(true)}
-							{...BUTTON_PRESS_STYLES}
 						>
-							<Paragraph fontWeight={'$6'} color={'$primary'}>
-								Shuffle
-							</Paragraph>
+							<SizableText fontSize='2' fontWeight='6' color='primary'>
+								{t('common.shuffle')}
+							</SizableText>
 						</Button>
 
 						<InstantMixButton item={album} navigation={navigation} />

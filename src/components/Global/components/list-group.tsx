@@ -1,14 +1,15 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListItem, Separator, Spacer, XStack, YGroup, YStack } from 'tamagui'
+import type { EventHandler } from '../../../types/Events'
+import { ListItem, SizableText, Spacer, XStack, YGroup, YStack } from 'tamagui'
 import ItemImage from './image'
 import Icon from './icon'
-import { H5, Text } from '../helpers/text'
+import { useTranslation } from 'react-i18next'
 
 interface ListGroupProps {
 	items: BaseItemDto[] | undefined
 	limit?: number
 	circularImages?: boolean | undefined
-	seeMore?: () => void | undefined
+	seeMore?: EventHandler
 }
 
 export default function ListGroup({
@@ -17,13 +18,10 @@ export default function ListGroup({
 	circularImages,
 	seeMore,
 }: ListGroupProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	return (
-		<YGroup
-			marginHorizontal={'$2'}
-			borderRadius={'$5'}
-			borderWidth={'$1'}
-			borderColor={'$borderColor'}
-		>
+		<YGroup marginHorizontal='2' borderRadius='5' borderWidth='1' borderColor='borderColor'>
 			{items?.slice(0, limit).map((item) => {
 				return (
 					<YGroup.Item key={item.Id}>
@@ -37,14 +35,18 @@ export default function ListGroup({
 								<Spacer />
 								<YStack justifyContent='center' flex={1}>
 									<XStack>
-										<Text bold fontSize={'$7'}>
-											{item.Name ?? 'Untitled'}
-										</Text>
-										<Text>{item.RecursiveItemCount?.toString() ?? ''}</Text>
+										<SizableText fontWeight='6' size={'7'}>
+											{item.Name ?? t('placeholders.untitled')}
+										</SizableText>
+										<SizableText>
+											{item.RecursiveItemCount?.toString() ?? ''}
+										</SizableText>
 									</XStack>
 
 									{item.Genres && (
-										<Text>{item.Genres.slice(0, 1).join(', ') ?? ''}</Text>
+										<SizableText>
+											{item.Genres.slice(0, 1).join(', ') ?? ''}
+										</SizableText>
 									)}
 								</YStack>
 								<Spacer />
@@ -61,13 +63,13 @@ export default function ListGroup({
 			{seeMore && (
 				<YGroup.Item>
 					<ListItem onPress={seeMore}>
-						<XStack alignItems='center' height={'$6'} marginHorizontal={'$2.5'}>
-							<Icon name='arrow-right-bottom' large />
+						<XStack alignItems='center' height='6' marginHorizontal='2-5'>
+							<Icon name='arrow-right-bottom' size='10' />
 
 							<Spacer />
-							<Text bold fontSize={'$7'} margin={'$1'} marginTop={'$2.5'}>
-								See More
-							</Text>
+							<SizableText fontWeight='6' size={'7'} margin={'1'} marginTop={'2-5'}>
+								{t('common.seeMore')}
+							</SizableText>
 						</XStack>
 					</ListItem>
 				</YGroup.Item>

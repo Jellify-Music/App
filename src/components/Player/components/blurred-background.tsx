@@ -1,5 +1,6 @@
 import React from 'react'
-import { useTheme, View, YStack, ZStack } from 'tamagui'
+import { useTheme, View, ZStack } from 'tamagui'
+import { StyleSheet } from 'react-native'
 import { useWindowDimensions } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { Blurhash } from 'react-native-blurhash'
@@ -7,6 +8,7 @@ import useIsLightMode from '../../../hooks/use-is-light-mode'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { useCurrentTrack } from '../../../stores/player/queue'
+import { usePlayerContext } from '../../../providers/Player'
 
 export default function BlurredBackground(): React.JSX.Element {
 	const currentTrack = useCurrentTrack()
@@ -15,19 +17,11 @@ export default function BlurredBackground(): React.JSX.Element {
 	const { width, height } = useWindowDimensions()
 
 	const theme = useTheme()
-	const isLightMode = useIsLightMode()
 
 	// Get blurhash safely
 	const blurhash = item && getBlurhashFromDto(item)
 
-	// Use theme colors so the gradient follows the active color preset
-	const darkGradientColors = [theme.black.val, theme.black75.val, theme.black25.val]
-	const darkGradientColors2 = [
-		theme.black25.val,
-		theme.black75.val,
-		theme.black.val,
-		theme.black.val,
-	]
+	const isLightMode = useIsLightMode()
 
 	// Define styles
 	const blurhashStyle = {
@@ -35,36 +29,11 @@ export default function BlurredBackground(): React.JSX.Element {
 		height: height,
 	}
 
-	const gradientStyle = {
-		width,
-		height,
-		flex: 1,
-	}
-
-	const gradientStyle2 = {
-		width,
-		height,
-		flex: 3,
-	}
-
-	const backgroundStyle = {
-		flex: 1,
-		position: 'absolute' as const,
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: theme.background.val,
-		width: width,
-		height: height,
-		opacity: 0.5,
-	}
-
 	return (
-		<ZStack width={width} height={height}>
-			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
+		<ZStack position='absolute' inset={0}>
+			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} decodeAsync />}
 
-			{isLightMode ? (
+			{isLightMode && (
 				<View
 					inset={0}
 					position='absolute'
@@ -72,14 +41,40 @@ export default function BlurredBackground(): React.JSX.Element {
 					width={width}
 					height={height}
 					opacity={0.5}
-					style={backgroundStyle}
 				/>
-			) : (
-				<YStack fullscreen>
-					<LinearGradient colors={darkGradientColors} style={gradientStyle} />
-					<LinearGradient colors={darkGradientColors2} style={gradientStyle2} />
-				</YStack>
 			)}
 		</ZStack>
 	)
 }
+
+export function BlurOverlay(): React.JSX.Element | null {
+	const theme = useTheme()
+
+	const isLightMode = useIsLightMode()
+
+	const { displayLyrics } = usePlayerContext()
+
+	// Use theme colors so the gradient follows the active color preset
+	const darkGradientColors2 = [
+		theme.black.val,
+		theme.black75.val,
+		!displayLyrics ? theme.black50.val : theme.black75.val,
+		!displayLyrics ? 'transparent' : theme.black75.val,
+		!displayLyrics ? theme.black50.val : theme.black75.val,
+		theme.black75.val,
+		theme.black.val,
+		theme.black.val,
+		theme.black.val,
+		theme.black.val,
+	]
+	return !isLightMode ? (
+		<LinearGradient colors={darkGradientColors2} style={styles.gradient} />
+	) : null
+}
+
+const styles = StyleSheet.create({
+	gradient: {
+		flex: 1,
+		...StyleSheet.absoluteFill,
+	},
+})

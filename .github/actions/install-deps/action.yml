@@ -1,0 +1,42 @@
+name: Install dependencies
+description: 'Set up bun (and Node on self-hosted Linux), restore node_modules and run bun i'
+runs:
+  using: "composite"
+  steps:
+    # Installs the version in package.json's packageManager. The self-hosted
+    # Macs have bun provisioned by Ansible (Nomadable's
+    # github_runner_bun_version), which must match it; the self-hosted Linux
+    # runners are a bare container image and need it installed.
+    - name: 🖥 Setup Bun
+      if: runner.environment != 'self-hosted' || runner.os != 'macOS'
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version-file: package.json
+
+    # Jest, the React Native CLI and React Native's Gradle plugin run on
+    # Node. GitHub-hosted runners have it and the self-hosted Macs have
+    # Homebrew's node@24; the self-hosted Linux runners get the same major.
+    - name: 🟢 Setup Node
+      if: runner.environment == 'self-hosted' && runner.os == 'Linux'
+      uses: actions/setup-node@v7
+      with:
+        node-version: '24'
+
+    # patches/** is in the key so a changed patch is never served a
+    # node_modules built without it.
+    - name: 📦 Cache node_modules
+      uses: actions/cache@v6
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-${{ runner.arch }}-node_modules-${{ hashFiles('bun.lock', 'patches/**') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-node_modules-
+
+    # On Linux bun hardlinks node_modules to its install cache, so
+    # patch-package's in-place edits would patch the cache too. That cache
+    # outlives the job on the self-hosted Linux runners, and the next job's
+    # install would then fail to apply the already-applied patches. Only the
+    # flag selects the backend; bunfig.toml and env vars don't.
+    - name: 📥 Install dependencies
+      shell: bash
+      run: bun i ${{ runner.environment == 'self-hosted' && runner.os == 'Linux' && '--backend=copyfile' || '' }}

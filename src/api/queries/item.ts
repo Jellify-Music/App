@@ -5,29 +5,41 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { groupBy, isEmpty, isEqual, isUndefined } from 'lodash'
 import { SectionList } from 'react-native'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
-import QueryConfig from '../../configs/query.config'
+import { ApiLimits } from '../../configs/querying/index.config'
 import { JellifyUser } from '../../types/JellifyUser'
+import { getApi } from '../../stores/auth/utils'
 
 /**
  * Fetches a single Jellyfin item by it's ID
  * @param itemId The ID of the item to fetch
+ * @param signal Optional AbortSignal to cancel the request
  * @returns The item - a {@link BaseItemDto}
  */
-export async function fetchItem(api: Api | undefined, itemId: string): Promise<BaseItemDto> {
+export async function fetchItem(
+	itemId: BaseItemDto['Id'],
+	signal?: AbortSignal,
+	api: Api | undefined = getApi(),
+): Promise<BaseItemDto> {
 	return new Promise((resolve, reject) => {
-		if (isEmpty(itemId)) return reject('No item ID proviced')
+		if (!itemId || isEmpty(itemId)) return reject('No item ID provided or it is empty')
 		if (isUndefined(api)) return reject('Client not initialized')
 
-		getItemsApi(api)
-			.getItems({
-				ids: [itemId],
-				fields: [ItemFields.Tags, ItemFields.Genres],
-			})
+		getLibraryApi(api)
+			.getItems(
+				{
+					ids: [itemId],
+					fields: [ItemFields.Tags, ItemFields.Genres],
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 			.then((response) => {
 				if (response.data.Items && response.data.TotalRecordCount === 1)
 					resolve(response.data.Items[0])
@@ -49,6 +61,7 @@ export async function fetchItem(api: Api | undefined, itemId: string): Promise<B
  * @param columns The number of columns to fetch
  * @param sortBy The field to sort by
  * @param sortOrder The order to sort by
+ * @param signal Optional AbortSignal to cancel the request
  * @returns A list of {@link BaseItemDto}s
  */
 export async function fetchItems(
@@ -62,26 +75,32 @@ export async function fetchItems(
 	isFavorite?: boolean | undefined,
 	parentId?: string | undefined,
 	ids?: string[] | undefined,
+	signal?: AbortSignal,
 ): Promise<{ title: string | number; data: BaseItemDto[] }> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client not initialized')
 		if (isUndefined(user)) return reject('User not initialized')
-		if (isUndefined(library)) return reject('Library not initialized')
 
-		getItemsApi(api)
-			.getItems({
-				parentId: parentId ?? library.musicLibraryId,
-				userId: user.id,
-				includeItemTypes: types,
-				sortBy: sortBy,
-				recursive: true,
-				sortOrder: sortOrder,
-				fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
-				startIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
-				limit: QueryConfig.limits.library,
-				isFavorite: isFavorite,
-				ids: ids,
-			})
+		getLibraryApi(api)
+			.getItems(
+				{
+					parentId: parentId ?? library?.musicLibraryId,
+					userId: user.id,
+					includeItemTypes: types,
+					sortBy: sortBy,
+					recursive: true,
+					sortOrder: sortOrder,
+					fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
+					startIndex: typeof page === 'number' ? page * ApiLimits.Items : 0,
+					limit: ApiLimits.Items,
+					isFavorite: isFavorite,
+					ids: ids,
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				resolve({ title: page, data: data.Items ?? [] })
 			})
@@ -94,12 +113,14 @@ export async function fetchItems(
 /**
  * Fetches tracks for an album, sectioned into discs for display in a {@link SectionList}
  * @param album The album to fetch tracks for
+ * @param signal Optional AbortSignal to cancel the request
  * @returns An array of {@link Section}s, where each section title is the disc number,
  * and the data is the disc tracks - an array of {@link BaseItemDto}s
  */
 export async function fetchAlbumDiscs(
 	api: Api | undefined,
 	album: BaseItemDto,
+	signal?: AbortSignal,
 ): Promise<{ title: string; data: BaseItemDto[] }[]> {
 	return new Promise<{ title: string; data: BaseItemDto[] }[]>((resolve, reject) => {
 		if (isEmpty(album.Id)) return reject('No album ID provided')
@@ -109,12 +130,18 @@ export async function fetchAlbumDiscs(
 
 		sortBy = [ItemSortBy.ParentIndexNumber, ItemSortBy.IndexNumber, ItemSortBy.SortName]
 
-		getItemsApi(api)
-			.getItems({
-				parentId: album.Id!,
-				sortBy: sortBy,
-				fields: [ItemFields.SortName],
-			})
+		getLibraryApi(api)
+			.getItems(
+				{
+					parentId: album.Id!,
+					sortBy: sortBy,
+					fields: [ItemFields.SortName],
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				const discs = data.Items
 					? Object.keys(groupBy(data.Items, (track) => track.ParentIndexNumber)).map(

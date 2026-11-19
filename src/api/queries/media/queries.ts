@@ -4,13 +4,18 @@ import { getApi } from '../../../stores/auth/utils'
 import {
 	useDownloadingDeviceProfileStore,
 	useStreamingDeviceProfileStore,
-} from '../../../stores/device-profile'
+} from '../../../stores/profile'
 import { SourceType } from '../../../types/JellifyTrack'
-import { ONE_DAY, queryClient } from '../../../constants/query-client'
+import { queryClient } from '../../client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
-import { EnsureQueryDataOptions } from '@tanstack/react-query'
+import { QueryExecuteOptions } from '@tanstack/react-query'
+import { QueryAges } from '../../../constants/durations'
 
-export const MediaInfoQuery = (itemId: string | null | undefined, source: SourceType) => {
+export const MediaInfoQuery = (
+	itemId: string | null | undefined,
+	source: SourceType,
+	signal?: AbortSignal,
+) => {
 	const api = getApi()
 
 	const streamingProfile = useStreamingDeviceProfileStore.getState().deviceProfile
@@ -23,15 +28,22 @@ export const MediaInfoQuery = (itemId: string | null | undefined, source: Source
 			deviceProfile: profile,
 			itemId,
 		}),
-		queryFn: () => fetchMediaInfo(profile, itemId),
+		queryFn: () => fetchMediaInfo(profile, itemId, signal),
 		enabled: Boolean(api && profile && itemId),
-		staleTime: ONE_DAY,
-	} as EnsureQueryDataOptions<PlaybackInfoResponse>
+		/**
+		 * Playback info carries a `PlaySessionId` (and for transcodes, a `TranscodingUrl`)
+		 * that the server tears down once playback of that session stops, so it must not
+		 * be reused for long or the player is handed a dead stream URL.
+		 */
+		staleTime: QueryAges.OneMinute * 5,
+		gcTime: QueryAges.OneMinute * 5,
+	} as QueryExecuteOptions<PlaybackInfoResponse>
 }
 
-export default async function ensureMediaInfoQuery(
+export default async function queryForMediaInfo(
 	itemId: string | null | undefined,
 	source: SourceType,
+	signal?: AbortSignal,
 ) {
-	return await queryClient.ensureQueryData<PlaybackInfoResponse>(MediaInfoQuery(itemId, source))
+	return await queryClient.query<PlaybackInfoResponse>(MediaInfoQuery(itemId, source, signal))
 }

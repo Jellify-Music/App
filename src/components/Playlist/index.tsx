@@ -3,14 +3,8 @@ import Icon from '../Global/components/icon'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import navigationRef from '../../screens/navigation'
-import { useLayoutEffect, useState } from 'react'
-import Animated, {
-	Easing,
-	FadeIn,
-	FadeOut,
-	LinearTransition,
-	useSharedValue,
-} from 'react-native-reanimated'
+import { useLayoutEffect } from 'react'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { ListRenderItemInfo, RefreshControl } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
@@ -21,6 +15,8 @@ import PlaylistTrack from './components/track'
 import { LegendList } from '@legendapp/list/react-native'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import PlaylistTracklistHeader from './components/header'
+import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
+import { ItemKeyExtractor } from '../../utils/parsing/key-extractor'
 
 export default function Playlist(): React.JSX.Element {
 	const {
@@ -31,45 +27,15 @@ export default function Playlist(): React.JSX.Element {
 		setEditing,
 		canEdit,
 		newName,
-		setNewName,
 		updatePlaylist,
 		refetch,
 		isUpdatingPlaylist,
 		onCancelEditing,
 		onReorder,
-		hasNextPage,
-		fetchNextPage,
 		isPending,
-		isFetchingNextPage,
 	} = usePlaylistContext()
 
 	const navigation = useNavigation()
-
-	// State to track when we're loading all pages before entering edit mode
-	const [isPreparingEditMode, setIsPreparingEditMode] = useState<boolean>(false)
-
-	const scrollPosition = useSharedValue({ x: 0, y: 0 })
-
-	/**
-	 * Fetches all remaining pages before entering edit mode.
-	 * This prevents data loss when saving a playlist that has unloaded tracks.
-	 */
-	const handleEnterEditMode = async () => {
-		if (hasNextPage) {
-			setIsPreparingEditMode(true)
-			try {
-				// Fetch all remaining pages
-				let hasMore: boolean = hasNextPage
-				while (hasMore) {
-					const result = await fetchNextPage()
-					hasMore = result.hasNextPage ?? false
-				}
-			} finally {
-				setIsPreparingEditMode(false)
-			}
-		}
-		setEditing(true)
-	}
 
 	const downloadTracks = useDownloadTracks()
 
@@ -87,9 +53,9 @@ export default function Playlist(): React.JSX.Element {
 			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 		>
-			<XStack gap={'$2'}>
+			<XStack gap='2'>
 				<Icon
-					color={'$warning'}
+					color={'warning'}
 					name='delete-sweep-outline' // otherwise use "delete-circle"
 					onPress={() => {
 						navigationRef.dispatch(
@@ -101,13 +67,13 @@ export default function Playlist(): React.JSX.Element {
 					}}
 				/>
 
-				<Icon color='$neutral' name='close-circle-outline' onPress={onCancelEditing} />
+				<Icon color='neutral' name='close-circle-outline' onPress={onCancelEditing} />
 			</XStack>
 		</Animated.View>
 	)
 
 	const downloadActions = (
-		<XStack gap={'$2'}>
+		<XStack gap='2'>
 			{playlistTracks &&
 				(isDownloaded ? (
 					<Animated.View
@@ -116,14 +82,14 @@ export default function Playlist(): React.JSX.Element {
 						layout={LinearTransition.springify()}
 					>
 						<Icon
-							color='$warning'
+							color='warning'
 							name='broom'
 							onPress={handleDeleteDownload}
 							{...ICON_PRESS_STYLES}
 						/>
 					</Animated.View>
 				) : downloadTracks.isPending ? (
-					<Spinner justifyContent='center' color={'$success'} />
+					<Spinner justifyContent='center' color='success' />
 				) : (
 					<Animated.View
 						entering={FadeIn.easing(Easing.in(Easing.ease))}
@@ -131,7 +97,7 @@ export default function Playlist(): React.JSX.Element {
 						layout={LinearTransition.springify()}
 					>
 						<Icon
-							color='$success'
+							color='success'
 							name='download-circle-outline'
 							onPress={handleDownload}
 							{...ICON_PRESS_STYLES}
@@ -144,14 +110,14 @@ export default function Playlist(): React.JSX.Element {
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
-				<XStack gap={'$2'}>
+				<XStack gap='2'>
 					{playlistTracks && !editing && downloadActions}
 					{canEdit && (
-						<XStack gap={'$2'}>
+						<XStack gap='2'>
 							{editing ? (
 								editModeActions
-							) : isUpdatingPlaylist || isPreparingEditMode ? (
-								<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
+							) : isUpdatingPlaylist ? (
+								<Spinner color='primary' />
 							) : null}
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
@@ -160,10 +126,10 @@ export default function Playlist(): React.JSX.Element {
 							>
 								<Icon
 									name={editing ? 'floppy' : 'pencil'}
-									color={editing ? '$success' : '$color'}
+									color={editing ? 'success' : 'color'}
 									onPress={() =>
 										!editing
-											? handleEnterEditMode()
+											? setEditing(true)
 											: updatePlaylist({
 													playlist,
 													tracks: playlistTracks ?? [],
@@ -184,22 +150,16 @@ export default function Playlist(): React.JSX.Element {
 		playlist,
 		onCancelEditing,
 		updatePlaylist,
-		isPreparingEditMode,
-		handleEnterEditMode,
 		playlistTracks,
 		newName,
 		setEditing,
 	])
 
-	const keyExtractor = (item: BaseItemDto) => item.Id!
-
-	const handleEndReached = () => {
-		if (hasNextPage && !isFetchingNextPage) {
-			fetchNextPage()
-		}
-	}
-
 	const renderItem = (info: ListRenderItemInfo<BaseItemDto>) => <PlaylistTrack {...info} />
+
+	const onRefresh = async () => {
+		await refetch()
+	}
 
 	return (
 		<DraxProvider>
@@ -207,19 +167,15 @@ export default function Playlist(): React.JSX.Element {
 				component={LegendList}
 				animationConfig={'spring'}
 				contentInsetAdjustmentBehavior='automatic'
-				containerStyle={{
-					flex: 1,
-				}}
 				ListHeaderComponent={<PlaylistTracklistHeader />}
 				data={playlistTracks}
 				lockToMainAxis
 				itemDraxViewProps={itemDraxViewProps}
-				keyExtractor={keyExtractor}
+				keyExtractor={ItemKeyExtractor}
 				renderItem={renderItem}
 				onReorder={onReorder}
-				onEndReached={handleEndReached}
-				estimatedItemSize={50}
-				refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
+				estimatedItemSize={ITEM_ROW_HEIGHT}
+				refreshControl={<RefreshControl refreshing={isPending} onRefresh={onRefresh} />}
 			/>
 		</DraxProvider>
 	)

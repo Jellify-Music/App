@@ -1,53 +1,68 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { useNavigation } from '@react-navigation/native'
-import { Text } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import { ActivityIndicator } from 'react-native'
-import { YStack } from 'tamagui'
+import { SizableText, YStack } from 'tamagui'
 import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Freeze } from 'react-freeze'
-import { LegendList } from '@legendapp/list/react-native'
-import List from '../Global/helpers/list'
+import List from '../Global/components/Lists/utils'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { useTranslation } from 'react-i18next'
 
 export default function SimilarArtists(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 	const { artist, similarArtists, fetchingSimilarArtists, fetchingAlbums, albums } =
 		useArtistContext()
 
+	const renderItem = ({ item: artist }: LegendListRenderItemProps<BaseItemDto>) => (
+		<ItemRow
+			item={artist}
+			onPress={() => {
+				navigation.push('Artist', {
+					artist,
+				})
+			}}
+		/>
+	)
+
 	return (
 		<Freeze freeze={fetchingAlbums && !albums}>
 			<YStack flex={1}>
-				<Text
-					margin={'$2'}
-					fontSize={'$6'}
-					bold
-				>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</Text>
+				<SizableText margin={'2'} size={'3'} fontWeight='6'>
+					{t('artist.similarTo', {
+						name: artist.Name ?? t('placeholders.unknownArtist'),
+					})}
+				</SizableText>
 
 				<List
-					data={similarArtists}
-					renderItem={({ item: artist }) => (
-						<ItemRow
-							item={artist}
-							onPress={() => {
-								navigation.push('Artist', {
-									artist,
-								})
-							}}
-						/>
-					)}
+					data={similarArtists?.slice(0, 5)}
+					renderItem={renderItem}
 					ListEmptyComponent={
-						fetchingSimilarArtists ? (
-							<ActivityIndicator />
-						) : (
-							<Text justify={'center'} textAlign='center'>
-								No similar artists
-							</Text>
-						)
+						<ListEmptyComponent fetchingSimilarArtists={fetchingSimilarArtists} />
 					}
 				/>
 			</YStack>
 		</Freeze>
+	)
+}
+
+interface ListEmptyComponentProps {
+	fetchingSimilarArtists: boolean
+}
+
+function ListEmptyComponent({ fetchingSimilarArtists }: ListEmptyComponentProps) {
+	const { t } = useTranslation()
+
+	return fetchingSimilarArtists ? (
+		<ActivityIndicator />
+	) : (
+		<SizableText fontSize='3' color={'neutral'} justify={'center'} textAlign='center'>
+			{t('artist.noSimilarArtists')}
+		</SizableText>
 	)
 }

@@ -1,16 +1,22 @@
 import Track from '../Global/components/Track'
-import { useTheme } from 'tamagui'
+import { SizableText, useTheme } from 'tamagui'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import useInstantMix from '../../api/queries/instant-mix'
-import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
-import { InstantMixProps } from '../../screens/base-types'
-import List from '../Global/helpers/list'
+import List from '../Global/components/Lists/utils'
+import MixTrackListHeader from './header'
+import { useTranslation } from 'react-i18next'
 
-export default function InstantMix({ route }: InstantMixProps): React.JSX.Element {
-	const { data: mix, isFetching, refetch } = useInstantMix(route.params.item)
+export default function InstantMix(): React.JSX.Element {
+	const { t } = useTranslation()
+
+	const { data: mix, isFetching, refetch } = useInstantMix()
 
 	const theme = useTheme()
+
+	const onRefresh = () => {
+		refetch()
+	}
 
 	return (
 		<List
@@ -26,13 +32,16 @@ export default function InstantMix({ route }: InstantMixProps): React.JSX.Elemen
 					tracklist={mix}
 				/>
 			)}
+			ListHeaderComponent={<MixTrackListHeader />}
 			ListEmptyComponent={
-				!isFetching ? <Text color={'$neutral'}>No mix tracks</Text> : undefined // Refresh Control will handle the spinner, which is actually called a "throbber" ;)
+				!isFetching ? (
+					<SizableText color={'neutral'}>{t('instantMix.noTracks')}</SizableText>
+				) : undefined // Refresh Control will handle the spinner, which is actually called a "throbber" ;)
 			}
 			refreshControl={
 				<RefreshControl
 					refreshing={isFetching}
-					onRefresh={refetch}
+					onRefresh={onRefresh}
 					tintColor={theme.success.val}
 				/>
 			}

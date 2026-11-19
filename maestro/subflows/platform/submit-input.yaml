@@ -1,0 +1,17 @@
+appId: com.cosmonautical.jellify
+---
+# Submits a focused input whose onSubmitEditing does the same as button_id.
+# Android hides the keyboard and taps the button; iOS can't hide React
+# Native's keyboard, which covers the button, so it presses Return instead.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+      - tapOn:
+          id: ${button_id}
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - pressKey: Enter

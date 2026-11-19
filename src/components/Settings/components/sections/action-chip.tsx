@@ -1,6 +1,7 @@
 import React from 'react'
+import type { EventHandler } from '../../../../types/Events'
 import { SizableText } from 'tamagui'
-import Button from '../../../Global/helpers/button'
+import Button from '../../../Global/utils/button'
 import Icon from '../../../Global/components/icon'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
@@ -8,7 +9,7 @@ interface ActionChipProps {
 	active: boolean
 	label: string
 	icon: MaterialDesignIconsIconName
-	onPress: () => void
+	onPress: EventHandler
 	testID?: string
 }
 
@@ -22,17 +23,16 @@ export default function ActionChip({
 	return (
 		<Button
 			testID={testID}
-			pressStyle={{ backgroundColor: '$neutral' }}
+			backgroundColor={{ default: active ? 'success' : 'transparent', press: 'neutral' }}
 			onPress={onPress}
-			backgroundColor={active ? '$success' : 'transparent'}
-			borderColor={active ? '$success' : '$borderColor'}
+			borderColor={active ? 'success' : 'borderColor'}
 			borderWidth={1}
-			paddingHorizontal='$2.5'
-			size='$2'
-			borderRadius='$10'
-			icon={<Icon name={icon} color={active ? '$background' : '$color'} small />}
+			padding='2'
+			size='xs'
+			borderRadius={Infinity}
+			icon={<Icon name={icon} color={active ? 'background' : 'color'} size='7' />}
 		>
-			<SizableText color={active ? '$background' : '$color'} size='$2'>
+			<SizableText fontWeight={'6'} color={`${active ? 'background' : 'color'}`} size='2'>
 				{label}
 			</SizableText>
 		</Button>

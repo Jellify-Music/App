@@ -1,7 +1,7 @@
 version: 2
 updates:
   # JavaScript/TypeScript dependencies (npm/bun)
-  - package-ecosystem: "npm"
+  - package-ecosystem: "bun"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -50,14 +50,6 @@ updates:
   # Ruby dependencies for Android (Fastlane)
   - package-ecosystem: "bundler"
     directory: "/android"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 15
-
-  # Root Gemfile (if used)
-  - package-ecosystem: "bundler"
-    directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"

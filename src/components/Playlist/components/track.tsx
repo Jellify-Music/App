@@ -1,10 +1,10 @@
 import { usePlaylistContext } from '../../../providers/Playlist'
-import { loadNewQueue } from '../../../hooks/player/functions/queue'
+import { loadNewQueue } from '../../../player/queuing'
 import { BaseStackParamList, RootStackParamList } from '@/src/screens/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ListRenderItemInfo, StyleSheet, View } from 'react-native'
+import { ListRenderItemInfo, StyleSheet } from 'react-native'
 import { DraxHandle } from 'react-native-drax'
 import Icon from '../../Global/components/icon'
 import Track from '../../Global/components/Track'
@@ -36,9 +36,9 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 	const onRemove = () => onRemoveTrack(track)
 
 	return editing ? (
-		<XStack alignItems='center'>
+		<XStack alignItems='center' backgroundColor='background' marginHorizontal='2'>
 			<DraxHandle style={styles.handle}>
-				<Icon name='drag' flexShrink={1} />
+				<Icon hitSlop={20} marginRight={'2'} size='7' name='drag-horizontal-variant' />
 			</DraxHandle>
 
 			<Track
@@ -54,7 +54,13 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 				editing={editing}
 			/>
 
-			<Icon name='close' color={'$warning'} flexShrink={1} onPress={onRemove} />
+			<Icon
+				size='7'
+				name='minus-circle-outline'
+				color={'warning'}
+				onPress={onRemove}
+				marginLeft={'2'}
+			/>
 		</XStack>
 	) : (
 		<Track

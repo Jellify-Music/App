@@ -1,24 +1,27 @@
-import { useRef } from 'react'
-import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
+import { useCurrentIndex, usePlayQueue } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo } from 'react-native'
-import { reorderQueue } from '../../hooks/player/functions/queue'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ListRenderItemInfo, Platform } from 'react-native'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
-import { LegendList, LegendListRef } from '@legendapp/list/react-native'
 import { itemDraxViewProps } from '../../configs/styling/drax'
+import { LegendList } from '@legendapp/list/react-native'
+import { FadeOut } from 'react-native-reanimated'
+import { View } from 'tamagui'
+import QueueListHeader from './components/header'
+import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
+import { usePlayerContext } from '../../providers/Player'
+import { Freeze } from 'react-freeze'
+import reorderQueue from '../../player/queuing/reorder'
 
 export default function Queue(): React.JSX.Element {
+	const { height } = useSafeAreaFrame()
+
+	const { bottom } = useSafeAreaInsets()
+
 	const queue = usePlayQueue()
 
 	const currentIndex = useCurrentIndex()
-
-	const queueRef = useQueueRef()
-
-	const listRef = useRef<LegendListRef>(null)
-
-	const { bottom } = useSafeAreaInsets()
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
@@ -29,37 +32,48 @@ export default function Queue(): React.JSX.Element {
 		})
 	}
 
-	const renderItem = (props: ListRenderItemInfo<TrackItem>) => (
-		<QueuedTrack {...props} queueRef={queueRef} />
-	)
+	const renderItem = (props: ListRenderItemInfo<TrackItem>) => <QueuedTrack {...props} />
 
-	const scrollToCurrentTrack = () => {
-		if (currentIndex === undefined || currentIndex === null) return
+	/**
+	 * For reasons unknown to humanity (at this time), this {@link DraxList} works better if the
+	 * default drawDistance from {@link LegendList} is used on Android, but better if the list is
+	 * more eagerly drawn on iOS.
+	 *
+	 * @see https://legendapp.com/open-source/list/v3/api/#drawdistance
+	 */
+	const drawDistance = Platform.OS === 'android' ? undefined : height
 
-		listRef.current?.scrollToIndex({
-			animated: true,
-			index: currentIndex,
-		})
-	}
+	const { freezeQueue } = usePlayerContext()
 
 	return (
-		<DraxProvider>
-			<DraxList<TrackItem>
-				component={LegendList}
-				animationConfig={'spring'}
-				contentInsetAdjustmentBehavior='automatic'
-				containerStyle={{
-					flex: 1,
-				}}
-				data={queue}
-				keyExtractor={keyExtractor}
-				ref={listRef}
-				renderItem={renderItem}
-				onReorder={onReorder}
-				onLayout={scrollToCurrentTrack}
-				lockToMainAxis
-				itemDraxViewProps={itemDraxViewProps}
-			/>
-		</DraxProvider>
+		<View flex={1} backgroundColor='background'>
+			<QueueListHeader />
+
+			<Freeze freeze={freezeQueue}>
+				<DraxProvider>
+					<DraxList<TrackItem>
+						animationConfig={'spring'}
+						contentInsetAdjustmentBehavior={'scrollableAxes'}
+						component={LegendList}
+						contentContainerStyle={{
+							paddingBottom: bottom,
+						}}
+						extraData={currentIndex}
+						data={queue}
+						keyExtractor={keyExtractor}
+						renderItem={renderItem}
+						onReorder={onReorder}
+						initialScrollIndex={currentIndex}
+						initialScrollOffset={ITEM_ROW_HEIGHT}
+						itemDraxViewProps={itemDraxViewProps}
+						lockToMainAxis
+						itemExiting={FadeOut.springify()}
+						estimatedItemSize={ITEM_ROW_HEIGHT}
+						drawDistance={drawDistance}
+						recycleItems
+					/>
+				</DraxProvider>
+			</Freeze>
+		</View>
 	)
 }

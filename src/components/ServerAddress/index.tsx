@@ -1,0 +1,60 @@
+import { SizableText, Spinner, YStack } from 'tamagui'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import LoginStackParamList from '../../screens/Login/types'
+import { useState } from 'react'
+import { isEmpty } from 'lodash'
+import useConnectToServer from '../../api/mutations/public-system-info'
+import Button from '../Global/utils/button'
+import AddressInput from '../ServerAddress/components/address-input'
+import Heading from '../ServerAddress/components/heading'
+import { useTranslation } from 'react-i18next'
+
+export default function ServerAddress(): React.JSX.Element {
+	const { t } = useTranslation()
+
+	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
+
+	const [serverAddress, setServerAddress] = useState<string | undefined>(undefined)
+
+	const { mutate: connectToServer, isPending } = useConnectToServer({
+		onSuccess: () => navigation.navigate('ServerAuthentication'),
+	})
+
+	const connectWithAddress = () => {
+		if (serverAddress !== undefined && serverAddress.length > 0)
+			connectToServer({ serverAddress })
+	}
+
+	return (
+		<YStack
+			flex={1}
+			gap='4'
+			justifyContent='center'
+			marginHorizontal='4'
+			testID='server_address_screen'
+		>
+			<Heading />
+
+			<AddressInput
+				setServerAddress={setServerAddress}
+				connectWithAddress={connectWithAddress}
+			/>
+
+			<Button
+				backgroundColor={`${isEmpty(serverAddress) || isPending ? 'neutral' : 'primary'}`}
+				onPress={connectWithAddress}
+				testID='connect_button'
+				flexShrink={1}
+			>
+				{isPending ? (
+					<Spinner color='background' />
+				) : (
+					<SizableText color='background' fontSize='2' fontWeight='6'>
+						{t('login.connect')}
+					</SizableText>
+				)}
+			</Button>
+		</YStack>
+	)
+}

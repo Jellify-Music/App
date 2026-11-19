@@ -1,11 +1,7 @@
 import React, { PropsWithChildren, createContext, use, useState } from 'react'
-import {
-	DownloadedTrack,
-	DownloadManager,
-	useDownloadProgress,
-	useDownloadStorage,
-} from 'react-native-nitro-player'
+import { DownloadedTrack, DownloadManager, useDownloadStorage } from 'react-native-nitro-player'
 import useDownloads from '../../hooks/downloads'
+import i18n from '../../i18n'
 
 export type StorageSummary = {
 	totalSpace: number
@@ -51,13 +47,10 @@ const sumDownloadBytes = (download: DownloadedTrack | undefined) => {
 export function StorageProvider({ children }: PropsWithChildren): React.JSX.Element {
 	const { data: downloads, refetch: refetchDownloads } = useDownloads()
 	const { storageInfo: storageInfo, refresh: refetchStorageInfo } = useDownloadStorage()
-	const activeDownloads = useDownloadProgress()
 
 	const [selection, setSelection] = useState<StorageSelectionState>({})
 	const [isDeleting, setIsDeleting] = useState(false)
 	const [isManuallyRefreshing, setIsManuallyRefreshing] = useState(false)
-
-	const activeDownloadsCount = Object.keys(activeDownloads ?? {}).length
 
 	const summary: StorageSummary | undefined = (() => {
 		if (!downloads || !storageInfo) return undefined
@@ -94,8 +87,8 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 		if (staleDownloads.length)
 			list.push({
 				id: 'stale-downloads',
-				title: 'Unused in 30+ days',
-				description: 'Remove tracks you have not touched recently.',
+				title: i18n.t('storage.suggestions.staleTitle'),
+				description: i18n.t('storage.suggestions.staleDescription'),
 				itemIds: staleDownloads.map((download) => download.trackId),
 				freedBytes: staleDownloads.reduce(
 					(acc, download) => acc + sumDownloadBytes(download),
@@ -107,8 +100,8 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 		if (largeDownloads.length)
 			list.push({
 				id: 'large-downloads',
-				title: 'Large files',
-				description: 'High bitrate albums occupying the most space.',
+				title: i18n.t('storage.suggestions.largeTitle'),
+				description: i18n.t('storage.suggestions.largeDescription'),
 				itemIds: largeDownloads.map((download) => download.trackId),
 				freedBytes: largeDownloads.reduce(
 					(acc, download) => acc + sumDownloadBytes(download),

@@ -3,10 +3,11 @@ import React from 'react'
 import Icon from './icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import Button from '../helpers/button'
+import Button from '../utils/button'
 import { CommonActions } from '@react-navigation/native'
 import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
-import { Paragraph, Text } from 'tamagui'
+import { SizableText } from 'tamagui'
+import { useTranslation } from 'react-i18next'
 
 export function InstantMixIconButton({
 	item,
@@ -18,7 +19,7 @@ export function InstantMixIconButton({
 	return (
 		<Icon
 			name='access-point'
-			color={'$success'}
+			color={'success'}
 			onPress={() =>
 				navigation.navigate('InstantMix', {
 					item,
@@ -35,10 +36,12 @@ export function InstantMixButton({
 	item: BaseItemDto
 	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	return (
 		<Button
-			borderRadius={'$4'}
-			icon={<Icon name='access-point' color='$success' small />}
+			borderRadius={'2'}
+			icon={<Icon name='access-point' color='success' size={'7'} />}
 			onPress={() =>
 				navigation.dispatch(
 					CommonActions.navigate('InstantMix', {
@@ -47,13 +50,13 @@ export function InstantMixButton({
 				)
 			}
 			flex={1}
-			borderColor={'$success'}
-			borderWidth={'$1'}
+			borderColor={'success'}
+			borderWidth={'1'}
 			{...BUTTON_PRESS_STYLES}
 		>
-			<Paragraph fontWeight={'$6'} color={'$success'}>
-				Mix
-			</Paragraph>
+			<SizableText fontSize={'2'} fontWeight='6' color='success'>
+				{t('common.mix')}
+			</SizableText>
 		</Button>
 	)
 }

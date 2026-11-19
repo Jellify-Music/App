@@ -10,8 +10,9 @@ subflows/
 │   └── flow.yaml    # Album detail screen (track list, playback)
 ├── artist/
 │   └── flow.yaml    # Artist detail screen (albums list, view tracks, back)
-└── playlist/
-    └── flow.yaml    # Playlist detail screen (track list, tap to play, back)
+├── playlist/
+│   └── flow.yaml    # Playlist detail screen (track list, tap to play, back)
+└── platform/        # iOS/Android variants of back, sheet dismissal, player close and keyboard steps
 ```
 
 ## How it works

@@ -1,16 +1,18 @@
-import { Label, Text } from '../../components/Global/helpers/text'
-import Input from '../../components/Global/helpers/input'
+import Input from '../../components/Global/utils/Input'
 import React, { useState } from 'react'
-import { Spinner, View, XStack } from 'tamagui'
-import Button from '../../components/Global/helpers/button'
+import { Label, Spinner, XStack, SizableText, YStack } from 'tamagui'
+import Button from '../../components/Global/utils/button'
 import Icon from '../../components/Global/components/icon'
 import { isEmpty } from 'lodash'
 import { useAddPlaylist } from '../../api/mutations/playlist'
 import LibraryStackParamList from './types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 
 export default function AddPlaylist(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const [name, setName] = useState<string>('')
@@ -18,45 +20,47 @@ export default function AddPlaylist(): React.JSX.Element {
 	const addPlaylist = useAddPlaylist()
 
 	return (
-		<View margin={'$2'} flex={1}>
-			<Label size='$2' htmlFor='name'>
-				Name
-			</Label>
-			<Input id='name' onChangeText={setName} />
-			<XStack justifyContent='space-evenly' gap={'$2'}>
+		<YStack margin='4' flex={1} gap='4'>
+			<YStack gap='2'>
+				<Label size='2' htmlFor='name' fontWeight='6' justifyContent='flex-end'>
+					{t('playlist.name')}
+				</Label>
+				<Input id='name' onChangeText={setName} />
+			</YStack>
+			<XStack justifyContent='space-evenly' gap='2'>
 				<Button
 					danger
-					borderWidth={'$1'}
-					borderColor={'$borderColor'}
+					borderWidth={'1'}
+					borderColor={'borderColor'}
 					onPress={libraryStackNavigation.goBack}
 					flex={1}
-					icon={() => <Icon name='chevron-left' small color={'$borderColor'} />}
+					icon={<Icon name='chevron-left' size='6' color={'borderColor'} />}
 				>
-					<Text bold color={'$borderColor'}>
-						Cancel
-					</Text>
+					<SizableText fontSize='2' fontWeight='6' color={'borderColor'}>
+						{t('common.cancel')}
+					</SizableText>
 				</Button>
 				<Button
 					onPress={() => addPlaylist.mutate({ name })}
 					flex={1}
-					borderWidth={'$1'}
-					borderColor={'$primary'}
+					borderWidth={'1'}
+					borderColor={'primary'}
 					icon={
 						!addPlaylist.isPending ? (
-							<Icon name='content-save' small color={'$primary'} />
+							<Icon name='content-save' size='6' color={'primary'} />
 						) : undefined
 					}
 					disabled={isEmpty(name) || addPlaylist.isPending}
 				>
 					{addPlaylist.isPending ? (
-						<Spinner color={'$primary'} />
+						<Spinner color='primary' />
 					) : (
-						<Text bold color={'$primary'}>
-							Save
-						</Text>
+						<SizableText fontSize='2' fontWeight='6' color={'primary'}>
+							{t('common.save')}
+						</SizableText>
 					)}
 				</Button>
 			</XStack>
-		</View>
+		</YStack>
 	)
 }

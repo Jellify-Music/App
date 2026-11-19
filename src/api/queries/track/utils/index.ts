@@ -9,11 +9,10 @@ import {
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { isUndefined } from 'lodash'
-import { ApiLimits } from '../../../../configs/query.config'
+import { ApiLimits } from '../../../../configs/querying/index.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { setQueryUserDataForItems } from '../../user-data'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 
 export default function fetchTracks(
 	api: Api | undefined,
@@ -28,10 +27,10 @@ export default function fetchTracks(
 	genreIds?: string[],
 	yearMin?: number,
 	yearMax?: number,
+	signal?: AbortSignal,
 ) {
 	return new Promise<BaseItemDto[]>((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
 
 		// SortName includes track numbers (e.g. "0001 - 0001 - Title"),
@@ -49,26 +48,30 @@ export default function fetchTracks(
 
 		const yearsParam = buildYearsParam(yearMin, yearMax)
 
-		getItemsApi(api)
-			.getItems({
-				includeItemTypes: [BaseItemKind.Audio],
-				parentId: library.musicLibraryId,
-				userId: user.id,
-				recursive: true,
-				filters: filters.length > 0 ? filters : undefined,
-				limit: ApiLimits.Library,
-				startIndex: pageParam * ApiLimits.Library,
-				sortBy: [finalSortBy],
-				sortOrder: [sortOrder],
-				fields: [ItemFields.SortName],
-				artistIds: artistId ? [artistId] : undefined,
-				genreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
-				years: yearsParam,
-				enableUserData: true,
-			})
+		getLibraryApi(api)
+			.getItems(
+				{
+					includeItemTypes: [BaseItemKind.Audio],
+					parentId: library?.musicLibraryId,
+					userId: user.id,
+					recursive: true,
+					filters: filters.length > 0 ? filters : undefined,
+					limit: ApiLimits.Library,
+					startIndex: pageParam * ApiLimits.Library,
+					sortBy: [finalSortBy],
+					sortOrder: [sortOrder],
+					fields: [ItemFields.SortName],
+					artistIds: artistId ? [artistId] : undefined,
+					genreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
+					years: yearsParam,
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
-				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
 			.catch((error) => {

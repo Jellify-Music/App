@@ -85,18 +85,7 @@ export enum QueryKeys {
 	AllAlbums = 'AllAlbums',
 	StorageInUse = 'StorageInUse',
 	Patrons = 'Patrons',
-
-	/**
-	 * @deprecated Use {@link InfiniteArtists} instead
-	 */
-	AllArtistsAlphabetical = 'AllArtistsAlphabetical',
-
-	/**
-	 * @deprecated Use {@link InfiniteAlbums} instead after refactoring
-	 * the infinite query in the {@link LibraryProvider}
-	 */
-	AllAlbumsAlphabetical = 'AllAlbumsAlphabetical',
-	RecentlyAddedAlbums = 'RecentlyAddedAlbums',
+	SpecialThanks = 'SpecialThanks',
 	PublicPlaylists = 'PublicPlaylists',
 
 	/**

@@ -35,7 +35,7 @@ If a screen or navigator requires bridging logic to render correctly (e.g. readi
 
 ## Base stack
 
-`base-stack.ts` exports `BaseStackScreens` — a plain screen config object that is spread into any tab stack that needs to navigate to shared detail screens.
+`base-stack.ts` exports `BaseStack` — a plain screen config object that is spread into any tab stack that needs to navigate to shared detail screens.
 
 **Screens included in the base stack:**
 
@@ -52,18 +52,18 @@ These screens are not mounted in `RootStack`; instead they live inside each tab'
 **Currently consumed by:** `Home`, `Library`, `Discover`, and `Search` tab stacks.
 
 ```ts
-// Example — spreading BaseStackScreens into a tab stack
-import { BaseStackScreens } from '../base-stack'
+// Example — spreading BaseStack into a tab stack
+import { BaseStack } from '../base-stack'
 
 const HomeStack = createNativeStackNavigator({
   screens: {
     HomeRoot: { screen: HomeScreen },
-    ...BaseStackScreens,     // Artist, Album, Playlist, InstantMix, Tracks
+    ...BaseStack,     // Artist, Album, Playlist, InstantMix, Tracks
   },
 })
 ```
 
-> If you add a new screen that should be reachable from multiple tabs, add it to `BaseStackScreens` and `BaseStackParamList` rather than duplicating the config in each tab stack.
+> If you add a new screen that should be reachable from multiple tabs, add it to `BaseStack` and `BaseStackParamList` rather than duplicating the config in each tab stack.
 
 ---
 
@@ -72,14 +72,14 @@ const HomeStack = createNativeStackNavigator({
 | Path | Description |
 |---|---|
 | `index.tsx` | Root `RootStack` navigator; mounts the app via `createStaticNavigation` |
-| `base-stack.ts` | `BaseStackScreens` — shared screen configs spread into each tab stack |
+| `base-stack.ts` | `BaseStack` — shared screen configs spread into each tab stack |
 | `navigation.ts` | `navigationRef` — a typed `NavigationContainerRef` for imperative navigation outside React |
 | `types.d.ts` | Shared param list types (`RootStackParamList`, `BaseStackParamList`) and screen prop types |
 | `Tabs/` | Bottom tab navigator (`HomeTab`, `LibraryTab`, `SearchTab`, `DiscoverTab`, `SettingsTab`) |
-| `Home/` | Home tab stack (recents, artists, tracks); spreads `BaseStackScreens` |
-| `Library/` | Library tab stack; includes `add-playlist` and `delete-playlist` sheet bridges; spreads `BaseStackScreens` |
-| `Discover/` | Discover tab stack (albums, artists, playlists); spreads `BaseStackScreens` |
-| `Search/` | Search tab stack; spreads `BaseStackScreens` |
+| `Home/` | Home tab stack (recents, artists, tracks); spreads `BaseStack` |
+| `Library/` | Library tab stack; includes `add-playlist` and `delete-playlist` sheet bridges; spreads `BaseStack` |
+| `Discover/` | Discover tab stack (albums, artists, playlists); spreads `BaseStack` |
+| `Search/` | Search tab stack; spreads `BaseStack` |
 | `Settings/` | Settings tab stack |
 | `Player/` | Player sheet (`PlayerRoot`) |
 | `Album/` | Album detail screen |

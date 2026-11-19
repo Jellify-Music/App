@@ -4,17 +4,19 @@ import SignOutModal from './sign-out-modal'
 import LibrarySelectionScreen from './library-selection'
 import StorageManagementScreen from '../Storage'
 import StorageSelectionModal from './storage-selection-modal'
-import { SettingsStackParamList } from './types'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
-import AccountScreen from './account'
-import AboutScreen from './about'
+import AccountScreen from '../Account'
+import AboutScreen from '../About'
 import PrivacyDeveloperScreen from './privacy-developer'
 import PlaybackScreen from './playback'
 import GesturesScreen from './gestures'
 import AppearanceScreen from './appearance'
+import { stackScreenOptions } from '../navigation'
+import i18n from '../../i18n'
 
 const SettingsStack = createNativeStackNavigator({
 	initialRouteName: 'Settings',
+	screenOptions: stackScreenOptions,
 	screens: {
 		Settings: {
 			screen: Settings,
@@ -25,11 +27,7 @@ const SettingsStack = createNativeStackNavigator({
 		LibrarySelection: {
 			screen: LibrarySelectionScreen,
 			options: {
-				title: 'Select Library',
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
+				title: i18n.t('navigation.selectLibrary'),
 			},
 		},
 		SignOut: {
@@ -45,11 +43,7 @@ const SettingsStack = createNativeStackNavigator({
 		StorageManagement: {
 			screen: StorageManagementScreen,
 			options: {
-				title: 'Storage Management',
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
+				title: i18n.t('navigation.storageManagement'),
 			},
 		},
 		StorageSelectionReview: {
@@ -64,67 +58,37 @@ const SettingsStack = createNativeStackNavigator({
 		Account: {
 			screen: AccountScreen,
 			options: {
-				title: 'Account',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
+				title: i18n.t('navigation.account'),
 			},
 		},
 		Appearance: {
 			screen: AppearanceScreen,
 			options: {
-				title: 'Appearance',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
+				title: i18n.t('settings.sections.appearance'),
 			},
 		},
 		Gestures: {
 			screen: GesturesScreen,
 			options: {
-				title: 'Gestures',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
+				title: i18n.t('settings.sections.gestures'),
 			},
 		},
 		Playback: {
 			screen: PlaybackScreen,
 			options: {
-				title: 'Playback',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
+				title: i18n.t('settings.sections.playback'),
 			},
 		},
 		PrivacyDeveloper: {
 			screen: PrivacyDeveloperScreen,
 			options: {
-				title: 'Privacy & Developer',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
+				title: i18n.t('settings.sections.privacyDeveloper'),
 			},
 		},
 		About: {
 			screen: AboutScreen,
 			options: {
-				title: 'About',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
+				title: i18n.t('settings.sections.about'),
 			},
 		},
 	},

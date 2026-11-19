@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
+import type { EventHandler } from '../../../../types/Events'
 import { XStack, YStack, getToken } from 'tamagui'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import { GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
 	Easing,
 	useAnimatedStyle,
@@ -9,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { runOnUI } from 'react-native-worklets'
 import Icon from '../icon'
-import { triggerHaptic } from '../../../../hooks/use-haptic-feedback'
+import { SWIPE_THRESHOLD, useSwipeableRowGesture } from '../../../../hooks/gestures/row'
 import {
 	notifySwipeableRowClosed,
 	notifySwipeableRowOpened,
@@ -18,26 +19,14 @@ import {
 } from './registery'
 import { SwipeableRowProvider } from './context'
 import { Pressable } from 'react-native'
-import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
+import { SwipeAction, QuickAction } from '../../../../hooks/gestures/types'
+import { useTranslation } from 'react-i18next'
 
-export type SwipeAction = {
-	label: string
-	icon: MaterialDesignIconsIconName
-	color: string // Tamagui token e.g. '$success'
-	onTrigger: () => void
-}
-
-export type QuickAction = {
-	icon: MaterialDesignIconsIconName
-	color: string // Tamagui token e.g. '$primary'
-	onPress: () => void
-}
-
-type Props = {
+type SwipeableRowProps = {
 	children: React.ReactNode
 	id?: string
-	onPress?: () => Promise<void> | null
-	onLongPress?: () => void | null
+	onPress?: EventHandler
+	onLongPress?: EventHandler
 	leftAction?: SwipeAction | null // immediate action on right swipe
 	leftActions?: QuickAction[] | null // quick action menu on right swipe
 	rightAction?: SwipeAction | null // legacy immediate action on left swipe
@@ -59,9 +48,10 @@ export default function SwipeableRow({
 	rightAction,
 	rightActions,
 	disabled,
-}: Props) {
+}: SwipeableRowProps) {
+	const { t } = useTranslation()
+
 	const tx = useSharedValue(0)
-	const dragging = useSharedValue(false)
 	const idRef = useRef<string | undefined>(undefined)
 	// React state for menu open (avoids pointerEvents bug from treating SharedValue object as truthy)
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -69,7 +59,6 @@ export default function SwipeableRow({
 	const menuOpenSV = useSharedValue(false)
 	const defaultMaxLeft = 120
 	const defaultMaxRight = -120
-	const threshold = 80
 	const [rightActionsWidth, setRightActionsWidth] = useState(0)
 	const [leftActionsWidth, setLeftActionsWidth] = useState(0)
 	const ACTION_SIZE = 48
@@ -137,184 +126,24 @@ export default function SwipeableRow({
 		}
 	}, [])
 
-	// menu open state now handled in React, no SharedValue mirroring required
-
-	const fgOpacity = useSharedValue(1.0)
-
-	/**
-	 * Reserve the right edge for per-row controls (e.g. three dots) by shrinking the tap area there
-	 * so those controls can receive presses without being swallowed by the row tap gesture.
-	 */
-	const tapGesture = Gesture.Tap()
-		.runOnJS(true)
-		.hitSlop({ right: -64 })
-		.maxDistance(2)
-		.onBegin(() => {
-			fgOpacity.set(0.5)
-		})
-		.onEnd((e, success) => {
-			// If a quick-action menu is open, row-level tap should NOT trigger onPress.
-			if (!isMenuOpen && onPress && success) {
-				triggerHaptic('impactLight')
-				onPress()
-			}
-		})
-		.onFinalize(() => {
-			fgOpacity.set(1.0)
-		})
-
-	const longPressGesture = Gesture.LongPress()
-		.runOnJS(true)
-		.onBegin(() => {
-			fgOpacity.set(0.5)
-		})
-		.onStart(() => {
-			if (onLongPress) {
-				triggerHaptic('impactLight')
-				onLongPress()
-			}
-			fgOpacity.set(1.0)
-		})
-		.onTouchesCancelled(() => {
-			fgOpacity.set(1.0)
-		})
-
-	const panGesture = Gesture.Pan()
-		.runOnJS(true)
-		.hitSlop({
-			/**
-			 * Preserve Swipe to go back system gestures
-			 *
-			 * This was a value I saw ComputerJazz recommend in an issue on
-			 * `react-native-draggable-flatlist`, figured it could serve as a good
-			 * basis to start from and tune from there ~Vi
-			 *
-			 * {@link https://github.com/computerjazz}
-			 * {@link https://github.com/computerjazz/react-native-draggable-flatlist/issues/336#issuecomment-970573916}
-			 */
-			left: -50,
-		})
-		.activeOffsetX([-15, 15])
-		.failOffsetY([-8, 8])
-		.onBegin(() => {
-			if (disabled) return
-			dragging.set(true)
-			fgOpacity.set(1.0)
-		})
-		.onUpdate((e) => {
-			if (disabled) return
-			const next = Math.max(Math.min(e.translationX, maxLeft), maxRight)
-			tx.value = next
-		})
-		.onEnd((e, success) => {
-			console.log(
-				'[SR] pan.onEnd success=',
-				success,
-				'tx=',
-				tx.value,
-				'isMenuOpen=',
-				isMenuOpen,
-			)
-			if (disabled) return
-			if (!success) return
-			// Velocity-based assistance: fast flicks open even if displacement below threshold
-			const v = e.velocityX
-			const velocityTrigger = 800
-			if (tx.value > threshold) {
-				// Right swipe: show left quick actions if provided; otherwise trigger leftAction
-				if (leftActions && leftActions.length > 0) {
-					triggerHaptic('impactLight')
-					// Snap open to expose quick actions, do not auto-trigger
-					const _maxLeft = maxLeft
-					runOnUI(() => {
-						'worklet'
-						tx.value = withTiming(_maxLeft, {
-							duration: 140,
-							easing: Easing.out(Easing.cubic),
-						})
-					})()
-					openMenu()
-					return
-				} else if (leftAction) {
-					triggerHaptic('impactLight')
-					leftAction.onTrigger()
-					close()
-					return
-				}
-			}
-			// Left swipe (quick actions)
-			if (tx.value < -Math.min(threshold, Math.abs(maxRight) / 2)) {
-				if (rightActions && rightActions.length > 0) {
-					triggerHaptic('impactLight')
-					// Snap open to expose quick actions, do not auto-trigger
-					const _maxRight = maxRight
-					runOnUI(() => {
-						'worklet'
-						tx.value = withTiming(_maxRight, {
-							duration: 140,
-							easing: Easing.out(Easing.cubic),
-						})
-					})()
-					openMenu()
-					return
-				} else if (rightAction) {
-					triggerHaptic('impactLight')
-					rightAction.onTrigger()
-					close()
-					return
-				}
-			}
-			// Velocity fallback (open quick actions if fast flick even without full displacement)
-			if (v > velocityTrigger && hasLeftSide) {
-				if (leftActions && leftActions.length > 0) {
-					triggerHaptic('impactLight')
-					const _maxLeft = maxLeft
-					runOnUI(() => {
-						'worklet'
-						tx.value = withTiming(_maxLeft, {
-							duration: 140,
-							easing: Easing.out(Easing.cubic),
-						})
-					})()
-					openMenu()
-					return
-				} else if (leftAction) {
-					triggerHaptic('impactLight')
-					leftAction.onTrigger()
-					close()
-					return
-				}
-			}
-			if (v < -velocityTrigger && hasRightSide) {
-				if (rightActions && rightActions.length > 0) {
-					triggerHaptic('impactLight')
-					const _maxRight = maxRight
-					runOnUI(() => {
-						'worklet'
-						tx.value = withTiming(_maxRight, {
-							duration: 140,
-							easing: Easing.out(Easing.cubic),
-						})
-					})()
-					openMenu()
-					return
-				} else if (rightAction) {
-					triggerHaptic('impactLight')
-					rightAction.onTrigger()
-					close()
-					return
-				}
-			}
-			runOnUI(() => {
-				'worklet'
-				tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
-			})()
-			syncClosedState()
-		})
-		.onFinalize(() => {
-			if (disabled) return
-			dragging.set(false)
-		})
+	const { gesture: combinedGesture, fgOpacity } = useSwipeableRowGesture({
+		tx,
+		maxLeft,
+		maxRight,
+		hasLeftSide: !!hasLeftSide,
+		hasRightSide: !!hasRightSide,
+		isMenuOpen,
+		disabled,
+		onPress,
+		onLongPress,
+		leftAction,
+		leftActions,
+		rightAction,
+		rightActions,
+		openMenu,
+		close,
+		syncClosedState,
+	})
 
 	const fgStyle = useAnimatedStyle(() => ({
 		transform: [
@@ -336,7 +165,7 @@ export default function SwipeableRow({
 	const leftUnderlayStyle = useAnimatedStyle(() => {
 		// Normalize progress to [0,1]
 		const leftMax = maxLeft === 0 ? 1 : maxLeft
-		const denom = Math.max(1, Math.min(threshold, leftMax))
+		const denom = Math.max(1, Math.min(SWIPE_THRESHOLD, leftMax))
 		const progress = Math.min(1, Math.max(0, tx.value / denom))
 		const opacity = progress < 1 ? progress * 0.9 : 1
 		return {
@@ -348,7 +177,7 @@ export default function SwipeableRow({
 	const rightUnderlayStyle = useAnimatedStyle(() => {
 		const rightMax = maxRight === 0 ? -1 : maxRight
 		const absMax = Math.abs(rightMax)
-		const denom = Math.max(1, Math.min(threshold, absMax))
+		const denom = Math.max(1, Math.min(SWIPE_THRESHOLD, absMax))
 		const progress = Math.min(1, Math.max(0, -tx.value / denom))
 		const opacity = progress < 1 ? progress * 0.9 : 1
 		return {
@@ -358,8 +187,6 @@ export default function SwipeableRow({
 	})
 
 	if (disabled) return <>{children}</>
-
-	const combinedGesture = Gesture.Race(panGesture, longPressGesture, tapGesture)
 
 	return (
 		<GestureDetector gesture={combinedGesture}>
@@ -383,10 +210,10 @@ export default function SwipeableRow({
 							flex={1}
 							backgroundColor={leftAction.color}
 							alignItems='center'
-							paddingLeft={getToken('$3')}
+							paddingLeft={getToken('3')}
 						>
 							<XStack alignItems='center'>
-								<Icon name={leftAction.icon} color={'$background'} />
+								<Icon name={leftAction.icon} color={'background'} />
 							</XStack>
 						</XStack>
 					</Animated.View>
@@ -409,7 +236,7 @@ export default function SwipeableRow({
 						{/* Underlay background matches list background for continuity */}
 						<XStack
 							flex={1}
-							backgroundColor={'$background'}
+							backgroundColor='background'
 							alignItems='center'
 							justifyContent='flex-start'
 						>
@@ -423,8 +250,6 @@ export default function SwipeableRow({
 								{leftActions.map((action, idx) => (
 									<XStack
 										key={`left-quick-action-${idx}`}
-										// Maestro test id for left quick action button
-										// pattern: quick-action-left-<index>
 										testID={`quick-action-left-${idx}`}
 										width={48}
 										height={48}
@@ -432,15 +257,15 @@ export default function SwipeableRow({
 										justifyContent='center'
 										backgroundColor={action.color}
 										borderRadius={0}
-										pressStyle={{ opacity: 0.8 }}
+										opacity='1 press:0.8'
 										role='button'
-										aria-label={`Left quick action ${action.icon}`}
+										aria-label={action.label}
 										onPress={() => {
 											action.onPress()
 											close()
 										}}
 									>
-										<Icon name={action.icon} color={'$background'} />
+										<Icon name={action.icon} color={'background'} />
 									</XStack>
 								))}
 							</XStack>
@@ -468,10 +293,10 @@ export default function SwipeableRow({
 							backgroundColor={rightAction.color}
 							alignItems='center'
 							justifyContent='flex-end'
-							paddingRight={getToken('$3')}
+							paddingRight={getToken('3')}
 						>
 							<XStack alignItems='center'>
-								<Icon name={rightAction.icon} color={'$background'} />
+								<Icon name={rightAction.icon} color={'background'} />
 							</XStack>
 						</XStack>
 					</Animated.View>
@@ -494,7 +319,7 @@ export default function SwipeableRow({
 						{/* Underlay background matches list background to keep continuity */}
 						<XStack
 							flex={1}
-							backgroundColor={'$background'}
+							backgroundColor='background'
 							alignItems='center'
 							justifyContent='flex-end'
 						>
@@ -515,15 +340,15 @@ export default function SwipeableRow({
 										justifyContent='center'
 										backgroundColor={action.color}
 										borderRadius={0}
-										pressStyle={{ opacity: 0.8 }}
+										opacity='1 press:0.8'
 										role='button'
-										aria-label={`Right quick action ${action.icon}`}
+										aria-label={action.label}
 										onPress={() => {
 											action.onPress()
 											close()
 										}}
 									>
-										<Icon name={action.icon} color={'$background'} />
+										<Icon name={action.icon} color={'background'} />
 									</XStack>
 								))}
 							</XStack>
@@ -544,9 +369,7 @@ export default function SwipeableRow({
 						style={fgStyle}
 						// Disable touches only while a menu is open; allow presses when closed
 						pointerEvents={isMenuOpen ? 'none' : 'auto'}
-						accessibilityHint={
-							leftAction || rightAction ? 'Swipe for actions' : undefined
-						}
+						accessibilityHint={leftAction || rightAction ? t('swipe.hint') : undefined}
 					>
 						{children}
 					</Animated.View>

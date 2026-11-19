@@ -13,3 +13,5 @@ declare module '@react-navigation/core' {
 }
 
 export type HomeStackParamList = StaticParamList<HomeNavigator>
+
+export default HomeStackParamList

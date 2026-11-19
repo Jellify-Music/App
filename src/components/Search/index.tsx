@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import Input from '../Global/helpers/input'
-import { H5, Text } from '../Global/helpers/text'
+import React, { useEffect, useRef, useState } from 'react'
+import { useSearchInputGesture } from '../../hooks/gestures/search'
+import Input from '../Global/utils/Input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { getToken, H3, Spinner, YStack } from 'tamagui'
+import { H3, H5, SizableText, Spinner, TamaguiElement, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
-import ItemCard from '../Global/components/item-card'
+import ItemCard from '../Global/components/Card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import navigationRef from '../../screens/navigation'
@@ -18,9 +18,12 @@ import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/messaging/search'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import useSearchResults from '../../api/queries/search'
-import List from '../Global/helpers/list'
+import List from '../Global/components/Lists/utils'
+import { useTranslation } from 'react-i18next'
 
 export default function Search(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
 
 	/**
@@ -33,6 +36,10 @@ export default function Search(): React.JSX.Element {
 	 * which is keyed off of this value for caching.
 	 */
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
+
+	const inputRef = useRef<TamaguiElement>(null)
+
+	useSearchInputGesture({ inputRef, navigation })
 
 	useEffect(() => {
 		const timeout = setTimeout(() => {
@@ -78,25 +85,23 @@ export default function Search(): React.JSX.Element {
 
 	return (
 		<List
-			contentContainerStyle={{
-				margin: getToken('$4'),
-			}}
 			contentInsetAdjustmentBehavior='automatic'
 			ListHeaderComponent={
-				<YStack paddingTop={'$2'}>
+				<YStack flex={1} paddingHorizontal='2'>
 					<Input
+						ref={inputRef}
 						placeholder={placeholder}
 						onChangeText={handleSearchStringUpdate}
 						value={inputValue}
 						testID='search-input'
-						accessibilityLabel='Search your library'
-						accessibilityHint='Type to search artists, albums, playlists, and songs'
+						accessibilityLabel={t('search.inputLabel')}
+						accessibilityHint={t('search.inputHint')}
 						clearButtonMode='always'
 					/>
 
 					{!isEmpty(artistResults) && (
-						<YStack accessibilityLabel='Artist results'>
-							<H3>Results</H3>
+						<YStack accessibilityLabel={t('search.artistResults')} flex={1}>
+							<H3>{t('search.results')}</H3>
 
 							<HorizontalCardList
 								data={artistResults}
@@ -117,10 +122,11 @@ export default function Search(): React.JSX.Element {
 												}),
 											)
 										}}
-										size={'$8'}
+										size={'10'}
 										caption={formatArtistName(artistResult.Name)}
 									/>
 								)}
+								slice={false}
 							/>
 						</YStack>
 					)}
@@ -130,7 +136,7 @@ export default function Search(): React.JSX.Element {
 				// Show spinner while fetching
 				if (fetchingResults) {
 					return (
-						<YStack alignContent='center' justifyContent='center' marginTop={'$4'}>
+						<YStack alignContent='center' justifyContent='center' marginTop='4'>
 							<Spinner />
 						</YStack>
 					)
@@ -142,14 +148,14 @@ export default function Search(): React.JSX.Element {
 						<YStack
 							alignItems='center'
 							justifyContent='center'
-							marginTop={'$8'}
-							gap={'$3'}
-							paddingHorizontal={'$4'}
+							marginTop='8'
+							gap='3'
+							paddingHorizontal='4'
 						>
-							<H5>No Results</H5>
-							<Text textAlign='center'>
+							<H5>{t('search.noResults')}</H5>
+							<SizableText fontSize='2' textAlign='center'>
 								{`No results found for "${searchString}". Try a different search term.`}
-							</Text>
+							</SizableText>
 						</YStack>
 					)
 				}

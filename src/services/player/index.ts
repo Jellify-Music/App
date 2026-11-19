@@ -7,6 +7,7 @@ import {
 	registerPlayerEventHandlers,
 	restoreFromStorage,
 } from './utils/initialization'
+import { notificationButtons } from './utils/favorite-button'
 
 export async function configureNitroPlayer(config: Partial<PlayerConfig>) {
 	try {
@@ -24,6 +25,8 @@ export default function registerNitroPlayer() {
 		androidAutoEnabled: Platform.OS === 'android',
 		carPlayEnabled: false,
 		showInNotification: true,
+		androidNotificationIcon: 'ic_notification',
+		notificationButtons,
 	})
 		.then(() => {
 			Initialize()

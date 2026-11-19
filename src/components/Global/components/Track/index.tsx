@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
+import type { EventHandler } from '../../../../types/Events'
 import { getToken } from 'tamagui'
-import { RunTimeTicks } from '../../helpers/time-codes'
+import { RunTimeTicks } from '../../utils/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueuingType } from '../../../../enums/queuing-type'
 import { Queue } from '../../../../services/types/queue-item'
@@ -8,8 +9,8 @@ import { networkStatusTypes } from '../../../Network/internetConnectionWatcher'
 import { useNetworkStatus } from '../../../../stores/network'
 import navigationRef from '../../../../screens/navigation'
 import SwipeableRow from '../SwipeableRow'
-import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
-import { buildSwipeConfig } from '../../helpers/swipe-actions'
+import { useSwipeSettingsStore } from '../../../../stores/settings/gestures'
+import { buildSwipeConfig } from '../../utils/swipe-actions'
 import { useIsFavorite } from '../../../../api/queries/user-data'
 import { useCurrentTrackId } from '../../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
@@ -17,7 +18,8 @@ import { BaseStackNavigator, StackActions, useNavigation } from '@react-navigati
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
 import { useIsDownloaded } from '../../../../hooks/downloads'
-import { addToQueue, loadNewQueue } from '../../../../hooks/player/functions/queue'
+import { addToQueue, loadNewQueue } from '../../../../player/queuing'
+import { useTranslation } from 'react-i18next'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -26,8 +28,8 @@ export interface TrackProps {
 	queue: Queue
 	playlist?: BaseItemDto
 	showArtwork?: boolean | undefined
-	onPress?: () => Promise<void> | undefined
-	onLongPress?: () => void | undefined
+	onPress?: EventHandler
+	onLongPress?: EventHandler
 	isNested?: boolean | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined
@@ -52,6 +54,8 @@ export default function Track({
 	sortingByReleasedDate,
 	sortingByPlayCount,
 }: TrackProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<BaseStackNavigator>()
 
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
@@ -116,11 +120,11 @@ export default function Track({
 	// Use Tamagui token references instead of resolved theme values
 	// to avoid per-instance useTheme() context subscriptions in lists
 	const textColor = isPlaying
-		? '$primary'
+		? 'primary'
 		: isOffline
 			? isDownloaded
 				? undefined
-				: '$neutral'
+				: 'neutral'
 			: undefined
 
 	// Memoize artists text
@@ -134,7 +138,7 @@ export default function Track({
 					: track.ArtistItems?.map((artist) => artist.Name).join(' • ')) ?? ''
 
 	// Memoize track name
-	const trackName = track.Name ?? 'Untitled Track'
+	const trackName = track.Name ?? t('placeholders.untitledTrack')
 
 	// Memoize index number
 	const indexNumber = track.IndexNumber?.toString() ?? ''
@@ -179,7 +183,7 @@ export default function Track({
 			props={{
 				style: {
 					textAlign: 'right',
-					minWidth: getToken('$10'),
+					minWidth: getToken('10'),
 					alignSelf: 'center',
 				},
 			}}

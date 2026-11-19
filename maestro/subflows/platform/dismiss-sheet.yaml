@@ -1,0 +1,17 @@
+appId: com.cosmonautical.jellify
+---
+# Dismisses the current sheet (e.g. the queue). iOS has no back key, so
+# drag the sheet down by its grabber.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 50%, 9%
+          end: 50%, 90%
+          duration: 400

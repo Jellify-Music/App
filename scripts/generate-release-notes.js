@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { OpenAI } from 'openai'
 
 const openai = new OpenAI({
@@ -7,23 +7,48 @@ const openai = new OpenAI({
 	baseURL: 'https://ai.jellify.app/ollama/v1',
 })
 
+/**
+ * Usage: bun scripts/generate-release-notes.js <release-title> <changes-file>
+ *
+ * The changes file is the release-changes.json written by collect-release-changes.js.
+ * Set RELEASE_KIND=ota for an over-the-air update.
+ */
 async function main() {
 	const version = process.argv[2]
 
 	if (!version) {
-		console.error('❌ Missing version argument')
+		console.error('❌ Missing release title argument')
 		process.exit(1)
 	}
 
-	const commitMessages = process.argv[3]
+	const changesFile = process.argv[3]
 
-	if (!commitMessages) {
-		console.error('❌ Missing commit messages')
+	if (!changesFile) {
+		console.error('❌ Missing changes file')
 		process.exit(1)
 	}
+
+	const { pullRequests, issues, looseCommits } = JSON.parse(readFileSync(changesFile, 'utf8'))
+
+	const changes = [
+		...pullRequests.map((pull) => `- ${pull.title}`),
+		...issues.map((issue) => `- Fixes issue: ${issue.title}`),
+		...looseCommits.map((subject) => `- ${subject}`),
+	].join('\n')
+
+	if (!changes) {
+		writeFileSync(
+			'release_notes.txt',
+			`Welcome to Jellify ${version}\n\nSmall fixes and improvements.`,
+		)
+		console.log('✅ No changes found, wrote placeholder release notes')
+		return
+	}
+
+	const isOta = process.env.RELEASE_KIND === 'ota'
 
 	const response = await openai.chat.completions.create({
-		model: 'gemma4:e4b',
+		model: 'gemma4:12b',
 		messages: [
 			{
 				role: 'system',
@@ -52,17 +77,25 @@ async function main() {
 			},
 			{
 				role: 'system',
-				content:
-					'You should start every release summary with a singular headline - "Welcome to Jellify X.Y.Z" where X.Y.Z is the SemVer of the release. Do not start with anything else.',
+				content: `You should start every release summary with a singular headline - "Welcome to Jellify ${version}". Do not start with anything else.`,
 			},
 			{
 				role: 'system',
 				content:
-					'After the headline, briefly summarize the release in 1-2 sentences. Then, include 3 bullet points that go into more detail about the changes in the release. Each bullet point should be 1-3 sentences long. Do not include more than 3 bullet points.',
+					'After the headline, briefly summarize the release in 3-4 sentences. Then, include 3 bullet points that go into more detail about the changes in the release. Each bullet point should be 1-3 sentences long. Do not include more than 3 bullet points.',
 			},
+			...(isOta
+				? [
+						{
+							role: 'system',
+							content:
+								'This release is an over-the-air update. It does not go through the App Store or Play Store: Jellify downloads it the next time it is opened, then asks to restart. Mention this briefly in the summary.',
+						},
+					]
+				: []),
 			{
 				role: 'user',
-				content: `Write a release summary for ${version} based on these commit messages:\n${commitMessages}. I'm a tech-savvy user of the app and I want to know what will be different in the app after I update.`,
+				content: `Write a release summary for ${version} based on these changes:\n${changes}\n\nI'm a tech-savvy user of the app and I want to know what will be different in the app after I update.`,
 			},
 		],
 	})

@@ -1,13 +1,7 @@
 import { useUpdatePlaylist } from '../../api/mutations/playlist'
 import { usePlaylistTracks } from '../../api/queries/playlist'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import {
-	FetchNextPageOptions,
-	InfiniteQueryObserverResult,
-	QueryObserverResult,
-	RefetchOptions,
-	UseMutateFunction,
-} from '@tanstack/react-query'
+import { QueryObserverResult, RefetchOptions, UseMutateFunction } from '@tanstack/react-query'
 import {
 	createContext,
 	Dispatch,
@@ -21,6 +15,7 @@ import {
 } from 'react'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { SortableReorderEvent } from 'react-native-drax'
+import { useTranslation } from 'react-i18next'
 
 interface PlaylistContext {
 	playlist: BaseItemDto
@@ -51,11 +46,6 @@ interface PlaylistContext {
 		options?: RefetchOptions | undefined,
 	) => Promise<QueryObserverResult<BaseItemDto[], Error>>
 	isPending: boolean
-	hasNextPage: boolean
-	fetchNextPage: (
-		options?: FetchNextPageOptions,
-	) => Promise<InfiniteQueryObserverResult<BaseItemDto[], Error>>
-	isFetchingNextPage: boolean
 }
 
 const PlaylistContext = createContext<PlaylistContext>({
@@ -76,9 +66,6 @@ const PlaylistContext = createContext<PlaylistContext>({
 	},
 	refetch: () => Promise.resolve({} as QueryObserverResult<BaseItemDto[], Error>),
 	isPending: false,
-	hasNextPage: false,
-	fetchNextPage: () => Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
-	isFetchingNextPage: false,
 })
 
 interface PlaylistProviderProps {
@@ -88,23 +75,19 @@ interface PlaylistProviderProps {
 }
 
 export const PlaylistProvider = ({ playlist, canEdit, children }: PlaylistProviderProps) => {
+	const { t } = useTranslation()
+
 	const playlistTrackIds = useRef<string[]>([])
 
 	const [editing, setEditing] = useState<boolean>(false)
 
-	const [newName, setNewName] = useState<string>(playlist.Name ?? 'Untitled Playlist')
+	const [newName, setNewName] = useState<string>(
+		playlist.Name ?? t('placeholders.untitledPlaylist'),
+	)
 
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[]>([])
 
-	const {
-		data: tracks,
-		isPending,
-		refetch,
-		isSuccess,
-		hasNextPage,
-		fetchNextPage,
-		isFetchingNextPage,
-	} = usePlaylistTracks(playlist)
+	const { data: tracks, isPending, refetch, isSuccess } = usePlaylistTracks(playlist)
 
 	const { mutate: updatePlaylist, isPending: isUpdatingPlaylist } = useUpdatePlaylist({
 		onSettled: () => {
@@ -160,9 +143,6 @@ export const PlaylistProvider = ({ playlist, canEdit, children }: PlaylistProvid
 		playlistTracks,
 		playlistTrackIds,
 		isPending,
-		hasNextPage,
-		fetchNextPage,
-		isFetchingNextPage,
 	}
 
 	return <PlaylistContext value={value}>{children}</PlaylistContext>

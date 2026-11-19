@@ -5,15 +5,17 @@ import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
 import { fetchAlbums } from './utils/album'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits, MaxPages } from '../../../configs/query.config'
-import { queryClient } from '../../../constants/query-client'
+import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
+import { queryClient } from '../../client'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyLibrary } from '../../../stores/auth'
 import useLibraryStore from '../../../stores/library'
 import { fetchAlbumDiscs } from '../item'
+import { QueryAges } from '../../../constants/durations'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
 import { AlbumQuery, RecentlyAddedQuery } from './queries'
+import { MusicLibraryQueryKey } from '../libraries/keys'
 
 export const useAlbum = (album: BaseItemDto) => useQuery(AlbumQuery(album))
 
@@ -22,12 +24,8 @@ const useAlbums = () => {
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const {
-		filters,
-		sortBy: librarySortByState,
-		sortDescending: librarySortDescendingState,
-	} = useLibraryStore()
-	const rawAlbumSortBy = librarySortByState.albums ?? ItemSortBy.SortName
+	const albumFilters = useLibraryStore((state) => state.filters.albums)
+	const rawAlbumSortBy = useLibraryStore((state) => state.sortBy.albums) ?? ItemSortBy.SortName
 	const albumSortByOptions = [
 		ItemSortBy.Name,
 		ItemSortBy.SortName,
@@ -40,10 +38,10 @@ const useAlbums = () => {
 	const librarySortBy = albumSortByOptions.includes(rawAlbumSortBy as ItemSortBy)
 		? (rawAlbumSortBy as ItemSortBy)
 		: ItemSortBy.Album
-	const sortDescending = librarySortDescendingState.albums ?? false
-	const isFavorites = filters.albums.isFavorites
-	const yearMin = filters.albums.yearMin
-	const yearMax = filters.albums.yearMax
+	const sortDescending = useLibraryStore((state) => state.sortDescending.albums) ?? false
+	const isFavorites = albumFilters.isFavorites
+	const yearMin = albumFilters.yearMin
+	const yearMax = albumFilters.yearMax
 
 	// Add letter sections when sorting by name/album/artist (for A-Z selector)
 	const isSortByLetter =
@@ -60,13 +58,13 @@ const useAlbums = () => {
 		queryKey: [
 			QueryKeys.InfiniteAlbums,
 			isFavorites,
-			library?.musicLibraryId,
+			MusicLibraryQueryKey(library?.musicLibraryId),
 			librarySortBy,
 			sortDescending,
 			yearMin,
 			yearMax,
 		],
-		queryFn: ({ pageParam }) =>
+		queryFn: ({ pageParam, signal }) =>
 			fetchAlbums(
 				api,
 				user,
@@ -77,6 +75,7 @@ const useAlbums = () => {
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
 				yearMin,
 				yearMax,
+				signal,
 			),
 		initialPageParam: 0,
 		select: selectAlbums,
@@ -101,25 +100,25 @@ export const useRecentlyAddedAlbums = () => {
 	return useInfiniteQuery(RecentlyAddedQuery(api, user, library))
 }
 
-export const useRefetchRecentlyAdded: () => () => void = () => {
-	const [library] = useJellifyLibrary()
-
-	return () =>
-		queryClient.invalidateQueries({
-			queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
-		})
-}
-
-export const useAlbumDiscs = (album: BaseItemDto) => {
+export const useAlbumDiscs = (album: BaseItemDto, enabled: boolean = true) => {
 	const api = getApi()
 
-	return useQuery(AlbumDiscsQuery(api, album))
+	return useQuery({ ...AlbumDiscsQuery(api, album), enabled })
 }
 
-export const ensureAlbumDiscsQuery = async (album: BaseItemDto) =>
-	await queryClient.ensureQueryData(AlbumDiscsQuery(getApi(), album))
+export async function refreshAlbumDiscs(album: BaseItemDto) {
+	return queryClient.query({
+		...AlbumDiscsQuery(getApi(), album),
+		staleTime: 0,
+	})
+}
+
+export async function prefetchAlbumDiscsQuery(album: BaseItemDto) {
+	return queryClient.query(AlbumDiscsQuery(getApi(), album)).catch(() => {})
+}
 
 const AlbumDiscsQuery = (api: Api | undefined, album: BaseItemDto) => ({
 	queryKey: AlbumDiscsQueryKey(album),
 	queryFn: () => fetchAlbumDiscs(api, album),
+	gcTime: QueryAges.OneWeek,
 })

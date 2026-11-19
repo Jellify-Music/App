@@ -1,13 +1,12 @@
-import TextTicker from 'react-native-text-ticker'
-import { Paragraph, XStack, YStack } from 'tamagui'
-import { TextTickerConfig } from '../component.config'
+import { Ticker } from '../../Global/utils/Animated/text'
+import { SizableText, XStack, YStack } from 'tamagui'
 import React from 'react'
 import FavoriteButton from '../../Global/components/favorite-button'
 import Icon from '../../Global/components/icon'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import { isExplicit } from '../../../utils/trackDetails'
+import { isExplicit } from '../../../utils/audio/explicit'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
@@ -16,8 +15,11 @@ import { RootStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { PlayerParamList } from '@/src/screens/Player/types'
 import navigationRef from '../../../screens/navigation'
+import { useTranslation } from 'react-i18next'
 
 export default function SongInfo(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const currentTrack = useCurrentTrack()
 
 	const rootStackNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -30,7 +32,7 @@ export default function SongInfo(): React.JSX.Element {
 	)
 
 	// Memoize expensive computations
-	const trackTitle = currentTrack?.title ?? 'Untitled Track'
+	const trackTitle = currentTrack?.title ?? t('placeholders.untitledTrack')
 
 	const handleTrackPress = () => {
 		if (album) {
@@ -77,50 +79,52 @@ export default function SongInfo(): React.JSX.Element {
 
 	return (
 		<XStack>
-			<YStack justifyContent='flex-start' flex={1} gap={'$1'}>
+			<YStack justifyContent='flex-start' flex={1}>
 				<Animated.View
 					entering={FadeIn.easing(Easing.in(Easing.ease))}
 					exiting={FadeOut.easing(Easing.out(Easing.ease))}
 					key={`${currentTrack?.id ?? 'unknown-track'}-song-info`}
 				>
-					<TextTicker
-						{...TextTickerConfig}
-						key={`${currentTrack?.id ?? 'no-track'}-title`}
-					>
-						<Paragraph
-							fontWeight={'$6'}
-							fontSize={'$6'}
-							onPress={handleTrackPress}
-							{...ICON_PRESS_STYLES}
-						>
-							{trackTitle}
-						</Paragraph>
-					</TextTicker>
+					<YStack gap={'1'}>
+						<Ticker key={`${currentTrack?.id ?? 'no-track'}-title`}>
+							<SizableText
+								fontSize='4'
+								fontWeight='6'
+								{...ICON_PRESS_STYLES}
+								onPress={handleTrackPress}
+							>
+								{trackTitle}
+							</SizableText>
+						</Ticker>
 
-					<TextTicker
-						{...TextTickerConfig}
-						key={`${currentTrack?.id ?? 'no-track'}-artist`}
-					>
-						<Paragraph
-							fontSize={'$6'}
-							onPress={handleArtistPress}
-							{...ICON_PRESS_STYLES}
-						>
-							{currentTrack?.artist ?? 'Unknown Artist'}
-						</Paragraph>
-						{isExplicit(item) && (
-							<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
-								<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
-							</XStack>
-						)}
-					</TextTicker>
+						<Ticker key={`${currentTrack?.id ?? 'no-track'}-artist`}>
+							<SizableText
+								fontSize='4'
+								{...ICON_PRESS_STYLES}
+								onPress={handleArtistPress}
+							>
+								{currentTrack?.artist ?? t('placeholders.unknownArtist')}
+							</SizableText>
+							{isExplicit(item) && (
+								<XStack alignSelf='center' paddingTop={5.3} paddingLeft='1'>
+									<Icon name='alpha-e-box-outline' color={'color'} size='5' />
+								</XStack>
+							)}
+						</Ticker>
+					</YStack>
 				</Animated.View>
 			</YStack>
 
-			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
-				<Icon name='dots-horizontal-circle-outline' onPress={openContextMenu} />
-
+			<XStack
+				justifyContent='flex-end'
+				alignItems='center'
+				flexShrink={1}
+				gap='3'
+				paddingLeft={'1'}
+			>
 				{currentTrack && item && <FavoriteButton item={item} />}
+
+				<Icon name='dots-horizontal-circle-outline' onPress={openContextMenu} />
 			</XStack>
 		</XStack>
 	)

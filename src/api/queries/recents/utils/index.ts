@@ -6,46 +6,71 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
-import { ApiLimits } from '../../../../configs/query.config'
-import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
+import { ApiLimits } from '../../../../configs/querying/index.config'
 import { Api } from '@jellyfin/sdk'
-import { isUndefined } from 'lodash'
+import { isUndefined, orderBy } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { JellifyUser } from '../../../../types/JellifyUser'
-import { queryClient } from '../../../../constants/query-client'
-import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/home.config'
+import { queryClient } from '../../../client'
+import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/categorizing/home.config'
 import { PlayItAgainQuery } from '..'
 import { ArtistQueryKey } from '../../artist/keys'
+import { setQueryUserDataForItem } from '../../user-data/cache'
+import { fetchMusicLibraryIds } from '../../libraries/utils/music-libraries'
 
+/**
+ * Fetches the albums most recently added to the user's music.
+ *
+ * The latest media endpoint needs a library to look in, so when no library is selected
+ * each music library is queried and the newest albums across all of them are kept.
+ *
+ * @param api The Jellyfin {@link Api} instance
+ * @param library The selected {@link JellifyLibrary}, or `undefined` for all music libraries
+ * @param page The page to fetch. The latest media endpoint isn't paginated, so this is unused
+ * @param signal Optional AbortSignal to cancel the request
+ * @returns The most recently added albums, newest first
+ */
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
+	if (isUndefined(api)) throw new Error('Client instance not set')
 
-		getUserLibraryApi(api)
-			.getLatestMedia({
-				parentId: library.musicLibraryId,
-				limit: ApiLimits.Discover,
-				enableUserData: true,
-				fields: [ItemFields.ParentId, ItemFields.Tags],
-				includeItemTypes: [BaseItemKind.Audio, BaseItemKind.MusicAlbum],
-			})
-			.then(({ data }) => {
-				if (data) {
-					return resolve(data)
-				}
-				return resolve([])
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
+	try {
+		const libraryIds = await fetchMusicLibraryIds(library)
+
+		const latest = await Promise.all(
+			libraryIds.map((parentId) =>
+				getLibraryApi(api)
+					.getLatestMedia(
+						{
+							parentId,
+							limit: ApiLimits.Discover,
+							enableUserData: true,
+							includeItemTypes: [BaseItemKind.MusicAlbum],
+							fields: [ItemFields.ParentId, ItemFields.Tags, ItemFields.DateCreated],
+						},
+						{
+							signal,
+						},
+					)
+					.then(({ data }) => data ?? []),
+			),
+		)
+
+		if (latest.length === 1) return latest[0]
+
+		return orderBy(latest.flat(), ({ DateCreated }) => DateCreated ?? '', 'desc').slice(
+			0,
+			ApiLimits.Discover,
+		)
+	} catch (error) {
+		console.error(error)
+		throw error
+	}
 }
 
 /**
@@ -60,25 +85,29 @@ export async function fetchRecentlyPlayed(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 	limit: number = ApiLimits.Recents,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 
-		getItemsApi(api)
-			.getItems({
-				includeItemTypes: [BaseItemKind.Audio],
-				startIndex: page * limit,
-				userId: user.id,
-				limit,
-				parentId: library.musicLibraryId,
-				recursive: true,
-				sortBy: [ItemSortBy.DatePlayed],
-				sortOrder: [SortOrder.Descending],
-				fields: [ItemFields.ParentId, ItemFields.Tags],
-			})
+		getLibraryApi(api)
+			.getItems(
+				{
+					includeItemTypes: [BaseItemKind.Audio],
+					startIndex: page * limit,
+					userId: user.id,
+					limit,
+					parentId: library?.musicLibraryId,
+					recursive: true,
+					sortBy: [ItemSortBy.DatePlayed],
+					sortOrder: [SortOrder.Descending],
+					fields: [ItemFields.ParentId, ItemFields.Tags],
+					enableUserData: true,
+				},
+				{ signal },
+			)
 			.then((response) => {
 				if (!response.data.Items) return resolve([])
 
@@ -102,6 +131,8 @@ export async function fetchRecentlyPlayed(
 
 				tracks.forEach((track, index) => {
 					if (processedIndexes.has(index)) return
+
+					setQueryUserDataForItem(track)
 
 					const albumId = track.ParentId
 					if (albumId && tracksByAlbum.has(albumId)) {
@@ -145,15 +176,20 @@ export function fetchRecentlyPlayedArtists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
 
 		// Get the recently played tracks from the query client
 		queryClient
-			.ensureInfiniteQueryData(PlayItAgainQuery(library))
+			.infiniteQuery({
+				...PlayItAgainQuery(library),
+				staleTime: 'static',
+				// Keep the pages, since artists are derived from one page at a time
+				select: (data) => data,
+			})
 			.then((recentlyPlayedTracks) => {
 				if (!recentlyPlayedTracks) {
 					return resolve([])
@@ -182,20 +218,25 @@ export function fetchRecentlyPlayedArtists(
 					return resolve([])
 				}
 
-				getItemsApi(api)
-					.getItems({
-						userId: user.id,
-						includeItemTypes: [BaseItemKind.MusicArtist],
-						ids: artistIds,
-						fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
-						enableImages: true,
-						enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
-						imageTypeLimit: 1,
-					})
+				getLibraryApi(api)
+					.getItems(
+						{
+							userId: user.id,
+							includeItemTypes: [BaseItemKind.MusicArtist],
+							ids: artistIds,
+							fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
+							enableImages: true,
+							enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+							imageTypeLimit: 1,
+							enableUserData: true,
+						},
+						{ signal },
+					)
 					.then(({ data }) => {
 						const fetchedArtists = data.Items ?? []
 
 						fetchedArtists.forEach((artist) => {
+							setQueryUserDataForItem(artist)
 							queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
 						})
 

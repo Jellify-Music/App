@@ -1,123 +1,94 @@
-import { queryClient } from '../../../constants/query-client'
-import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
-import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { getUserDataApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
-import Toast from 'react-native-toast-message'
-import { getApi, getUser, getLibrary } from '../../../stores/auth/utils'
-import { TrackQueryKeys } from '../../queries/track/keys'
-import { QueryKeys } from '../../../enums/query-keys'
-import { captureError, LoggingContext } from '../../../utils/logging'
-import { setQueryUserDataForItem } from '../../queries/user-data'
+import { getApi } from '../../../stores/auth/utils'
+import { LoggingContext } from '../../../utils/logging'
 import { applyHapticFeedback } from '../../../utils/haptics'
+import { handleError } from '../../../utils/errors'
+import { ApiNotAvailableError } from '../../../types/errors'
+import { EventHandler } from '../../../types/Events'
+import { onFavoriteChanged } from './utils/on-change'
+
+export const FAVORITE_MUTATION_KEY = ['favorite']
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
-	onToggle?: () => void
+	onToggle?: EventHandler
 }
 
 /**
- * Optimized query invalidation that only invalidates:
- * 1. The query for the specific item type (Tracks, Albums, or Artists)
- * 2. Only favorites-filtered queries when isFavorites === true
- * This prevents unnecessary refetches of large lists when filters aren't active.
+ * Marks or unmarks an item as a favorite in Jellyfin, without the UI side effects of the hooks.
+ * Used by the system media controls, which toggle favorites outside of React.
+ *
+ * @param item The item to mark or unmark as a favorite
+ * @param isFavorite Whether the item should be marked as a favorite or not
+ *
+ * @returns A promise that resolves when the favorite status has been updated
  */
-function invalidateRelevantQueries(item: BaseItemDto): void {
-	const library = getLibrary()
+export async function setFavorite(item: BaseItemDto, isFavorite: boolean): Promise<void> {
+	const api = getApi()
 
-	// Only invalidate if favorites filter is active, or always invalidate favorites-filtered queries
-	// (so they're fresh when user turns on filter later)
-	if (!library) return
+	if (isUndefined(api)) throw new ApiNotAvailableError()
+	if (isUndefined(item.Id)) throw new Error('Item ID is undefined')
 
-	const libraryId = library.musicLibraryId
+	const { data } = isFavorite
+		? await getUserDataApi(api).markFavoriteItem({ itemId: item.Id })
+		: await getUserDataApi(api).unmarkFavoriteItem({ itemId: item.Id })
 
-	// Determine which query to invalidate based on item type
-	// Always invalidate favorites-filtered queries so they're fresh when filter is turned on
-	if (item.Type === BaseItemKind.Audio) {
-		// For tracks: always invalidate favorites-filtered query
-		queryClient.invalidateQueries({
-			predicate: (query) => {
-				const key = query.queryKey
-				if (key[0] !== TrackQueryKeys.AllTracks) return false
-				if (key[1] !== libraryId) return false
-				// Always invalidate favorites-filtered queries (so they're fresh when filter is turned on)
-				if (key[2] === 'favorites:true') return true
-				return false
-			},
-		})
-	} else if (item.Type === BaseItemKind.MusicAlbum) {
-		// For albums: always invalidate favorites-filtered query
-		queryClient.invalidateQueries({
-			predicate: (query) => {
-				const key = query.queryKey
-				if (key[0] !== QueryKeys.InfiniteAlbums) return false
-				if (key[2] !== libraryId) return false
-				// Always invalidate favorites-filtered queries
-				if (key[1] === true) return true
-				return false
-			},
-		})
-	} else if (item.Type === BaseItemKind.MusicArtist) {
-		// For artists: always invalidate favorites-filtered query
-		queryClient.invalidateQueries({
-			predicate: (query) => {
-				const key = query.queryKey
-				if (key[0] !== QueryKeys.InfiniteArtists) return false
-				if (key[3] !== libraryId) return false
-				// Always invalidate favorites-filtered queries
-				if (key[1] === true) return true
-				return false
-			},
-		})
-	}
+	onFavoriteChanged(item, data)
 }
 
+/**
+ * Adds a favorite item to the user's favorites
+ *
+ * @param item The item to add to favorites
+ *
+ * @returns A mutation object for adding a favorite item
+ */
 export const useAddFavorite = () => {
 	return useMutation({
+		mutationKey: FAVORITE_MUTATION_KEY,
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
 
 			if (isUndefined(api)) Promise.reject('API instance not defined')
 			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
 			else
-				return await getUserLibraryApi(api).markFavoriteItem({
+				return await getUserDataApi(api).markFavoriteItem({
 					itemId: item.Id,
 				})
 		},
 		onSuccess: (data, { item, onToggle }) => {
 			applyHapticFeedback('success')
 
-			const user = getUser()
-
 			if (onToggle) onToggle()
 
-			if (user) setQueryUserDataForItem(item, data?.data)
-
-			// Optimized: Only invalidate the relevant query based on item type and filter state
-			invalidateRelevantQueries(item)
+			onFavoriteChanged(item, data?.data)
 		},
-		onError: (error, variables) => {
-			captureError(error, LoggingContext.Favorites, 'Unable to set favorite for item')
-
-			applyHapticFeedback('error')
-
-			Toast.show({
-				text1: 'Failed to add favorite',
-				type: 'error',
-			})
+		onError: (error) => {
+			handleError(error, LoggingContext.Favorites, 'addFavorite')
 		},
 	})
 }
 
+/**
+ * Removes a favorite item from the user's favorites
+ *
+ * @param item The item to remove from favorites
+ *
+ * @returns A mutation object for removing a favorite item
+ */
 export const useRemoveFavorite = () => {
 	return useMutation({
+		mutationKey: FAVORITE_MUTATION_KEY,
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
 
 			if (isUndefined(api)) Promise.reject('API instance not defined')
 			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
 			else
-				return await getUserLibraryApi(api).unmarkFavoriteItem({
+				return await getUserDataApi(api).unmarkFavoriteItem({
 					itemId: item.Id,
 				})
 		},
@@ -126,20 +97,10 @@ export const useRemoveFavorite = () => {
 
 			if (onToggle) onToggle()
 
-			setQueryUserDataForItem(item, data?.data)
-
-			// Optimized: Only invalidate the relevant query based on item type and filter state
-			invalidateRelevantQueries(item)
+			onFavoriteChanged(item, data?.data)
 		},
-		onError: (error, variables) => {
-			captureError(error, LoggingContext.Favorites, 'Unable to remove favorite for item')
-
-			applyHapticFeedback('error')
-
-			Toast.show({
-				text1: 'Failed to remove favorite',
-				type: 'error',
-			})
+		onError: (error) => {
+			handleError(error, LoggingContext.Favorites, 'removeFavorite')
 		},
 	})
 }

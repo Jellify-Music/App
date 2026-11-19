@@ -3,13 +3,14 @@ import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
 import { JellifyUser } from '../../../types/JellifyUser'
 import { isUndefined } from 'lodash'
-import { getQuickConnectApi, getUserApi } from '@jellyfin/sdk/lib/utils/api'
+import { getAuthenticationApi } from '@jellyfin/sdk/lib/utils/api'
 import { useNavigation } from '@react-navigation/native'
-import LoginStackParamList from '@/src/screens/Login/types'
+import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyUser } from '../../../stores/auth'
-import Toast from 'react-native-toast-message'
+import { handleError } from '../../../utils/errors'
+import { LoggingContext } from '../../../utils/logging'
 
 export const useInitiateQuickConnect = () => {
 	const api = getApi()
@@ -18,15 +19,10 @@ export const useInitiateQuickConnect = () => {
 		mutationFn: async () => {
 			if (isUndefined(api)) return Promise.reject(new Error('API client is not initialized'))
 
-			return await getQuickConnectApi(api).initiateQuickConnect()
+			return await getAuthenticationApi(api).initiateQuickConnect()
 		},
 		onError: async (error: Error) => {
-			Toast.show({
-				text1: 'Unable to initiate Quick Connect',
-				text2: error.message,
-				type: 'error',
-			})
-			console.error('An error occurred initiating Quick Connect', error)
+			handleError(error, LoggingContext.Authentication, 'initiateQuickConnect')
 		},
 		onSuccess: async ({ data }, variables) => {
 			console.log(`Successfully initiated Quick Connect. Code is ${data.Code}`)
@@ -42,7 +38,7 @@ export const useAuthorizeQuickConnect = () => {
 	return useMutation({
 		mutationFn: async (code: string) => {
 			if (user) {
-				return await getQuickConnectApi(api!).authorizeQuickConnect({
+				return await getAuthenticationApi(api!).authorizeQuickConnect({
 					code,
 					userId: user.id,
 				})
@@ -56,11 +52,11 @@ const useAuthenticateWithQuickConnect = () => {
 
 	const [, setUser] = useJellifyUser()
 
-	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
+	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	return useMutation({
 		mutationFn: async (secret: string) => {
-			return await getUserApi(api!).authenticateWithQuickConnect({
+			return await getAuthenticationApi(api!).authenticateWithQuickConnect({
 				quickConnectDto: { Secret: secret },
 			})
 		},
@@ -84,10 +80,10 @@ const useAuthenticateWithQuickConnect = () => {
 			}
 
 			setUser(user)
-			navigation.navigate('LibrarySelection')
+			navigation.navigate('Tabs')
 		},
 		onError: async (error: Error) => {
-			console.error('An error occurred connecting to the Jellyfin instance', error)
+			handleError(error, LoggingContext.Authentication, 'quickConnectSignIn')
 		},
 		retry: 0,
 		gcTime: 0,
@@ -99,7 +95,7 @@ const useQuickConnectStatus = () => {
 
 	return useMutation({
 		mutationFn: async (secret: string) => {
-			return await getQuickConnectApi(api!).getQuickConnectState({
+			return await getAuthenticationApi(api!).getQuickConnectState({
 				secret,
 			})
 		},

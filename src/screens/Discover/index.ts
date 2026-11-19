@@ -1,53 +1,40 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import Index from '../../components/Discover/component'
+import Index from '../../components/Discover'
 import DiscoverAlbums from './albums'
 import PublicPlaylists from './playlists'
 import SuggestedArtists from './artists'
 import DiscoverStackParamList, { DiscoverAlbumScreenType } from './types'
 import { BaseStack } from '../base-stack'
-import useJellifyStore from '../../stores/auth'
+import { stackScreenOptions } from '../navigation'
+import { getPublicServerInfo } from '../../api/queries/public-server-info'
+import i18n from '../../i18n'
 
 const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 	initialRouteName: 'Discover',
+	screenOptions: stackScreenOptions,
 	screens: {
 		Discover: {
 			screen: Index,
-			options: {
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
-			},
 		},
 		...BaseStack,
 		Albums: {
 			screen: DiscoverAlbums,
 			options: ({ route }) => ({
 				title: getAlbumScreenTitle(route.params.type),
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
 			}),
 		},
 		PublicPlaylists: {
 			screen: PublicPlaylists,
-			options: {
-				title: `Playlists on ${useJellifyStore.getState().server?.name || 'Jellyfin'}`,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
-			},
+			options: () => ({
+				title: i18n.t('discover.playlistsOn', {
+					server: getPublicServerInfo()?.ServerName ?? 'Jellyfin',
+				}),
+			}),
 		},
 		SuggestedArtists: {
 			screen: SuggestedArtists,
 			options: {
-				title: 'Artists for You',
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
+				title: i18n.t('discover.artistsForYou'),
 			},
 		},
 	},
@@ -56,11 +43,13 @@ const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 function getAlbumScreenTitle(type: DiscoverAlbumScreenType) {
 	switch (type) {
 		case DiscoverAlbumScreenType.RecentlyAdded:
-			return 'Recently Added'
+			return i18n.t('discover.recentlyAdded')
 		case DiscoverAlbumScreenType.Suggested:
-			return 'More from the Vault'
+			return i18n.t('discover.moreFromTheVault')
 		default:
-			return 'Albums on Jellyfin'
+			return i18n.t('discover.albumsOn', {
+				server: getPublicServerInfo()?.ServerName ?? 'Jellyfin',
+			})
 	}
 }
 

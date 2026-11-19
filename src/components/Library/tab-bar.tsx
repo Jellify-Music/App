@@ -1,27 +1,45 @@
-import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
-import React from 'react'
-import { XStack, YStack, Paragraph } from 'tamagui'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { MaterialTopTabBar, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
+import { useIsAudioMuseEnabled } from '../../api/queries/plugins'
 import Icon from '../Global/components/icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useLibraryStore from '../../stores/library'
-import { handleLibraryShuffle } from '../../hooks/player/functions/shuffle'
+import { handleLibraryShuffle } from '../../player/controls/shuffle'
 import { TrackPlayer } from 'react-native-nitro-player'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { applyHapticFeedback } from '../../utils/haptics'
+import { handleError } from '../../utils/errors'
+import { LoggingContext } from '../../utils/logging'
+import { SizableText, useTheme, XStack, YStack } from 'tamagui'
+import { useTranslation } from 'react-i18next'
 
-function LibraryTabBar(props: MaterialTopTabBarProps) {
+export default function LibraryTabBar(props: MaterialTopTabBarProps) {
+	const { t } = useTranslation()
+
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const insets = useSafeAreaInsets()
 
+	const { darkBackground75 } = useTheme()
+
+	const audioMuseEnabled = useIsAudioMuseEnabled()
+
+	const tabBarShadowStyle = {
+		boxShadow: [
+			{
+				offsetY: 3,
+				offsetX: 0,
+				blurRadius: 6,
+				spreadDistance: 1,
+				color: darkBackground75.val,
+			},
+		],
+	}
+
 	const currentTab = props.state.routes[props.state.index].name as
-		| 'Tracks'
-		| 'Albums'
-		| 'Artists'
-		| 'Playlists'
+		'Tracks' | 'Albums' | 'Artists' | 'Playlists'
 
 	// Subscribe directly to the current tab's filter state for reactivity
 	const currentFilters = useLibraryStore((state) => {
@@ -46,38 +64,28 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 
 			await TrackPlayer.play()
 		} catch (error) {
-			console.error('Failed to shuffle and play:', error)
+			handleError(error, LoggingContext.Queue, 'shuffleLibrary')
 		}
 	}
 
 	return (
-		<YStack marginTop={insets.top}>
+		<YStack marginTop={insets.top} style={tabBarShadowStyle}>
 			<MaterialTopTabBar {...props} />
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
 					alignContent={'flex-start'}
 					justifyContent='flex-start'
-					paddingHorizontal={'$1'}
-					paddingVertical={'$2'}
-					gap={'$2'}
+					paddingHorizontal='1'
+					paddingVertical='2'
+					gap='2'
 				>
 					{props.state.routes[props.state.index].name === 'Playlists' && (
-						<XStack
-							onPress={() => {
-								applyHapticFeedback('info')
-								props.navigation.navigate('AddPlaylist')
-							}}
-							alignItems={'center'}
-							justifyContent={'center'}
-							{...ICON_PRESS_STYLES}
-						>
-							<Icon name={'plus-circle-outline'} color={'$primary'} />
+						<>
+							<AddPlaylistButton />
 
-							<Paragraph fontWeight={'$6'} color={'$primary'}>
-								Create Playlist
-							</Paragraph>
-						</XStack>
+							{audioMuseEnabled && <GeneratePlaylistButton />}
+						</>
 					)}
 
 					{props.state.routes[props.state.index].name === 'Tracks' && (
@@ -87,11 +95,11 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 							justifyContent={'center'}
 							{...ICON_PRESS_STYLES}
 						>
-							<Icon name={'shuffle'} color={'$borderColor'} />
+							<Icon name={'shuffle'} color={'borderColor'} />
 
-							<Paragraph fontWeight={'$6'} color={'$borderColor'}>
-								All
-							</Paragraph>
+							<SizableText fontSize='2' fontWeight='6' color='borderColor'>
+								{t('common.all')}
+							</SizableText>
 						</XStack>
 					)}
 
@@ -108,11 +116,11 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 								justifyContent={'center'}
 								{...ICON_PRESS_STYLES}
 							>
-								<Icon name={'sort'} color={'$borderColor'} />
+								<Icon name={'sort'} color={'borderColor'} />
 
-								<Paragraph fontWeight={'$6'} color={'$borderColor'}>
-									Sort
-								</Paragraph>
+								<SizableText fontSize='2' fontWeight='6' color='borderColor'>
+									{t('library.sort')}
+								</SizableText>
 							</XStack>
 
 							<XStack
@@ -128,15 +136,16 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 							>
 								<Icon
 									name={hasActiveFilters ? 'filter-variant' : 'filter'}
-									color={hasActiveFilters ? '$primary' : '$borderColor'}
+									color={hasActiveFilters ? 'primary' : 'borderColor'}
 								/>
 
-								<Paragraph
-									fontWeight={'$6'}
-									color={hasActiveFilters ? '$primary' : '$borderColor'}
+								<SizableText
+									fontSize='2'
+									fontWeight='6'
+									color={`${hasActiveFilters ? 'primary' : 'borderColor'}`}
 								>
-									Filter
-								</Paragraph>
+									{t('library.filter')}
+								</SizableText>
 							</XStack>
 						</>
 					)}
@@ -168,16 +177,16 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 											.setArtistsFilters({ isFavorites: undefined })
 									}
 								}}
-								pressStyle={{ opacity: 0.6 }}
+								opacity='1 press:0.6'
 								transition='quick'
 								alignItems={'center'}
 								justifyContent={'center'}
 							>
-								<Icon name={'filter-remove'} color={'$borderColor'} />
+								<Icon name={'filter-remove'} color={'borderColor'} />
 
-								<Paragraph fontWeight={'$6'} color={'$borderColor'}>
-									Clear
-								</Paragraph>
+								<SizableText fontSize='2' fontWeight='6' color='borderColor'>
+									{t('common.clear')}
+								</SizableText>
 							</XStack>
 						)}
 				</XStack>
@@ -186,4 +195,48 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	)
 }
 
-export default LibraryTabBar
+function AddPlaylistButton() {
+	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+
+	const onPress = () => {
+		applyHapticFeedback('info')
+		navigation.navigate('AddPlaylist')
+	}
+
+	return (
+		<XStack
+			onPress={onPress}
+			alignItems={'center'}
+			justifyContent={'center'}
+			{...ICON_PRESS_STYLES}
+		>
+			<Icon name={'playlist-plus'} color={'borderColor'} />
+			<SizableText fontSize='2' fontWeight='6' color='borderColor'>
+				Add
+			</SizableText>
+		</XStack>
+	)
+}
+
+function GeneratePlaylistButton() {
+	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+
+	const onPress = () => {
+		applyHapticFeedback('info')
+		navigation.navigate('GeneratePlaylist')
+	}
+
+	return (
+		<XStack
+			onPress={onPress}
+			alignItems={'center'}
+			justifyContent={'center'}
+			{...ICON_PRESS_STYLES}
+		>
+			<Icon name={'creation'} color={'borderColor'} />
+			<SizableText fontSize='2' fontWeight='6' color='borderColor'>
+				Generate
+			</SizableText>
+		</XStack>
+	)
+}

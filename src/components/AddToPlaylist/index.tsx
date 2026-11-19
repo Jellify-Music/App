@@ -1,23 +1,12 @@
-import { useMutation, InfiniteData } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { addManyToPlaylist } from '../../api/mutations/playlist/utils/playlists'
-import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
-import Icon from '../Global/components/icon'
-import { AddToPlaylistMutation } from './types'
-import { Text } from '../Global/helpers/text'
-import ItemImage from '../Global/components/image'
-import TextTicker from 'react-native-text-ticker'
-import { TextTickerConfig } from '../Player/component.config'
-import { getItemName } from '../../utils/formatting/item-names'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
-import { getApi, getUser } from '../../stores/auth/utils'
-import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { useState } from 'react'
-import { queryClient } from '../../constants/query-client'
-import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
-import { ViewToken } from '@legendapp/list/react-native'
-import List from '../Global/helpers/list'
+import { View } from 'tamagui'
+import { useRecentlyUpdatedPlaylists } from '../../api/queries/playlist'
+import { AnimatedList } from '../Global/components/Lists/utils'
+import type { LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { LinearTransition } from 'react-native-reanimated'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import AddToPlaylistRow from './components/row'
+import AddToPlaylistHeader from './components/header'
 
 export default function AddToPlaylist({
 	tracks,
@@ -30,160 +19,32 @@ export default function AddToPlaylist({
 		data: playlists,
 		isPending: playlistsFetchPending,
 		isSuccess: playlistsFetchSuccess,
-	} = useUserPlaylists()
+	} = useRecentlyUpdatedPlaylists()
 
-	const [visiblePlaylistIds, setVisiblePlaylistIds] = useState<string[]>([])
+	const { bottom } = useSafeAreaInsets()
 
-	const onViewableItemsChanged = ({
-		viewableItems,
-	}: {
-		viewableItems: ViewToken<BaseItemDto>[]
-	}) => {
-		const visibleIds = viewableItems.map(({ item }) => item.Id!)
-		setVisiblePlaylistIds(visibleIds)
-	}
+	const renderItem = ({ item: playlist }: LegendListRenderItemProps<BaseItemDto>) => (
+		<AddToPlaylistRow
+			playlist={playlist}
+			tracks={tracks ? tracks : tracks[0] ? [tracks[0]] : []}
+		/>
+	)
 
 	return (
 		<View flex={1}>
-			{(source ?? tracks[0]) && (
-				<XStack gap={'$2'} margin={'$2'} elevation={'$4'}>
-					<ItemImage
-						item={source ?? tracks[0]}
-						width={'$6'}
-						height={'$6'}
-						imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 90 }}
-					/>
-
-					<YStack justifyContent='space-evenly'>
-						<TextTicker {...TextTickerConfig}>
-							<Text bold fontSize={'$6'}>
-								{getItemName(source ?? tracks[0])}
-							</Text>
-						</TextTicker>
-
-						{(source ?? tracks[0])?.ArtistItems && (
-							<TextTicker {...TextTickerConfig}>
-								<Text bold>
-									{`${(source ?? tracks[0])!.ArtistItems?.map((artist) => getItemName(artist)).join(', ')}`}
-								</Text>
-							</TextTicker>
-						)}
-					</YStack>
-				</XStack>
-			)}
-
+			<AddToPlaylistHeader source={source} tracks={tracks} />
 			{!playlistsFetchPending && playlistsFetchSuccess && (
-				<List
+				// Adding to a playlist moves it to the front of the list, so animate the reorder
+				<AnimatedList<BaseItemDto>
 					data={playlists}
-					renderItem={({ item: playlist }) => (
-						<AddToPlaylistRow
-							key={playlist.Id}
-							playlist={playlist}
-							tracks={tracks ? tracks : tracks[0] ? [tracks[0]] : []}
-							visible={visiblePlaylistIds.includes(playlist.Id!)}
-						/>
-					)}
-					onViewableItemsChanged={onViewableItemsChanged}
+					itemLayoutAnimation={LinearTransition.springify()}
+					renderItem={renderItem}
+					contentContainerStyle={{
+						margin: 8,
+						paddingBottom: bottom,
+					}}
 				/>
 			)}
 		</View>
-	)
-}
-
-function AddToPlaylistRow({
-	playlist,
-	tracks,
-	visible,
-}: {
-	playlist: BaseItemDto
-	tracks: BaseItemDto[]
-	visible: boolean
-}): React.JSX.Element {
-	const { data: playlistTracks, isPending: fetchingPlaylistTracks } = usePlaylistTracks(
-		playlist,
-		!visible,
-	)
-
-	const useAddToPlaylist = useMutation({
-		mutationFn: ({ playlist, tracks }: AddToPlaylistMutation) => {
-			triggerHaptic('impactLight')
-
-			const api = getApi()
-			const user = getUser()
-
-			return addManyToPlaylist(api, user, tracks, playlist)
-		},
-		onSuccess: (_, { tracks }) => {
-			triggerHaptic('notificationSuccess')
-
-			queryClient.setQueryData(
-				PlaylistTracksQueryKey(playlist),
-				(prev: InfiniteData<BaseItemDto[]> | undefined) => {
-					if (!prev) return prev
-
-					return {
-						...prev,
-						pages: prev.pages.map((page: BaseItemDto[], idx: number) =>
-							idx === prev.pages.length - 1 ? [...page, ...tracks] : page,
-						),
-					}
-				},
-			)
-		},
-		onError: (error) => {
-			console.error(error)
-			triggerHaptic('notificationError')
-		},
-	})
-
-	const isInPlaylist =
-		tracks.filter((track) =>
-			playlistTracks?.map((playlistTrack) => playlistTrack.Id).includes(track.Id!),
-		).length > 0
-
-	return (
-		<XStack
-			transition={'quick'}
-			disabled={isInPlaylist}
-			alignItems='center'
-			gap={'$2'}
-			margin={'$2'}
-			opacity={isInPlaylist ? 0.5 : 1}
-			pressStyle={{ opacity: 0.6 }}
-			onPress={() => {
-				if (!isInPlaylist) {
-					useAddToPlaylist.mutate({
-						tracks,
-						playlist,
-					})
-				}
-			}}
-		>
-			<ItemImage
-				item={playlist}
-				height={'$4'}
-				width={'$4'}
-				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
-			/>
-
-			<YStack alignItems='flex-start' justifyContent='space-evenly' flexGrow={1}>
-				<Text bold>{playlist.Name ?? 'Untitled Playlist'}</Text>
-
-				<Text color={'$neutral'}>{`${playlistTracks?.length ?? 0} tracks`}</Text>
-			</YStack>
-
-			<Animated.View
-				entering={FadeIn.easing(Easing.in(Easing.ease))}
-				exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			>
-				{isInPlaylist ? (
-					<Icon flex={1} name='check-circle-outline' color={'$success'} />
-				) : fetchingPlaylistTracks || useAddToPlaylist.isPending ? (
-					<Spinner color={'$primary'} />
-				) : (
-					<Spacer flex={1} />
-				)}
-			</Animated.View>
-		</XStack>
 	)
 }

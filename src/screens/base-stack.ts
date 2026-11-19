@@ -2,14 +2,15 @@ import AlbumScreen from './Album'
 import ArtistScreen from './Artist'
 import { PlaylistScreen } from './Playlist'
 import TracksScreen from './Tracks'
-import InstantMix from '../components/InstantMix/component'
+import InstantMixScreen from './InstantMix'
 import { createNativeStackScreen } from '@react-navigation/native-stack'
+import i18n from '../i18n'
 
 export const BaseStack = {
 	Artist: createNativeStackScreen({
 		screen: ArtistScreen,
 		options: ({ route, theme }) => ({
-			title: route.params.artist.Name ?? 'Unknown Artist',
+			title: route.params.artist.Name ?? i18n.t('placeholders.unknownArtist'),
 			headerTitleStyle: {
 				color: theme.colors.background,
 			},
@@ -18,7 +19,7 @@ export const BaseStack = {
 	Album: createNativeStackScreen({
 		screen: AlbumScreen,
 		options: ({ route, theme }) => ({
-			title: route.params.album.Name ?? 'Untitled Album',
+			title: route.params.album.Name ?? i18n.t('placeholders.untitledAlbum'),
 			headerTitleStyle: {
 				color: theme.colors.background,
 			},
@@ -27,22 +28,27 @@ export const BaseStack = {
 	Playlist: createNativeStackScreen({
 		screen: PlaylistScreen,
 		options: ({ route, theme }) => ({
-			title: route.params.playlist.Name ?? 'Untitled Playlist',
+			title: route.params.playlist.Name ?? i18n.t('placeholders.untitledPlaylist'),
 			headerTitleStyle: {
 				color: theme.colors.background,
 			},
 		}),
 	}),
 	InstantMix: createNativeStackScreen({
-		screen: InstantMix,
+		screen: InstantMixScreen,
 		options: ({ route }) => ({
-			headerTitle: `${route.params.item.Name ?? route.params.item.OriginalTitle ?? 'Untitled'} Mix`,
+			headerTitle: i18n.t('instantMix.title', {
+				name:
+					route.params.item.Name ??
+					route.params.item.OriginalTitle ??
+					i18n.t('placeholders.untitled'),
+			}),
 		}),
 	}),
 	Tracks: createNativeStackScreen({
 		screen: TracksScreen,
 		options: {
-			title: 'Tracks',
+			title: i18n.t('navigation.tracks'),
 		},
 	}),
 }

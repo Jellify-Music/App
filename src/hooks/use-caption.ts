@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { INFO_CAPTIONS } from '../configs/messaging/info'
-import { ONE_HOUR } from '../constants/query-client'
 import { pickRandomItemFromArray } from '../utils/parsing/random'
 import { LOADING_CAPTIONS } from '../configs/messaging/loading'
+import { QueryAges } from '../constants/durations'
 
 enum CaptionQueryKeys {
 	InfoCaption,
@@ -13,7 +13,7 @@ export const useInfoCaption = () =>
 	useQuery({
 		queryKey: [CaptionQueryKeys.InfoCaption],
 		queryFn: () => `${pickRandomItemFromArray(INFO_CAPTIONS)}`,
-		staleTime: ONE_HOUR,
+		staleTime: QueryAges.OneHour,
 		initialData: 'Live and in stereo',
 		refetchOnMount: 'always',
 		refetchOnWindowFocus: 'always',

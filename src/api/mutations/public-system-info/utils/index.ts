@@ -1,81 +1,27 @@
-import { getSystemApi } from '@jellyfin/sdk/lib/utils/api'
-
-import { Jellyfin } from '@jellyfin/sdk/lib/jellyfin'
+import { ServerAddressNotAvailableError } from '../../../../types/errors'
 import { JellyfinInfo } from '../../../info'
-import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
-import { Api } from '@jellyfin/sdk'
-import HTTPS, { HTTP } from '../../../../constants/protocols'
-import { captureError } from '../../../../utils/logging'
-import LoggingContext from '../../../../utils/logging/enums'
-
-type ConnectionType = 'hostname' | 'ipAddress'
+import type { ConnectToServerResult } from '../types'
+import i18n from '../../../../i18n'
 
 /**
  * Attempts to connect to a Jellyfin server.
  *
+ * Address normalization (protocol, default ports) and candidate ranking is handled by the
+ * Jellyfin SDK. Candidates are ranked with HTTPS first, so HTTP is only used as a fallback.
+ *
  * @param serverAddress The server address to connect to.
- * @param useHttps Whether to use HTTPS.
- * @returns The public system info response.
+ * @returns The public system info response and the normalized URL of the responding server.
  */
-export async function connectToServer(serverAddress: string): Promise<{
-	publicSystemInfoResponse: PublicSystemInfo
-	connectionType: ConnectionType
-}> {
-	if (!serverAddress) throw new Error('Server address was empty')
+export async function connectToServer(serverAddress: string): Promise<ConnectToServerResult> {
+	if (!serverAddress) throw new ServerAddressNotAvailableError()
 
-	const serverAddressContainsProtocol =
-		serverAddress.includes(HTTP) || serverAddress.includes(HTTPS)
+	const candidates = await JellyfinInfo.discovery.getRecommendedServerCandidates(serverAddress)
+	const best = JellyfinInfo.discovery.findBestServer(candidates)
 
-	const jellyfin = new Jellyfin(JellyfinInfo)
+	if (!best?.systemInfo?.Version) throw new Error(i18n.t('login.unableToConnect'))
 
-	// Use the protocol provided in the server address if it exists, otherwise default to HTTPS
-	const hostnameApi = jellyfin.createApi(
-		`${serverAddressContainsProtocol ? '' : HTTPS}${serverAddress}`,
-	)
-
-	const httpApi = !serverAddressContainsProtocol
-		? jellyfin.createApi(`${HTTP}${serverAddress}`)
-		: undefined
-
-	// First attempt to connect using the hostname (with the protocol provided or defaulting to HTTPS)
-	try {
-		return await connect(hostnameApi, 'hostname')
-	} catch (error) {
-		console.info('Unable to connect, attempting to connect via HTTP if available')
+	return {
+		publicSystemInfoResponse: best.systemInfo,
+		resolvedUrl: best.address,
 	}
-
-	// If the first attempt fails and we haven't already tried HTTP, attempt to connect using HTTP
-	if (httpApi) {
-		try {
-			return await connect(httpApi, 'ipAddress')
-		} catch (error) {
-			console.info('Unable to connect via HTTP')
-		}
-	}
-
-	throw new Error('Unable to connect to Jellyfin')
-}
-
-function connect(api: Api, connectionType: ConnectionType) {
-	return getSystemApi(api)
-		.getPublicSystemInfo()
-		.then((response) => {
-			if (!response.data.Version)
-				throw new Error(
-					`Jellyfin instance did not respond to our ${connectionType} request`,
-				)
-
-			return {
-				publicSystemInfoResponse: response.data,
-				connectionType,
-			}
-		})
-		.catch((error) => {
-			captureError(
-				error,
-				LoggingContext.PublicSystemInfo,
-				`Failed to connect to Jellyfin via ${connectionType}`,
-			)
-			throw new Error(`Unable to connect to Jellyfin via ${connectionType}`)
-		})
 }

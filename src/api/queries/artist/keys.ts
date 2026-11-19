@@ -1,14 +1,17 @@
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { MusicLibraryQueryKey } from '../libraries/keys'
+
 enum ArtistQueryKeys {
 	ArtistById = 'ARTIST_BY_ID',
 	ArtistAlbums = 'ARTIST_ALBUMS',
 }
 
-export const ArtistQueryKey = (artistId: string | undefined | null) => [
+export const ArtistQueryKey = (artistId: BaseItemDto['Id']) => [
 	ArtistQueryKeys.ArtistById,
 	artistId,
 ]
 
-export const ArtistAlbumsQueryKey = (artistId: string | undefined | null) => [
-	ArtistQueryKeys.ArtistAlbums,
-	artistId,
-]
+export const ArtistAlbumsQueryKey = (
+	artistId: BaseItemDto['Id'],
+	libraryId: string | undefined,
+) => [ArtistQueryKeys.ArtistAlbums, artistId, MusicLibraryQueryKey(libraryId)]

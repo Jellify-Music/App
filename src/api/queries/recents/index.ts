@@ -1,22 +1,19 @@
 import { RecentlyPlayedArtistsQueryKey, RecentlyPlayedTracksQueryKey } from './keys'
-import {
-	InfiniteData,
-	QueryKey,
-	useInfiniteQuery,
-	UseInfiniteQueryOptions,
-} from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
+import type { BaseItemDtoInfiniteQueryOptions } from '@/src/api/types/infinite-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
 import { isUndefined } from 'lodash'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'
-import { ONE_HOUR } from '../../../constants/query-client'
+import { QueryAges } from '../../../constants/durations'
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
-const RECENTS_QUERY_CONFIG = {
-	staleTime: ONE_HOUR,
-} as const
+const RECENTS_QUERY_CONFIG: Pick<BaseItemDtoInfiniteQueryOptions, 'staleTime' | 'maxPages'> = {
+	staleTime: QueryAges.OneHour,
+	maxPages: MaxPages.Home,
+}
 
 export const useRecentlyPlayedTracks = () => {
 	const [library] = useJellifyLibrary()
@@ -26,17 +23,15 @@ export const useRecentlyPlayedTracks = () => {
 
 export const PlayItAgainQuery: (
 	library: JellifyLibrary | undefined,
-) => UseInfiniteQueryOptions<BaseItemDto[], Error, BaseItemDto[], QueryKey, number> = (
-	library: JellifyLibrary | undefined,
-) => {
+) => BaseItemDtoInfiniteQueryOptions = (library: JellifyLibrary | undefined) => {
 	const api = getApi()
 
 	const user = getUser()
 
 	return {
 		queryKey: RecentlyPlayedTracksQueryKey(user, library),
-		queryFn: ({ pageParam }: { pageParam: number }) =>
-			fetchRecentlyPlayed(api, user, library, pageParam),
+		queryFn: ({ pageParam, signal }) =>
+			fetchRecentlyPlayed(api, user, library, pageParam, signal),
 		initialPageParam: 0,
 		select: (data: InfiniteData<BaseItemDto[]>) => data.pages.flatMap((page) => page),
 		getNextPageParam: (
@@ -72,7 +67,8 @@ export const useRecentArtists = () => {
 
 	return useInfiniteQuery({
 		queryKey: RecentlyPlayedArtistsQueryKey(user, library),
-		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(api, user, library, pageParam),
+		queryFn: ({ pageParam, signal }) =>
+			fetchRecentlyPlayedArtists(api, user, library, pageParam, signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
