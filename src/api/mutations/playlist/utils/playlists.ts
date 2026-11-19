@@ -177,6 +177,7 @@ export async function createPlaylist(name: string) {
 					Name: name,
 					IsPublic: false,
 					MediaType: MediaType.Audio,
+					UserId: user.id,
 				},
 			})
 			.then((result) => {

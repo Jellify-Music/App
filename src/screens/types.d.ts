@@ -72,6 +72,9 @@ export type RootStackParamList = {
 		onDelete: () => void
 	}
 
+	AddPlaylistUsers: {
+		playlist: BaseItemDto
+	}
 	PrivacyPolicy: undefined
 
 	Ota: { pullRequest?: boolean } | undefined
@@ -84,5 +87,19 @@ export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
 export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
+export type FiltersProps = NativeStackScreenProps<RootStackParamList, 'Filters'>
+export type SortOptionsProps = NativeStackScreenProps<RootStackParamList, 'SortOptions'>
+export type GenreSelectionProps = NativeStackScreenProps<RootStackParamList, 'GenreSelection'>
+export type YearSelectionProps = NativeStackScreenProps<RootStackParamList, 'YearSelection'>
+
+export type GenresProps = {
+	genres: InfiniteData<BaseItemDto[], unknown> | undefined
+	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
+	hasNextPage: boolean
+	isPending: boolean
+	isFetchingNextPage: boolean
+}
+
+export type AddPlaylistUsersProps = NativeStackScreenProps<RootStackParamList, 'AddPlaylistUsers'>
 export type PrivacyPolicyProps = NativeStackScreenProps<RootStackParamList, 'PrivacyPolicy'>
 export type OtaProps = NativeStackScreenProps<RootStackParamList, 'Ota'>

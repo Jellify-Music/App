@@ -11,9 +11,11 @@ import AudioSpecsSheet from './Stats'
 import { getUser } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
+import addPlaylistUsers from './Library/add-playlist-users'
 import {
 	addToPlaylistSheetPresentation,
 	bottomSheetPresentation,
+	canUseFormSheet,
 	playerSheetPresentation,
 } from '../utils/navigating/form-sheet'
 import { createStaticNavigation, InitialState } from '@react-navigation/native'
@@ -103,6 +105,15 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				headerShown: false,
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
+			},
+		},
+		AddPlaylistUsers: {
+			screen: addPlaylistUsers,
+			options: {
+				title: i18n.t('playlist.share'),
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: canUseFormSheet ? [1.0] : undefined,
 				sheetGrabberVisible: true,
 			},
 		},
