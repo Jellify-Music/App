@@ -1,5 +1,7 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { getTokenValue, H5, XStack, YStack } from 'tamagui'
+import { getTokenValue, H5, useTheme, XStack, YStack } from 'tamagui'
+import { StyleSheet } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import ActionPill from './action-pill'
 import ItemImage from '../Global/components/image'
@@ -25,6 +27,9 @@ export default function ArtistHeader(): React.JSX.Element {
 
 	// the image runs up behind the status bar; the back and favourite pills sit on it (see the screen)
 	const { top } = useSafeAreaInsets()
+
+	const theme = useTheme()
+	const background = theme.background.val
 
 	const { artist, albums } = useArtistContext()
 
@@ -60,24 +65,37 @@ export default function ArtistHeader(): React.JSX.Element {
 
 	return (
 		<YStack>
+			{/* The image runs down to where the tabs start; the name and buttons sit on its foot */}
 			<ItemImage
 				item={artist}
-				height={getTokenValue('14', 'size') + top}
+				height={getTokenValue('14', 'size') + top + NAME_ROW_HEIGHT}
 				type={ImageType.Backdrop}
 				cornered
 				imageOptions={backdropImageOptions}
 			/>
 
-			{/* box-none: the space between the pills is still the image's, not theirs */}
+			{/* Fades the artwork into the page, so the name reads on any image */}
+			<LinearGradient
+				colors={[transparentOf(background), background]}
+				style={styles.gradient}
+				pointerEvents='none'
+			/>
+
+			{/* box-none: the space around the name and pill is still the image's, not theirs */}
 			<XStack
 				position='absolute'
 				left='$2'
 				right={AZ_SCROLLER_CLEARANCE}
 				bottom='$2'
 				alignItems='center'
-				justifyContent='flex-end'
+				justifyContent='space-between'
+				gap='$2'
 				pointerEvents='box-none'
 			>
+				<H5 fontWeight='6' flexShrink={1} numberOfLines={1}>
+					{artist.Name}
+				</H5>
+
 				<ActionPill>
 					<Icon
 						size='7'
@@ -96,13 +114,33 @@ export default function ArtistHeader(): React.JSX.Element {
 					/>
 				</ActionPill>
 			</XStack>
-
-			<YStack paddingHorizontal='2'>
-				<H5 fontWeight='6'>{artist.Name}</H5>
-			</YStack>
 		</YStack>
 	)
 }
+
+/** Room under the image's artwork for the name and the buttons that sit on its foot */
+const NAME_ROW_HEIGHT = 72
+
+/** The same colour with no opacity, so a fade to it doesn't pass through grey */
+function transparentOf(color: string): string {
+	const hex = /^#([0-9a-f]{6})/i.exec(color)
+	if (hex) return `#${hex[1]}00`
+
+	const rgb = /^rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/i.exec(color)
+	if (rgb) return `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, 0)`
+
+	return 'transparent'
+}
+
+const styles = StyleSheet.create({
+	gradient: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		bottom: 0,
+		height: '60%',
+	},
+})
 
 const backdropImageOptions: ImageUrlOptions = {
 	maxWidth: 1440,

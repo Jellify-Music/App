@@ -34,7 +34,7 @@ export default function ArtistScreen({
 					justifyContent='space-between'
 					pointerEvents='box-none'
 				>
-					<ActionPill>
+					<ActionPill circular>
 						<Icon
 							name='chevron-left'
 							size='7'
