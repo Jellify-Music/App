@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { DownloadManager, useDownloadProgress } from 'react-native-nitro-player'
@@ -10,6 +10,7 @@ import { QueryAges } from '../../constants/durations'
 import { chunk } from '../../utils/concurrency'
 import { handleError } from '../../utils/errors'
 import { LoggingContext } from '../../utils/logging'
+import useDownloadQueueStore from '../../stores/download-queue'
 import { useDownloadedIds } from '.'
 import { downloadItems } from './functions'
 import { useDeleteDownloads } from './mutations'
@@ -60,28 +61,83 @@ export function useArtistDownload() {
 
 	const [running, setRunning] = useState<Map<string, number>>(new Map())
 
-	useEffect(() => {
+	/** What the downloader is running or has waiting of this artist's, and how far along each is */
+	const readRunning = () => {
 		const ours = new Set(trackIds)
 
-		setRunning(
-			new Map(
-				DownloadManager.getActiveDownloads()
-					.filter(
-						(task) =>
-							ours.has(task.trackId) &&
-							(task.state === 'pending' || task.state === 'downloading'),
-					)
-					.map((task) => [task.trackId, progressMap.get(task.trackId)?.progress ?? 0]),
-			),
+		return new Map(
+			DownloadManager.getActiveDownloads()
+				.filter(
+					(task) =>
+						ours.has(task.trackId) &&
+						(task.state === 'pending' || task.state === 'downloading'),
+				)
+				.map((task): [string, number] => [
+					task.trackId,
+					progressMap.get(task.trackId)?.progress ?? 0,
+				]),
 		)
+	}
+
+	useEffect(() => {
+		setRunning(readRunning())
 	}, [progressMap, tracks])
+
+	/** Set by {@link cancel}, and read between batches so that the ones not yet handed over never are */
+	const cancelled = useRef(false)
+
+	/**
+	 * Stops these tracks' downloads, running or waiting, and forgets what was queued and not finished.
+	 * Only these tracks: whatever else is downloading carries on. Tracks already downloaded stay.
+	 */
+	const cancelTracks = async (ids: ReadonlySet<string>) => {
+		const tasks = DownloadManager.getActiveDownloads().filter(
+			(task) =>
+				ids.has(task.trackId) &&
+				(task.state === 'pending' ||
+					task.state === 'downloading' ||
+					task.state === 'paused'),
+		)
+
+		await Promise.allSettled(
+			tasks.map((task) => DownloadManager.cancelDownload(task.downloadId)),
+		)
+
+		const { entries, remove } = useDownloadQueueStore.getState()
+		remove(
+			Object.values(entries)
+				.filter((entry) => ids.has(entry.trackId) && !entry.done)
+				.map((entry) => entry.trackId),
+		)
+
+		// a task that was only waiting may never say it is gone, so look rather than wait to be told
+		setRunning(readRunning())
+	}
 
 	const download = useMutation({
 		mutationFn: async (items: typeof missingTracks) => {
-			for (const batch of chunk(items, DOWNLOAD_BATCH_SIZE)) await downloadItems(batch)
+			cancelled.current = false
+
+			for (const batch of chunk(items, DOWNLOAD_BATCH_SIZE)) {
+				if (cancelled.current) break
+
+				await downloadItems(batch)
+
+				// stopped while this batch was being handed over: stop what it just started too
+				if (cancelled.current) {
+					await cancelTracks(new Set(batch.map((track) => track.Id!)))
+					break
+				}
+			}
 		},
 		onError: (error) => handleError(error, LoggingContext.Downloads, 'download'),
 	})
+
+	const cancel = async () => {
+		cancelled.current = true
+
+		await cancelTracks(new Set(trackIds))
+	}
 
 	const { mutate: removeDownloads } = useDeleteDownloads()
 
@@ -138,5 +194,5 @@ export function useArtistDownload() {
 			() => removeDownloads(trackIds),
 		)
 
-	return { state, progress, startDownload, removeAll }
+	return { state, progress, startDownload, removeAll, cancel }
 }

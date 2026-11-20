@@ -107,7 +107,8 @@
 			"removeMessage_one": "{{count}} downloaded track by {{name}} will be removed from your device.",
 			"removeMessage_other": "{{count}} downloaded tracks by {{name}} will be removed from your device.",
 			"downloadAll": "Download all",
-			"removeAll": "Remove all downloads"
+			"removeAll": "Remove all downloads",
+			"stop": "Stop downloading"
 		},
 		"links": {
 			"musicbrainz": "MusicBrainz",

@@ -3,6 +3,7 @@ import { Alert } from 'react-native'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import useDownloadQueueStore from '../../src/stores/download-queue'
 import {
 	ARTIST_DOWNLOAD_CONFIRM_THRESHOLD,
 	useArtistDownload,
@@ -10,7 +11,8 @@ import {
 
 let mockTracks: BaseItemDto[] = []
 let mockDownloaded = new Set<string>()
-let mockActive: { trackId: string; state: string }[] = []
+let mockActive: { trackId: string; state: string; downloadId?: string }[] = []
+const mockCancelDownload = jest.fn<Promise<void>, [string]>()
 let mockProgressMap = new Map<string, { progress: number }>()
 let mockAlbums: BaseItemDto[] | undefined = [{ Id: 'album-1' }]
 let mockFeaturedOn: BaseItemDto[] | undefined = [{ Id: 'album-2' }]
@@ -43,9 +45,13 @@ jest.mock('../../src/hooks/downloads/mutations', () => ({
 
 jest.mock('react-native-nitro-player', () => ({
 	useDownloadProgress: () => ({ progressMap: mockProgressMap }),
-	DownloadManager: { getActiveDownloads: () => mockActive },
+	DownloadManager: {
+		getActiveDownloads: () => mockActive,
+		cancelDownload: (id: string) => mockCancelDownload(id),
+	},
 }))
 
+jest.mock('../../src/constants/storage', () => require('../helpers/memory-storage'))
 jest.mock('../../src/stores/auth/utils', () => ({ getApi: () => ({}), getUser: () => ({}) }))
 
 const tracks = (count: number): BaseItemDto[] =>
@@ -88,6 +94,8 @@ describe('useArtistDownload', () => {
 		mockDownloaded = new Set()
 		mockActive = []
 		mockProgressMap = new Map()
+		mockCancelDownload.mockReset().mockResolvedValue(undefined)
+		useDownloadQueueStore.setState({ entries: {} })
 		mockAlbums = [{ Id: 'album-1' }]
 		mockFeaturedOn = [{ Id: 'album-2' }]
 		mockDownloadItems.mockReset().mockResolvedValue(undefined)
@@ -262,5 +270,94 @@ describe('useArtistDownload', () => {
 
 		// 4 done, one half way, one queued: (4 + 0.5 + 0) / 10
 		await waitFor(() => expect(result.current.progress).toBeCloseTo(0.45))
+	})
+
+	describe('stopping it', () => {
+		it("cancels this artist's running and waiting downloads, and nothing else", async () => {
+			mockTracks = tracks(10)
+			mockActive = [
+				{ trackId: 'track-1', downloadId: 'd1', state: 'downloading' },
+				{ trackId: 'track-2', downloadId: 'd2', state: 'pending' },
+				{ trackId: 'track-3', downloadId: 'd3', state: 'paused' },
+				{ trackId: 'track-4', downloadId: 'd4', state: 'completed' },
+				{ trackId: 'someone-elses', downloadId: 'd5', state: 'downloading' },
+			]
+			const { result } = await setup()
+
+			await act(async () => result.current.cancel())
+
+			expect(mockCancelDownload.mock.calls.map(([id]) => id).sort()).toEqual([
+				'd1',
+				'd2',
+				'd3',
+			])
+		})
+
+		it('forgets what was queued and not finished, and keeps what is done', async () => {
+			mockTracks = tracks(10)
+			useDownloadQueueStore.getState().record([
+				{ Id: 'track-1', AlbumId: 'a' },
+				{ Id: 'track-2', AlbumId: 'a' },
+				{ Id: 'someone-elses', AlbumId: 'z' },
+			])
+			useDownloadQueueStore.getState().markDone('track-1')
+			const { result } = await setup()
+
+			await act(async () => result.current.cancel())
+
+			expect(Object.keys(useDownloadQueueStore.getState().entries).sort()).toEqual([
+				'someone-elses',
+				'track-1',
+			])
+		})
+
+		it('does not fail when a download cannot be cancelled', async () => {
+			mockTracks = tracks(3)
+			mockActive = [{ trackId: 'track-1', downloadId: 'd1', state: 'downloading' }]
+			mockCancelDownload.mockRejectedValue(new Error('already finished'))
+			const { result } = await setup()
+
+			await expect(act(async () => result.current.cancel())).resolves.not.toThrow()
+		})
+
+		it('stops handing tracks over, and stops the batch that was being handed over', async () => {
+			mockTracks = tracks(60)
+			let release!: () => void
+			mockDownloadItems.mockImplementationOnce(
+				() => new Promise<void>((resolve) => (release = resolve)),
+			)
+			const { result } = await setup()
+
+			await act(async () => result.current.startDownload())
+			await waitFor(() => expect(mockDownloadItems).toHaveBeenCalledTimes(1))
+
+			// told to stop while the first batch is still being handed over
+			await act(async () => result.current.cancel())
+
+			// the first batch gets going just as it is let through
+			mockActive = [{ trackId: 'track-0', downloadId: 'd0', state: 'pending' }]
+			await act(async () => release())
+
+			await waitFor(() => expect(mockCancelDownload).toHaveBeenCalledWith('d0'))
+			// the other two batches are never handed over
+			expect(mockDownloadItems).toHaveBeenCalledTimes(1)
+		})
+
+		it('is ready to be started again once stopped', async () => {
+			mockTracks = tracks(10)
+			mockActive = [{ trackId: 'track-1', downloadId: 'd1', state: 'downloading' }]
+			const { result } = await setup()
+
+			await waitFor(() => expect(result.current.state).toBe('downloading'))
+
+			mockActive = []
+			await act(async () => result.current.cancel())
+
+			await waitFor(() => expect(result.current.state).toBe('ready'))
+
+			// and a new download goes ahead: stopping is not remembered
+			await act(async () => result.current.startDownload())
+			await waitFor(() => expect(mockDownloadItems).toHaveBeenCalled())
+		})
 	})
 })

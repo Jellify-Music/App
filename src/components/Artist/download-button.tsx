@@ -1,5 +1,5 @@
 import React from 'react'
-import { Spinner } from 'tamagui'
+import { Spinner, View, XStack } from 'tamagui'
 import { useTranslation } from 'react-i18next'
 import { useArtistDownload } from '../../hooks/downloads/artist'
 import Icon from '../Global/components/icon'
@@ -12,7 +12,7 @@ import CircularProgressIndicator from '../Global/components/DownloadIndicator/ci
 export default function ArtistDownloadButton(): React.JSX.Element | null {
 	const { t } = useTranslation()
 
-	const { state, progress, startDownload, removeAll } = useArtistDownload()
+	const { state, progress, startDownload, removeAll, cancel } = useArtistDownload()
 
 	switch (state) {
 		// nothing to download, so nothing to offer
@@ -22,11 +22,33 @@ export default function ArtistDownloadButton(): React.JSX.Element | null {
 		case 'loading':
 			return <Spinner color='neutral' />
 
+		// tapping it while it downloads stops the download
 		case 'downloading':
-			return progress > 0 && progress < 1 ? (
-				<CircularProgressIndicator progress={progress} size={28} strokeWidth={4} />
-			) : (
-				<Spinner color='neutral' />
+			return (
+				<XStack
+					onPress={cancel}
+					role='button'
+					aria-label={t('artist.download.stop')}
+					testID='artist-stop-download-button'
+					hitSlop={8}
+					alignItems='center'
+					justifyContent='center'
+				>
+					{progress > 0 && progress < 1 ? (
+						<CircularProgressIndicator progress={progress} size={28} strokeWidth={4} />
+					) : (
+						<Spinner color='neutral' />
+					)}
+
+					{/* a stop square in the middle of the ring, so it reads as something to press */}
+					<View
+						position='absolute'
+						width={9}
+						height={9}
+						borderRadius={2}
+						backgroundColor='$neutral'
+					/>
+				</XStack>
 			)
 
 		case 'downloaded':
