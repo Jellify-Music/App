@@ -30,6 +30,7 @@ import { Queue } from '../../../services/types/queue-item'
 import { formatArtistName } from '../../../utils/formatting/artist-names'
 import { addToQueue, loadNewQueue } from '../../../player/queuing'
 import { useTranslation } from 'react-i18next'
+import AlbumDownloadIndicator from '../../Downloads/album-download-indicator'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -281,35 +282,50 @@ function ItemRowDetails({
 			</SizableText>
 
 			{shouldRenderArtistName && (
-				<SizableText
-					color={'borderColor'}
-					lineBreakStrategyIOS='standard'
-					numberOfLines={1}
-					fontSize='2'
-				>
-					{formatArtistName(
-						item.AlbumArtist,
-						sortingByReleasedDate ? item.ProductionYear?.toString() : undefined,
+				// where a track shows its download: before the artist's name
+				<XStack alignItems='center'>
+					{item.Type === BaseItemKind.MusicAlbum && (
+						<AlbumDownloadIndicator album={item} />
 					)}
-				</SizableText>
-			)}
 
-			{shouldRenderProductionYear && (
-				<XStack gap='2'>
 					<SizableText
-						fontSize='2'
+						flexShrink={1}
 						color={'borderColor'}
 						lineBreakStrategyIOS='standard'
 						numberOfLines={1}
+						fontSize='2'
 					>
-						{item.ProductionYear?.toString() ?? t('placeholders.unknownYear')}
+						{formatArtistName(
+							item.AlbumArtist,
+							sortingByReleasedDate ? item.ProductionYear?.toString() : undefined,
+						)}
 					</SizableText>
+				</XStack>
+			)}
 
-					<SizableText fontSize='2' color={'borderColor'}>
-						•
-					</SizableText>
+			{shouldRenderProductionYear && (
+				// the indicator is outside the row's gap, which would leave a space where nothing is shown
+				<XStack alignItems='center'>
+					{item.Type === BaseItemKind.MusicAlbum && (
+						<AlbumDownloadIndicator album={item} />
+					)}
 
-					<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+					<XStack gap='2'>
+						<SizableText
+							fontSize='2'
+							color={'borderColor'}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+						>
+							{item.ProductionYear?.toString() ?? t('placeholders.unknownYear')}
+						</SizableText>
+
+						<SizableText fontSize='2' color={'borderColor'}>
+							•
+						</SizableText>
+
+						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+					</XStack>
 				</XStack>
 			)}
 
