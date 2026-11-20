@@ -2,6 +2,7 @@ import React from 'react'
 import { ParamListBase, useNavigation, useNavigationState } from '@react-navigation/native'
 import { MaterialTopTabNavigationProp } from '@react-navigation/material-top-tabs'
 import { SizableText, XStack, YStack } from 'tamagui'
+import { useTranslation } from 'react-i18next'
 import { applyHapticFeedback } from '../../utils/haptics'
 
 /**
@@ -9,6 +10,15 @@ import { applyHapticFeedback } from '../../utils/haptics'
  * away together with the list, which is why this is drawn here rather than by the navigator.
  */
 export default function ArtistTabBar(): React.JSX.Element {
+	const { t } = useTranslation()
+
+	const labels: Record<string, string> = {
+		Discography: t('artist.tabs.discography'),
+		Tracks: t('artist.tabs.tracks'),
+		Playlists: t('artist.tabs.playlists'),
+		Info: t('artist.tabs.info'),
+	}
+
 	const navigation = useNavigation<MaterialTopTabNavigationProp<ParamListBase>>()
 
 	const names = useNavigationState((state) => state.routes.map((route) => route.name))
@@ -39,7 +49,7 @@ export default function ArtistTabBar(): React.JSX.Element {
 						style={{ fontFamily: 'Figtree-Bold' }}
 						color={name === active ? '$primary' : '$borderColor'}
 					>
-						{name}
+						{labels[name] ?? name}
 					</SizableText>
 				</YStack>
 			))}

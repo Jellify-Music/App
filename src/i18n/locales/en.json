@@ -79,7 +79,24 @@
 		"noAlbums": "No albums",
 		"similarTo": "Similar to {{name}}",
 		"noSimilarArtists": "No similar artists",
-		"viewTracks": "View Tracks"
+		"viewTracks": "View Tracks",
+		"tabs": {
+			"discography": "Discography",
+			"tracks": "Tracks",
+			"playlists": "Playlists",
+			"info": "Info"
+		},
+		"playlists": {
+			"checked": "Checked {{checked}} of {{total}} playlists",
+			"looking": "Looking through your playlists",
+			"notOnAny": "{{name}} isn't on any playlists",
+			"thisArtist": "This artist",
+			"failedLists_one": "Couldn't load one of your playlist lists",
+			"failedLists_other": "Couldn't load your playlists",
+			"failedPlaylists_one": "Couldn't check a playlist",
+			"failedPlaylists_other": "Couldn't check {{count}} playlists",
+			"tapToRetry": "{{message}}. Tap to retry"
+		}
 	},
 	"cast": {
 		"noDevices": "Use the Cast button to pick a device"

@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { RefreshControl } from 'react-native'
 import { SizableText, Spinner, useTheme, View, YStack } from 'tamagui'
+import { useTranslation } from 'react-i18next'
 import { BaseStackParamList } from '../../../screens/types'
 import { useArtistContext } from '../../../providers/Artist'
 import { useArtistPlaylists } from '../../../hooks/use-artist-playlists'
@@ -14,6 +15,8 @@ import { closeAllSwipeableRows } from '../../Global/components/SwipeableRow/regi
 
 /** The playlists, the user's own and public ones, that this artist appears on */
 export default function PlaylistsTab(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { artist } = useArtistContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -50,15 +53,15 @@ export default function PlaylistsTab(): React.JSX.Element {
 	// Something couldn't be looked at, so what's shown may be incomplete
 	const failureMessage =
 		failedLists > 0
-			? `Couldn't load ${failedLists === 1 ? 'one of your playlist lists' : 'your playlists'}`
+			? t('artist.playlists.failedLists', { count: failedLists })
 			: failedPlaylists > 0
-				? `Couldn't check ${failedPlaylists === 1 ? 'a playlist' : `${failedPlaylists} playlists`}`
+				? t('artist.playlists.failedPlaylists', { count: failedPlaylists })
 				: undefined
 
 	const failureNotice = failureMessage ? (
 		<YStack alignItems='center' padding='3' onPress={retry} testID='artist-playlists-retry'>
 			<SizableText fontSize='3' color='neutral'>
-				{`${failureMessage}. Tap to retry`}
+				{t('artist.playlists.tapToRetry', { message: failureMessage })}
 			</SizableText>
 		</YStack>
 	) : null
@@ -67,8 +70,11 @@ export default function PlaylistsTab(): React.JSX.Element {
 	const progress = (
 		<SizableText fontSize='3' color='neutral' testID='artist-playlists-progress'>
 			{total > 0
-				? `Checked ${checked.toLocaleString()} of ${total.toLocaleString()} playlists`
-				: 'Looking through your playlists'}
+				? t('artist.playlists.checked', {
+						checked: checked.toLocaleString(),
+						total: total.toLocaleString(),
+					})
+				: t('artist.playlists.looking')}
 		</SizableText>
 	)
 
@@ -102,7 +108,9 @@ export default function PlaylistsTab(): React.JSX.Element {
 					) : (
 						<>
 							<SizableText fontSize='3' color='neutral'>
-								{`${artist.Name ?? 'This artist'} isn't on any playlists`}
+								{t('artist.playlists.notOnAny', {
+									name: artist.Name ?? t('artist.playlists.thisArtist'),
+								})}
 							</SizableText>
 							{failureNotice}
 						</>
