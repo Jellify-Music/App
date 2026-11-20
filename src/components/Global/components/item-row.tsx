@@ -272,50 +272,60 @@ function ItemRowDetails({
 
 	return (
 		<YStack alignContent='center' justifyContent='center' flexGrow={1}>
-			<XStack alignItems='center'>
-				{item.Type === BaseItemKind.MusicAlbum && <AlbumDownloadIndicator album={item} />}
-
-				<SizableText
-					flexShrink={1}
-					fontSize='2'
-					fontWeight='6'
-					lineBreakStrategyIOS='standard'
-					numberOfLines={1}
-				>
-					{item.Name ?? ''}
-				</SizableText>
-			</XStack>
+			<SizableText
+				fontSize='2'
+				fontWeight='6'
+				lineBreakStrategyIOS='standard'
+				numberOfLines={1}
+			>
+				{item.Name ?? ''}
+			</SizableText>
 
 			{shouldRenderArtistName && (
-				<SizableText
-					color={'borderColor'}
-					lineBreakStrategyIOS='standard'
-					numberOfLines={1}
-					fontSize='2'
-				>
-					{formatArtistName(
-						item.AlbumArtist,
-						sortingByReleasedDate ? item.ProductionYear?.toString() : undefined,
+				// where a track shows its download: before the artist's name
+				<XStack alignItems='center'>
+					{item.Type === BaseItemKind.MusicAlbum && (
+						<AlbumDownloadIndicator album={item} />
 					)}
-				</SizableText>
-			)}
 
-			{shouldRenderProductionYear && (
-				<XStack gap='2'>
 					<SizableText
-						fontSize='2'
+						flexShrink={1}
 						color={'borderColor'}
 						lineBreakStrategyIOS='standard'
 						numberOfLines={1}
+						fontSize='2'
 					>
-						{item.ProductionYear?.toString() ?? t('placeholders.unknownYear')}
+						{formatArtistName(
+							item.AlbumArtist,
+							sortingByReleasedDate ? item.ProductionYear?.toString() : undefined,
+						)}
 					</SizableText>
+				</XStack>
+			)}
 
-					<SizableText fontSize='2' color={'borderColor'}>
-						•
-					</SizableText>
+			{shouldRenderProductionYear && (
+				// the indicator is outside the row's gap, which would leave a space where nothing is shown
+				<XStack alignItems='center'>
+					{item.Type === BaseItemKind.MusicAlbum && (
+						<AlbumDownloadIndicator album={item} />
+					)}
 
-					<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+					<XStack gap='2'>
+						<SizableText
+							fontSize='2'
+							color={'borderColor'}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+						>
+							{item.ProductionYear?.toString() ?? t('placeholders.unknownYear')}
+						</SizableText>
+
+						<SizableText fontSize='2' color={'borderColor'}>
+							•
+						</SizableText>
+
+						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+					</XStack>
 				</XStack>
 			)}
 
