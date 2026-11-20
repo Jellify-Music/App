@@ -1,5 +1,5 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { XStack, YStack } from 'tamagui'
+import { H5, XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
 import { useArtistContext } from '../../providers/Artist'
 import { InstantMixIconButton } from '../Global/components/instant-mix-button'
@@ -91,6 +91,10 @@ export default function ArtistHeader(): React.JSX.Element {
 					/>
 				</ActionPill>
 			</XStack>
+
+			<YStack paddingHorizontal='2'>
+				<H5 fontWeight='6'>{artist.Name}</H5>
+			</YStack>
 		</YStack>
 	)
 }
