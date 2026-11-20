@@ -108,6 +108,13 @@
 			"removeMessage_other": "{{count}} downloaded tracks by {{name}} will be removed from your device.",
 			"downloadAll": "Download all",
 			"removeAll": "Remove all downloads"
+		},
+		"links": {
+			"musicbrainz": "MusicBrainz",
+			"wikipedia": "Wikipedia",
+			"youtube": "YouTube",
+			"bandsintown": "Bandsintown",
+			"open": "Open {{name}}"
 		}
 	},
 	"cast": {
@@ -490,7 +497,8 @@
 		"shuffleQueue": "Failed to shuffle queue",
 		"unshuffleQueue": "Failed to unshuffle queue",
 		"generatePlaylist": "Failed to generate playlist",
-		"saveGeneratedPlaylist": "Failed to save generated playlist"
+		"saveGeneratedPlaylist": "Failed to save generated playlist",
+		"openLink": "Couldn't open the link"
 	},
 	"about": {
 		"otaVersion": "OTA Version: {{version}}",

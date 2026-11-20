@@ -1,11 +1,15 @@
 import { BaseItemDto, ItemFields } from '@jellyfin/sdk/lib/generated-client'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { getApi } from '../../../stores/auth/utils'
+import { isMusicBrainzId } from './links'
 
 /** What the Jellyfin server reports about an artist */
 export interface ArtistInfo {
-	bio: string
+	/** Plain text, if the server has a biography */
+	bio?: string
 	genres: string[]
+	/** The artist's MusicBrainz ID, if the server knows it */
+	musicBrainzId?: string
 }
 
 /**
@@ -27,7 +31,10 @@ export function toPlainText(text: string): string {
 		.trim()
 }
 
-/** The artist's own biography and genres from the Jellyfin server, or null if it has no biography */
+/**
+ * The artist's own biography, genres and MusicBrainz ID from the Jellyfin server, or null if it has
+ * neither a biography nor an ID
+ */
 export async function fetchArtistInfo(
 	artist: BaseItemDto,
 	signal?: AbortSignal,
@@ -36,11 +43,21 @@ export async function fetchArtistInfo(
 	if (!api || !artist.Id) return null
 
 	const { data } = await getLibraryApi(api).getItems(
-		{ ids: [artist.Id], fields: [ItemFields.Overview, ItemFields.Genres] },
+		{
+			ids: [artist.Id],
+			fields: [ItemFields.Overview, ItemFields.Genres, ItemFields.ProviderIds],
+		},
 		{ signal },
 	)
 	const item = data.Items?.[0]
 	const bio = item?.Overview ? toPlainText(item.Overview) : undefined
+	const musicBrainzId = item?.ProviderIds?.MusicBrainzArtist
 
-	return bio ? { bio, genres: item?.Genres ?? [] } : null
+	if (!bio && !isMusicBrainzId(musicBrainzId)) return null
+
+	return {
+		bio: bio || undefined,
+		genres: item?.Genres ?? [],
+		musicBrainzId: isMusicBrainzId(musicBrainzId) ? musicBrainzId : undefined,
+	}
 }
