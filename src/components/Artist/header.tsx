@@ -1,5 +1,7 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { H5, XStack, YStack } from 'tamagui'
+import { getTokenValue, H5, XStack, YStack } from 'tamagui'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import ActionPill from './action-pill'
 import ItemImage from '../Global/components/image'
 import { useArtistContext } from '../../providers/Artist'
 import { InstantMixIconButton } from '../Global/components/instant-mix-button'
@@ -20,6 +22,9 @@ export default function ArtistHeader(): React.JSX.Element {
 	const { t } = useTranslation()
 
 	const api = getApi()
+
+	// the image runs up behind the status bar; the back and favourite pills sit on it (see the screen)
+	const { top } = useSafeAreaInsets()
 
 	const { artist, albums } = useArtistContext()
 
@@ -57,7 +62,7 @@ export default function ArtistHeader(): React.JSX.Element {
 		<YStack>
 			<ItemImage
 				item={artist}
-				height={'14'}
+				height={getTokenValue('14', 'size') + top}
 				type={ImageType.Backdrop}
 				cornered
 				imageOptions={backdropImageOptions}
@@ -96,22 +101,6 @@ export default function ArtistHeader(): React.JSX.Element {
 				<H5 fontWeight='6'>{artist.Name}</H5>
 			</YStack>
 		</YStack>
-	)
-}
-
-/** A group of buttons on the artist's image, on a background that keeps them readable on any artwork */
-function ActionPill({ children }: { children: React.ReactNode }): React.JSX.Element {
-	return (
-		<XStack
-			alignItems='center'
-			gap='3'
-			paddingHorizontal='3'
-			paddingVertical='1'
-			borderRadius={999}
-			backgroundColor='$darkBackground'
-		>
-			{children}
-		</XStack>
 	)
 }
 

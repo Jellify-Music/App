@@ -10,18 +10,10 @@ import i18n from '../i18n'
 export const BaseStackScreens = {
 	Artist: {
 		screen: ArtistScreen,
-		options: ({
-			route,
-			theme,
-		}: {
-			route: RouteProp<BaseStackParamList, 'Artist'>
-			theme: ReactNavigation.Theme
-		}) => ({
-			title: route.params.artist.Name ?? i18n.t('placeholders.unknownArtist'),
-			headerTitleStyle: {
-				color: theme.colors.background,
-			},
-		}),
+		options: {
+			// the artist's image runs to the top of the screen, with its own back and favourite buttons
+			headerShown: false,
+		},
 	},
 	Album: {
 		screen: AlbumScreen,
