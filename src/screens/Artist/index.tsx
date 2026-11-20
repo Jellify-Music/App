@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { XStack, YStack } from 'tamagui'
 import { ArtistProvider } from '../../providers/Artist'
 import ActionPill from '../../components/Artist/action-pill'
+import ArtistDownloadButton from '../../components/Artist/download-button'
 import FavoriteButton from '../../components/Global/components/favorite-button'
 import Icon from '../../components/Global/components/icon'
 import { BaseStackParamList } from '../types'
@@ -70,6 +71,8 @@ export default function ArtistScreen({
 					</ActionPill>
 
 					<ActionPill>
+						<ArtistDownloadButton />
+
 						<FavoriteButton item={artist} />
 					</ActionPill>
 				</XStack>

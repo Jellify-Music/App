@@ -96,6 +96,18 @@
 			"failedPlaylists_one": "Couldn't check a playlist",
 			"failedPlaylists_other": "Couldn't check {{count}} playlists",
 			"tapToRetry": "{{message}}. Tap to retry"
+		},
+		"download": {
+			"confirmTitle_one": "Download {{count}} track?",
+			"confirmTitle_other": "Download {{count}} tracks?",
+			"confirmMessage_one": "This downloads the {{count}} track left of everything by {{name}} to your device.",
+			"confirmMessage_other": "This downloads the {{count}} tracks left of everything by {{name}} to your device.",
+			"removeTitle_one": "Remove {{count}} download?",
+			"removeTitle_other": "Remove {{count}} downloads?",
+			"removeMessage_one": "This removes the {{count}} downloaded track by {{name}} from your device.",
+			"removeMessage_other": "This removes the {{count}} downloaded tracks by {{name}} from your device.",
+			"downloadAll": "Download all",
+			"removeAll": "Remove all downloads"
 		}
 	},
 	"cast": {
