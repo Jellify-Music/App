@@ -8,9 +8,8 @@ import navigationRef from '../../screens/navigation'
 import { useLayoutEffect } from 'react'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { ListRenderItemInfo, RefreshControl } from 'react-native'
-import { useAreAllDownloaded } from '../../hooks/downloads'
-import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
-import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
+import { useCollectionDownload } from '../../hooks/downloads/collection'
+import DownloadButton from '../Global/components/download-button'
 import { DraxList, DraxProvider } from 'react-native-drax'
 import { usePlaylistContext } from '../../providers/Playlist'
 import PlaylistTrack from './components/track'
@@ -24,7 +23,6 @@ export default function Playlist(): React.JSX.Element {
 	const {
 		playlist,
 		playlistTracks,
-		playlistTrackIds,
 		editing,
 		setEditing,
 		canEdit,
@@ -39,15 +37,7 @@ export default function Playlist(): React.JSX.Element {
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	const downloadTracks = useDownloadTracks()
-
-	const isDownloaded = useAreAllDownloaded(playlistTrackIds.current)
-
-	const { mutate: deleteDownloads } = useDeleteDownloads()
-
-	const handleDeleteDownload = () => deleteDownloads(playlistTrackIds.current)
-
-	const handleDownload = () => downloadTracks.mutate(playlistTracks ?? [])
+	const collection = useCollectionDownload(playlistTracks)
 
 	const editModeActions = (
 		<Animated.View
@@ -74,39 +64,16 @@ export default function Playlist(): React.JSX.Element {
 		</Animated.View>
 	)
 
+	// remounted for each state, so that each fades in, as the buttons did before
 	const downloadActions = (
-		<XStack gap='2'>
-			{playlistTracks &&
-				(isDownloaded ? (
-					<Animated.View
-						entering={FadeIn.easing(Easing.in(Easing.ease))}
-						exiting={FadeOut.easing(Easing.out(Easing.ease))}
-						layout={LinearTransition.springify()}
-					>
-						<Icon
-							color='warning'
-							name='broom'
-							onPress={handleDeleteDownload}
-							{...ICON_PRESS_STYLES}
-						/>
-					</Animated.View>
-				) : downloadTracks.isPending ? (
-					<Spinner justifyContent='center' color='success' />
-				) : (
-					<Animated.View
-						entering={FadeIn.easing(Easing.in(Easing.ease))}
-						exiting={FadeOut.easing(Easing.out(Easing.ease))}
-						layout={LinearTransition.springify()}
-					>
-						<Icon
-							color='success'
-							name='download-circle-outline'
-							onPress={handleDownload}
-							{...ICON_PRESS_STYLES}
-						/>
-					</Animated.View>
-				))}
-		</XStack>
+		<Animated.View
+			key={collection.state}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
+			layout={LinearTransition.springify()}
+		>
+			<DownloadButton collection={collection} />
+		</Animated.View>
 	)
 
 	useLayoutEffect(() => {
@@ -155,6 +122,9 @@ export default function Playlist(): React.JSX.Element {
 		playlistTracks,
 		newName,
 		setEditing,
+		// the button's values, not the object they come in, which is new every time
+		collection.state,
+		collection.progress,
 	])
 
 	const renderItem = (info: ListRenderItemInfo<BaseItemDto>) => <PlaylistTrack {...info} />
