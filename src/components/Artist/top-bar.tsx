@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { StatusBar, StyleSheet } from 'react-native'
 import Animated, { interpolate, useAnimatedStyle } from 'react-native-reanimated'
 import { useIsFocused, useNavigation } from '@react-navigation/native'
@@ -17,6 +17,8 @@ import FavoriteButton from '../Global/components/favorite-button'
 import Icon from '../Global/components/icon'
 import ActionPill from './action-pill'
 import ArtistDownloadButton from './download-button'
+import ArtistDownloadsPanel from './downloads-panel'
+import { useArtistDownload } from '../../hooks/downloads/artist'
 import { useArtistCollapsed, useArtistScrollY, useArtistTopBar } from './scroll'
 
 /**
@@ -39,6 +41,11 @@ export default function ArtistTopBar(): React.JSX.Element {
 	const isFocused = useIsFocused()
 
 	const isLightMode = useIsLightMode()
+
+	const download = useArtistDownload()
+
+	// which albums are downloading, shown on request, and only while something is
+	const [showingDownloads, setShowingDownloads] = useState(false)
 
 	const backgroundStyle = useAnimatedStyle(() => ({
 		opacity: interpolate(scrollY.get(), [fadeFrom, fadeTo], [0, 1], 'clamp'),
@@ -93,11 +100,18 @@ export default function ArtistTopBar(): React.JSX.Element {
 				</ActionPill>
 
 				<ActionPill>
-					<ArtistDownloadButton />
+					<ArtistDownloadButton
+						download={download}
+						onShowProgress={() => setShowingDownloads((showing) => !showing)}
+					/>
 
 					<FavoriteButton item={artist} />
 				</ActionPill>
 			</XStack>
+
+			{showingDownloads && download.state === 'downloading' ? (
+				<ArtistDownloadsPanel trackIds={download.trackIds} top={height + 4} />
+			) : null}
 		</>
 	)
 }

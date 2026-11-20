@@ -4,6 +4,8 @@ import { DownloadManager } from 'react-native-nitro-player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import { TrackItem } from 'react-native-nitro-player/lib/types/PlayerQueue'
 import resolveTrackUrls from '../../../utils/fetching/track-media-info'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import useDownloadQueueStore from '../../../stores/download-queue'
 
 // Prevents redundant DownloadManager checks on every progress tick after the 30% threshold.
 const autoDownloadTriggered = new Set<string>()
@@ -29,6 +31,9 @@ export default async function handleAutoDownload(
 		if (isDownloadedOrDownloadPending) return
 
 		// Re-resolve the track URL using the download profile, not the stream profile
+		const dto = getTrackDto(track)
+		if (dto?.Id) useDownloadQueueStore.getState().record([dto])
+
 		const [downloadTrack] = await resolveTrackUrls([track], 'download')
 		await DownloadManager.downloadTrack(downloadTrack)
 	}
