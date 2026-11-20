@@ -1,5 +1,5 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { getTokenValue, H5, useTheme, XStack, YStack } from 'tamagui'
+import { getTokenValue, H4, useTheme, XStack, YStack } from 'tamagui'
 import { StyleSheet } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -91,9 +91,9 @@ export default function ArtistHeader(): React.JSX.Element {
 				gap='$2'
 				pointerEvents='box-none'
 			>
-				<H5 fontWeight='6' flexShrink={1} numberOfLines={1}>
+				<H4 fontWeight='6' flexShrink={1} numberOfLines={1}>
 					{artist.Name}
-				</H5>
+				</H4>
 
 				<ActionPill>
 					<Icon
