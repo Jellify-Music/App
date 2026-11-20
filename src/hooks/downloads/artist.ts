@@ -138,8 +138,5 @@ export function useArtistDownload() {
 			() => removeDownloads(trackIds),
 		)
 
-	return { state, progress, trackIds, startDownload, removeAll }
+	return { state, progress, startDownload, removeAll }
 }
-
-/** What {@link useArtistDownload} gives the button, and whatever shows the albums downloading */
-export type ArtistDownload = ReturnType<typeof useArtistDownload>

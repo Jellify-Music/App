@@ -55,16 +55,6 @@ describe('useDownloadingAlbums', () => {
 		expect(result.current[0].progress).toBeCloseTo(0.5)
 	})
 
-	it('limits it to albums with a track among those asked for', async () => {
-		queue('a', '1')
-		queue('b', '2')
-		mockActive = [task('1', 0.1), task('2', 0.1)]
-
-		const { result } = await renderHook(() => useDownloadingAlbums(new Set(['2'])))
-
-		expect(result.current.map((g) => g.albumId)).toEqual(['b'])
-	})
-
 	it('forgets an album once all of it is done', async () => {
 		queue('a', '1')
 

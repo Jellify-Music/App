@@ -3,12 +3,8 @@ import { DownloadManager, useDownloadProgress } from 'react-native-nitro-player'
 import useDownloadQueueStore from '../../stores/download-queue'
 import { DownloadGroup, groupDownloads } from '../../utils/download-groups'
 
-/**
- * The albums that are downloading, each with how far along it is.
- *
- * @param only Limits it to albums with a track among these, such as one artist's
- */
-export function useDownloadingAlbums(only?: ReadonlySet<string>): DownloadGroup[] {
+/** The albums that are downloading, each with how far along it is */
+export function useDownloadingAlbums(): DownloadGroup[] {
 	const entries = useDownloadQueueStore((state) => state.entries)
 
 	// Progress events are only a trigger to look again: a finished download's last event can go
@@ -34,5 +30,5 @@ export function useDownloadingAlbums(only?: ReadonlySet<string>): DownloadGroup[
 		if (forget.length > 0) useDownloadQueueStore.getState().remove(forget)
 	}, [forget.join(',')])
 
-	return only ? groups.filter((group) => group.trackIds.some((id) => only.has(id))) : groups
+	return groups
 }

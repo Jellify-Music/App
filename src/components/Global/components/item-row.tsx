@@ -30,6 +30,7 @@ import { Queue } from '../../../services/types/queue-item'
 import { formatArtistName } from '../../../utils/formatting/artist-names'
 import { addToQueue, loadNewQueue } from '../../../player/queuing'
 import { useTranslation } from 'react-i18next'
+import AlbumDownloadIndicator from '../../Downloads/album-download-indicator'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -271,14 +272,21 @@ function ItemRowDetails({
 
 	return (
 		<YStack alignContent='center' justifyContent='center' flexGrow={1}>
-			<SizableText
-				fontSize='2'
-				fontWeight='6'
-				lineBreakStrategyIOS='standard'
-				numberOfLines={1}
-			>
-				{item.Name ?? ''}
-			</SizableText>
+			<XStack alignItems='center'>
+				{item.Type === BaseItemKind.MusicAlbum && (
+					<AlbumDownloadIndicator albumId={item.Id} />
+				)}
+
+				<SizableText
+					flexShrink={1}
+					fontSize='2'
+					fontWeight='6'
+					lineBreakStrategyIOS='standard'
+					numberOfLines={1}
+				>
+					{item.Name ?? ''}
+				</SizableText>
+			</XStack>
 
 			{shouldRenderArtistName && (
 				<SizableText
