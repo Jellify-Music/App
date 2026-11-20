@@ -273,9 +273,7 @@ function ItemRowDetails({
 	return (
 		<YStack alignContent='center' justifyContent='center' flexGrow={1}>
 			<XStack alignItems='center'>
-				{item.Type === BaseItemKind.MusicAlbum && (
-					<AlbumDownloadIndicator albumId={item.Id} />
-				)}
+				{item.Type === BaseItemKind.MusicAlbum && <AlbumDownloadIndicator album={item} />}
 
 				<SizableText
 					flexShrink={1}

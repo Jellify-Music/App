@@ -42,7 +42,7 @@ export function fetchAlbums(
 					startIndex: page * ApiLimits.Library,
 					limit: ApiLimits.Library,
 					isFavorite: isFavorite,
-					fields: [ItemFields.SortName],
+					fields: [ItemFields.SortName, ItemFields.ChildCount],
 					recursive: true,
 					years: yearsParam,
 					enableUserData: true,
