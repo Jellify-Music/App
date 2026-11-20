@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { DownloadedTrack, DownloadManager } from 'react-native-nitro-player'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { queryClient } from '../../api/client'
 import ALL_DOWNLOADS_KEY from './keys'
 import { downloadItems } from './functions'
@@ -8,7 +9,8 @@ import { LoggingContext } from '../../utils/logging'
 
 const useDownloadTracks = () =>
 	useMutation({
-		mutationFn: downloadItems,
+		// not passed on as it is: a mutation function is given more than the tracks
+		mutationFn: (items: BaseItemDto[]) => downloadItems(items),
 		onError: (error) => handleError(error, LoggingContext.Downloads, 'download'),
 	})
 

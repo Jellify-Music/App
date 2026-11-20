@@ -1,18 +1,17 @@
-import { YStack, XStack, Spinner, useTheme, SizableText } from 'tamagui'
+import { YStack, XStack, useTheme, SizableText } from 'tamagui'
 import { RefreshControl, SectionList } from 'react-native'
 import Track from '../Global/components/Track'
 import FavoriteButton from '../Global/components/favorite-button'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React, { useLayoutEffect } from 'react'
-import Icon from '../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '../../screens/types'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
-import { useAreAllDownloaded } from '../../hooks/downloads'
-import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
+import { useCollectionDownload } from '../../hooks/downloads/collection'
+import DownloadButton from '../Global/components/download-button'
 import { useAlbumDiscs } from '../../api/queries/album'
 import { ItemKeyExtractor } from '../../utils/parsing/key-extractor'
 import AlbumSectionHeader from './section-header'
@@ -35,8 +34,6 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	const { data: discs, isPending, refetch } = useAlbumDiscs(album)
 
-	const downloadTracks = useDownloadTracks()
-
 	const sections = (Array.isArray(discs) ? discs : []).map(({ title, data }) => ({
 		title,
 		data: Array.isArray(data) ? data : [],
@@ -46,16 +43,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	const albumTrackList = discs?.flatMap((disc) => disc.data)
 
-	const isDownloaded = useAreAllDownloaded(albumTrackList?.map(({ Id }) => Id) ?? [])
-
-	const { mutate: deleteDownloads } = useDeleteDownloads()
-
-	const handleDeleteDownload = () =>
-		deleteDownloads(
-			albumTrackList?.map(({ Id }) => Id).filter((id): id is string => id != null) ?? [],
-		)
-
-	const handleDownload = () => downloadTracks.mutate(albumTrackList ?? [])
+	const collection = useCollectionDownload(albumTrackList)
 
 	const onRefresh = async () => {
 		await refetch()
@@ -65,39 +53,13 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 		navigation.setOptions({
 			headerRight: () => (
 				<XStack gap='2' justifyContent='center' alignContent='center'>
-					{albumTrackList &&
-						(isDownloaded ? (
-							<Icon
-								color='warning'
-								name='broom'
-								onPress={handleDeleteDownload}
-								transition={'quick'}
-								opacity='1 enter:0 exit:0'
-							/>
-						) : downloadTracks.isPending ? (
-							<Spinner justifyContent='center' color='neutral' />
-						) : (
-							<Icon
-								color='success'
-								name='download-circle-outline'
-								onPress={handleDownload}
-								transition={'quick'}
-								opacity='1 enter:0 exit:0'
-							/>
-						))}
+					<DownloadButton collection={collection} />
 					<FavoriteButton item={album} />
 				</XStack>
 			),
 		})
-	}, [
-		album,
-		navigation,
-		isDownloaded,
-		handleDeleteDownload,
-		handleDownload,
-		downloadTracks.isPending,
-		albumTrackList,
-	])
+		// the button's values, not the object they come in, which is new every time
+	}, [album, navigation, collection.state, collection.progress])
 
 	return (
 		<SectionList
