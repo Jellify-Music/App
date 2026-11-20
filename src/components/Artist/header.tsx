@@ -1,9 +1,10 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { getTokenValue, H4, useTheme, XStack, YStack } from 'tamagui'
+import { getTokenValue, SizableText, useTheme, View, XStack, YStack } from 'tamagui'
 import { StyleSheet } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import ActionPill from './action-pill'
+import { transparentOf } from '../../utils/color'
 import ItemImage from '../Global/components/image'
 import { useArtistContext } from '../../providers/Artist'
 import { InstantMixIconButton } from '../Global/components/instant-mix-button'
@@ -91,9 +92,18 @@ export default function ArtistHeader(): React.JSX.Element {
 				gap='$2'
 				pointerEvents='box-none'
 			>
-				<H4 fontWeight='6' flexShrink={1} numberOfLines={1}>
-					{artist.Name}
-				</H4>
+				{/* flex, so the name has a width to be cut to */}
+				<View flex={1}>
+					<SizableText
+						fontFamily='$heading'
+						size='$7'
+						fontWeight='6'
+						numberOfLines={1}
+						ellipsizeMode='tail'
+					>
+						{artist.Name}
+					</SizableText>
+				</View>
 
 				<ActionPill>
 					<Icon
@@ -119,17 +129,6 @@ export default function ArtistHeader(): React.JSX.Element {
 
 /** Room under the image's artwork for the name and the buttons that sit on its foot */
 const NAME_ROW_HEIGHT = 72
-
-/** The same colour with no opacity, so a fade to it doesn't pass through grey */
-function transparentOf(color: string): string {
-	const hex = /^#([0-9a-f]{6})/i.exec(color)
-	if (hex) return `#${hex[1]}00`
-
-	const rgb = /^rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/i.exec(color)
-	if (rgb) return `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, 0)`
-
-	return 'transparent'
-}
 
 const styles = StyleSheet.create({
 	gradient: {
