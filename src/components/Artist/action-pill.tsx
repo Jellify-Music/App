@@ -1,5 +1,6 @@
 import React from 'react'
 import { XStack } from 'tamagui'
+import useIsLightMode from '../../hooks/use-is-light-mode'
 
 /** The height of every pill, so a lone button's circle matches the groups beside it */
 const PILL_HEIGHT = 44
@@ -15,6 +16,9 @@ export default function ActionPill({
 	children: React.ReactNode
 	circular?: boolean
 }): React.JSX.Element {
+	// the icons take the theme's own colours, so the pill has to be a ground they read on in either
+	const isLightMode = useIsLightMode()
+
 	return (
 		<XStack
 			alignItems='center'
@@ -24,7 +28,9 @@ export default function ActionPill({
 			width={circular ? PILL_HEIGHT : undefined}
 			paddingHorizontal={circular ? 0 : '3'}
 			borderRadius={999}
-			backgroundColor='$darkBackground'
+			backgroundColor={isLightMode ? '$lightBackground' : '$darkBackground'}
+			borderWidth={isLightMode ? 1 : 0}
+			borderColor='$borderColor'
 		>
 			{children}
 		</XStack>

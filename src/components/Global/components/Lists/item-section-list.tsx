@@ -92,7 +92,8 @@ export default function ItemSectionList({
 				scrollEventThrottle={16}
 				stickySectionHeadersEnabled
 				stickyHeaderConfig={topInset > 0 ? { offset: topInset } : undefined}
-				renderItem={render}
+				// lists without a header are left exactly as they were: no extra view around every row
+				renderItem={scrollerOverlaysList ? render : renderItem}
 				refreshControl={
 					<RefreshControl
 						refreshing={query.isFetching}

@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useTheme, XStack } from 'tamagui'
 import { useArtistContext } from '../../providers/Artist'
+import useIsLightMode from '../../hooks/use-is-light-mode'
 import { BaseStackParamList } from '../../screens/types'
 import { getBlurhashFromDto } from '../../utils/parsing/blurhash'
 import {
@@ -37,27 +38,31 @@ export default function ArtistTopBar(): React.JSX.Element {
 
 	const isFocused = useIsFocused()
 
+	const isLightMode = useIsLightMode()
+
 	const backgroundStyle = useAnimatedStyle(() => ({
 		opacity: interpolate(scrollY.get(), [fadeFrom, fadeTo], [0, 1], 'clamp'),
 	}))
 
-	// While the image is under the status bar, its icons follow how bright the image is up there,
-	// rather than the app's theme. Without a blurhash to go by, the app's own style stands.
+	// While the image is under the status bar, its icons follow how bright the image is up there.
+	// Once the bar is solid, they follow the theme, which the status bar does not do by itself.
 	const luminance = blurhashLuminance(
 		// the header shows the artist's backdrop, or else their primary image: read the one on show
 		getBlurhashFromDto(artist, ImageType.Backdrop) ||
 			getBlurhashFromDto(artist, ImageType.Primary),
 	)
-	const statusBarStyle =
-		collapsed || luminance === undefined
-			? undefined
+	const themeStyle = isLightMode ? 'dark-content' : 'light-content'
+	const statusBarStyle = collapsed
+		? themeStyle
+		: luminance === undefined
+			? themeStyle
 			: luminance > LUMINANCE_CONTRAST_MIDPOINT
 				? 'dark-content'
 				: 'light-content'
 
 	return (
 		<>
-			{isFocused && statusBarStyle ? <StatusBar barStyle={statusBarStyle} /> : null}
+			{isFocused ? <StatusBar barStyle={statusBarStyle} /> : null}
 
 			<Animated.View
 				pointerEvents='none'
