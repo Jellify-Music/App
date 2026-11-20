@@ -14,6 +14,7 @@ import { closeAllSwipeableRows } from '../SwipeableRow/registery'
 import AZScroller, { AZ_SCROLLER_CLEARANCE } from '../AZScroller'
 import ListStickyHeader from './list-sticky-header'
 import { useTranslation } from 'react-i18next'
+import { useListChrome } from './chrome'
 
 interface ItemSectionListProps {
 	ref: RefObject<SectionListRef | null>
@@ -34,6 +35,9 @@ export default function ItemSectionList({
 
 	const theme = useTheme()
 
+	// a screen drawing over the top of the list (the artist's top bar) says how much it covers
+	const { topInset, onScroll: onScrollChrome } = useListChrome()
+
 	/**
 	 * With a header, the A-Z scroller floats over the list instead of taking a column beside it, so the
 	 * header (an artist's image, say) can run edge to edge. Rows then leave room for it themselves.
@@ -44,7 +48,7 @@ export default function ItemSectionList({
 	const headerHeight = useSharedValue(0)
 	const scrollY = useSharedValue(0)
 	const scrollerStyle = useAnimatedStyle(() => ({
-		top: Math.max(headerHeight.get() - scrollY.get(), 0),
+		top: Math.max(headerHeight.get() - scrollY.get(), topInset),
 	}))
 
 	const onRefresh = () => {
@@ -78,13 +82,16 @@ export default function ItemSectionList({
 					) : undefined
 				}
 				onScroll={
-					scrollerOverlaysList
-						? (event: NativeSyntheticEvent<NativeScrollEvent>) =>
+					scrollerOverlaysList || onScrollChrome
+						? (event: NativeSyntheticEvent<NativeScrollEvent>) => {
 								scrollY.set(event.nativeEvent.contentOffset.y)
+								onScrollChrome?.(event)
+							}
 						: undefined
 				}
 				scrollEventThrottle={16}
 				stickySectionHeadersEnabled
+				stickyHeaderConfig={topInset > 0 ? { offset: topInset } : undefined}
 				renderItem={render}
 				refreshControl={
 					<RefreshControl

@@ -1,9 +1,10 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { getTokenValue, SizableText, useTheme, View, XStack, YStack } from 'tamagui'
+import { SizableText, useTheme, View, XStack, YStack } from 'tamagui'
 import { StyleSheet } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import ActionPill from './action-pill'
+import { artistImageHeight } from './scroll'
 import { transparentOf } from '../../utils/color'
 import ItemImage from '../Global/components/image'
 import { useArtistContext } from '../../providers/Artist'
@@ -68,7 +69,7 @@ export default function ArtistHeader(): React.JSX.Element {
 			{/* The image runs down to where the tabs start; the name and buttons sit on its foot */}
 			<ItemImage
 				item={artist}
-				height={getTokenValue('14', 'size') + top + NAME_ROW_HEIGHT}
+				height={artistImageHeight(top)}
 				type={ImageType.Backdrop}
 				cornered
 				imageOptions={backdropImageOptions}
@@ -126,9 +127,6 @@ export default function ArtistHeader(): React.JSX.Element {
 		</YStack>
 	)
 }
-
-/** Room under the image's artwork for the name and the buttons that sit on its foot */
-const NAME_ROW_HEIGHT = 72
 
 const styles = StyleSheet.create({
 	gradient: {

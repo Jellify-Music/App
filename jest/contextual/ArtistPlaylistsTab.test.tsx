@@ -4,6 +4,7 @@ import { TamaguiProvider } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import config from '../../src/configs/tamagui.config'
 import PlaylistsTab from '../../src/components/Artist/tabs/playlists'
+import { ArtistScrollProvider } from '../../src/components/Artist/scroll'
 
 const mockNavigate = jest.fn()
 const mockRetry = jest.fn()
@@ -12,6 +13,7 @@ let mockHook: Record<string, unknown> = {}
 
 jest.mock('@react-navigation/native', () => ({
 	useNavigation: () => ({ navigate: mockNavigate }),
+	useIsFocused: () => true,
 }))
 
 jest.mock('../../src/providers/Artist', () => ({
@@ -76,7 +78,9 @@ const state = (overrides: Record<string, unknown> = {}) => ({
 const renderTab = () =>
 	render(
 		<TamaguiProvider config={config} defaultTheme='haze_dark'>
-			<PlaylistsTab />
+			<ArtistScrollProvider>
+				<PlaylistsTab />
+			</ArtistScrollProvider>
 		</TamaguiProvider>,
 	)
 

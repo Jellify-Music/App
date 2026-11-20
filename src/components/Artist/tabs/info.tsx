@@ -4,6 +4,7 @@ import { SizableText, YStack } from 'tamagui'
 import { useArtistContext } from '../../../providers/Artist'
 import { useArtistInfo } from '../../../api/queries/artist-info'
 import ArtistListHeader from '../list-header'
+import { useArtistListScroll } from '../scroll'
 
 /**
  * Whether the artist has info to show. The Info tab is only offered when it does, and while we're
@@ -20,8 +21,15 @@ export default function InfoTab(): React.JSX.Element {
 	const { artist } = useArtistContext()
 	const { data: info } = useArtistInfo(artist)
 
+	const { onScroll, scrollEventThrottle } = useArtistListScroll()
+
 	return (
-		<ScrollView contentInsetAdjustmentBehavior='automatic' testID='artist-info-scroll'>
+		<ScrollView
+			contentInsetAdjustmentBehavior='automatic'
+			testID='artist-info-scroll'
+			onScroll={onScroll}
+			scrollEventThrottle={scrollEventThrottle}
+		>
 			<ArtistListHeader />
 
 			<YStack padding='$3' gap='$3'>

@@ -12,6 +12,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import ItemRow from '../../Global/components/item-row'
 import SimilarArtists from '../similar'
 import ArtistListHeader from '../list-header'
+import { useArtistListScroll } from '../scroll'
 import { Spinner, useTheme, YStack, SizableText, View } from 'tamagui'
 import {
 	filterForAlbums,
@@ -26,6 +27,8 @@ export default function DiscographyTab(): React.JSX.Element {
 	const { featuredOn, albums, fetchingAlbums, refresh } = useArtistContext()
 
 	const theme = useTheme()
+
+	const { onScroll, scrollEventThrottle, topInset } = useArtistListScroll()
 
 	const sections: SectionListData<BaseItemDto>[] = albums
 		? [
@@ -94,6 +97,9 @@ export default function DiscographyTab(): React.JSX.Element {
 			renderSectionHeader={renderSectionHeader}
 			renderItem={renderItem}
 			refreshControl={refreshControl}
+			onScroll={onScroll}
+			scrollEventThrottle={scrollEventThrottle}
+			stickyHeaderConfig={{ offset: topInset }}
 			ListHeaderComponent={ArtistListHeader}
 			ListFooterComponent={SimilarArtists}
 			ListEmptyComponent={ListEmptyComponent}

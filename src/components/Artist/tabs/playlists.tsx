@@ -9,6 +9,7 @@ import { BaseStackParamList } from '../../../screens/types'
 import { useArtistContext } from '../../../providers/Artist'
 import { useArtistPlaylists } from '../../../hooks/use-artist-playlists'
 import ArtistListHeader from '../list-header'
+import { useArtistListScroll } from '../scroll'
 import ItemRow from '../../Global/components/item-row'
 import List from '../../Global/components/Lists/utils'
 import { closeAllSwipeableRows } from '../../Global/components/SwipeableRow/registery'
@@ -22,6 +23,8 @@ export default function PlaylistsTab(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const theme = useTheme()
+
+	const { onScroll, scrollEventThrottle } = useArtistListScroll()
 
 	const {
 		playlists,
@@ -84,6 +87,8 @@ export default function PlaylistsTab(): React.JSX.Element {
 			data={playlists}
 			renderItem={renderItem}
 			onScrollBeginDrag={closeAllSwipeableRows}
+			onScroll={onScroll}
+			scrollEventThrottle={scrollEventThrottle}
 			refreshControl={
 				<RefreshControl
 					refreshing={isRefreshing}
