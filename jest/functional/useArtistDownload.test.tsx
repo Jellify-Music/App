@@ -10,7 +10,8 @@ import {
 
 let mockTracks: BaseItemDto[] = []
 let mockDownloaded = new Set<string>()
-let mockProgress = { overallProgress: 0, isDownloading: false }
+let mockActive: { trackId: string; state: string }[] = []
+let mockProgressMap = new Map<string, { progress: number }>()
 let mockAlbums: BaseItemDto[] | undefined = [{ Id: 'album-1' }]
 let mockFeaturedOn: BaseItemDto[] | undefined = [{ Id: 'album-2' }]
 const mockDownloadItems = jest.fn<Promise<void>, [BaseItemDto[]]>()
@@ -41,7 +42,8 @@ jest.mock('../../src/hooks/downloads/mutations', () => ({
 }))
 
 jest.mock('react-native-nitro-player', () => ({
-	useDownloadProgress: () => mockProgress,
+	useDownloadProgress: () => ({ progressMap: mockProgressMap }),
+	DownloadManager: { getActiveDownloads: () => mockActive },
 }))
 
 jest.mock('../../src/stores/auth/utils', () => ({ getApi: () => ({}), getUser: () => ({}) }))
@@ -84,7 +86,8 @@ describe('useArtistDownload', () => {
 	beforeEach(() => {
 		mockTracks = []
 		mockDownloaded = new Set()
-		mockProgress = { overallProgress: 0, isDownloading: false }
+		mockActive = []
+		mockProgressMap = new Map()
 		mockAlbums = [{ Id: 'album-1' }]
 		mockFeaturedOn = [{ Id: 'album-2' }]
 		mockDownloadItems.mockReset().mockResolvedValue(undefined)
@@ -209,43 +212,55 @@ describe('useArtistDownload', () => {
 	it('is downloaded once every track is, even while the downloader still says it is busy', async () => {
 		mockTracks = tracks(5)
 		mockDownloaded = new Set(idsOf(mockTracks) as string[])
-		mockProgress = { overallProgress: 1, isDownloading: true }
+		mockActive = [{ trackId: 'track-4', state: 'downloading' }]
 		const { result } = await setup()
 
 		expect(result.current.state).toBe('downloaded')
 	})
 
-	it('is downloading while the downloader is busy with tracks that are still missing', async () => {
+	it('is downloading while the downloader has tracks of the artist that are still missing', async () => {
 		mockTracks = tracks(10)
 		mockDownloaded = new Set(idsOf(mockTracks.slice(0, 4)) as string[])
-		mockProgress = { overallProgress: 0.5, isDownloading: true }
+		mockActive = [{ trackId: 'track-5', state: 'downloading' }]
 		const { result } = await setup()
 
-		expect(result.current.state).toBe('downloading')
+		await waitFor(() => expect(result.current.state).toBe('downloading'))
 	})
 
-	it('measures progress by the tracks done plus what is in flight, so it does not start over', async () => {
+	it('is ready, not downloading, when only stale progress remains and the downloader has nothing', async () => {
+		mockTracks = tracks(10)
+		// a progress entry whose "completed" event never came
+		mockProgressMap = new Map([['track-9', { progress: 1 }]])
+		mockActive = []
+		const { result } = await setup()
+
+		expect(result.current.state).toBe('ready')
+		expect(result.current.progress).toBe(0)
+	})
+
+	it('ignores other downloads, and ones that have finished, failed or been cancelled', async () => {
+		mockTracks = tracks(3)
+		mockActive = [
+			{ trackId: 'someone-elses', state: 'downloading' },
+			{ trackId: 'track-0', state: 'failed' },
+			{ trackId: 'track-1', state: 'cancelled' },
+		]
+		const { result } = await setup()
+
+		expect(result.current.state).toBe('ready')
+	})
+
+	it('measures progress by the tracks done plus how far the running ones are', async () => {
 		mockTracks = tracks(10)
 		mockDownloaded = new Set(idsOf(mockTracks.slice(0, 4)) as string[])
-		mockProgress = { overallProgress: 0, isDownloading: true }
-		const { result, rerender } = await setup()
+		mockActive = [
+			{ trackId: 'track-4', state: 'downloading' },
+			{ trackId: 'track-5', state: 'pending' },
+		]
+		mockProgressMap = new Map([['track-4', { progress: 0.5 }]])
+		const { result } = await setup()
 
-		// 4 of 10 are done, and none of what is in flight has got anywhere yet
-		expect(result.current.progress).toBeCloseTo(0.4)
-
-		// the downloader's own figure covers only what is in flight, and counts for a share of the whole
-		mockProgress = { overallProgress: 0.5, isDownloading: true }
-		await rerender({})
-
-		expect(result.current.progress).toBeGreaterThan(0.4)
-		expect(result.current.progress).toBeLessThan(1)
-
-		// one more lands and the downloader's figure drops back: the total still goes up
-		const before = result.current.progress
-		mockDownloaded = new Set(idsOf(mockTracks.slice(0, 5)) as string[])
-		mockProgress = { overallProgress: 0.1, isDownloading: true }
-		await rerender({})
-
-		expect(result.current.progress).toBeGreaterThan(before - 0.05)
+		// 4 done, one half way, one queued: (4 + 0.5 + 0) / 10
+		await waitFor(() => expect(result.current.progress).toBeCloseTo(0.45))
 	})
 })

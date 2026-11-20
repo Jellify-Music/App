@@ -1,12 +1,12 @@
+import { useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useDownloadProgress } from 'react-native-nitro-player'
+import { DownloadManager, useDownloadProgress } from 'react-native-nitro-player'
 import { useTranslation } from 'react-i18next'
 import { useArtistContext } from '../../providers/Artist'
 import { fetchAlbumsTracks } from '../../api/queries/artist/utils/download-tracks'
 import { getApi } from '../../stores/auth/utils'
 import { QueryAges } from '../../constants/durations'
-import { MAX_CONCURRENT_DOWNLOADS } from '../../configs/networking/download.config'
 import { chunk } from '../../utils/concurrency'
 import { handleError } from '../../utils/errors'
 import { LoggingContext } from '../../utils/logging'
@@ -54,10 +54,27 @@ export function useArtistDownload() {
 
 	const missingTracks = tracks?.filter((track) => !downloadedIds?.has(track.Id!)) ?? []
 
-	const { overallProgress, isDownloading } = useDownloadProgress({
-		trackIds,
-		activeOnly: true,
-	})
+	// Progress events are only a trigger to look again: a finished download's last event can go
+	// missing, which leaves it looking busy for good. The downloader's own list of tasks is what's true.
+	const { progressMap } = useDownloadProgress({ trackIds, activeOnly: true })
+
+	const [running, setRunning] = useState<Map<string, number>>(new Map())
+
+	useEffect(() => {
+		const ours = new Set(trackIds)
+
+		setRunning(
+			new Map(
+				DownloadManager.getActiveDownloads()
+					.filter(
+						(task) =>
+							ours.has(task.trackId) &&
+							(task.state === 'pending' || task.state === 'downloading'),
+					)
+					.map((task) => [task.trackId, progressMap.get(task.trackId)?.progress ?? 0]),
+			),
+		)
+	}, [progressMap, tracks])
 
 	const download = useMutation({
 		mutationFn: async (items: typeof missingTracks) => {
@@ -76,16 +93,14 @@ export function useArtistDownload() {
 			? 'empty'
 			: missingTracks.length === 0
 				? 'downloaded'
-				: download.isPending || isDownloading
+				: download.isPending || running.size > 0
 					? 'downloading'
 					: 'ready'
 
-	// `overallProgress` is only of the tracks being downloaded right now, so it starts over as each one
-	// finishes: weigh it by how many are in flight, on top of the tracks that are done
+	// the tracks that are done, and how far along the ones being downloaded are
 	const total = tracks?.length ?? 0
-	const inFlight = Math.min(missingTracks.length, MAX_CONCURRENT_DOWNLOADS)
-	const progress =
-		total === 0 ? 0 : (total - missingTracks.length + inFlight * overallProgress) / total
+	const inFlight = [...running.values()].reduce((sum, progress) => sum + progress, 0)
+	const progress = total === 0 ? 0 : (total - missingTracks.length + inFlight) / total
 
 	/** Asks first when it is a lot of tracks, then does it */
 	const confirmThen = (

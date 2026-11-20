@@ -100,12 +100,12 @@
 		"download": {
 			"confirmTitle_one": "Download {{count}} track?",
 			"confirmTitle_other": "Download {{count}} tracks?",
-			"confirmMessage_one": "This downloads the {{count}} track left of everything by {{name}} to your device.",
-			"confirmMessage_other": "This downloads the {{count}} tracks left of everything by {{name}} to your device.",
+			"confirmMessage_one": "{{count}} track from {{name}}'s discography and the albums they appear on will be downloaded to your device.",
+			"confirmMessage_other": "{{count}} tracks from {{name}}'s discography and the albums they appear on will be downloaded to your device.",
 			"removeTitle_one": "Remove {{count}} download?",
 			"removeTitle_other": "Remove {{count}} downloads?",
-			"removeMessage_one": "This removes the {{count}} downloaded track by {{name}} from your device.",
-			"removeMessage_other": "This removes the {{count}} downloaded tracks by {{name}} from your device.",
+			"removeMessage_one": "{{count}} downloaded track by {{name}} will be removed from your device.",
+			"removeMessage_other": "{{count}} downloaded tracks by {{name}} will be removed from your device.",
 			"downloadAll": "Download all",
 			"removeAll": "Remove all downloads"
 		}
