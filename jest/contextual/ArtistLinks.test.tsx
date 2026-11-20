@@ -27,7 +27,7 @@ describe('artist links', () => {
 
 	beforeEach(() => {
 		mockFound = undefined
-		openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(true)
+		openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue()
 	})
 
 	afterEach(() => openURL.mockRestore())
