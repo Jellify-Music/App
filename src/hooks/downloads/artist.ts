@@ -6,6 +6,7 @@ import { useArtistContext } from '../../providers/Artist'
 import { fetchAlbumsTracks } from '../../api/queries/artist/utils/download-tracks'
 import { getApi } from '../../stores/auth/utils'
 import { QueryAges } from '../../constants/durations'
+import { MAX_CONCURRENT_DOWNLOADS } from '../../configs/networking/download.config'
 import { chunk } from '../../utils/concurrency'
 import { handleError } from '../../utils/errors'
 import { LoggingContext } from '../../utils/logging'
@@ -67,15 +68,24 @@ export function useArtistDownload() {
 
 	const { mutate: removeDownloads } = useDeleteDownloads()
 
+	// The downloader keeps reporting a download in progress for a while after its last track has
+	// landed, so having everything is what decides, not how busy it says it is
 	const state: ArtistDownloadState = !tracks
 		? 'loading'
 		: tracks.length === 0
 			? 'empty'
-			: download.isPending || isDownloading
-				? 'downloading'
-				: missingTracks.length === 0
-					? 'downloaded'
+			: missingTracks.length === 0
+				? 'downloaded'
+				: download.isPending || isDownloading
+					? 'downloading'
 					: 'ready'
+
+	// `overallProgress` is only of the tracks being downloaded right now, so it starts over as each one
+	// finishes: weigh it by how many are in flight, on top of the tracks that are done
+	const total = tracks?.length ?? 0
+	const inFlight = Math.min(missingTracks.length, MAX_CONCURRENT_DOWNLOADS)
+	const progress =
+		total === 0 ? 0 : (total - missingTracks.length + inFlight * overallProgress) / total
 
 	/** Asks first when it is a lot of tracks, then does it */
 	const confirmThen = (
@@ -113,5 +123,5 @@ export function useArtistDownload() {
 			() => removeDownloads(trackIds),
 		)
 
-	return { state, progress: overallProgress, startDownload, removeAll }
+	return { state, progress, startDownload, removeAll }
 }
