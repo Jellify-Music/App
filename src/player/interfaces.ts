@@ -18,6 +18,9 @@ export interface QueueMutation {
 	track: BaseItemDto
 	/**
 	 * The index in the queue of the initially played track.
+	 *
+	 * When {@link shuffled} is set, the track at this index plays first and
+	 * the rest are shuffled. Leave it unset to shuffle the entire tracklist.
 	 */
 	index?: number | undefined
 	/**
