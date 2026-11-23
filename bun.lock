@@ -8,7 +8,7 @@
         "@jellify-music/audiomuse-ai-jellyfin-sdk": "0.1.1",
         "@jellify-music/react-native-reanimated-slider": "0.7.0",
         "@jellyfin/sdk": "1.0.2",
-        "@legendapp/list": "3.7.2",
+        "@legendapp/list": "3.7.3",
         "@react-native-clipboard/clipboard": "1.16.3",
         "@react-native-community/netinfo": "12.0.1",
         "@react-native-vector-icons/material-design-icons": "14.0.0",
@@ -430,7 +430,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@legendapp/list": ["@legendapp/list@3.7.2", "", { "dependencies": { "use-sync-external-store": "^1.5.0" }, "peerDependencies": { "react": "*", "react-dom": "*", "react-native": "*" }, "optionalPeers": ["react-dom", "react-native"] }, "sha512-StFy5qjOHHuxHKjenwLq500S/z+zuF43hj8iqXhX9EMtzeOagPfsnMRWphvBG4CYBvMTX6VzgLjN5BzzwY1jDA=="],
+    "@legendapp/list": ["@legendapp/list@3.7.3", "", { "dependencies": { "use-sync-external-store": "^1.5.0" }, "peerDependencies": { "react": "*", "react-dom": "*", "react-native": "*" }, "optionalPeers": ["react-dom", "react-native"] }, "sha512-trGu1i4xo1+r6gG6GI3qrrZAfYHbB25uVj32/KnxhaQ7/eW4AqzhM5cW21Oye4dpg+180Ts1aejRuI8z6Xc4eg=="],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.2.5", "", { "dependencies": { "@tybys/wasm-util": "^0.10.3" }, "peerDependencies": { "@emnapi/core": "^1.7.1 || ^2.0.0-alpha.4", "@emnapi/runtime": "^1.7.1 || ^2.0.0-alpha.4" } }, "sha512-HshSvXzmBxNzqejd3k/KemgQ3hdREUYFRRrgxOZ+gPljDIsO2SDZrVZMd4Z/HsxudQbE62OVyVFE8z9BCurfjA=="],
 
