@@ -7,7 +7,7 @@ import {
 	registerPlayerEventHandlers,
 	restoreFromStorage,
 } from './utils/initialization'
-import { notificationButtons } from './utils/favorite-button'
+import { notificationButtons } from './utils/notification-buttons'
 
 export async function configureNitroPlayer(config: Partial<PlayerConfig>) {
 	try {

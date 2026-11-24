@@ -20,7 +20,8 @@ import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import { getDeviceProfile } from '../../../utils/audio/device-profiles'
 import { updateTrackMediaInfo } from './track-media-info'
-import { onNotificationButtonPress } from './favorite-button'
+import { onNotificationButtonPress } from './notification-buttons'
+import { syncShuffleButton } from './shuffle-button'
 
 /**
  * Re-derives device profiles from the persisted quality settings on startup.
@@ -52,6 +53,8 @@ export function registerPlayerEventHandlers() {
 	TrackPlayer.onSeek(onSeek)
 
 	TrackPlayer.onNotificationButtonPress(onNotificationButtonPress)
+
+	syncShuffleButton()
 
 	TrackPlayer.appStartedWithNotification((track) => {
 		console.debug(`App started with notification`)
