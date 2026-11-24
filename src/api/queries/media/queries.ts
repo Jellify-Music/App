@@ -6,6 +6,7 @@ import {
 	useStreamingDeviceProfileStore,
 } from '../../../stores/profile'
 import { SourceType } from '../../../types/JellifyTrack'
+import { CAST_DEVICE_PROFILE } from '../../../utils/audio/device-profiles'
 import { queryClient } from '../../client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
 import { QueryExecuteOptions } from '@tanstack/react-query'
@@ -18,9 +19,7 @@ export const MediaInfoQuery = (
 ) => {
 	const api = getApi()
 
-	const streamingProfile = useStreamingDeviceProfileStore.getState().deviceProfile
-	const downloadingProfile = useDownloadingDeviceProfileStore.getState().deviceProfile
-	const profile = source === 'stream' ? streamingProfile : downloadingProfile
+	const profile = getDeviceProfileForSource(source)
 
 	return {
 		queryKey: MediaInfoQueryKey({
@@ -46,4 +45,15 @@ export default async function queryForMediaInfo(
 	signal?: AbortSignal,
 ) {
 	return await queryClient.query<PlaybackInfoResponse>(MediaInfoQuery(itemId, source, signal))
+}
+
+function getDeviceProfileForSource(source: SourceType) {
+	switch (source) {
+		case 'stream':
+			return useStreamingDeviceProfileStore.getState().deviceProfile
+		case 'download':
+			return useDownloadingDeviceProfileStore.getState().deviceProfile
+		case 'cast':
+			return CAST_DEVICE_PROFILE
+	}
 }
