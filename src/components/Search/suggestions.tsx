@@ -13,12 +13,15 @@ import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/messaging/search'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import List from '../Global/components/Lists/utils'
+import { useTranslation } from 'react-i18next'
 
 interface SuggestionsHeaderProps {
 	suggestions?: BaseItemDto[]
 }
 
 function SuggestionsHeader({ suggestions }: SuggestionsHeaderProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
 
 	const suggestedArtists = suggestions?.filter((suggestion) => suggestion.Type === 'MusicArtist')
@@ -37,9 +40,13 @@ function SuggestionsHeader({ suggestions }: SuggestionsHeaderProps): React.JSX.E
 	)
 
 	return (
-		<YStack accessibilityLabel='Suggested artists' marginTop='2' paddingHorizontal='2'>
+		<YStack
+			accessibilityLabel={t('search.suggestedArtists')}
+			marginTop='2'
+			paddingHorizontal='2'
+		>
 			<SizableText fontWeight='6' size={'4'}>
-				Suggestions
+				{t('search.suggestions')}
 			</SizableText>
 
 			<HorizontalCardList data={suggestedArtists} renderItem={renderItem} />

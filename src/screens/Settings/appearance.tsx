@@ -10,31 +10,30 @@ import { useAppSettingsStore } from '../../stores/settings/app'
 import { PRESET_PALETTES } from '../../configs/styling/themes'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 import AppIconSettings from '../../components/Settings/components/settings/AppIcon'
+import { useTranslation } from 'react-i18next'
 
 type ThemeOptionConfig = {
 	value: Appearance
-	label: string
 	icon: MaterialDesignIconsIconName
 }
 
 type ColorPresetConfig = {
 	value: ColorPreset
-	label: string
 }
 
 const THEME_OPTIONS: ThemeOptionConfig[] = [
-	{ value: 'system', label: 'Match Device', icon: 'theme-light-dark' },
-	{ value: 'light', label: 'Light', icon: 'white-balance-sunny' },
-	{ value: 'dark', label: 'Dark', icon: 'weather-night' },
-	{ value: 'oled', label: 'OLED Black', icon: 'invert-colors' },
+	{ value: 'system', icon: 'theme-light-dark' },
+	{ value: 'light', icon: 'white-balance-sunny' },
+	{ value: 'dark', icon: 'weather-night' },
+	{ value: 'oled', icon: 'invert-colors' },
 ]
 
-const COLOR_PRESET_LABELS: ColorPresetConfig[] = [
-	{ value: 'haze', label: 'Haze' },
-	{ value: 'ocean', label: 'Ocean' },
-	{ value: 'forest', label: 'Forest' },
-	{ value: 'sunset', label: 'Sunset' },
-	{ value: 'peanut', label: 'Peanut' },
+const COLOR_PRESET_OPTIONS: ColorPresetConfig[] = [
+	{ value: 'haze' },
+	{ value: 'ocean' },
+	{ value: 'forest' },
+	{ value: 'sunset' },
+	{ value: 'peanut' },
 ]
 
 function ThemeOptionCard({
@@ -46,6 +45,8 @@ function ThemeOptionCard({
 	isSelected: boolean
 	onPress: EventHandler
 }) {
+	const { t } = useTranslation()
+
 	return (
 		<XStack
 			onPress={onPress}
@@ -62,7 +63,7 @@ function ThemeOptionCard({
 		>
 			<Icon size='7' name={option.icon} color={isSelected ? 'primary' : 'borderColor'} />
 			<SizableText fontSize='2' fontWeight='6' flex={1}>
-				{option.label}
+				{t(`settings.appearance.themes.${option.value}`)}
 			</SizableText>
 			{isSelected && <Icon size='7' name='check-circle-outline' color='primary' />}
 		</XStack>
@@ -78,6 +79,8 @@ function ColorPresetCard({
 	isSelected: boolean
 	onPress: EventHandler
 }) {
+	const { t } = useTranslation()
+
 	const palette = PRESET_PALETTES[preset.value].dark
 
 	return (
@@ -96,7 +99,7 @@ function ColorPresetCard({
 		>
 			<YStack width={20} height={20} borderRadius={10} backgroundColor={palette.primary} />
 			<SizableText fontSize='2' fontWeight='6' flex={1}>
-				{preset.label}
+				{t(`settings.appearance.colorPresets.${preset.value}`)}
 			</SizableText>
 			{isSelected && <Icon size='7' name='check-circle-outline' color='primary' />}
 		</XStack>
@@ -104,6 +107,8 @@ function ColorPresetCard({
 }
 
 export default function AppearanceScreen(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { bottom } = useSafeAreaInsets()
 
 	const {
@@ -126,7 +131,7 @@ export default function AppearanceScreen(): React.JSX.Element {
 				<YStack padding='4' gap='6'>
 					<YStack gap='3'>
 						<SizableText fontSize='3' fontWeight='6'>
-							Theme
+							{t('settings.appearance.theme')}
 						</SizableText>
 						<XStack flexWrap='wrap' gap='2'>
 							{THEME_OPTIONS.map((option) => (
@@ -142,10 +147,10 @@ export default function AppearanceScreen(): React.JSX.Element {
 
 					<YStack gap='3'>
 						<SizableText fontSize='3' fontWeight='6'>
-							Color Scheme
+							{t('settings.appearance.colorScheme')}
 						</SizableText>
 						<XStack flexWrap='wrap' gap='2'>
-							{COLOR_PRESET_LABELS.map((preset) => (
+							{COLOR_PRESET_OPTIONS.map((preset) => (
 								<ColorPresetCard
 									key={preset.value}
 									preset={preset}
@@ -161,10 +166,10 @@ export default function AppearanceScreen(): React.JSX.Element {
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
 							<SizableText fontSize='3' fontWeight='6'>
-								Hide Runtimes
+								{t('settings.appearance.hideRuntimes')}
 							</SizableText>
 							<SizableText fontSize='2' color='borderColor'>
-								Hide track duration lengths
+								{t('settings.appearance.hideRuntimesDescription')}
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel
@@ -177,10 +182,10 @@ export default function AppearanceScreen(): React.JSX.Element {
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
 							<SizableText fontSize='3' fontWeight='6'>
-								Hide Card Indicators
+								{t('settings.appearance.hideCardIndicators')}
 							</SizableText>
 							<SizableText fontSize='2' color='borderColor'>
-								Hide indicators on card corners
+								{t('settings.appearance.hideCardIndicatorsDescription')}
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel

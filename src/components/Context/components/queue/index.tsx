@@ -3,6 +3,7 @@ import { QueuingType } from '../../../../enums/queuing-type'
 import AddToQueueMenuRowsProps from './types'
 import type { ContextMenuRowImageProp } from '../types'
 import ContextMenuRow from '..'
+import { useTranslation } from 'react-i18next'
 
 // Use same icon as swipe Play Later for consistency
 const IMAGE_PROP: ContextMenuRowImageProp = {
@@ -10,18 +11,20 @@ const IMAGE_PROP: ContextMenuRowImageProp = {
 }
 
 export default function AddToQueueMenuRows({ tracks }: AddToQueueMenuRowsProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	return (
 		<>
 			<ContextMenuRow
 				onPress={() => addToQueue({ tracks, queuingType: QueuingType.PlayNext })}
 				imageProp={IMAGE_PROP}
-				label='Play Next'
+				label={t('context.playNext')}
 			/>
 
 			<ContextMenuRow
 				onPress={() => addToQueue({ tracks, queuingType: QueuingType.PlayLater })}
 				imageProp={IMAGE_PROP}
-				label='Play Later'
+				label={t('context.playLater')}
 			/>
 		</>
 	)

@@ -7,6 +7,7 @@ import { RefreshControl } from 'react-native'
 import { closeAllSwipeableRows } from '../SwipeableRow/registery'
 import AZScroller from '../AZScroller'
 import ListStickyHeader from './list-sticky-header'
+import { useTranslation } from 'react-i18next'
 
 interface ItemSectionListProps {
 	ref: RefObject<SectionListRef | null>
@@ -21,6 +22,8 @@ export default function ItemSectionList({
 	renderItem,
 	sortDescending,
 }: ItemSectionListProps) {
+	const { t } = useTranslation()
+
 	const theme = useTheme()
 
 	const onRefresh = () => {
@@ -55,7 +58,7 @@ export default function ItemSectionList({
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<SizableText fontSize='2' marginVertical='auto' color='borderColor'>
-							No items
+							{t('common.noItems')}
 						</SizableText>
 					</YStack>
 				}

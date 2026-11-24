@@ -8,8 +8,11 @@ import useConnectToServer from '../../api/mutations/public-system-info'
 import Button from '../Global/utils/button'
 import AddressInput from '../ServerAddress/components/address-input'
 import Heading from '../ServerAddress/components/heading'
+import { useTranslation } from 'react-i18next'
 
 export default function ServerAddress(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
 	const [serverAddress, setServerAddress] = useState<string | undefined>(undefined)
@@ -48,7 +51,7 @@ export default function ServerAddress(): React.JSX.Element {
 					<Spinner color='background' />
 				) : (
 					<SizableText color='background' fontSize='2' fontWeight='6'>
-						Connect
+						{t('login.connect')}
 					</SizableText>
 				)}
 			</Button>

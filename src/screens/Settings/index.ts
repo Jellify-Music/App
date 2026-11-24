@@ -13,6 +13,7 @@ import PlaybackScreen from './playback'
 import GesturesScreen from './gestures'
 import AppearanceScreen from './appearance'
 import { stackScreenOptions } from '../navigation'
+import i18n from '../../i18n'
 
 const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 	initialRouteName: 'Settings',
@@ -27,7 +28,7 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 		LibrarySelection: {
 			screen: LibrarySelectionScreen,
 			options: {
-				title: 'Select Library',
+				title: i18n.t('navigation.selectLibrary'),
 			},
 		},
 		SignOut: {
@@ -43,7 +44,7 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 		StorageManagement: {
 			screen: StorageManagementScreen,
 			options: {
-				title: 'Storage Management',
+				title: i18n.t('navigation.storageManagement'),
 			},
 		},
 		StorageSelectionReview: {
@@ -58,37 +59,37 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 		Account: {
 			screen: AccountScreen,
 			options: {
-				title: 'Account',
+				title: i18n.t('navigation.account'),
 			},
 		},
 		Appearance: {
 			screen: AppearanceScreen,
 			options: {
-				title: 'Appearance',
+				title: i18n.t('settings.sections.appearance'),
 			},
 		},
 		Gestures: {
 			screen: GesturesScreen,
 			options: {
-				title: 'Gestures',
+				title: i18n.t('settings.sections.gestures'),
 			},
 		},
 		Playback: {
 			screen: PlaybackScreen,
 			options: {
-				title: 'Playback',
+				title: i18n.t('settings.sections.playback'),
 			},
 		},
 		PrivacyDeveloper: {
 			screen: PrivacyDeveloperScreen,
 			options: {
-				title: 'Privacy & Developer',
+				title: i18n.t('settings.sections.privacyDeveloper'),
 			},
 		},
 		About: {
 			screen: AboutScreen,
 			options: {
-				title: 'About',
+				title: i18n.t('settings.sections.about'),
 			},
 		},
 	},

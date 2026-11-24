@@ -9,6 +9,7 @@ import type { ContextMenuRowImageProp } from '../types'
 import ContextMenuRow from '..'
 import { handleError } from '../../../../utils/errors'
 import { LoggingContext } from '../../../../utils/logging'
+import { useTranslation } from 'react-i18next'
 
 const IMAGE_PROP: ContextMenuRowImageProp = {
 	iconName: 'playlist-remove',
@@ -19,6 +20,8 @@ export default function RemoveFromPlaylistRow({
 	track,
 	playlist,
 }: RemoveFromPlaylistRowProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const api = useApi()
 
 	const { mutate: removeTrack, isPending } = useMutation({
@@ -29,7 +32,7 @@ export default function RemoveFromPlaylistRow({
 			navigationRef.goBack()
 		},
 		onError: (error) => {
-			handleError(error, LoggingContext.Playlist, 'Failed to remove from playlist')
+			handleError(error, LoggingContext.Playlist, 'removeFromPlaylist')
 		},
 	})
 
@@ -38,7 +41,7 @@ export default function RemoveFromPlaylistRow({
 			onPress={() => removeTrack()}
 			disabled={isPending}
 			imageProp={IMAGE_PROP}
-			label='Remove from Playlist'
+			label={t('context.removeFromPlaylist')}
 		/>
 	)
 }
