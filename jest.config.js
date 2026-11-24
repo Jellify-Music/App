@@ -22,7 +22,6 @@ module.exports = {
 		'./jest/setup/nitro-ota.ts',
 		'./jest/setup/nitro-player.ts',
 		'./jest/setup/pulsar.ts',
-		'./jest/setup/rnfs.ts',
 		'./jest/setup/keyboard-controller.ts',
 		'./jest/setup/safe-area-context.ts',
 		'./src/configs/tamagui.config.ts',
