@@ -19,9 +19,9 @@
         "@sentry/react-native": "8.33.0",
         "@tamagui/animations-reanimated": "3.3.3",
         "@tamagui/config": "3.3.3",
-        "@tanstack/query-async-storage-persister": "5.108.2",
-        "@tanstack/react-query": "5.108.2",
-        "@tanstack/react-query-persist-client": "5.108.2",
+        "@tanstack/query-async-storage-persister": "5.108.4",
+        "@tanstack/react-query": "5.108.4",
+        "@tanstack/react-query-persist-client": "5.108.4",
         "axios": "1.21.1",
         "i18next": "27.2.2",
         "lodash": "4.18.1",
@@ -883,15 +883,15 @@
 
     "@tamagui/z-index-stack": ["@tamagui/z-index-stack@3.3.3", "", { "peerDependencies": { "react": ">=19" } }, "sha512-uJhrdvEe+d/aoB+vRYwTBZjDWT2+Wlx/d68fhL3a9ZrK4S8stUWpII3h8lZvFP7VeRKx/UvBbpsShUWWFLp8Pg=="],
 
-    "@tanstack/query-async-storage-persister": ["@tanstack/query-async-storage-persister@5.108.2", "", { "dependencies": { "@tanstack/query-core": "5.108.2", "@tanstack/query-persist-client-core": "5.108.2" } }, "sha512-Abtxibhp9H5g2OXvEdAVJM4oVjIKP0ntKnyDmD2gp2z0cWDZtXqLJ8BsmCy+KnN4ikC0e3xDfJpu/hy2ScHv8A=="],
+    "@tanstack/query-async-storage-persister": ["@tanstack/query-async-storage-persister@5.108.4", "", { "dependencies": { "@tanstack/query-core": "5.108.4", "@tanstack/query-persist-client-core": "5.108.4" } }, "sha512-3OxWCRj+ix1dYmu+8LOfJvBNSWQuas7XfkkEPmWvIQJaYcg6+uXoybMWgokAd87h67B0uiZf2mPnXqP1tVdj+g=="],
 
-    "@tanstack/query-core": ["@tanstack/query-core@5.108.2", "", {}, "sha512-0l+0xDKqn71hfJBKaAvFP/X7WYM0TbscEk6nK1pHaWQUWUEA+WJD0VlT8wF+HIJANMV9B/DouPWwDnX3w/l9BA=="],
+    "@tanstack/query-core": ["@tanstack/query-core@5.108.4", "", {}, "sha512-2Ks5dlLWz4eXJrthOyG0qW3SLt3xx0RrQmAmN0rnmogiaaOYuWiAe6HAm9KE2b2v8nig+vraNz8fsfZ6fF6zFg=="],
 
-    "@tanstack/query-persist-client-core": ["@tanstack/query-persist-client-core@5.108.2", "", { "dependencies": { "@tanstack/query-core": "5.108.2" } }, "sha512-IMl2Cmu6aau4mTuHXROVYuDmSAXEdwAjVG3Hsb6KkcW/praiTCSRdBOzoVvBridhrIHkFX3VUSYSVu5xEKap8A=="],
+    "@tanstack/query-persist-client-core": ["@tanstack/query-persist-client-core@5.108.4", "", { "dependencies": { "@tanstack/query-core": "5.108.4" } }, "sha512-ZsATTbw5zRsbjobn2s24TA8v4WhPVz2X5X8d4F3ws+H3DmygPQx3JUOg4W8ym6RbLPd7JXgCzYTOaMlAbfcKXA=="],
 
-    "@tanstack/react-query": ["@tanstack/react-query@5.108.2", "", { "dependencies": { "@tanstack/query-core": "5.108.2" }, "peerDependencies": { "@types/react": "^18 || ^19", "react": "^18 || ^19" }, "optionalPeers": ["@types/react"] }, "sha512-wV6hEjVGTfh9rvu3uREYW0hgBfS9klDejGelhPY575jD5jg6qbAb1nzT7hR1Q+wemR66ZjtE5p9pAGUwqK8zbg=="],
+    "@tanstack/react-query": ["@tanstack/react-query@5.108.4", "", { "dependencies": { "@tanstack/query-core": "5.108.4" }, "peerDependencies": { "@types/react": "^18 || ^19", "react": "^18 || ^19" }, "optionalPeers": ["@types/react"] }, "sha512-GlTa94kfEKTVsbzXe58rFA3GZ0ZE7N1aFtbZAfOS3XxMv8YNn4C+8rsz40LorHLazdm5PsqCroWaYAR+ZkMXMQ=="],
 
-    "@tanstack/react-query-persist-client": ["@tanstack/react-query-persist-client@5.108.2", "", { "dependencies": { "@tanstack/query-persist-client-core": "5.108.2" }, "peerDependencies": { "@tanstack/react-query": "^5.108.2", "@types/react": "^18 || ^19", "react": "^18 || ^19" }, "optionalPeers": ["@types/react"] }, "sha512-bqqlo7Gr3OBbVtbRfTY+yvdCByl7MWaE8wLRkB5dL+AGrSlYwgABSzo7J4x100Stiv09+aN2SyBrnw/HU98olg=="],
+    "@tanstack/react-query-persist-client": ["@tanstack/react-query-persist-client@5.108.4", "", { "dependencies": { "@tanstack/query-persist-client-core": "5.108.4" }, "peerDependencies": { "@tanstack/react-query": "^5.108.4", "@types/react": "^18 || ^19", "react": "^18 || ^19" }, "optionalPeers": ["@types/react"] }, "sha512-q4C5sYcIH7JImZfL9fbhumwKFkHS51cEZWyGcuPTDPfwF74s3OQmoOzidkuu1ywmPr1EYqvrQiXPqyc0sh36cg=="],
 
     "@testing-library/react-native": ["@testing-library/react-native@14.1.0", "", { "dependencies": { "jest-matcher-utils": "^30.4.1", "picocolors": "^1.1.1", "pretty-format": "^30.4.1", "redent": "^3.0.0" }, "peerDependencies": { "jest": ">=29.0.0", "react": ">=19.0.0", "react-native": ">=0.78", "test-renderer": "^1.0.0" }, "optionalPeers": ["jest"] }, "sha512-tWOam5U3aUE8XqStdWAN/OuUUdGRzh/vJMg7SfCaqXNKx7orRh04590Jp4JbORctYjORoRYfJSg04I2//wnxYw=="],
 
@@ -2119,7 +2119,7 @@
 
     "react-native-is-edge-to-edge": ["react-native-is-edge-to-edge@1.3.1", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-NIXU/iT5+ORyCc7p0z2nnlkouYKX425vuU1OEm6bMMtWWR9yvb+Xg5AZmImTKoF9abxCPqrKC3rOZsKzUYgYZA=="],
 
-    "react-native-keyboard-controller": ["react-native-keyboard-controller@1.23.1", "", { "dependencies": { "react-native-is-edge-to-edge": "^1.2.1" }, "peerDependencies": { "react": "*", "react-native": "*", "react-native-reanimated": ">=3.0.0" } }, "sha512-U3rWb4Vfx3eBaAEJTjbl2zxfI1rl2+OFqEUiBKX0bhc38/jyeJRlcLO34jKo3nO9AQvPtWnPU7rRQ7ngBldKpw=="],
+    "react-native-keyboard-controller": ["react-native-keyboard-controller@1.22.9", "", { "dependencies": { "react-native-is-edge-to-edge": "^1.2.1" }, "peerDependencies": { "react": "*", "react-native": "*", "react-native-reanimated": ">=3.0.0" } }, "sha512-nLoXvTbIy/9cI4p/bAXUP7Vfi6Mf2Q7g/gsh2H29C7hgUSQQLdoQjl8inhKC25oxaEibB0CMR++h3HP/k/+BVw=="],
 
     "react-native-linear-gradient": ["react-native-linear-gradient@2.8.3", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-KflAXZcEg54PXkLyflaSZQ3PJp4uC4whM7nT/Uot9m0e/qxFV3p6uor1983D1YOBJbJN7rrWdqIjq0T42jOJyA=="],
 
@@ -2133,7 +2133,7 @@
 
     "react-native-nitro-player": ["react-native-nitro-player@1.10.0", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" } }, "sha512-j0zpSsAWZHg/IIps5RKW/FQsjTz1htHNr3ljytKgFyrWzHGhFWEFnoAbJsA2kNlt+5SHr1TJoxXaIcdhmJCApQ=="],
 
-    "react-native-pager-view": ["react-native-pager-view@10.0.3", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-nKrb83HA3OU7rkUGnxteu5dxTJqdMMS6m87QK+IEWrt7bR38izT5KTXlAEXO5AaJu1Kcu5JG5WLTgv3JnGZacA=="],
+    "react-native-pager-view": ["react-native-pager-view@8.0.4", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-9ASQA/gdQv63pESFbzyODgsY07kZoBjLqBRvZ/HNYn+h29XyOX2BICuvVmhemxw/pz3hKGqGEU31DDhDArwaRg=="],
 
     "react-native-pulsar": ["react-native-pulsar@1.7.0", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-worklets": "*" } }, "sha512-izuzr3S76Ltrobvngceke380XDOea4n9J7Lbha6XDgzYBx1H+rz/obcI1b2sBNyiJ9ig9KCNXrkd+6uQY9ailw=="],
 
