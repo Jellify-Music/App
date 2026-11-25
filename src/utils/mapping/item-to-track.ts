@@ -34,7 +34,13 @@ export function mapDtoToTrack(
 	item: BaseItemDto,
 	downloadedTrackIds: Map<string, DownloadedTrack>,
 ): TrackItem {
-	const api = getApi()!
+	const api = getApi()
+
+	/**
+	 * Url is always provided as empty so we can respond to events from Nitro Player
+	 * when streaming is necessary
+	 */
+	const url = ''
 
 	const downloadedTrack = downloadedTrackIds.get(item.Id!)
 
@@ -59,7 +65,7 @@ export function mapDtoToTrack(
 	return {
 		...(headers ? { headers } : {}),
 		id: item.Id ?? '',
-		url: downloadedTrack?.localPath ? `file://${downloadedTrack.localPath}` : '',
+		url,
 		artwork: downloadedTrack?.localArtworkPath
 			? `file://${downloadedTrack.localArtworkPath}`
 			: getItemImageUrl(item, ImageType.Primary, {
