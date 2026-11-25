@@ -23,6 +23,7 @@
     "fastlane:android:build": "cd android && bundle install && bundle exec fastlane build",
     "fastlane:android:gplay": "cd android && bundle install && bundle exec fastlane gplay",
     "fastlane:android:fdroid": "cd android && bundle install && bundle exec fastlane fdroid",
+    "fastlane:android:fdroid:check": "cd android && bundle install && bundle exec fastlane fdroid_check",
     "androidBuild": "cd android && ./gradlew clean && ./gradlew assembleRelease && cd .. && echo 'find apk in android/app/build/outputs/apk/release'",
     "prepare": "husky",
     "format:check": "prettier --check .",
