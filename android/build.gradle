@@ -9,7 +9,7 @@ buildscript {
 
         // F-Droid / FOSS build (-Pfoss=true): no proprietary Google libraries.
         isFossBuild = (findProperty("foss") ?: "false").toString().toBoolean()
-        // Read by react-native-nitro-player (see patches/) to compile out Google Cast.
+        // Read by react-native-nitro-player (1.10.0+) to compile out Google Cast.
         nitroPlayerCastEnabled = !isFossBuild
     }
     repositories {
