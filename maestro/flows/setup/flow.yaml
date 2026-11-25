@@ -60,4 +60,9 @@ appId: com.cosmonautical.jellify
 
 - runFlow: select-server.yaml
 - runFlow: login.yaml
-- runFlow: select-library.yaml
+
+# Wait for home screen by checking for home tab button
+- extendedWaitUntil:
+    visible:
+      id: "home-tab-button"
+    timeout: 30000

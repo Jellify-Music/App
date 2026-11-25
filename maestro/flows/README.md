@@ -6,7 +6,7 @@ Each subdirectory here corresponds to a top-level screen in Jellify's UI — the
 
 ```
 flows/
-├── setup/       # App launch, login, server & library selection
+├── setup/       # App launch, login, server selection
 ├── home/        # Home tab
 ├── quick-actions/ # Track row swipe actions & favoriting
 ├── library/     # Library tab
@@ -27,11 +27,11 @@ For screens that are reachable from multiple navigation stacks (e.g. an album de
 
 | Flow | Screen | Tab bar ID |
 |---|---|---|
-| `setup/` | Login, server selection, library selection | — |
+| `setup/` | Login, server selection | — |
 | `home/` | Home tab | `home-tab-button` |
 | `quick-actions/` | Track row swipe gestures & favoriting | — |
 | `library/` | Library tab | `library-tab-button` |
 | `search/` | Search tab | `search-tab-button` |
 | `discover/` | Discover tab | `discover-tab-button` |
 | `settings/` | Settings tab | `settings-tab-button` |
-| `player/` | Full-screen player & queue | `miniplayer-test-id` (expand) |
+| `player/` | Full-screen player, queue & header-link navigation to the source album | `miniplayer-test-id` (expand) |

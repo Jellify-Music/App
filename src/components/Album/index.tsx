@@ -16,6 +16,7 @@ import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mut
 import { useAlbumDiscs } from '../../api/queries/album'
 import { ItemKeyExtractor } from '../../utils/parsing/key-extractor'
 import AlbumSectionHeader from './section-header'
+import { useTranslation } from 'react-i18next'
 
 /**
  * The screen for an Album's track list
@@ -26,6 +27,8 @@ import AlbumSectionHeader from './section-header'
  * @returns A React component
  */
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const theme = useTheme()
@@ -99,10 +102,6 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	return (
 		<SectionList
 			contentInsetAdjustmentBehavior='automatic'
-			contentContainerStyle={{
-				paddingTop: 8,
-				paddingHorizontal: 8,
-			}}
 			sections={sections}
 			keyExtractor={ItemKeyExtractor}
 			maxToRenderPerBatch={50}
@@ -130,8 +129,13 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 			ListEmptyComponent={() => (
 				<YStack flex={1} alignContent='center' margin='4'>
 					{isPending ? null : (
-						<SizableText textAlign='center' color='borderColor'>
-							No album tracks
+						<SizableText
+							fontSize='3'
+							fontWeight='6'
+							textAlign='center'
+							color='borderColor'
+						>
+							{t('album.noTracks')}
 						</SizableText>
 					)}
 				</YStack>

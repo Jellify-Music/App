@@ -46,7 +46,13 @@ appId: com.cosmonautical.jellify
 
 - takeScreenshot: screenshots/library/library_playlists_screen
 
-- assertVisible: Jerry's Mix
+# Jerry's Mix sorts below the generated playlists, off the bottom of the screen
+- scrollUntilVisible:
+    element:
+      text: "Jerry's Mix"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
 
 - tapOn: Jerry's Mix
 

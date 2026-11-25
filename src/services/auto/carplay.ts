@@ -32,6 +32,7 @@ import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
 import { AA_PLAYLIST_NAME_PREFIX } from './android-auto'
+import i18n from '../../i18n'
 
 const LETTERS = ['#', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ']
 const TILE_LIMIT = 500
@@ -42,17 +43,17 @@ const TILES = 8
 
 // Lazy tabs show at once on a start from the car and fill in once JS is up
 const TABS: CarPlayListTemplate[] = [
-	tab('home', 'Home', 'house.fill'),
-	tab('artists', 'Artists', 'music.mic'),
-	tab('albums', 'Albums', 'square.stack.fill'),
-	tab('playlists', 'Playlists', 'music.note.list'),
+	tab('home', i18n.t('navigation.home'), 'house.fill'),
+	tab('artists', i18n.t('car.artists'), 'music.mic'),
+	tab('albums', i18n.t('car.albums'), 'square.stack.fill'),
+	tab('playlists', i18n.t('car.playlists'), 'music.note.list'),
 ]
 
 function tab(id: string, title: string, image: string): CarPlayListTemplate {
 	return { type: 'list', id, title, lazy: true, tab: { title, image } }
 }
 
-// Titles of lists that can be opened, so their "More…" pages keep the name
+// Titles of lists that can be opened, so their i18n.t('car.more') pages keep the name
 const titles = new Map(TABS.map((template) => [template.id, template.title]))
 
 function opens(id: string, title: string): CarPlayListTemplate {
@@ -80,13 +81,13 @@ const message = (title: string): CarPlayListItem => ({ id: `message:${title}`, t
 
 const retry = (): CarPlayListItem => ({
 	id: RETRY_ID,
-	title: "Couldn't reach your Jellyfin server",
-	subtitle: 'Tap to try again',
+	title: i18n.t('car.unreachable'),
+	subtitle: i18n.t('car.tapToRetry'),
 	image: 'arrow.clockwise',
 })
 
 const problem = (error: { response?: { status?: number } } | undefined) =>
-	error?.response?.status === 401 ? message('Sign in again in Jellify on your phone') : retry()
+	error?.response?.status === 401 ? message(i18n.t('car.signInAgain')) : retry()
 
 // Tracks only play from a PlayerQueue playlist; build one per list, replacing the previous copy afterwards
 async function carPlaylist(key: string, tracks: TrackItem[]) {
@@ -102,7 +103,7 @@ async function carPlaylist(key: string, tracks: TrackItem[]) {
 }
 
 async function playableTracks(key: string, found: TrackItem[]): Promise<CarPlayListSection[]> {
-	if (found.length === 0) return [{ items: [message('Nothing here yet')] }]
+	if (found.length === 0) return [{ items: [message(i18n.t('car.empty'))] }]
 	const { playlistId, tracks } = await carPlaylist(key, found)
 	return [
 		{
@@ -176,7 +177,11 @@ function withMore(base: string, offset: number, items: CarPlayListItem[]): CarPl
 		{
 			items: [
 				...items.slice(0, PAGE_SIZE),
-				{ id: more, title: 'More…', template: opens(more, titles.get(base) ?? '') },
+				{
+					id: more,
+					title: i18n.t('car.more'),
+					template: opens(more, titles.get(base) ?? ''),
+				},
 			],
 		},
 	]
@@ -211,11 +216,11 @@ async function songTiles(
 function albumTiles(items: BaseItemDto[]): CarPlayImageRow | undefined {
 	const albums = items.filter((item) => item.Type === BaseItemKind.MusicAlbum)
 	if (albums.length === 0) return undefined
-	titles.set('added', 'Recently added')
+	titles.set('added', i18n.t('car.recentlyAdded'))
 	return {
 		type: 'imageRow',
 		id: 'added',
-		title: 'Recently added',
+		title: i18n.t('car.recentlyAdded'),
 		multipleLines: true,
 		elements: albums.slice(0, TILES).map((album) => ({
 			id: `album:${album.Id}`,
@@ -236,10 +241,10 @@ async function home(
 	const [results, downloads] = await Promise.all([
 		Promise.allSettled([
 			fetchRecentlyPlayed(api, user, library, 0).then((items) =>
-				songTiles('picks:recents', 'Play it again', items),
+				songTiles('picks:recents', i18n.t('home.playItAgain'), items),
 			),
 			fetchFrequentlyPlayed(api, library, 0).then((items) =>
-				songTiles('picks:frequents', 'On Repeat', items),
+				songTiles('picks:frequents', i18n.t('home.onRepeat'), items),
 			),
 			fetchRecentlyAdded(api, library, 0).then(albumTiles),
 		]),
@@ -252,23 +257,23 @@ async function home(
 	const shortcuts: CarPlayListItem[] = [
 		{
 			id: 'picks:favorites',
-			title: 'Favorites',
+			title: i18n.t('filters.favorites'),
 			image: 'heart.fill',
-			template: opens('picks:favorites', 'Favorites'),
+			template: opens('picks:favorites', i18n.t('filters.favorites')),
 		},
 	]
 	if (downloads.length > 0)
 		shortcuts.push({
 			id: 'picks:downloads',
-			title: 'Downloads',
-			subtitle: `${downloads.length} song${downloads.length === 1 ? '' : 's'}`,
+			title: i18n.t('car.downloads'),
+			subtitle: i18n.t('car.songCount', { count: downloads.length }),
 			image: 'arrow.down.circle.fill',
-			template: opens('picks:downloads', 'Downloads'),
+			template: opens('picks:downloads', i18n.t('car.downloads')),
 		})
 	const sections: CarPlayListSection[] = []
 	if (tiles.length > 0) sections.push({ items: tiles })
 	else if (failure) sections.push({ items: [problem(failure.reason)] })
-	sections.push({ header: 'Your library', items: shortcuts })
+	sections.push({ header: i18n.t('car.yourLibrary'), items: shortcuts })
 	return sections
 }
 
@@ -276,7 +281,7 @@ async function load(templateId: string): Promise<CarPlayListSection[]> {
 	const api = getApi()
 	const user = getUser()
 	const library = getLibrary()
-	if (!api || !user) return [{ items: [message('Open Jellify on your phone to sign in')] }]
+	if (!api || !user) return [{ items: [message(i18n.t('car.signIn'))] }]
 
 	const [base, offsetText] = templateId.split('@')
 	const offset = Number(offsetText) || 0
@@ -293,7 +298,7 @@ async function load(templateId: string): Promise<CarPlayListSection[]> {
 			const albums = (await fetchRecentlyAdded(api, library, 0)).filter(
 				(item) => item.Type === BaseItemKind.MusicAlbum,
 			)
-			if (albums.length === 0) return [{ items: [message('Nothing here yet')] }]
+			if (albums.length === 0) return [{ items: [message(i18n.t('car.empty'))] }]
 			return [{ items: albums.map((album) => row('album', album)) }]
 		}
 		case 'artists':
@@ -316,6 +321,7 @@ async function load(templateId: string): Promise<CarPlayListSection[]> {
 							await getItems({
 								parentId: musicLibraryId,
 								includeItemTypes: [BaseItemKind.MusicArtist],
+								recursive: true,
 								sortBy: [ItemSortBy.SortName],
 								sortOrder: [SortOrder.Ascending],
 								enableImages: true,
@@ -424,7 +430,10 @@ export function registerCarPlayService() {
 	if (Platform.OS !== 'ios' || !CarPlayHelper.isAvailable() || isRegistered) return () => {}
 	isRegistered = true
 
-	CarPlayHelper.set({ templates: TABS, nowPlaying: { upNextTitle: 'Queue', albumArtist: true } })
+	CarPlayHelper.set({
+		templates: TABS,
+		nowPlaying: { upNextTitle: i18n.t('car.queue'), albumArtist: true },
+	})
 	CarPlayHelper.setTemplateLoader(loadTemplate)
 	CarPlayHelper.onSelect((id, templateId) => {
 		if (id === RETRY_ID) CarPlayHelper.reload(templateId)

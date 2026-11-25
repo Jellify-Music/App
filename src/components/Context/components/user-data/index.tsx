@@ -3,6 +3,7 @@ import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/fav
 import FavoriteContextMenuRowProps from './types'
 import type { ContextMenuRowImageProp } from '../types'
 import ContextMenuRow from '..'
+import { useTranslation } from 'react-i18next'
 
 const ADD_FAVORITE_IMAGE_PROP: ContextMenuRowImageProp = {
 	iconName: 'heart-outline',
@@ -25,6 +26,8 @@ export default function FavoriteContextMenuRow({
 }
 
 function AddFavoriteContextMenuRow({ item }: FavoriteContextMenuRowProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { mutate, isPending } = useAddFavorite()
 
 	return (
@@ -32,12 +35,14 @@ function AddFavoriteContextMenuRow({ item }: FavoriteContextMenuRowProps): React
 			onPress={() => mutate({ item })}
 			disabled={isPending}
 			imageProp={ADD_FAVORITE_IMAGE_PROP}
-			label='Add to favorites'
+			label={t('context.addToFavorites')}
 		/>
 	)
 }
 
 function RemoveFavoriteContextMenuRow({ item }: FavoriteContextMenuRowProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const { mutate, isPending } = useRemoveFavorite()
 
 	return (
@@ -45,7 +50,7 @@ function RemoveFavoriteContextMenuRow({ item }: FavoriteContextMenuRowProps): Re
 			onPress={() => mutate({ item })}
 			disabled={isPending}
 			imageProp={REMOVE_FAVORITE_IMAGE_PROP}
-			label='Remove from favorites'
+			label={t('context.removeFromFavorites')}
 		/>
 	)
 }

@@ -3,6 +3,7 @@ import type { EventHandler } from '../../../types/Events'
 import { ListItem, SizableText, Spacer, XStack, YGroup, YStack } from 'tamagui'
 import ItemImage from './image'
 import Icon from './icon'
+import { useTranslation } from 'react-i18next'
 
 interface ListGroupProps {
 	items: BaseItemDto[] | undefined
@@ -17,6 +18,8 @@ export default function ListGroup({
 	circularImages,
 	seeMore,
 }: ListGroupProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	return (
 		<YGroup marginHorizontal='2' borderRadius='5' borderWidth='1' borderColor='borderColor'>
 			{items?.slice(0, limit).map((item) => {
@@ -33,7 +36,7 @@ export default function ListGroup({
 								<YStack justifyContent='center' flex={1}>
 									<XStack>
 										<SizableText fontWeight='6' size={'7'}>
-											{item.Name ?? 'Untitled'}
+											{item.Name ?? t('placeholders.untitled')}
 										</SizableText>
 										<SizableText>
 											{item.RecursiveItemCount?.toString() ?? ''}
@@ -65,7 +68,7 @@ export default function ListGroup({
 
 							<Spacer />
 							<SizableText fontWeight='6' size={'7'} margin={'1'} marginTop={'2-5'}>
-								See More
+								{t('common.seeMore')}
 							</SizableText>
 						</XStack>
 					</ListItem>

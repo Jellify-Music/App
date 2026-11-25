@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import Input from '../Global/utils/input'
+import React, { useEffect, useRef, useState } from 'react'
+import { useSearchInputGesture } from '../../hooks/gestures/search'
+import Input from '../Global/utils/Input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { H3, H5, SizableText, Spinner, YStack } from 'tamagui'
+import { H3, H5, SizableText, Spinner, TamaguiElement, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
@@ -18,8 +19,11 @@ import { SEARCH_PLACEHOLDERS } from '../../configs/messaging/search'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import useSearchResults from '../../api/queries/search'
 import List from '../Global/components/Lists/utils'
+import { useTranslation } from 'react-i18next'
 
 export default function Search(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
 
 	/**
@@ -32,6 +36,10 @@ export default function Search(): React.JSX.Element {
 	 * which is keyed off of this value for caching.
 	 */
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
+
+	const inputRef = useRef<TamaguiElement>(null)
+
+	useSearchInputGesture({ inputRef, navigation })
 
 	useEffect(() => {
 		const timeout = setTimeout(() => {
@@ -79,20 +87,21 @@ export default function Search(): React.JSX.Element {
 		<List
 			contentInsetAdjustmentBehavior='automatic'
 			ListHeaderComponent={
-				<YStack flex={1}>
+				<YStack flex={1} paddingHorizontal='2'>
 					<Input
+						ref={inputRef}
 						placeholder={placeholder}
 						onChangeText={handleSearchStringUpdate}
 						value={inputValue}
 						testID='search-input'
-						accessibilityLabel='Search your library'
-						accessibilityHint='Type to search artists, albums, playlists, and songs'
+						accessibilityLabel={t('search.inputLabel')}
+						accessibilityHint={t('search.inputHint')}
 						clearButtonMode='always'
 					/>
 
 					{!isEmpty(artistResults) && (
-						<YStack accessibilityLabel='Artist results' flex={1}>
-							<H3>Results</H3>
+						<YStack accessibilityLabel={t('search.artistResults')} flex={1}>
+							<H3>{t('search.results')}</H3>
 
 							<HorizontalCardList
 								data={artistResults}
@@ -143,7 +152,7 @@ export default function Search(): React.JSX.Element {
 							gap='3'
 							paddingHorizontal='4'
 						>
-							<H5>No Results</H5>
+							<H5>{t('search.noResults')}</H5>
 							<SizableText fontSize='2' textAlign='center'>
 								{`No results found for "${searchString}". Try a different search term.`}
 							</SizableText>

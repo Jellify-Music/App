@@ -10,8 +10,11 @@ import { Freeze } from 'react-freeze'
 import List from '../Global/components/Lists/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { useTranslation } from 'react-i18next'
 
 export default function SimilarArtists(): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 	const { artist, similarArtists, fetchingSimilarArtists, fetchingAlbums, albums } =
 		useArtistContext()
@@ -29,11 +32,12 @@ export default function SimilarArtists(): React.JSX.Element {
 
 	return (
 		<Freeze freeze={fetchingAlbums && !albums}>
-			<YStack flex={1} margin={'2'}>
-				<SizableText
-					size={'3'}
-					fontWeight='6'
-				>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</SizableText>
+			<YStack flex={1}>
+				<SizableText margin={'2'} size={'3'} fontWeight='6'>
+					{t('artist.similarTo', {
+						name: artist.Name ?? t('placeholders.unknownArtist'),
+					})}
+				</SizableText>
 
 				<List
 					data={similarArtists?.slice(0, 5)}
@@ -52,11 +56,13 @@ interface ListEmptyComponentProps {
 }
 
 function ListEmptyComponent({ fetchingSimilarArtists }: ListEmptyComponentProps) {
+	const { t } = useTranslation()
+
 	return fetchingSimilarArtists ? (
 		<ActivityIndicator />
 	) : (
 		<SizableText fontSize='3' color={'neutral'} justify={'center'} textAlign='center'>
-			No similar artists
+			{t('artist.noSimilarArtists')}
 		</SizableText>
 	)
 }

@@ -1,33 +1,9 @@
 import React from 'react'
-import { Platform, TextInputProps } from 'react-native'
-import {
-	SizableText,
-	Input as TamaguiInput,
-	InputProps as TamaguiInputProps,
-	XStack,
-	YStack,
-} from 'tamagui'
-import Icon from '../components/icon'
-
-type RNTextInputAutofillSubset = Partial<
-	Pick<
-		TextInputProps,
-		| 'autoComplete'
-		| 'textContentType'
-		| 'importantForAutofill'
-		| 'returnKeyType'
-		| 'autoFocus'
-		| 'keyboardType'
-	>
->
-
-type InputProps = Exclude<TamaguiInputProps, 'size'> &
-	RNTextInputAutofillSubset & {
-		title?: string | undefined
-		testID?: string | undefined
-		prependElement?: React.JSX.Element | undefined
-		appendElement?: React.JSX.Element | undefined
-	}
+import { Platform } from 'react-native'
+import { SizableText, Input as TamaguiInput, XStack, YStack } from 'tamagui'
+import Icon from '../../components/icon'
+import { useTranslation } from 'react-i18next'
+import { InputProps } from './types'
 
 /**
  * On Android, `clearButtonMode` is iOS-only and produces no UI. We render a
@@ -37,6 +13,8 @@ type InputProps = Exclude<TamaguiInputProps, 'size'> &
  * Tracked by https://github.com/Jellify-Music/App/issues/652
  */
 export default function Input(props: InputProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	const {
 		prependElement,
 		appendElement,
@@ -109,8 +87,8 @@ export default function Input(props: InputProps): React.JSX.Element {
 				{showAndroidClearButton && (
 					<YStack
 						accessibilityRole='button'
-						accessibilityLabel='Clear text'
-						accessibilityHint='Clears the contents of the text field'
+						accessibilityLabel={t('input.clear')}
+						accessibilityHint={t('input.clearHint')}
 						onPress={() => onChangeText?.('')}
 						testID={clearButtonTestID}
 						alignItems='center'
