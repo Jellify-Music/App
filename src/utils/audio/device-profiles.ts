@@ -77,7 +77,7 @@ export function getDeviceProfile(
 	type: SourceType,
 ): DeviceProfile {
 	const qualityParams = getQualityParams(streamingQuality)
-	const profiles = PLAYER_PROFILES
+	const profiles = type === 'cast' ? CAST_PLAYER_PROFILES : PLAYER_PROFILES
 
 	const directPlayProfiles =
 		qualityParams == null
@@ -184,7 +184,6 @@ const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
 			MinSegments: 1,
-			BreakOnNonKeyFrames: true,
 			Protocol: MediaStreamProtocol.Hls,
 			Type: DlnaProfileType.Audio,
 		},
@@ -232,6 +231,53 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
 }
 
 /**
+ * What the Cast Default Media Receiver can decode. Used for the URLs handed to a
+ * Cast receiver, which decodes the stream itself instead of the phone.
+ *
+ * ALAC has no decoder on the receiver, so it's transcoded. The transcode is
+ * progressive so the receiver gets a stream with a length it can seek in.
+ */
+const CAST_PLAYER_PROFILES: DeviceProfile = {
+	DirectPlayProfiles: [
+		...UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles!,
+		{
+			Container: 'ogg',
+			AudioCodec: 'vorbis,opus',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			Container: 'webm',
+			AudioCodec: 'opus',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			Container: 'm4a',
+			AudioCodec: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			Container: 'mp4',
+			AudioCodec: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			Container: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
+	],
+	TranscodingProfiles: [
+		{
+			AudioCodec: 'aac',
+			Container: 'aac',
+			Context: EncodingContext.Streaming,
+			MaxAudioChannels: '2',
+			Protocol: MediaStreamProtocol.Http,
+			Type: DlnaProfileType.Audio,
+		},
+	],
+}
+
+/**
  * Contains the {@link DeviceProfile.DirectPlayProfiles} and
  * {@link DeviceProfile.TranscodingProfiles} for Jellify
  *
@@ -246,3 +292,9 @@ const PLAYER_PROFILES: DeviceProfile = ['ios', 'macos'].includes(Platform.OS)
 	: Platform.OS === 'android'
 		? ANDROID_PLAYER_PROFILES
 		: UNIVERSAL_PLAYER_PROFILES
+
+/**
+ * The profile for URLs handed to a Cast receiver. It describes the receiver rather than
+ * this device, so it's built once and never posted as this session's capabilities.
+ */
+export const CAST_DEVICE_PROFILE = getDeviceProfile(StreamingQuality.Original, 'cast')

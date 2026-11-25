@@ -26,6 +26,7 @@ enum LoggingContext {
 	UI = 'UI',
 	MediaInfo = 'MediaInfo',
 	NitroPlayer = 'Nitro Player',
+	Cast = 'Cast',
 	ImageCache = 'Image Cache',
 	Downloads = 'Downloads',
 	LibraryFetch = 'Library Fetch',

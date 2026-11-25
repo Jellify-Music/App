@@ -1,6 +1,7 @@
 import registerNitroPlayer from './player'
 import registerAutoService from './auto'
 import { configureDownloadManager } from './storage'
+import registerCast from './cast'
 
 /**
  * Registers all necessary services for the app, including:
@@ -10,6 +11,7 @@ import { configureDownloadManager } from './storage'
  */
 export default function registerServices() {
 	registerNitroPlayer()
+	registerCast()
 	configureDownloadManager()
 	registerAutoService()
 }
