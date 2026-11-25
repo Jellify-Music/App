@@ -10,7 +10,6 @@ import { slimifyDto } from './slimify-dto'
 import { getItemImageUrl } from '../../api/queries/image/utils'
 import { getTrackMediaSourceInfo } from './track-extra-payload'
 import { getItemName } from '../formatting/item-names'
-import buildAudioApiUrl from './item-to-audio-api-url'
 
 export function mapDtosToTracks(
 	items: BaseItemDto[],
@@ -35,7 +34,13 @@ export function mapDtoToTrack(
 	item: BaseItemDto,
 	downloadedTrackIds: Map<string, DownloadedTrack>,
 ): TrackItem {
-	const api = getApi()!
+	const api = getApi()
+
+	/**
+	 * Url is always provided as empty so we can respond to events from Nitro Player
+	 * when streaming is necessary
+	 */
+	const url = ''
 
 	const downloadedTrack = downloadedTrackIds.get(item.Id!)
 
@@ -52,10 +57,6 @@ export function mapDtoToTrack(
 	if (downloadedTrack?.localPath) {
 		console.debug('Downloaded track path', `file://${downloadedTrack.localPath}`)
 	}
-
-	// Downloaded tracks get a remote URL so a Cast receiver can load them; the player still plays the local file.
-	// Streamed tracks stay empty and are resolved by onTracksNeedUpdate.
-	const url = downloadedTrack ? buildAudioApiUrl(item, undefined) : ''
 
 	if (downloadedTrack?.localArtworkPath) {
 		console.debug('Downloaded track artwork path', `file://${downloadedTrack.localArtworkPath}`)

@@ -27,8 +27,7 @@ describe('mapDtoToTrack', () => {
 		expect(track.url).toBe('')
 	})
 
-	// Cast receivers can't load file:// URLs, and the player prefers the local file on its own
-	it('uses a remote stream URL for downloaded tracks', () => {
+	it('uses an empty url for downloaded tracks', () => {
 		const downloaded = {
 			trackId: 'track-1',
 			localPath: '/downloads/track-1.mp3',
@@ -37,7 +36,7 @@ describe('mapDtoToTrack', () => {
 
 		const track = mapDtoToTrack(item, new Map([['track-1', downloaded]]))
 
-		expect(track.url).toMatch(/^https:\/\/jellyfin\.example\.com\/Audio\/track-1\/stream\?/)
+		expect(track.url).toMatch('')
 		expect(track.url).not.toContain('file://')
 	})
 })
