@@ -4,7 +4,7 @@ import { OpenAI } from 'openai'
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
 
-	baseURL: 'https://ai.jellify.app/ollama/v1',
+	baseURL: 'https://ai.jellify.app/api',
 })
 
 const MODEL = 'mlx-community/Qwen3.5-9B-4bit'
