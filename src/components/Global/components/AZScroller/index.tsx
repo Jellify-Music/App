@@ -46,6 +46,7 @@ export default function AZScroller({
 	const theme = useTheme()
 
 	const [operationPending, setOperationPending] = useState<boolean>(false)
+	const operationPendingRef = useRef(false)
 
 	const overlayOpacity = useSharedValue(0)
 
@@ -91,41 +92,27 @@ export default function AZScroller({
 		)
 	}
 
-	const onLetterSelect = async (letter: string) => {
-		await onLetterPaginateQuery(letter, query)
-	}
+	const scrollToLetter = (
+		sections: LibrarySectionListData[] | undefined,
+		selectedLetter: string,
+	) => {
+		if (!sections || sections.length === 0) return
 
-	const scrollToLetter = (selectedLetter: string) => {
-		if (query.data) {
-			const upperLetters = query.data
-				.map((section) => section.title)
-				.map((letter) => letter.toUpperCase())
-				.sort()
+		// Sections are already in list order, so find the first one at or past the letter
+		const index = sections.findIndex((section) => {
+			const title = section.title.toUpperCase()
+			if (title === selectedLetter) return true
+			if (selectedLetter === '#') return true
+			if (title === '#') return false
+			return reverseOrder ? title < selectedLetter : title > selectedLetter
+		})
 
-			const index = upperLetters.findIndex((letter) => letter >= selectedLetter)
-
-			if (index !== -1) {
-				sectionListRef.current?.scrollToLocation({
-					sectionIndex: index,
-					itemIndex: 0,
-					viewPosition: 0.1,
-					animated: true,
-				})
-			}
-
-			// else {
-			// 	// fallback: scroll to last section
-			// 	const lastLetter = upperLetters[upperLetters.length - 1]
-			// 	const scrollIndex = artists.indexOf(lastLetter)
-			// 	if (scrollIndex !== -1) {
-			// 		sectionListRef.current?.scrollToIndex({
-			// 			index: scrollIndex,
-			// 			viewPosition: 0.1,
-			// 			animated: true,
-			// 		})
-			// 	}
-			// }
-		}
+		sectionListRef.current?.scrollToLocation({
+			sectionIndex: index === -1 ? sections.length - 1 : index,
+			itemIndex: 0,
+			viewPosition: 0.1,
+			animated: true,
+		})
 	}
 
 	const handleGestureBeginOrUpdate = (e: { y: number }) => {
@@ -141,18 +128,23 @@ export default function AZScroller({
 	}
 
 	const handleGestureEnd = () => {
-		if (selectedLetter.value) {
-			scheduleOnRN(async () => {
-				setOperationPending(true)
-				onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
-					scheduleOnRN(hideOverlay)
-					setOperationPending(false)
-					scrollToLetter(selectedLetter.value)
-				})
-			})
-		} else {
+		const letter = selectedLetter.value
+		if (!letter || operationPendingRef.current) {
 			scheduleOnRN(hideOverlay)
+			return
 		}
+
+		operationPendingRef.current = true
+		setOperationPending(true)
+
+		onLetterPaginateQuery(letter, query, !!reverseOrder)
+			.then((sections) => scrollToLetter(sections, letter))
+			.catch((error) => console.warn('AZScroller: failed to paginate to letter', error))
+			.finally(() => {
+				operationPendingRef.current = false
+				setOperationPending(false)
+				scheduleOnRN(hideOverlay)
+			})
 	}
 
 	const panGesture = usePanGesture({
