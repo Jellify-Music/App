@@ -1,13 +1,3 @@
-# Draft fdroiddata recipe. Submit as metadata/com.cosmonautical.jellify.yml in a
-# merge request to https://gitlab.com/fdroid/fdroiddata.
-#
-# Mirrors `bundle exec fastlane fdroid` (android/fastlane/Fastfile): the F-Droid
-# buildserver runs Gradle directly, so the lane's .env overrides and -Pfoss=true
-# are reproduced in prebuild/gradleprops below. Keep the two in sync.
-#
-# Listing text, icon, screenshots and changelogs come from
-# android/fastlane/metadata/android, which fdroidserver picks up automatically.
-
 Categories:
   - Multimedia
 License: MIT
@@ -34,7 +24,7 @@ Builds:
     sudo:
       - apt-get update
       - apt-get install -y unzip
-      # Node >= 22 is required (package.json engines); Debian's nodejs is too old.
+      # Node >= 22 is required (package.json engines) - Debian's nodejs is too old
       # sha256 from https://nodejs.org/dist/v22.11.0/SHASUMS256.txt
       - curl -Lo /tmp/node.tar.xz https://nodejs.org/dist/v22.11.0/node-v22.11.0-linux-x64.tar.xz
       - echo "83bf07dd343002a26211cf1fcd46a9d9534219aad42ee02847816940bf610a72  /tmp/node.tar.xz" | sha256sum -c -
@@ -43,10 +33,7 @@ Builds:
     init: cd ../.. && bun install --frozen-lockfile
     output: build/outputs/apk/release/app-universal-release-unsigned.apk
     prebuild:
-      # Same overrides as FOSS_ENV in the Fastfile
       - node ../../scripts/updateEnv.js OTA_UPDATE_ENABLED=false GLITCHTIP_DSN= IS_FOSS_BUILD=true
-      # Non-free deps are already compiled out by -Pfoss=true; strip the declarations
-      # too so the scanner passes.
       - sed -i -e '/play-services-cast-framework/d' -e '/installreferrer/d' build.gradle
       - sed -i -e '/play-services-cast-framework/d' ../../node_modules/react-native-nitro-player/android/build.gradle
       - sed -i -e '/installreferrer/d' -e '/play-services/d' -e '/firebase/d' ../../node_modules/react-native-device-info/android/build.gradle
@@ -58,7 +45,7 @@ Builds:
       - foss=true
 
 AutoUpdateMode: Version
-# Skip OTA tags like 1.3.1-ota.3; only full releases ship native changes.
+# Skips our internal OTA version numbers
 UpdateCheckMode: Tags ^\d+\.\d+\.\d+$
 CurrentVersion: 1.4.2
 CurrentVersionCode: 211
