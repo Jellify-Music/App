@@ -7,6 +7,8 @@ const openai = new OpenAI({
 	baseURL: 'https://ai.jellify.app/ollama/v1',
 })
 
+const MODEL = 'mlx-community/Qwen3.5-9B-4bit'
+
 /**
  * Usage: bun scripts/generate-release-notes.js <release-title> <changes-file>
  *
@@ -65,7 +67,7 @@ async function main() {
 	const isOta = process.env.RELEASE_KIND === 'ota'
 
 	const response = await openai.chat.completions.create({
-		model: 'gemma4:12b',
+		model: MODEL,
 		messages: [
 			{
 				role: 'system',
@@ -125,7 +127,7 @@ async function main() {
 	if (isOta) return
 
 	const storeResponse = await openai.chat.completions.create({
-		model: 'gemma4:12b',
+		model: MODEL,
 		messages: [
 			{
 				role: 'system',

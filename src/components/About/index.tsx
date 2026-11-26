@@ -4,6 +4,7 @@ import { PRIVACY_POLICY_URL, SOURCE_CODE_URL } from '../../configs/privacy.confi
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { useInfoCaption } from '../../hooks/use-caption'
 import { downloadUpdate } from '../../services/ota'
+import { IS_FOSS_BUILD } from '../../configs/config'
 import React from 'react'
 import { version } from '../../../package.json'
 import { Linking } from 'react-native'
@@ -94,17 +95,19 @@ export default function About(): React.JSX.Element {
 							</SizableText>
 						</XStack>
 
-						<XStack
-							alignItems='center'
-							gap='1'
-							{...ICON_PRESS_STYLES}
-							onPress={() => downloadUpdate(true)}
-						>
-							<Icon name='cellphone-arrow-down' size='7' color='success' />
-							<SizableText fontSize='2' fontWeight='4'>
-								{t('about.update')}
-							</SizableText>
-						</XStack>
+						{!IS_FOSS_BUILD && (
+							<XStack
+								alignItems='center'
+								gap='1'
+								{...ICON_PRESS_STYLES}
+								onPress={() => downloadUpdate(true)}
+							>
+								<Icon name='cellphone-arrow-down' size='7' color='success' />
+								<SizableText fontSize='2' fontWeight='4'>
+									{t('about.update')}
+								</SizableText>
+							</XStack>
+						)}
 					</XStack>
 
 					<YStack gap='2'>
