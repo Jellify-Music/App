@@ -6,8 +6,15 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '@/src/screens/types'
 import Icon from '../../../../components/Global/components/icon'
 import { useTranslation } from 'react-i18next'
+import { IS_FOSS_BUILD } from '../../../../configs/config'
 
-export default function SendMetricsAndCrashDataSetting(): React.JSX.Element {
+export default function SendMetricsAndCrashDataSetting(): React.JSX.Element | null {
+	if (IS_FOSS_BUILD) return null
+
+	return <SendMetricsAndCrashDataToggle />
+}
+
+function SendMetricsAndCrashDataToggle(): React.JSX.Element {
 	const { t } = useTranslation()
 
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()

@@ -14,6 +14,7 @@ import { downloadPRUpdate } from '../../services/ota/pull-request'
 import SendMetricsAndCrashDataSetting from '../../components/Settings/components/settings/send-metrics-and-crash-data'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { useTranslation } from 'react-i18next'
+import { IS_FOSS_BUILD } from '../../configs/config'
 
 export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	const { t } = useTranslation()
@@ -75,58 +76,61 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 					</XStack>
 				</SettingsSection>
 
-				<SettingsSection
-					title={t('settings.developer.title')}
-					icon='code-braces'
-					iconColor='borderColor'
-					defaultExpanded
-					collapsible={false}
-				>
-					<XStack alignItems='center' justifyContent='space-between'>
-						<YStack flex={1}>
-							<SizableText fontSize='3' fontWeight='6'>
-								{t('settings.developer.options')}
-							</SizableText>
-							<SizableText fontSize='2' color='borderColor'>
-								{t('settings.developer.optionsDescription')}
-							</SizableText>
-						</YStack>
-						<SwitchWithLabel
-							testID='developer-options-switch'
-							checked={developerOptionsEnabled}
-							onCheckedChange={setDeveloperOptionsEnabled}
-							size='2'
-						/>
-					</XStack>
-
-					{developerOptionsEnabled && (
-						<YStack gap='2' paddingTop='1'>
-							<SizableText fontSize='2' color='borderColor'>
-								{t('settings.developer.prIdDescription')}
-							</SizableText>
-							<XStack gap='2' alignItems='center'>
-								<Input
-									placeholder={t('settings.developer.prIdPlaceholder')}
-									value={localPrId}
-									onChangeText={setLocalPrId}
-									keyboardType='numeric'
-									flex={1}
-								/>
-								<Button
-									circular
-									backgroundColor='primary'
-									onPress={handleSubmitPr}
-									icon={<Icon name='check' color='background' size='7' />}
-								/>
-							</XStack>
-							{prId && (
-								<SizableText color='success' fontSize='2'>
-									{t('settings.developer.currentPrId')} {prId}
+				{/* The only developer option is installing a PR's OTA update, which FOSS builds don't ship */}
+				{!IS_FOSS_BUILD && (
+					<SettingsSection
+						title={t('settings.developer.title')}
+						icon='code-braces'
+						iconColor='borderColor'
+						defaultExpanded
+						collapsible={false}
+					>
+						<XStack alignItems='center' justifyContent='space-between'>
+							<YStack flex={1}>
+								<SizableText fontSize='3' fontWeight='6'>
+									{t('settings.developer.options')}
 								</SizableText>
-							)}
-						</YStack>
-					)}
-				</SettingsSection>
+								<SizableText fontSize='2' color='borderColor'>
+									{t('settings.developer.optionsDescription')}
+								</SizableText>
+							</YStack>
+							<SwitchWithLabel
+								testID='developer-options-switch'
+								checked={developerOptionsEnabled}
+								onCheckedChange={setDeveloperOptionsEnabled}
+								size='2'
+							/>
+						</XStack>
+
+						{developerOptionsEnabled && (
+							<YStack gap='2' paddingTop='1'>
+								<SizableText fontSize='2' color='borderColor'>
+									{t('settings.developer.prIdDescription')}
+								</SizableText>
+								<XStack gap='2' alignItems='center'>
+									<Input
+										placeholder={t('settings.developer.prIdPlaceholder')}
+										value={localPrId}
+										onChangeText={setLocalPrId}
+										keyboardType='numeric'
+										flex={1}
+									/>
+									<Button
+										circular
+										backgroundColor='primary'
+										onPress={handleSubmitPr}
+										icon={<Icon name='check' color='background' size='7' />}
+									/>
+								</XStack>
+								{prId && (
+									<SizableText color='success' fontSize='2'>
+										{t('settings.developer.currentPrId')} {prId}
+									</SizableText>
+								)}
+							</YStack>
+						)}
+					</SettingsSection>
+				)}
 			</YStack>
 		</ScrollView>
 	)
