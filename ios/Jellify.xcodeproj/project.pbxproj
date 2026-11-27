@@ -222,7 +222,6 @@
 				B301C4EEB8109D8C24E55044 /* Stickers.xcassets */,
 				6E2CE299F7FF385080C2E97C /* Info.plist */,
 			);
-			name = JellifyStickers;
 			path = JellifyStickers;
 			sourceTree = "<group>";
 		};
@@ -646,7 +645,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 317;
+				CURRENT_PROJECT_VERSION = 318;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_BITCODE = NO;
@@ -689,7 +688,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 317;
+				CURRENT_PROJECT_VERSION = 318;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -940,7 +939,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 317;
+				CURRENT_PROJECT_VERSION = 318;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
