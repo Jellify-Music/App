@@ -15,6 +15,9 @@ import { SectionListRef } from '@legendapp/list/section-list'
 import onLetterPaginateQuery from './utils'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 
+/** Room to leave at the right edge of anything underneath the scroller that must stay tappable. Lists with a header draw the scroller over the list, so rows and header buttons keep this clear. */
+export const AZ_SCROLLER_CLEARANCE = 32
+
 const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
 

@@ -23,6 +23,8 @@ import { useDownloadProgress } from 'react-native-nitro-player'
 import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
 import { DownloadQuality } from '../../enums/audio-quality'
 import { useTranslation } from 'react-i18next'
+import DownloadingList from '../../components/Downloads/downloading-list'
+import { useDownloadingAlbums } from '../../hooks/downloads/queue'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
 
@@ -34,6 +36,8 @@ export default function StorageManagementScreen(): React.JSX.Element {
 	const { data: downloads } = useDownloads()
 
 	const { progressList } = useDownloadProgress()
+
+	const downloadingAlbums = useDownloadingAlbums()
 
 	const { mutateAsync: deleteDownloads } = useDeleteDownloads()
 
@@ -183,6 +187,15 @@ export default function StorageManagementScreen(): React.JSX.Element {
 							activeDownloads={progressList}
 							onDeleteAll={handleDeleteAll}
 						/>
+						{downloadingAlbums.length > 0 && (
+							<YStack gap='3' testID='storage-downloading'>
+								<SizableText size='2' fontWeight='6'>
+									{t('downloads.downloading')}
+								</SizableText>
+
+								<DownloadingList groups={downloadingAlbums} />
+							</YStack>
+						)}
 						<DownloadSettingsSection
 							autoDownload={autoDownload}
 							setAutoDownload={setAutoDownload}

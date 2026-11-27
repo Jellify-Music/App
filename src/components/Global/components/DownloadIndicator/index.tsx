@@ -29,13 +29,36 @@ export default function DownloadIndicator({ item, size }: DownloadIndicatorProps
 		activeOnly: true,
 	})
 
-	const isVisible = isDownloaded || isDownloading
+	return (
+		<DownloadStatus
+			isDownloaded={isDownloaded}
+			isDownloading={isDownloading}
+			progress={overallProgress}
+			size={size}
+		/>
+	)
+}
 
-	if (!isVisible) return null
+/**
+ * How a download is shown: the tick once it is downloaded, the circle while it downloads, nothing
+ * otherwise. Tracks and albums both use it, so they look the same.
+ */
+export function DownloadStatus({
+	isDownloaded,
+	isDownloading,
+	progress,
+	size,
+}: {
+	isDownloaded: boolean
+	isDownloading: boolean
+	progress: number
+	size: FontSizeTokens
+}) {
+	if (!isDownloaded && !isDownloading) return null
 
 	return isDownloaded ? (
 		<Icon size={size} name='download-circle' color={'success'} />
 	) : (
-		<CircularProgressIndicator progress={overallProgress} size={12} strokeWidth={4} />
+		<CircularProgressIndicator progress={progress} size={12} strokeWidth={4} />
 	)
 }

@@ -12,6 +12,7 @@ import {
 	useThemeSetting,
 } from '../stores/settings/app'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import DownloadingAlbumsSync from './Downloads/downloading-albums-sync'
 
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
@@ -54,6 +55,7 @@ function App(): React.JSX.Element {
 	return (
 		<StorageProvider>
 			<Root />
+			<DownloadingAlbumsSync />
 			<Toast topOffset={top} config={JellifyToastConfig(theme)} />
 		</StorageProvider>
 	)

@@ -1,18 +1,20 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { H5, Paragraph, XStack, YStack } from 'tamagui'
+import { SizableText, useTheme, View, XStack, YStack } from 'tamagui'
+import { StyleSheet } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import ActionPill from './action-pill'
+import { artistImageHeight } from './scroll'
+import { transparentOf } from '../../utils/color'
 import ItemImage from '../Global/components/image'
 import { useArtistContext } from '../../providers/Artist'
-import FavoriteButton from '../Global/components/favorite-button'
 import { InstantMixIconButton } from '../Global/components/instant-mix-button'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
-import IconButton from '../Global/utils/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { getApi } from '../../stores/auth/utils'
 import Icon from '../Global/components/icon'
-import { useArtistTracks } from '../../api/queries/track'
-import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { loadNewQueue } from '../../player/queuing'
 import { ImageUrlOptions } from '../../api/queries/image/utils'
 import { handleError } from '../../utils/errors'
@@ -23,6 +25,12 @@ export default function ArtistHeader(): React.JSX.Element {
 	const { t } = useTranslation()
 
 	const api = getApi()
+
+	// the image runs up behind the status bar; the back and favourite pills sit on it (see the screen)
+	const { top } = useSafeAreaInsets()
+
+	const theme = useTheme()
+	const background = theme.background.val
 
 	const { artist, albums } = useArtistContext()
 
@@ -56,68 +64,79 @@ export default function ArtistHeader(): React.JSX.Element {
 		}
 	}
 
-	const tracksInfiniteQuery = useArtistTracks(artist.Id!)
-
 	return (
-		<YStack flex={1}>
+		<YStack>
+			{/* The image runs down to where the tabs start; the name and buttons sit on its foot */}
 			<ItemImage
 				item={artist}
-				height={'14'}
+				height={artistImageHeight(top)}
 				type={ImageType.Backdrop}
 				cornered
 				imageOptions={backdropImageOptions}
 			/>
 
-			<YStack paddingHorizontal='2'>
-				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
-					<XStack alignItems='center' flex={1} justifyContent='space-between'>
-						<H5 flexGrow={1} fontWeight={'6'}>
-							{artist.Name}
-						</H5>
-					</XStack>
-				</XStack>
+			{/* Fades the artwork into the page, so the name reads on any image */}
+			<LinearGradient
+				colors={[transparentOf(background), background]}
+				style={styles.gradient}
+				pointerEvents='none'
+			/>
 
-				<XStack alignItems='center' justifyContent='space-between' flex={1}>
-					<XStack alignItems='center' gap='3' flex={1}>
-						<FavoriteButton item={artist} />
+			{/* box-none: the space around the name and pill is still the image's, not theirs */}
+			<XStack
+				position='absolute'
+				left='$2'
+				right='$2'
+				bottom='$2'
+				alignItems='center'
+				justifyContent='space-between'
+				gap='$2'
+				pointerEvents='box-none'
+			>
+				{/* flex, so the name has a width to be cut to */}
+				<View flex={1}>
+					<SizableText
+						fontFamily='$heading'
+						size='$7'
+						fontWeight='6'
+						numberOfLines={1}
+						ellipsizeMode='tail'
+					>
+						{artist.Name}
+					</SizableText>
+				</View>
 
-						<InstantMixIconButton item={artist} navigation={navigation} />
-					</XStack>
+				<ActionPill>
+					<Icon
+						size='7'
+						color='primary'
+						name='shuffle'
+						onPress={() => playArtist(true)}
+					/>
 
-					<XStack alignItems='center' justifyContent='flex-end' gap='3' flex={1}>
-						<Icon
-							size='7'
-							color='primary'
-							name='shuffle'
-							onPress={() => playArtist(true)}
-						/>
-						<IconButton circular name='play' onPress={() => playArtist(false)} />
-					</XStack>
-				</XStack>
+					<InstantMixIconButton item={artist} navigation={navigation} />
 
-				<XStack
-					alignItems='center'
-					flex={1}
-					justifyContent='flex-start'
-					marginVertical='2'
-					{...ICON_PRESS_STYLES}
-					onPress={() =>
-						navigation.navigate('Tracks', {
-							tracksInfiniteQuery,
-							showAlphabeticalSelector: true,
-						})
-					}
-				>
-					<Paragraph fontWeight='6' fontSize='3'>
-						{t('artist.viewTracks')}
-					</Paragraph>
-
-					<Icon name='chevron-right' size='7' />
-				</XStack>
-			</YStack>
+					<Icon
+						size='7'
+						color='primary'
+						name='play-circle-outline'
+						onPress={() => playArtist(false)}
+					/>
+				</ActionPill>
+			</XStack>
 		</YStack>
 	)
 }
+
+const styles = StyleSheet.create({
+	gradient: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		bottom: 0,
+		height: '60%',
+	},
+})
 
 const backdropImageOptions: ImageUrlOptions = {
 	maxWidth: 1440,
