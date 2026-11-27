@@ -97,7 +97,8 @@
 		"playLater": "Play Later",
 		"openAudioSpecs": "Open Audio Specs",
 		"addToFavorites": "Add to favorites",
-		"removeFromFavorites": "Remove from favorites"
+		"removeFromFavorites": "Remove from favorites",
+		"stopDownload": "Stop downloading"
 	},
 	"discover": {
 		"recentlyAdded": "Recently Added",

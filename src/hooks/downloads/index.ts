@@ -19,6 +19,13 @@ const DOWNLOADED_IDS_QUERY = {
 	select: selectDownloadedIds,
 }
 
+/** The ids of everything that is downloaded, shared by every consumer */
+export const useDownloadedIds = (): Set<string> | undefined => {
+	const { data } = useQuery(DOWNLOADED_IDS_QUERY)
+
+	return data
+}
+
 /**
  * Returns true if the given track id is currently downloaded. O(1) per call.
  *
