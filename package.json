@@ -121,7 +121,7 @@
     "husky": "9.1.7",
     "jest": "30.5.2",
     "lint-staged": "17.6.1",
-    "openai": "7.62.0",
+    "openai": "7.63.0",
     "patch-package": "8.0.1",
     "prettier": "3.10.1",
     "react-dom": "19.3.0",
