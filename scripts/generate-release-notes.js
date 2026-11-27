@@ -9,6 +9,15 @@ const openai = new OpenAI({
 
 const MODEL = 'mlx-community/Qwen3.5-9B-4bit'
 
+// Qwen3.5 thinks before it answers, and a non-streaming request waits for all of it. On the
+// self-hosted MLX server that can run past the request timeout, and every retry stacks another
+// generation onto the same server. Release notes don't need the reasoning, so turn it off.
+const MODEL_OPTIONS = {
+	model: MODEL,
+	chat_template_kwargs: { enable_thinking: false },
+	max_tokens: 1024,
+}
+
 /**
  * Usage: bun scripts/generate-release-notes.js <release-title> <changes-file>
  *
@@ -67,7 +76,7 @@ async function main() {
 	const isOta = process.env.RELEASE_KIND === 'ota'
 
 	const response = await openai.chat.completions.create({
-		model: MODEL,
+		...MODEL_OPTIONS,
 		messages: [
 			{
 				role: 'system',
@@ -127,7 +136,7 @@ async function main() {
 	if (isOta) return
 
 	const storeResponse = await openai.chat.completions.create({
-		model: MODEL,
+		...MODEL_OPTIONS,
 		messages: [
 			{
 				role: 'system',
