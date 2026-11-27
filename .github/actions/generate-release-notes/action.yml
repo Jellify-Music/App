@@ -30,6 +30,9 @@ outputs:
   release_body:
     description: 'The narrative followed by the issues, PRs and contributors, for the GitHub release'
     value: ${{ steps.set-output.outputs.release_body }}
+  store_notes:
+    description: 'A plain-text summary of at most 500 characters, for Google Play and F-Droid. Empty for an OTA'
+    value: ${{ steps.set-output.outputs.store_notes }}
 runs:
   using: "composite"
   steps:
@@ -100,5 +103,9 @@ runs:
           cat release_notes.txt
           printf '\n\n'
           cat release-changes.md
+          echo "$delimiter"
+
+          echo "store_notes<<$delimiter"
+          if [ -f store_notes.txt ]; then cat store_notes.txt; echo; fi
           echo "$delimiter"
         } >> "$GITHUB_OUTPUT"

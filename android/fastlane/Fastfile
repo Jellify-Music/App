@@ -15,6 +15,45 @@
 
 default_platform(:android)
 
+# Dependency groups F-Droid rejects as non-free. FOSS builds must not resolve any of these.
+NON_FREE_DEPENDENCY_GROUPS = [
+  'com.google.android.gms',
+  'com.google.firebase',
+  'com.google.android.play',
+  'com.android.installreferrer',
+].freeze
+
+# .env overrides for FOSS builds: no OTA (F-Droid forbids downloading executable code),
+# no crash reporting, and the JS-side flag that hides Google Cast UI.
+FOSS_ENV = {
+  'OTA_UPDATE_ENABLED' => 'false',
+  'GLITCHTIP_DSN' => '',
+  'IS_FOSS_BUILD' => 'true',
+}.freeze
+
+# `sh` runs from the fastlane folder, so resolve paths explicitly
+ANDROID_DIR = File.expand_path('..', __dir__)
+APP_DIR = File.expand_path('../..', __dir__)
+ENV_FILE = File.join(APP_DIR, '.env')
+
+# The versionCode the release was built with, read from the app's build.gradle
+def android_version_code
+  File.read(File.join(ANDROID_DIR, 'app/build.gradle'))[/^\s*versionCode\s+(\d+)/, 1].to_i
+end
+
+# Applies FOSS_ENV to the app's .env for the duration of the block, then restores it.
+def with_foss_env
+  original = File.read(ENV_FILE)
+  begin
+    sh('node', File.join(APP_DIR, 'scripts/updateEnv.js'), *FOSS_ENV.map { |key, value| "#{key}=#{value}" })
+    yield
+  ensure
+    File.write(ENV_FILE, original)
+    # The build baked FOSS values into superconfig's generated sources; regenerate from the restored .env
+    Dir.chdir(APP_DIR) { sh('node', 'node_modules/react-native-superconfig/scripts/generate-config.js') }
+  end
+end
+
 platform :android do
   desc "Runs all the tests"
   lane :test do
@@ -25,15 +64,68 @@ platform :android do
     gradle(task: 'clean assembleRelease')
   end
 
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
+  desc "Deploy a new version to Google Play internal testing, then promote it to open testing"
+  lane :gplay do
     gradle(task: 'clean bundleRelease')
-    upload_to_play_store(
+
+    play_store_options = {
       package_name: 'com.cosmonautical.jellify',
+      json_key: './play-store-credentials.json',
+      # fastlane/metadata holds the F-Droid listing; keep the Play listing managed in the console.
+      # Changelogs are shared: changelogs/<versionCode>.txt becomes the release notes.
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    }
+
+    upload_to_play_store(
+      **play_store_options,
       track: 'internal',
       release_status: 'completed',
-      json_key: './play-store-credentials.json',
     )
+
+    # Same build to open testing, like TestFlight's external groups. Google reviews it before it goes live.
+    upload_to_play_store(
+      **play_store_options,
+      track: 'internal',
+      track_promote_to: 'beta',
+      track_promote_release_status: 'completed',
+      version_code: android_version_code,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+    )
+
     gradle(task: 'assembleRelease') # This is to ensure the app is built and the apk is generated FOR GITHUB ACTIONS
+  end
+
+  desc "Fail if the FOSS (F-Droid) build resolves any non-free dependencies"
+  lane :fdroid_check do
+    # build.gradle refuses -Pfoss=true unless .env is set up for FOSS too
+    dependencies = with_foss_env do
+      sh(File.join(ANDROID_DIR, 'gradlew'), '-p', ANDROID_DIR, ':app:dependencies', '--configuration', 'releaseRuntimeClasspath', '-Pfoss=true', log: false)
+    end
+    offenders = dependencies.lines
+                            .map(&:strip)
+                            .select { |line| NON_FREE_DEPENDENCY_GROUPS.any? { |group| line.include?("#{group}:") } }
+                            .uniq
+
+    if offenders.any?
+      UI.user_error!("FOSS build resolves non-free dependencies:\n#{offenders.join("\n")}")
+    end
+
+    UI.success('FOSS build has no non-free dependencies')
+  end
+
+  desc "Build the FOSS (F-Droid) release APKs: no Google Cast, OTA, or crash reporting"
+  lane :fdroid do
+    fdroid_check
+
+    with_foss_env do
+      # Separate invocations: cleaning in the same run as the build races native prefab outputs
+      gradle(task: 'clean', properties: { 'foss' => 'true' })
+      gradle(task: 'assembleRelease', properties: { 'foss' => 'true' })
+    end
+
+    UI.success("FOSS APKs are in #{File.join(ANDROID_DIR, 'app/build/outputs/apk/release')}")
   end
 end

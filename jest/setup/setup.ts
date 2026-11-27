@@ -23,6 +23,7 @@ jest.mock('react-native-superconfig', () => ({
 		IS_MAESTRO_BUILD: 'false',
 		GLITCHTIP_DSN: '',
 		TELEMETRYDECK_APPID: '00000000-0000-0000-0000-000000000000',
+		IS_FOSS_BUILD: 'false',
 	},
 }))
 

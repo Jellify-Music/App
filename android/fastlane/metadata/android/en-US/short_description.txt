@@ -1,0 +1,1 @@
+A free and open source music player for Jellyfin

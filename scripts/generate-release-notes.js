@@ -4,15 +4,35 @@ import { OpenAI } from 'openai'
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
 
-	baseURL: 'https://ai.jellify.app/ollama/v1',
+	baseURL: 'https://ai.jellify.app/api',
 })
+
+const MODEL = 'mlx-community/Qwen3.5-9B-4bit'
 
 /**
  * Usage: bun scripts/generate-release-notes.js <release-title> <changes-file>
  *
  * The changes file is the release-changes.json written by collect-release-changes.js.
  * Set RELEASE_KIND=ota for an over-the-air update.
+ *
+ * Writes release_notes.txt (TestFlight, GitHub, Discord) and, for full releases,
+ * store_notes.txt: a plain-text version short enough for Google Play and F-Droid.
  */
+
+// Google Play rejects release notes longer than this; F-Droid lints changelogs to the same limit
+const STORE_NOTES_LIMIT = 500
+
+/** Trims text to the limit, preferring to cut at a line or sentence boundary. */
+function fitToLimit(text, limit) {
+	if (text.length <= limit) return text
+
+	const clipped = text.slice(0, limit)
+	const boundary = Math.max(clipped.lastIndexOf('\n'), clipped.lastIndexOf('. ') + 1)
+
+	if (boundary > limit / 2) return clipped.slice(0, boundary).trim()
+
+	return `${clipped.slice(0, limit - 1).trimEnd()}…`
+}
 async function main() {
 	const version = process.argv[2]
 
@@ -37,10 +57,9 @@ async function main() {
 	].join('\n')
 
 	if (!changes) {
-		writeFileSync(
-			'release_notes.txt',
-			`Welcome to Jellify ${version}\n\nSmall fixes and improvements.`,
-		)
+		const placeholder = `Welcome to Jellify ${version}\n\nSmall fixes and improvements.`
+		writeFileSync('release_notes.txt', placeholder)
+		writeFileSync('store_notes.txt', placeholder)
 		console.log('✅ No changes found, wrote placeholder release notes')
 		return
 	}
@@ -48,7 +67,7 @@ async function main() {
 	const isOta = process.env.RELEASE_KIND === 'ota'
 
 	const response = await openai.chat.completions.create({
-		model: 'gemma4:12b',
+		model: MODEL,
 		messages: [
 			{
 				role: 'system',
@@ -103,6 +122,30 @@ async function main() {
 	const releaseNotes = response.choices[0].message.content.trim()
 	writeFileSync('release_notes.txt', releaseNotes, 'utf8')
 	console.log('✅ Release notes written to release_notes.txt')
+
+	// OTA updates never reach the stores
+	if (isOta) return
+
+	const storeResponse = await openai.chat.completions.create({
+		model: MODEL,
+		messages: [
+			{
+				role: 'system',
+				content: `You condense mobile app release notes for app store listings. Write plain text with no markdown and no emojis. Keep the headline "Welcome to Jellify ${version}", then at most 3 short lines starting with "- " covering what users will notice most. The whole thing must be under ${STORE_NOTES_LIMIT - 50} characters.`,
+			},
+			{
+				role: 'user',
+				content: releaseNotes,
+			},
+		],
+	})
+
+	const storeNotes = fitToLimit(
+		storeResponse.choices[0].message.content.trim(),
+		STORE_NOTES_LIMIT,
+	)
+	writeFileSync('store_notes.txt', storeNotes, 'utf8')
+	console.log(`✅ Store notes (${storeNotes.length} characters) written to store_notes.txt`)
 }
 
 main()

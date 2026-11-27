@@ -1,7 +1,7 @@
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import getTrackDto from '../utils/mapping/track-extra-payload'
 
-export type SourceType = 'stream' | 'download'
+export type SourceType = 'stream' | 'download' | 'cast'
 
 export type BaseItemDtoSlimified = Pick<
 	BaseItemDto,
