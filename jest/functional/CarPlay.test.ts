@@ -166,7 +166,7 @@ describe('CarPlay service', () => {
 				{ Id: 'a1', Name: 'Abbey Road', AlbumArtist: 'The Beatles', Type: 'MusicAlbum' },
 			])
 			const home = (await loader()('home')) as CarPlayListTemplate
-			const [library, tiles] = home.sections!
+			const [tiles, library] = home.sections!
 			const [recents, frequents, added] = tiles.items as CarPlayImageRow[]
 			expect(tiles.items.map((row) => [row.id, row.title])).toEqual([
 				['picks:recents', 'Play it again'],
@@ -198,9 +198,9 @@ describe('CarPlay service', () => {
 			;(fetchRecentlyAdded as jest.Mock).mockRejectedValueOnce(new Error('offline'))
 			;(DownloadManager.getAllDownloadedTracks as jest.Mock).mockResolvedValueOnce([{}])
 			expect(rowTitles(await loader()('home'))).toEqual([
+				"Couldn't reach your Jellyfin server",
 				'Favorites',
 				'Downloads',
-				"Couldn't reach your Jellyfin server",
 			])
 		})
 
@@ -432,7 +432,7 @@ describe('CarPlay service', () => {
 			;(fetchRecentlyPlayed as jest.Mock).mockResolvedValueOnce([])
 			;(fetchFrequentlyPlayed as jest.Mock).mockResolvedValueOnce(songs('f', 1))
 			;(fetchRecentlyAdded as jest.Mock).mockResolvedValueOnce([])
-			const [, tiles] = ((await loader()('home')) as CarPlayListTemplate).sections!
+			const [tiles] = ((await loader()('home')) as CarPlayListTemplate).sections!
 			expect(tiles.items.map((row) => row.id)).toEqual(['picks:frequents'])
 		})
 
