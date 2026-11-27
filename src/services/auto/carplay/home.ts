@@ -44,8 +44,8 @@ export default async function home(): Promise<CarPlayListSection[]> {
 			template: opens('picks:downloads', i18n.t('car.downloads')),
 		})
 	const sections: CarPlayListSection[] = []
-	sections.push({ header: i18n.t('car.yourLibrary'), items: shortcuts })
 	if (tiles.length > 0) sections.push({ items: tiles })
 	else if (failure) sections.push({ items: [problem(failure.reason)] })
+	sections.push({ header: i18n.t('car.yourLibrary'), items: shortcuts })
 	return sections
 }
