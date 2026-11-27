@@ -88,6 +88,7 @@ async function main() {
 					'Release notes should be concise and helpful to any user of the app - regardless of their technical knowledge. Highlight things that an average user would care about, but feel free to provide more technical details if they are interesting and relevant. Do not include any information that is not relevant to the user experience of the app.',
 					'Release notes should be written in a way that is easy to understand and follow, and engaging and entertaining to read.',
 					'Do not include emojis in the release notes. Do not include emojis at all.',
+					'Do not mention changes related to Maestro or Jest, GitHub Actions, or the release notes generation script. Those kinds of details are irrelevant to the reader.',
 					`You should start every release summary with a singular headline - "Welcome to Jellify ${version}". Do not start with anything else.`,
 					'After the headline, briefly summarize the release in 3-4 sentences. Then, include 3 bullet points that go into more detail about the changes in the release. Each bullet point should be 1-3 sentences long. Do not include more than 3 bullet points.',
 					...(isOta
