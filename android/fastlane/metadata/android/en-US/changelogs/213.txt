@@ -1,0 +1,4 @@
+Welcome to Jellify 1.4.2
+- Favorite tracks directly from your phone's Control Center or media notifications.
+- Search across all your music libraries at once for a more comprehensive experience.
+- Tap error messages to copy details to your clipboard for easier troubleshooting.
