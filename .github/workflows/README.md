@@ -76,7 +76,7 @@ since their last update, including what already went out over the air.
 
 Each release body is the narrative from
 [`generate-release-notes.js`](../../scripts/generate-release-notes.js)
-(written by `mlx-community/Qwen3.5-9B-4bit` through Open WebUI at
+(written by `mlx-community/Qwen3.8-27B-4bit` through Open WebUI at
 `ai.jellify.app`, with thinking turned off so it answers in seconds),
 then the issues closed by the merged PRs, the PRs themselves, the
 contributors, and a full changelog link, all collected by

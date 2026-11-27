@@ -7,11 +7,12 @@ const openai = new OpenAI({
 	baseURL: 'https://ai.jellify.app/api',
 })
 
-const MODEL = 'mlx-community/Qwen3.5-9B-4bit'
+const MODEL = 'mlx-community/Qwen3.8-27B-4bit'
 
-// Qwen3.5 thinks before it answers, and a non-streaming request waits for all of it. On the
+// Qwen thinks before it answers, and a non-streaming request waits for all of it. On the
 // self-hosted MLX server that can run past the request timeout, and every retry stacks another
 // generation onto the same server. Release notes don't need the reasoning, so turn it off.
+// The 8-bit 27B runs out of GPU memory there, so stay on 4-bit.
 const MODEL_OPTIONS = {
 	model: MODEL,
 	chat_template_kwargs: { enable_thinking: false },
@@ -80,47 +81,22 @@ async function main() {
 		messages: [
 			{
 				role: 'system',
-				content:
+				// Qwen3.8's chat template only accepts a single system message, at the start
+				content: [
 					'You are a friendly and bubbly React Native developer named Violet that is writing concise and friendly mobile app release notes from commit messages.',
-			},
-			{
-				role: 'system',
-				content:
 					'You are writing release notes for a mobile app called Jellify. Jellify is a music player for Android and iOS that allows you to play music from your Jellyfin media server over the internet.',
-			},
-			{
-				role: 'system',
-				content:
 					'Release notes should be concise and helpful to any user of the app - regardless of their technical knowledge. Highlight things that an average user would care about, but feel free to provide more technical details if they are interesting and relevant. Do not include any information that is not relevant to the user experience of the app.',
-			},
-			{
-				role: 'system',
-				content:
 					'Release notes should be written in a way that is easy to understand and follow, and engaging and entertaining to read.',
-			},
-			{
-				role: 'system',
-				content:
 					'Do not include emojis in the release notes. Do not include emojis at all.',
-			},
-			{
-				role: 'system',
-				content: `You should start every release summary with a singular headline - "Welcome to Jellify ${version}". Do not start with anything else.`,
-			},
-			{
-				role: 'system',
-				content:
+					`You should start every release summary with a singular headline - "Welcome to Jellify ${version}". Do not start with anything else.`,
 					'After the headline, briefly summarize the release in 3-4 sentences. Then, include 3 bullet points that go into more detail about the changes in the release. Each bullet point should be 1-3 sentences long. Do not include more than 3 bullet points.',
-			},
-			...(isOta
-				? [
-						{
-							role: 'system',
-							content:
+					...(isOta
+						? [
 								'This release is an over-the-air update. It does not go through the App Store or Play Store: Jellify downloads it the next time it is opened, then asks to restart. Mention this briefly in the summary.',
-						},
-					]
-				: []),
+							]
+						: []),
+				].join('\n\n'),
+			},
 			{
 				role: 'user',
 				content: `Write a release summary for ${version} based on these changes:\n${changes}\n\nI'm a tech-savvy user of the app and I want to know what will be different in the app after I update.`,
