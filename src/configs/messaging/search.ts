@@ -1,6 +1,10 @@
+/**
+ * Translation keys for the playful search placeholders.
+ * Resolve with `t()` at render time so they follow the device language.
+ */
 export const SEARCH_PLACEHOLDERS = [
-	'Not all who wander are lost...',
-	'Seek and you shall find...',
-	'I am the eggman, I am the jellyfish...',
-	'In the land of music, I am the explorer...',
-]
+	'search.placeholders.wander',
+	'search.placeholders.seek',
+	'search.placeholders.eggman',
+	'search.placeholders.explorer',
+] as const
