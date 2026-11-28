@@ -15,6 +15,9 @@ const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 	screens: {
 		Discover: {
 			screen: Index,
+			options: {
+				title: i18n.t('navigation.discover'),
+			},
 		},
 		...BaseStackScreens,
 		Albums: {
