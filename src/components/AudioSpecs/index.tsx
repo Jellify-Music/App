@@ -9,6 +9,8 @@ import { parseBitrateFromTranscodingUrl } from '../../utils/audio/transcoding'
 import { SourceType } from '../../types/JellifyTrack'
 import { capitalize } from 'lodash'
 import { useTranslation } from 'react-i18next'
+import ModalHeader from '../Global/components/modal-header'
+import { CONTEXT_MENU_TOP_MARGIN } from '../../configs/styling/context'
 
 interface AudioSpecsProps {
 	item: BaseItemDto
@@ -26,7 +28,8 @@ export default function AudioSpecs({
 	const { bottom } = useSafeAreaInsets()
 
 	return (
-		<View paddingBottom={bottom}>
+		<View paddingBottom={bottom} marginTop={CONTEXT_MENU_TOP_MARGIN}>
+			<ModalHeader item={item} />
 			{streamingMediaSourceInfo && (
 				<MediaSourceInfoView type='stream' mediaInfo={streamingMediaSourceInfo} />
 			)}

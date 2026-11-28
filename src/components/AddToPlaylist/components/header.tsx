@@ -1,8 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { XStack, YStack, SizableText } from 'tamagui'
-import ItemImage from '../../Global/components/image'
-import { Ticker } from '../../Global/utils/Animated/text'
-import { getItemName } from '../../../utils/formatting/item-names'
+import ModalHeader from '../../Global/components/modal-header'
 
 /**
  * Props for the AddToPlaylistHeader component
@@ -23,33 +20,7 @@ export default function AddToPlaylistHeader({
 	source,
 	tracks,
 }: AddToPlaylistHeaderProps): React.JSX.Element {
-	return (
-		(source ?? tracks[0]) && (
-			<XStack gap='2' padding='2' boxShadow={'0 2px 8px 0 black75'}>
-				<ItemImage
-					item={source ?? tracks[0]}
-					width={'6'}
-					height={'6'}
-					imageOptions={{ maxWidth: 150, maxHeight: 150, quality: 90 }}
-					elevate
-				/>
+	const item = source ?? tracks[0]
 
-				<YStack justifyContent='space-evenly'>
-					<Ticker>
-						<SizableText fontWeight='6' fontSize='4'>
-							{getItemName(source ?? tracks[0])}
-						</SizableText>
-					</Ticker>
-
-					{(source ?? tracks[0])?.ArtistItems && (
-						<Ticker>
-							<SizableText fontWeight='6' fontSize={'3'}>
-								{`${(source ?? tracks[0])!.ArtistItems?.map((artist) => getItemName(artist)).join(', ')}`}
-							</SizableText>
-						</Ticker>
-					)}
-				</YStack>
-			</XStack>
-		)
-	)
+	return item && <ModalHeader item={item} />
 }
