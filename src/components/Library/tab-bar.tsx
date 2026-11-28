@@ -196,6 +196,8 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 }
 
 function AddPlaylistButton() {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const onPress = () => {
@@ -212,13 +214,15 @@ function AddPlaylistButton() {
 		>
 			<Icon name={'playlist-plus'} color={'borderColor'} />
 			<SizableText fontSize='2' fontWeight='6' color='borderColor'>
-				Add
+				{t('library.add')}
 			</SizableText>
 		</XStack>
 	)
 }
 
 function GeneratePlaylistButton() {
+	const { t } = useTranslation()
+
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const onPress = () => {
@@ -235,7 +239,7 @@ function GeneratePlaylistButton() {
 		>
 			<Icon name={'creation'} color={'borderColor'} />
 			<SizableText fontSize='2' fontWeight='6' color='borderColor'>
-				Generate
+				{t('library.generate')}
 			</SizableText>
 		</XStack>
 	)

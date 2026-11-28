@@ -67,10 +67,12 @@ interface EmptyStateProps {
 const PLACEHOLDER = pickRandomItemFromArray(SEARCH_PLACEHOLDERS)
 
 function EmptyState({ isFetching }: EmptyStateProps): React.JSX.Element {
+	const { t } = useTranslation()
+
 	return (
 		<YStack alignContent='center' gap='2' justifyContent='center'>
 			<SizableText fontSize='3' textAlign='center'>
-				{PLACEHOLDER}
+				{t(PLACEHOLDER)}
 			</SizableText>
 			{isFetching && <Spinner color='primary' />}
 		</YStack>

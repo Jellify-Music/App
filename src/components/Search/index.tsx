@@ -90,7 +90,7 @@ export default function Search(): React.JSX.Element {
 				<YStack flex={1} paddingHorizontal='2'>
 					<Input
 						ref={inputRef}
-						placeholder={placeholder}
+						placeholder={t(placeholder)}
 						onChangeText={handleSearchStringUpdate}
 						value={inputValue}
 						testID='search-input'

@@ -136,7 +136,15 @@
 		"createPlaylist": "Create Playlist",
 		"generatePlaylist": "Generate Playlist",
 		"sort": "Sort",
-		"filter": "Filter"
+		"filter": "Filter",
+		"add": "Add",
+		"generate": "Generate",
+		"tabs": {
+			"artists": "Artists",
+			"albums": "Albums",
+			"tracks": "Tracks",
+			"playlists": "Playlists"
+		}
 	},
 	"librarySelector": {
 		"title": "Select Music Library",
@@ -211,7 +219,13 @@
 		"results": "Results",
 		"noResults": "No Results",
 		"suggestedArtists": "Suggested artists",
-		"suggestions": "Suggestions"
+		"suggestions": "Suggestions",
+		"placeholders": {
+			"wander": "Not all who wander are lost...",
+			"seek": "Seek and you shall find...",
+			"eggman": "I am the eggman, I am the jellyfish...",
+			"explorer": "In the land of music, I am the explorer..."
+		}
 	},
 	"settings": {
 		"appIcon": {

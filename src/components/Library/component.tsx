@@ -5,6 +5,7 @@ import ArtistsTab from './components/artists-tab'
 import AlbumsTab from './components/albums-tab'
 import LibraryTabBar from './tab-bar'
 import React from 'react'
+import i18n from '../../i18n'
 
 const LibraryTabs = createMaterialTopTabNavigator({
 	tabBar: (props) => <LibraryTabBar {...props} />,
@@ -30,24 +31,28 @@ const LibraryTabs = createMaterialTopTabNavigator({
 		Artists: {
 			screen: ArtistsTab,
 			options: {
+				title: i18n.t('library.tabs.artists'),
 				tabBarButtonTestID: 'library-artists-tab-button',
 			},
 		},
 		Albums: {
 			screen: AlbumsTab,
 			options: {
+				title: i18n.t('library.tabs.albums'),
 				tabBarButtonTestID: 'library-albums-tab-button',
 			},
 		},
 		Tracks: {
 			screen: TracksTab,
 			options: {
+				title: i18n.t('library.tabs.tracks'),
 				tabBarButtonTestID: 'library-tracks-tab-button',
 			},
 		},
 		Playlists: {
 			screen: PlaylistsTab,
 			options: {
+				title: i18n.t('library.tabs.playlists'),
 				tabBarButtonTestID: 'library-playlists-tab-button',
 			},
 		},
