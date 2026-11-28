@@ -40,7 +40,7 @@ export default function AddToPlaylist({
 					itemLayoutAnimation={LinearTransition.springify()}
 					renderItem={renderItem}
 					contentContainerStyle={{
-						margin: 8,
+						marginHorizontal: 14,
 						paddingBottom: bottom,
 					}}
 				/>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { ListItem, SizableText } from 'tamagui'
+import { ListItem, SizableText, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import ItemImage from '../../Global/components/image'
 import CircularProgressIndicator from '../../Global/components/DownloadIndicator/circular-progress-indicator'
@@ -24,12 +24,15 @@ export default function ContextMenuRow({
 			opacity='1 press:0.5'
 			backgroundColor={'transparent'}
 			flex={1}
-			gap='3'
+			gap='2'
+			paddingHorizontal='3'
 			justifyContent='flex-start'
 			onPress={onPress}
 			disabled={disabled}
 		>
-			<ContextMenuRowImage imageProp={imageProp} />
+			<XStack width='6' justifyContent='center' alignItems='center'>
+				<ContextMenuRowImage imageProp={imageProp} />
+			</XStack>
 
 			{'imageType' in imageProp ? <Ticker>{labelElement}</Ticker> : labelElement}
 		</ListItem>
@@ -47,14 +50,15 @@ function ContextMenuRowImage({
 				circular={imageProp.circular}
 				item={imageProp.item}
 				type={imageProp.imageType}
-				height={'2'}
-				width={'2'}
-				imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 100 }}
+				height={'3'}
+				width={'3'}
+				imageOptions={{ maxWidth: 100, maxHeight: 100, quality: 100 }}
+				elevate
 			/>
 		)
 
 	if ('progress' in imageProp)
 		return <CircularProgressIndicator progress={imageProp.progress} size={24} strokeWidth={4} />
 
-	return <Icon size={'7'} color={imageProp.color ?? 'primary'} name={imageProp.iconName} />
+	return <Icon size={'8'} color={imageProp.color ?? 'primary'} name={imageProp.iconName} />
 }

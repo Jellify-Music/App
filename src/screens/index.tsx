@@ -1,16 +1,12 @@
 import Tabs from './Tabs'
 import OtaScreen from './Ota'
 import { RootStackParamList } from './types'
-import { SizableText, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
-import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
 import { getUser } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
-import { formatArtistNames } from '../utils/formatting/artist-names'
 import {
 	addToPlaylistSheetPresentation,
 	bottomSheetPresentation,
@@ -26,7 +22,6 @@ import { useState } from 'react'
 import PlayerStack from './Player'
 import LoginStack from './Login'
 import PrivacyPolicyScreen from './PrivacyPolicy'
-import { Ticker } from '../components/Global/utils/Animated/text'
 import i18n from '../i18n'
 
 /**
@@ -61,12 +56,12 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		},
 		Context: {
 			screen: Context,
-			options: ({ route }) => ({
-				header: () => ContextSheetHeader(route.params.item),
+			options: {
+				headerShown: false,
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
-			}),
+			},
 		},
 		AddToPlaylist: {
 			screen: AddToPlaylistSheet,
@@ -80,12 +75,12 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 		},
 		AudioSpecs: {
 			screen: AudioSpecsSheet,
-			options: ({ route }) => ({
-				header: () => ContextSheetHeader(route.params.item),
+			options: {
+				headerShown: false,
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
-			}),
+			},
 		},
 		DeletePlaylist: {
 			screen: DeletePlaylist,
@@ -142,25 +137,5 @@ export default function Root(): React.JSX.Element {
 			theme={getJellifyNavTheme(colorPreset, resolvedMode)}
 			onReady={onReady}
 		/>
-	)
-}
-
-function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
-	return (
-		<YStack gap='1' marginVertical='4' alignItems='center'>
-			<Ticker>
-				<SizableText fontSize='5' fontWeight='6'>
-					{getItemName(item)}
-				</SizableText>
-			</Ticker>
-
-			{(item.ArtistItems?.length ?? 0) > 0 && (
-				<Ticker>
-					<SizableText fontSize='3' fontWeight='6'>
-						{`${formatArtistNames(item.ArtistItems?.map((artist) => getItemName(artist)) ?? [])}`}
-					</SizableText>
-				</Ticker>
-			)}
-		</YStack>
 	)
 }

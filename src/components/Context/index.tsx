@@ -16,6 +16,8 @@ import StatsMenuRow from './components/stats'
 import ViewInstantMixMenuRow from './components/instant-mix'
 import ViewAlbumMenuRow from './components/album'
 import ArtistMenuRows from './components/artist'
+import ModalHeader from '../Global/components/modal-header'
+import { CONTEXT_MENU_TOP_MARGIN } from '../../configs/styling/context'
 
 interface ContextProps {
 	item: BaseItemDto
@@ -77,7 +79,9 @@ export default function ItemContext({
 	}, [item?.Id])
 
 	return (
-		<YGroup gap='2' marginBottom={bottom}>
+		<YGroup gap='2' marginBottom={bottom} marginTop={CONTEXT_MENU_TOP_MARGIN}>
+			<ModalHeader item={item} />
+
 			<FavoriteContextMenuRow item={item} />
 
 			{hasTracks && <AddToQueueMenuRows tracks={itemTracks} />}
